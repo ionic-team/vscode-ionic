@@ -1,0 +1,117 @@
+{
+	"name": "vs-code-ionic-recommendations",
+	"displayName": "Ionic",
+	"description": "Tooling and recommendations for your Ionic project",
+	"version": "0.0.1",
+	"publisher": "ionic",
+	"enableProposedApi": true,
+	"private": true,
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://ionic.io"
+	},
+	"engines": {
+		"vscode": "^1.57.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onView:ionicRecommendations",
+		"onLanguage:json",
+		"onLanguage:jsonc",
+		"onCommand:testView.reveal"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "ionic-recommendation",
+					"title": "Ionic",
+					"icon": "media/ionic.svg"
+				}
+			]
+		},
+		"views": {
+			"ionic-recommendation": [
+				{
+					"id": "ionicRecommendations",
+					"name": "Ionic",
+					"icon": "media/ionic.svg",
+					"contextualTitle": "Ionic"
+				}
+			],
+			"explorer": []
+		},
+		"commands": [
+			{
+				"command": "ionicRecommendations.refreshEntry",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "ionicRecommendations.addEntry",
+				"title": "Add"
+			},
+			{
+				"command": "ionicRecommendations.editEntry",
+				"title": "Info",
+				"icon": {
+					"light": "resources/light/info.svg",
+					"dark": "resources/dark/info.svg"
+				}
+			},
+			{
+				"command": "ionicRecommendations.fixIssue",
+				"title": "Fix Issue"
+			}
+		],
+		"menus": {
+			"commandPalette": [],
+			"view/title": [
+				{
+					"command": "ionicRecommendations.refreshEntry",
+					"when": "view == ionicRecommendations",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "ionicRecommendations.editEntry",
+					"when": "view == ionicRecommendations && viewItem == recommendation",
+					"group": "inline"
+				}
+
+			]
+		},
+		"configuration": []
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"lint": "eslint . --ext .ts,.tsx"
+	},
+	"devDependencies": {
+		"@types/mkdirp": "^0.5.2",
+		"@types/node": "^12.12.0",
+		"@types/rimraf": "^2.0.2",
+		"@types/vscode": "^1.52.0",
+		"@typescript-eslint/eslint-plugin": "^4.16.0",
+		"@typescript-eslint/parser": "^4.16.0",
+		"eslint": "^7.21.0",
+		"typescript": "^4.4.3"
+	},
+	"dependencies": {
+		"fast-xml-parser": "^3.21.1",
+		"jsonc-parser": "^0.4.2",
+		"minimist": "^0.2.1",
+		"mkdirp": "^0.5.1",
+		"rimraf": "^2.6.2"
+	}
+}
