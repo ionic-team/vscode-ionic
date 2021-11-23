@@ -9,7 +9,8 @@ This extension to Visual Studio Code provides:
 - Capacitor and Ionic commands
 
 ## Developing
-Press F5 in VSCode to start debugging the extension
+- Run `npm install`
+- Press F5 in VSCode to start debugging the extension
 
 ## ToDo
 - When serve is run have option to stop
