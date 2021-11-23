@@ -109,7 +109,10 @@ function capacitorRecommendations(project: Project): Tip[] {
 	// Plugins that are not required
 	tips.push(notRequiredPlugin('cordova-plugin-add-swift-support'));
 	tips.push(notRequiredPlugin('cordova-plugin-compat'));
-	tips.push(notRequiredPlugin('cordova-plugin-whitelist', 'The functionality is built into Capacitors configuration file'));
+	if (!exists('cordova-plugin-file-transfer')) {
+		// Note: If you still use cordova-plugin-file-transfer it requires the whitelist plugin (https://github.com/ionic-team/capacitor/issues/1199)
+		tips.push(notRequiredPlugin('cordova-plugin-whitelist', 'The functionality is built into Capacitors configuration file'));
+	}
 	tips.push(notRequiredPlugin('cordova-plugin-crosswalk-webview', 'Capacitor doesn’t allow to change the webview'));
 	tips.push(notRequiredPlugin('cordova-plugin-ionic-webview', 'An App store compliant Webview is built into Capacitor'));
 	tips.push(notRequiredPlugin('cordova-plugin-wkwebview-engine', 'An App store compliant Webview is built into Capacitor'));
@@ -239,6 +242,10 @@ export class Project {
 		if (exists(name)) {
 			this.add(new Tip(title, message, TipType.Warning, description, `npm uninstall ${name}`, 'Uninstall', `Uninstalled ${name}`));
 		}
+	}
+
+	public recommendAdd(name: string, title: string, message: string, description?: string) {
+		this.add(new Tip(title, message, TipType.Warning, description, `npm install ${name}`, 'Install', `Installed ${name}`));
 	}
 
 	public deprecatedPlugin(name: string, message: string, url?: string) {
@@ -388,7 +395,7 @@ export function reviewProject(folder: string): Recommendation[] {
 		project.tip(warnMinVersion('cordova-ios', '6.1.0'));
 
 		if (isGreaterOrEqual('cordova-android', '10.0.0')) {
-			project.checkNotExists('cordova-plugin-whitelist', 'must be removed as its functionality is now built into Cordova');
+			project.checkNotExists('cordova-plugin-whitelist', 'should be removed as its functionality is now built into Cordova');
 			project.checkNotExists('phonegap-plugin-multidex', 'is not compatible with cordova-android 10+');
 			project.checkNotExists('cordova-plugin-androidx', 'is not required when using cordova-android 10+');
 			project.checkNotExists('cordova-plugin-androidx-adapter', 'is not required when using cordova-android 10+');
@@ -443,6 +450,13 @@ export function reviewProject(folder: string): Recommendation[] {
 			`The plugin ${libString('cordova-plugin-appsflyer-sdk')} should be replaced with ${libString('appsflyer-capacitor-plugin')}.`,
 			'appsflyer-capacitor-plugin'
 		);
+
+		if (exists('cordova-plugin-file-transfer') && !exists('cordova-plugin-whitelist')) {
+			// Latest 1.7.1 of the file-transfer plugin requires whitelist in Capacitor projects. See: https://github.com/ionic-team/capacitor/issues/1199
+			project.recommendAdd('cordova-plugin-whitelist', 'cordova-plugin-file-transfer',
+				'Install cordova-plugin-whitelist for compatibility',
+				'The plugin cordova-plugin-file-transfer has a dependency on cordova-plugin-whitelist when used with a Capacitor project');
+		}
 
 		if (exists('@ionic-enterprise/auth')) {
 			// TODO: Complete work

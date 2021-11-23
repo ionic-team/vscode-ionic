@@ -1,0 +1,2 @@
+## Changelog
+- 11/23/2021 - In Capacitor projects: if `cordova-plugin-file-transfer` is used then verify `cordova-plugin-whitelist` is installed (see [https://github.com/ionic-team/capacitor/issues/1199]())
