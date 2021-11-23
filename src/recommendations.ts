@@ -31,7 +31,7 @@ function capacitorMigrationChecks(packages, project: Project) {
 	project.setGroup(
 		'Capacitor Migration',
 		'Your Cordova application ' + project.name + ' can be migrated to Capacitor (see [guide](https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor)). The following recommendations will help with the migration:',
-		TipType.Capacitor
+		TipType.Capacitor, true
 	);
 
 	tips.push(...capacitorRecommendations(project));
@@ -69,8 +69,10 @@ function capacitorRecommendations(project: Project): Tip[] {
 		tips.push(new Tip(
 			'Add Capacitor Integration', '', TipType.Capacitor, 'Add the Capacitor integration to this project',
 			[
+				`npm install --save -E @capacitor/core@latest`,
+				`npm install -D -E @capacitor/cli@latest`,
 				`npm install @capacitor/app @capacitor/core @capacitor/haptics @capacitor/keyboard @capacitor/status-bar --save-exact`,
-				`npx cap init "${project.name}" "${asAppId(project.name)}"`
+				`npx capacitor init "${project.name}" "${asAppId(project.name)}" --web-dir www`
 			],
 			'Add Capacitor', 'Capacitor added to this project',
 			'https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor'
@@ -307,7 +309,7 @@ export function reviewProject(folder: string): Recommendation[] {
 	project.type = isCapacitor() ? 'Capacitor' : 'Cordova';
 	project.folder = folder;
 
-	if (isCapacitor()) {
+	if (isCapacitor() && !isCordova()) {
 		project.setGroup(
 			`${project.name}`, ``, TipType.Ionic, false);
 
@@ -459,7 +461,7 @@ export function reviewProject(folder: string): Recommendation[] {
 		webProject(project);
 	}
 
-	if (isCapacitor()) {
+	if (isCapacitor() && !isCordova()) {
 		project.tips(capacitorRecommendations(project));
 	}
 

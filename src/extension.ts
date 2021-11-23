@@ -6,9 +6,14 @@ import { Recommendation } from './recommendation';
 import { Tip } from './tip';
 import { run } from './utilities';
 
+
+let channel: vscode.OutputChannel = undefined;
+
 async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: DepNodeProvider, successMessage?: string) {
 	//Create output channel
-	const channel: vscode.OutputChannel = vscode.window.createOutputChannel("Ionic");
+	if (!channel) {
+		channel = vscode.window.createOutputChannel("Ionic");
+	}
 
 	await vscode.window.withProgress(
 		{
