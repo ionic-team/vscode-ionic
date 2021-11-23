@@ -18,6 +18,9 @@ Press F5 in VSCode to start debugging the extension
 - Web projects - ionic serve button - hide it
 
 ## Overview
-This video shows opening a Cordova project in Visual Studio Code and using the Ionic extension to convert it to Capacitor:
+This video shows opening a Cordova project in Visual Studio Code and using the Ionic extension to:
+1. Convert it to Capacitor
+2. Update and remove plugins and dependencies
+
 https://user-images.githubusercontent.com/84595830/142964859-ece2abfc-6954-4447-b3fd-0f6b781c5bae.mp4
 
