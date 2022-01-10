@@ -101,6 +101,7 @@ function capacitorRecommendations(project: Project): Tip[] {
 	tips.push(incompatiblePlugin('cordova-plugin-music-controls', 'It causes build failures, skipped'));
 	tips.push(incompatiblePlugin('cordova-plugin-qrscanner', 'https://github.com/ionic-team/capacitor/issues/1213'));
 	tips.push(incompatiblePlugin('cordova-plugin-googlemaps', 'It causes build failures on iOS, skipped for iOS only'));
+	tips.push(incompatiblePlugin('newrelic-cordova-plugin', 'It relies on Cordova hooks. https://github.com/newrelic/newrelic-cordova-plugin/issues/15'));
 	//tips.push(incompatiblePlugin('phonegap-plugin-push', 'It will not compile but can be replaced with the plugin cordova-plugin-push'));
 	tips.push(replacementPlugin('phonegap-plugin-push', 'cordova-plugin-push', 'It will not compile but can be replaced with the plugin cordova-plugin-push'));
 
@@ -238,9 +239,9 @@ export class Project {
 		}
 	}
 
-	public recommendRemove(name: string, title: string, message: string, description?: string) {
+	public recommendRemove(name: string, title: string, message: string, description?: string, url?: string) {
 		if (exists(name)) {
-			this.add(new Tip(title, message, TipType.Warning, description, `npm uninstall ${name}`, 'Uninstall', `Uninstalled ${name}`));
+			this.add(new Tip(title, message, TipType.Warning, description, `npm uninstall ${name}`, 'Uninstall', `Uninstalled ${name}`, url));
 		}
 	}
 
@@ -359,6 +360,7 @@ export function reviewProject(folder: string): Recommendation[] {
 	project.recommendRemove('protractor',
 		`Protractor`,
 		`Your project has a dependency on Protractor whose development is slated to end December 2022. Consider migrating to a different E2E Testing solution.`,
+		'https://docs.cypress.io/guides/migrating-to-cypress/protractor'
 		//`Your project has a dependency on Protractor whose development is [slated to end December 2022](https://github.com/angular/protractor/issues/5502). Consider migrating to a different E2E Testing solution.`,
 	);
 

@@ -165,7 +165,7 @@ export function checkCordovaAndroidPreferenceMinimum(preference, minVersion): Ti
 	}
 }
 
-function equals(value, expected) {
+function equals(value: any, expected: any | Array<any>) {
 	if (value == expected) {
 		return true;
 	}

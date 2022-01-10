@@ -61,7 +61,7 @@ export class Recommendation extends vscode.TreeItem {
 		this.setIcon('lightbulb');
 	}
 
-	public iconCOmment() {
+	public iconComment() {
 		this.setIcon('comment');
 	}
 
