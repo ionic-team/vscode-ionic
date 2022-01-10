@@ -3,15 +3,19 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 
-export async function run(folder: string, command: string, channel: vscode.OutputChannel): Promise<void> {
+export interface CancelObject {
+	proc: child_process.ChildProcess;
+}
+
+export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject): Promise<void> {
 	if (command == 'rem-cordova') {
 		return removeCordovaFromPackageJSON(folder);
 	}
 	return new Promise((resolve, reject) => {
 		console.log(`exec ${command} (${folder})`);
-		child_process.exec(command, { cwd: folder }, (error: child_process.ExecException, stdout: string, stderror: string) => {
+		const proc = child_process.exec(command, { cwd: folder }, (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (stdout) {
-				channel.appendLine(stdout);				
+				channel.appendLine(stdout);
 			}
 			if (stderror) {
 				console.error(stderror);
@@ -28,6 +32,7 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 				reject(command + ' Failed');
 			}
 		});
+		cancelObject.proc = proc;
 	});
 }
 

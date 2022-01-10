@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { DepNodeProvider } from './ionicRecommendations';
 import { Recommendation } from './recommendation';
 import { Tip } from './tip';
-import { run } from './utilities';
+import { CancelObject, run } from './utilities';
 
 
 let channel: vscode.OutputChannel = undefined;
@@ -19,21 +19,31 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 		{
 			location: vscode.ProgressLocation.Notification,
 			title: `${command}`,
-			cancellable: false,
+			cancellable: true,
 		},
 		async (progress, token) => {
 			progress.report({
 				message: `...`,
 			});
 
+			const cancelObject: CancelObject = {proc: undefined};
+
+			const interval = setInterval(() => {
+				// Kill the process if the user cancels				
+				if (token.isCancellationRequested) {
+					clearInterval(interval);
+					cancelObject.proc.kill();										
+				}
+			}, 1000);
+
 			if (Array.isArray(command)) {
 				for (const cmd of command) {
 					channel.appendLine(cmd);
-					await run(rootPath, cmd, channel);
+					await run(rootPath, cmd, channel, cancelObject);
 				}
 			} else {
 				channel.appendLine(command);
-				await run(rootPath, command, channel);
+				await run(rootPath, command, channel, cancelObject);
 			}
 			return true;
 		}
@@ -66,7 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showInformationMessage(info, 'Ok');
 		} else {
 			const urlBtn = tip.url ? 'Info' : undefined;
-			const selection = await vscode.window.showInformationMessage(info, urlBtn, tip.commandTitle);			
+			const selection = await vscode.window.showInformationMessage(info, urlBtn, tip.commandTitle);
 			if (selection == tip.commandTitle) {
 				fixIssue(tip.command, rootPath, ionicProvider, tip.commandSuccess);
 			}

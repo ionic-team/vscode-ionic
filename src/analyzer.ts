@@ -20,7 +20,7 @@ let allDependencies;
 let cordovaConfig;
 let androidManifest;
 
-function processConfigXML(folder) {
+function processConfigXML(folder: string) {
 	const configXMLFilename = `${folder}/config.xml`;
 	const config = { preferences: {}, androidPreferences: {}, iosPreferences: {}, plugins: {} };
 	if (fs.existsSync(configXMLFilename)) {
@@ -84,7 +84,7 @@ export const isCapacitor = () => !!allDependencies['@capacitor/core'];
 export const isCordova = () =>
 	!!(allDependencies['cordova-ios'] || allDependencies['cordova-android'] || packageFile.cordova);
 
-export const load = (fn, project) => {
+export const load = (fn: string, project) => {
 	let packageJsonFilename = fn;
 	if (fs.lstatSync(fn).isDirectory()) {
 		packageJsonFilename = fn + '/package.json';
