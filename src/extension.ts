@@ -4,17 +4,58 @@ import * as vscode from 'vscode';
 import { DepNodeProvider } from './ionicRecommendations';
 import { Recommendation } from './recommendation';
 import { Tip } from './tip';
-import { CancelObject, run } from './utilities';
+import { CancelObject, run, getRunOutput } from './utilities';
 
 
 let channel: vscode.OutputChannel = undefined;
 
+/**
+ * Runs the command and obtains the stdout, parses it for the list of device names and target ids
+ * @param  {string} command Node command which gathers device list
+ * @param  {string} rootPath Path where the node command runs
+ */
+async function getDevices(command: string, rootPath: string) {
+	const result = await getRunOutput(command, rootPath);
+
+	const lines = result.split('\n');
+	lines.shift(); // Remove the header
+	const devices = [];
+	for (const line of lines) {
+		const data = line.split('|');
+		if (data.length == 3) {
+			devices.push({ name: data[0].trim(), target: data[2].trim() });
+		}
+	}
+	return devices;
+}
+
+/**
+ * Uses vscodes Quick pick dialog to allow selection of a device and
+ * returns the command used to run on the selected device
+ * @param  {string} command
+ * @param  {string} rootPath
+ */
+async function selectDevice(command: string, rootPath: string) {
+	const devices = await getDevices(command, rootPath);
+	const names = devices.map(device => device.name);
+	const selected = await vscode.window.showQuickPick(names);
+	const device = devices.find(device => device.name == selected);
+	if (!device) return;
+	return command.replace('--list', '--target=' + device?.target);
+}
+
+/**
+ * Runs the command while showing a vscode window that can be cancelled
+ * @param  {string|string[]} command Node command
+ * @param  {string} rootPath path to run the command
+ * @param  {DepNodeProvider} ionicProvider? the provide which will be refreshed on completion
+ * @param  {string} successMessage? Message to display if successful
+ */
 async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: DepNodeProvider, successMessage?: string) {
 	//Create output channel
 	if (!channel) {
 		channel = vscode.window.createOutputChannel("Ionic");
 	}
-
 	await vscode.window.withProgress(
 		{
 			location: vscode.ProgressLocation.Notification,
@@ -26,13 +67,13 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 				message: `...`,
 			});
 
-			const cancelObject: CancelObject = {proc: undefined};
+			const cancelObject: CancelObject = { proc: undefined };
 
 			const interval = setInterval(() => {
 				// Kill the process if the user cancels				
 				if (token.isCancellationRequested) {
 					clearInterval(interval);
-					cancelObject.proc.kill();										
+					cancelObject.proc.kill();
 				}
 			}, 1000);
 
@@ -90,7 +131,14 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('ionicRecommendations.run', async (tip: Tip) => {
 		if (tip.command) {
 			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
-			fixIssue(tip.command, rootPath);
+			if (tip.command.indexOf('--list') !== -1) {
+				const newCommand = await selectDevice(tip.command as string, rootPath);
+				if (newCommand) {
+					fixIssue(newCommand, rootPath);
+				}
+			} else {
+				fixIssue(tip.command, rootPath);
+			}
 		}
 	});
 }

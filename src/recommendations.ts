@@ -324,7 +324,9 @@ export function reviewProject(folder: string): Recommendation[] {
 		project.addScripts();
 		project.setGroup(`Capacitor`, 'Recommendations related to Capacitor', TipType.Capacitor, true);
 
-		project.add(new Tip('Serve', '', TipType.Run, 'Serve', `ionic serve`, 'Serving', `Project Served`));
+		project.add(new Tip('Serve', '(in default browser)', TipType.Run, 'Serve', `ionic serve`, 'Serving', `Project Served`));
+		project.add(new Tip('Run on Android','(With Live Reload)', TipType.Run, 'Run', 'ionic cap run android -l --external --list', 'Running', 'Project is running'));
+		project.add(new Tip('Run on iOS','(With Live Reload)', TipType.Run, 'Run', 'ionic cap run ios -l --external --list', 'Running', 'Project is running'));
 		project.add(new Tip('Build', '', TipType.Run, 'Build', `npm run build`, 'Building', `Project Built`));
 		project.add(new Tip('Sync', '', TipType.Run, 'Capacitor Sync', `npx cap sync`, 'Capacitor Sync', `Capacitor Dependencies Synced`));
 		if (exists('@capacitor/ios')) {

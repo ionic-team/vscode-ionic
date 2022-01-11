@@ -36,6 +36,22 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 	});
 }
 
+export async function getRunOutput(command: string, folder: string) : Promise<string> {
+	return new Promise((resolve, reject) => {
+		let out = '';
+		child_process.exec(command, { cwd: folder }, (error: child_process.ExecException, stdout: string, stderror: string) => {
+			if (stdout) {
+				out += stdout;
+			}
+			if (!error) {
+				resolve(out);
+			} else {
+				reject();
+			}
+		});
+	});
+}
+
 export function getPackageJSON(folder: string): PackageFile {
 	const filename = path.join(folder, 'package.json');
 	return JSON.parse(fs.readFileSync(filename, 'utf8'));
