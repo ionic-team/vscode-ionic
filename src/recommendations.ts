@@ -190,7 +190,7 @@ export class Project {
 	public note(title: string, message: string, url?: string, tipType?: TipType, description?: string) {
 		const r = new Recommendation(description ? description : message, message, title, vscode.TreeItemCollapsibleState.None,
 			{
-				command: 'ionicRecommendations.fixIssue',
+				command: 'ionic.fix',
 				title: 'Do Things',
 				arguments: []
 			}, undefined);
@@ -215,14 +215,14 @@ export class Project {
 
 	public add(tip: Tip) {
 		let cmd: vscode.Command = {
-			command: 'ionicRecommendations.fixIssue',
+			command: 'ionic.fix',
 			title: 'Fix',
 			arguments: [tip]
 		};
 
 		if (tip.type == TipType.Run) {
 			cmd = {
-				command: 'ionicRecommendations.run',
+				command: 'ionic.run',
 				title: 'Run',
 				arguments: [tip]
 			};

@@ -1,8 +1,9 @@
 {
-	"name": "vs-code-ionic-recommendations",
+	"name": "Ionic",
 	"displayName": "Ionic",
 	"description": "Tooling and recommendations for your Ionic project",
 	"version": "0.0.1",
+	"icon": "media/ionic.png",
 	"publisher": "ionic",
 	"enableProposedApi": true,
 	"private": true,
@@ -18,7 +19,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onView:ionicRecommendations",
+		"onView:ionic",
 		"onLanguage:json",
 		"onLanguage:jsonc",
 		"onCommand:testView.reveal"
@@ -37,7 +38,7 @@
 		"views": {
 			"ionic-recommendation": [
 				{
-					"id": "ionicRecommendations",
+					"id": "ionic",
 					"name": "Ionic",
 					"icon": "media/ionic.svg",
 					"contextualTitle": "Ionic"
@@ -47,7 +48,7 @@
 		},
 		"commands": [
 			{
-				"command": "ionicRecommendations.refreshEntry",
+				"command": "ionic.refresh",
 				"title": "Refresh",
 				"icon": {
 					"light": "resources/light/refresh.svg",
@@ -55,11 +56,11 @@
 				}
 			},
 			{
-				"command": "ionicRecommendations.addEntry",
+				"command": "ionic.add",
 				"title": "Add"
 			},
 			{
-				"command": "ionicRecommendations.editEntry",
+				"command": "ionic.edit",
 				"title": "Info",
 				"icon": {
 					"light": "resources/light/info.svg",
@@ -67,7 +68,7 @@
 				}
 			},
 			{
-				"command": "ionicRecommendations.fixIssue",
+				"command": "ionic.fix",
 				"title": "Fix Issue"
 			}
 		],
@@ -75,15 +76,15 @@
 			"commandPalette": [],
 			"view/title": [
 				{
-					"command": "ionicRecommendations.refreshEntry",
-					"when": "view == ionicRecommendations",
+					"command": "ionic.refresh",
+					"when": "view == ionic",
 					"group": "navigation"
 				}
 			],
 			"view/item/context": [
 				{
-					"command": "ionicRecommendations.editEntry",
-					"when": "view == ionicRecommendations && viewItem == recommendation",
+					"command": "ionic.edit",
+					"when": "view == ionic && viewItem == recommendation",
 					"group": "inline"
 				}
 

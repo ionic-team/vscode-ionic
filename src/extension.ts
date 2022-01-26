@@ -102,15 +102,15 @@ export function activate(context: vscode.ExtensionContext) {
 		? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 
 	const ionicProvider = new DepNodeProvider(rootPath);
-	vscode.window.registerTreeDataProvider('ionicRecommendations', ionicProvider);
-	vscode.commands.registerCommand('ionicRecommendations.refreshEntry', () => ionicProvider.refresh());
-	vscode.commands.registerCommand('ionicRecommendations.addEntry', () => vscode.window.showInformationMessage(`Successfully called add entry.`));
-	vscode.commands.registerCommand('ionicRecommendations.editEntry', (node: Recommendation) => {
+	vscode.window.registerTreeDataProvider('ionic', ionicProvider);
+	vscode.commands.registerCommand('ionic.refresh', () => ionicProvider.refresh());
+	vscode.commands.registerCommand('ionic.add', () => vscode.window.showInformationMessage(`Successfully called add entry.`));
+	vscode.commands.registerCommand('ionic.edit', (node: Recommendation) => {
 		const url = node.url ? node.url : `https://www.npmjs.com/package/${node.label}`;
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
 	});
 
-	vscode.commands.registerCommand('ionicRecommendations.fixIssue', async (tip: Tip) => {
+	vscode.commands.registerCommand('ionic.fix', async (tip: Tip) => {
 		console.log(tip);
 		const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
 		if (!tip.command) {
@@ -128,7 +128,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	vscode.commands.registerCommand('ionicRecommendations.run', async (tip: Tip) => {
+	vscode.commands.registerCommand('ionic.run', async (tip: Tip) => {
 		if (tip.command) {
 			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
 			if (tip.command.indexOf('--list') !== -1) {
