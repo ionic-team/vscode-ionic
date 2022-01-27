@@ -1,11 +1,10 @@
 {
-	"name": "Ionic",
+	"name": "ionic",
 	"displayName": "Ionic",
-	"description": "Tooling and recommendations for your Ionic project",
+	"description": "Ionic & Capacitor project tooling and recommendations",
 	"version": "0.0.1",
 	"icon": "media/ionic.png",
 	"publisher": "ionic",
-	"enableProposedApi": true,
 	"private": true,
 	"license": "MIT",
 	"repository": {
@@ -22,7 +21,10 @@
 		"onView:ionic",
 		"onLanguage:json",
 		"onLanguage:jsonc",
-		"onCommand:testView.reveal"
+		"onCommand:ionic.refresh",
+		"onCommand:ionic.add",
+		"onCommand:ionic.edit",
+		"onCommand:ionic.fix"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -87,7 +89,6 @@
 					"when": "view == ionic && viewItem == recommendation",
 					"group": "inline"
 				}
-
 			]
 		},
 		"configuration": []
@@ -113,6 +114,7 @@
 		"jsonc-parser": "^0.4.2",
 		"minimist": "^0.2.1",
 		"mkdirp": "^0.5.1",
-		"rimraf": "^2.6.2"
+		"rimraf": "^2.6.2",
+		"semver": "7.3.5"
 	}
 }

@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { DepNodeProvider } from './ionicRecommendations';
 import { Recommendation } from './recommendation';
 import { Tip } from './tip';
-import { CancelObject, run, getRunOutput } from './utilities';
+import { CancelObject, run, getRunOutput, handleError } from './utilities';
 
 
 let channel: vscode.OutputChannel = undefined;
@@ -15,18 +15,22 @@ let channel: vscode.OutputChannel = undefined;
  * @param  {string} rootPath Path where the node command runs
  */
 async function getDevices(command: string, rootPath: string) {
-	const result = await getRunOutput(command, rootPath);
+	try {
+		const result = await getRunOutput(command, rootPath);
 
-	const lines = result.split('\n');
-	lines.shift(); // Remove the header
-	const devices = [];
-	for (const line of lines) {
-		const data = line.split('|');
-		if (data.length == 3) {
-			devices.push({ name: data[0].trim(), target: data[2].trim() });
+		const lines = result.split('\n');
+		lines.shift(); // Remove the header
+		const devices = [];
+		for (const line of lines) {
+			const data = line.split('|');
+			if (data.length == 3) {
+				devices.push({ name: data[0].trim(), target: data[2].trim() });
+			}
 		}
+		return devices;
+	} catch (error) {
+		handleError(error);
 	}
-	return devices;
 }
 
 /**

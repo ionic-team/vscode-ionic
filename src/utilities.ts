@@ -28,7 +28,7 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 			if (!error) {
 				resolve();
 			} else {
-				vscode.window.showErrorMessage(stderror, 'Ok');
+				handleError(stderror);
 				reject(command + ' Failed');
 			}
 		});
@@ -36,9 +36,19 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 	});
 }
 
-export async function getRunOutput(command: string, folder: string) : Promise<string> {
+export async function handleError(error: string): Promise<string> {
+	if (error.includes('ionic: command not found')) {
+		const selection = await vscode.window.showErrorMessage('The Ionic CLI is not installed. Get started by running npm install -g @ionic/cli at the terminal.', 'More Information');
+		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse('https://ionicframework.com/docs/intro/cli#install-the-ionic-cli'));
+		return;
+	}
+	vscode.window.showErrorMessage(error, 'Ok');
+}
+
+export async function getRunOutput(command: string, folder: string): Promise<string> {
 	return new Promise((resolve, reject) => {
 		let out = '';
+		console.log(`${command}...`);
 		child_process.exec(command, { cwd: folder }, (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (stdout) {
 				out += stdout;
@@ -46,7 +56,7 @@ export async function getRunOutput(command: string, folder: string) : Promise<st
 			if (!error) {
 				resolve(out);
 			} else {
-				reject();
+				reject(stderror);
 			}
 		});
 	});
