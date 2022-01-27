@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { reviewProject } from './recommendations';
+import { reviewProject, starterProject } from './recommendations';
 import { Recommendation } from './recommendation';
 
 export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {
@@ -32,12 +32,10 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
 		} else {
 			const packageJsonPath = path.join(this.workspaceRoot, 'package.json');
 			if (this.pathExists(packageJsonPath)) {
-				return Promise.resolve(
-					reviewProject(this.workspaceRoot)
+				return Promise.resolve(reviewProject(this.workspaceRoot)
 				);
 			} else {
-				vscode.window.showInformationMessage('Workspace has no package.json');
-				return Promise.resolve([]);
+				return Promise.resolve(starterProject(this.workspaceRoot));
 			}
 		}
 	}

@@ -24,7 +24,7 @@ import { Recommendation } from './recommendation';
 import { Tip, TipType } from './tip';
 import * as fs from 'fs';
 import * as path from 'path';
-import { getPackageJSON, PackageFile } from './utilities';
+import { getPackageJSON, getRunOutput, PackageFile } from './utilities';
 
 function capacitorMigrationChecks(packages, project: Project) {
 	const tips: Tip[] = [];
@@ -174,6 +174,7 @@ export class Project {
 		if (type == TipType.Cordova) r.iconCordova();
 		if (type == TipType.Ionic) r.iconIonic();
 		if (type == TipType.Android) r.iconAndroid();
+		if (type == TipType.Vue) r.iconVue();
 		this.group = r;
 		this.groups.push(this.group);
 	}
@@ -308,6 +309,60 @@ function webProject(project: Project) {
 		'Add Capacitor', 'Capacitor added to this project',
 		'https://capacitorjs.com'
 	));
+}
+
+export async function starterProject(folder: string): Promise<Recommendation[]> {
+	const project: Project = new Project('New Project');
+
+	const out = await getRunOutput('ionic start -l', folder);
+	const projects = parseIonicStart(out);
+	let type = undefined;
+	for (const starter of projects) {
+		if (type != starter.type) {
+			type = starter.type;
+			project.setGroup(`New ${type} Project`, '', TipType.Ionic, false);
+		}
+		const name = "my-app";
+		project.add(new Tip(
+			`${starter.name}`,
+			`${starter.description}`,
+			TipType.Run,
+			'Create Project',
+			[`ionic start ${name} ${starter.name} --capacitor`,
+			`mv ${name}/{,.[^.]}* .`,
+			`rmdir ${name}`
+			],
+			'Creating Project',
+			'Project Created'));
+	}
+	return project.groups;
+}
+
+function parseIonicStart(text: string): Array<any> {
+	const lines = text.split('\n');
+	let type = undefined;
+	let result = [];
+	for (const line of lines) {
+		if (line.includes('--type=')) {
+			const t = line.split('=');
+			type = t[1].replace(')', '');
+			switch (type) {
+				case 'ionic-angular': type = 'Angular'; break;
+				case 'react': type = 'React'; break;
+				case 'vue': type = 'Vue'; break;
+			}
+		}
+		if (line.includes('|')) {
+			const t = line.split('|');
+			const name = t[0].trim();
+			const description = t[1].trim();
+			if (name != 'name') {
+				result.push({ type: type, name: name, description: description });
+			}
+		}
+	}
+	result = result.filter((project) => { return (project.type != 'ionic1') && (project.type != 'angular'); });
+	return result;
 }
 
 export function reviewProject(folder: string): Recommendation[] {

@@ -7,6 +7,7 @@ This extension to Visual Studio Code provides:
 - Integration of Capacitor into web projects
 - Running scripts from package.json
 - Capacitor and Ionic commands
+- Creation of Capacitor based Ionic projects
 
 ## Overview
 This video shows opening a Cordova project in Visual Studio Code and using the Ionic extension to:

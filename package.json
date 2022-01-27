@@ -96,6 +96,7 @@
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
+		"package": "vsce package && cp ionic-0.0.1.vsix site/ionic.vsix",
 		"watch": "tsc -watch -p ./",
 		"lint": "eslint . --ext .ts,.tsx"
 	},

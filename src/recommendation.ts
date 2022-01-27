@@ -41,6 +41,10 @@ export class Recommendation extends vscode.TreeItem {
 		this.setIcon('android');
 	}
 
+	public iconVue() {
+		this.setIcon('vue');
+	}
+
 	public iconReplace() {
 		this.setIcon('files');
 	}

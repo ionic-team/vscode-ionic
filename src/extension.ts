@@ -72,8 +72,9 @@ async function showProgress(message: string, func: () => Promise<any>) {
  * @param  {string} rootPath path to run the command
  * @param  {IonicTreeProvider} ionicProvider? the provide which will be refreshed on completion
  * @param  {string} successMessage? Message to display if successful
+ * @param  {string} title? Command title
  */
-async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, successMessage?: string) {
+async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, successMessage?: string, title?: string) {
 	//Create output channel
 	if (!channel) {
 		channel = vscode.window.createOutputChannel("Ionic");
@@ -81,7 +82,7 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 	await vscode.window.withProgress(
 		{
 			location: vscode.ProgressLocation.Notification,
-			title: `${command}`,
+			title: `${title ? title : command}`,
 			cancellable: true,
 		},
 		async (progress, token) => {
@@ -141,7 +142,7 @@ export function activate(context: vscode.ExtensionContext) {
 			const urlBtn = tip.url ? 'Info' : undefined;
 			const selection = await vscode.window.showInformationMessage(info, urlBtn, tip.commandTitle);
 			if (selection == tip.commandTitle) {
-				fixIssue(tip.command, rootPath, ionicProvider, tip.commandSuccess);
+				fixIssue(tip.command, rootPath, ionicProvider, tip.commandSuccess, tip.commandTitle);
 			}
 			if (selection && selection == urlBtn) {
 				vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
@@ -159,7 +160,7 @@ export function activate(context: vscode.ExtensionContext) {
 					fixIssue(newCommand, rootPath);
 				}
 			} else {
-				fixIssue(tip.command, rootPath);
+				fixIssue(tip.command, rootPath, ionicProvider, undefined, tip.commandTitle);
 			}
 		}
 	});
