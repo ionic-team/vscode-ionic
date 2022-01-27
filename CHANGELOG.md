@@ -1,4 +1,5 @@
 ## Changelog
+- 1/25/2022 - Fix bug with display of protractor removal
 - 1/25/2022 - Detect ionic CLI missing and direct user to website
 - 11/30/2021 - Add link for recommendation of migration from Protractor
 - 11/30/2021 - Added newrelic-cordova-plugin as a incompatible Capacitor plugin
