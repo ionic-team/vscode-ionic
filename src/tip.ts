@@ -5,7 +5,7 @@ export class Tip {
 		public readonly type?: TipType,
 		public readonly description?: string,
 		public readonly command?: string | string[],
-		public readonly commandTitle?: string,
+		public commandTitle?: string,
 		public readonly commandSuccess?: string,
 		public url?: string
 	) { }	

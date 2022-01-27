@@ -1,4 +1,5 @@
 ## Changelog
+- 01/27/2022 - Improve titles for running tasks
 - 01/27/2022 - Add option to create Ionic project for blank folders
 - 01/27/2022 - Stream output for commands and focus output window
 - 01/27/2022 - Show progress when getting device list

@@ -39,7 +39,7 @@ async function getDevices(command: string, rootPath: string) {
  * @param  {string} command
  * @param  {string} rootPath
  */
-async function selectDevice(command: string, rootPath: string) {
+async function selectDevice(command: string, rootPath: string, tip: Tip) {
 	let devices;
 	await showProgress('Getting Devices', async () => {
 		devices = await getDevices(command, rootPath);
@@ -50,6 +50,7 @@ async function selectDevice(command: string, rootPath: string) {
 	const selected = await vscode.window.showQuickPick(names);
 	const device = devices.find(device => device.name == selected);
 	if (!device) return;
+	tip.commandTitle += ' on '+device?.name;
 	return command.replace('--list', '--target=' + device?.target);
 }
 
@@ -155,9 +156,9 @@ export function activate(context: vscode.ExtensionContext) {
 		if (tip.command) {
 			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
 			if (tip.command.indexOf('--list') !== -1) {
-				const newCommand = await selectDevice(tip.command as string, rootPath);
+				const newCommand = await selectDevice(tip.command as string, rootPath, tip);
 				if (newCommand) {
-					fixIssue(newCommand, rootPath);
+					fixIssue(newCommand, rootPath, undefined, undefined, tip.commandTitle);
 				}
 			} else {
 				fixIssue(tip.command, rootPath, ionicProvider, undefined, tip.commandTitle);
