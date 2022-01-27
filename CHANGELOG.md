@@ -1,4 +1,5 @@
 ## Changelog
+- 01/27/2022 - Stream output for commands and focus output window
 - 01/27/2022 - Show progress when getting device list
 - 01/26/2022 - Fix bug with display of protractor removal
 - 01/25/2022 - Detect ionic CLI missing and direct user to website

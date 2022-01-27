@@ -14,13 +14,6 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 	return new Promise((resolve, reject) => {
 		console.log(`exec ${command} (${folder})`);
 		const proc = child_process.exec(command, { cwd: folder }, (error: child_process.ExecException, stdout: string, stderror: string) => {
-			if (stdout) {
-				channel.appendLine(stdout);
-			}
-			if (stderror) {
-				console.error(stderror);
-				channel.appendLine(stderror);
-			}
 			if (error) {
 				console.error(error);
 			}
@@ -31,6 +24,13 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 				handleError(stderror);
 				reject(command + ' Failed');
 			}
+		});
+		proc.stdout.on('data', (data) => {
+			channel.appendLine(data);
+			channel.show();
+		});
+		proc.stderr.on('data', (data) => {
+			channel.appendLine(data);
 		});
 		cancelObject.proc = proc;
 	});
