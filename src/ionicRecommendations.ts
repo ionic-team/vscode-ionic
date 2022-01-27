@@ -6,7 +6,7 @@ import * as path from 'path';
 import { reviewProject } from './recommendations';
 import { Recommendation } from './recommendation';
 
-export class DepNodeProvider implements vscode.TreeDataProvider<Recommendation> {
+export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {
 	private _onDidChangeTreeData: vscode.EventEmitter<Recommendation | undefined | void> = new vscode.EventEmitter<Recommendation | undefined | void>();
 	readonly onDidChangeTreeData: vscode.Event<Recommendation | undefined | void> = this._onDidChangeTreeData.event;
 
@@ -32,7 +32,9 @@ export class DepNodeProvider implements vscode.TreeDataProvider<Recommendation> 
 		} else {
 			const packageJsonPath = path.join(this.workspaceRoot, 'package.json');
 			if (this.pathExists(packageJsonPath)) {
-				return Promise.resolve(reviewProject(this.workspaceRoot));
+				return Promise.resolve(
+					reviewProject(this.workspaceRoot)
+				);
 			} else {
 				vscode.window.showInformationMessage('Workspace has no package.json');
 				return Promise.resolve([]);

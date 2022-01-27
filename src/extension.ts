@@ -1,7 +1,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { DepNodeProvider } from './ionicRecommendations';
+import { IonicTreeProvider } from './ionicRecommendations';
 import { Recommendation } from './recommendation';
 import { Tip } from './tip';
 import { CancelObject, run, getRunOutput, handleError } from './utilities';
@@ -40,7 +40,12 @@ async function getDevices(command: string, rootPath: string) {
  * @param  {string} rootPath
  */
 async function selectDevice(command: string, rootPath: string) {
-	const devices = await getDevices(command, rootPath);
+	let devices;
+	await showProgress('Getting Devices', async () => {
+		devices = await getDevices(command, rootPath);
+	});
+
+	//const devices = await getDevices(command, rootPath);
 	const names = devices.map(device => device.name);
 	const selected = await vscode.window.showQuickPick(names);
 	const device = devices.find(device => device.name == selected);
@@ -48,14 +53,27 @@ async function selectDevice(command: string, rootPath: string) {
 	return command.replace('--list', '--target=' + device?.target);
 }
 
+async function showProgress(message: string, func: () => Promise<any>) {
+	await vscode.window.withProgress(
+		{
+			location: vscode.ProgressLocation.Window,
+			title: `${message}`,
+			cancellable: true,
+		},
+		async (progress, token) => {
+			await func();
+		}	
+	);
+}
+
 /**
  * Runs the command while showing a vscode window that can be cancelled
  * @param  {string|string[]} command Node command
  * @param  {string} rootPath path to run the command
- * @param  {DepNodeProvider} ionicProvider? the provide which will be refreshed on completion
+ * @param  {IonicTreeProvider} ionicProvider? the provide which will be refreshed on completion
  * @param  {string} successMessage? Message to display if successful
  */
-async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: DepNodeProvider, successMessage?: string) {
+async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, successMessage?: string) {
 	//Create output channel
 	if (!channel) {
 		channel = vscode.window.createOutputChannel("Ionic");
@@ -105,7 +123,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const rootPath = (vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 0))
 		? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 
-	const ionicProvider = new DepNodeProvider(rootPath);
+	const ionicProvider = new IonicTreeProvider(rootPath);
 	vscode.window.registerTreeDataProvider('ionic', ionicProvider);
 	vscode.commands.registerCommand('ionic.refresh', () => ionicProvider.refresh());
 	vscode.commands.registerCommand('ionic.add', () => vscode.window.showInformationMessage(`Successfully called add entry.`));
