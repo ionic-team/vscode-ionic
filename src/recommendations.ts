@@ -403,10 +403,10 @@ export function reviewProject(folder: string): Recommendation[] {
 		project.add(new Tip('Build', '', TipType.Run, 'Build', `npm run build`, 'Building', `Project Built`));
 		project.add(new Tip('Sync', '', TipType.Run, 'Capacitor Sync', `npx cap sync`, 'Capacitor Sync', `Capacitor Dependencies Synced`));
 		if (exists('@capacitor/ios')) {
-			project.add(new Tip('Open In Xcode', '', TipType.Run, 'Open Xcode', `npx cap open ios`, 'Open Xcode', `Xcode Opened`));
+			project.add(new Tip('Open In Xcode', '', TipType.Run, 'Open Xcode', `npx cap open ios`, 'Opening project in Xcode', `Xcode Opened`));
 		}
 		if (exists('@capacitor/android')) {
-			project.add(new Tip('Open In Android Studio', '', TipType.Run, 'Open Android Studio', `npx cap open android`, 'Open Android Studio', `Android Studio Opened`));
+			project.add(new Tip('Open In Android Studio', '', TipType.Run, 'Opening project in Android Studio', `npx cap open android`, 'Open Android Studio', `Android Studio Opened`));
 		}
 	}
 

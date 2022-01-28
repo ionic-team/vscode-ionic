@@ -26,11 +26,11 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 			}
 		});
 		proc.stdout.on('data', (data) => {
-			channel.appendLine(data);
+			channel.append(data);
 			channel.show();
 		});
 		proc.stderr.on('data', (data) => {
-			channel.appendLine(data);
+			channel.append(data);
 		});
 		cancelObject.proc = proc;
 	});

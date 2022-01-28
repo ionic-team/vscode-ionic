@@ -53,7 +53,7 @@ async function selectDevice(command: string, rootPath: string, tip: Tip) {
 	const selected = await vscode.window.showQuickPick(names);
 	const device = devices.find(device => device.name == selected);
 	if (!device) return;
-	tip.commandTitle += ' on ' + device?.name;
+	tip.commandTitle = 'Running on ' + device?.name;
 	return command.replace('--list', '--target=' + device?.target);
 }
 
@@ -102,11 +102,11 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 
 			if (Array.isArray(command)) {
 				for (const cmd of command) {
-					channel.appendLine(cmd);
+					channel.append(cmd);
 					await run(rootPath, cmd, channel, cancelObject);
 				}
 			} else {
-				channel.appendLine(command);
+				channel.append(command);
 				await run(rootPath, command, channel, cancelObject);
 			}
 			return true;

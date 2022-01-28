@@ -1,5 +1,7 @@
 ## Changelog
 ### Version 0.0.1
+- Fix additional carriage returns in logging
+- Fix label when running on a device
 - Fix iOS target device selection to filter unknown device
 - Remove recommendations group if no recommendations
 - Cleanup links to node packages and wording of 'upgrade' vs 'update'

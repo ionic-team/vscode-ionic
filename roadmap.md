@@ -5,3 +5,6 @@
 - Support @angular project upgrades (ie multiple package update)
 - On Web projects that are Angular based hook up dist or configured folder
 - Option to hide particular recommendations
+
+#Bugs
+- Errors reported back from code have coloring but showMessage in VS Code does not and shows markup for colors
