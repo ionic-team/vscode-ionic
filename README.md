@@ -9,6 +9,9 @@ This extension to Visual Studio Code provides:
 - Capacitor and Ionic commands
 - Creation of Capacitor based Ionic projects
 
+## Submit Feedback
+[File an issue](https://github.com/ionic-team/vscode-extension/issues) to provide feedback on bugs and feature requests.
+
 ## Overview
 This video shows opening a Cordova project in Visual Studio Code and using the Ionic extension to:
 1. Convert it to Capacitor
