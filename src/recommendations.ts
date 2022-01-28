@@ -167,7 +167,12 @@ export class Project {
 	}
 
 	public setGroup(title: string, message: string, type?: TipType, expanded?: boolean) {
-		const r = new Recommendation(message, title, '', expanded ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.Collapsed);
+
+		// If the last group has no items in it then remove it (eg if there are no recommendations for a project)
+		if (this.groups.length > 1 && this.groups[this.groups.length-1].children.length == 0) {
+			this.groups.pop();
+		}
+		const r = new Recommendation(message, '', title, expanded ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.Collapsed);
 		r.children = [];
 		r.iconDependency();
 		if (type == TipType.Capacitor) r.iconCapacitor();
@@ -211,7 +216,7 @@ export class Project {
 			case TipType.Capacitor: r.iconCapacitor(); break;
 			case TipType.Ionic: r.iconIonic(); break;
 			case TipType.Android: r.iconAndroid(); break;
-			case TipType.Run: r.iconRun(); break;
+			//case TipType.Run: r.iconRun(); break;
 			case TipType.Link: r.iconReplace(); break;
 		}
 	}

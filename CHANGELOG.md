@@ -1,5 +1,6 @@
 ## Changelog
 ### Version 0.0.1
+- Remove recommendations group if no recommendations
 - Cleanup links to node packages and wording of 'upgrade' vs 'update'
 - Improve titles for running tasks
 - Add option to create Ionic project for blank folders
