@@ -1,11 +1,9 @@
-# VS Code Extension for Ionic
-
-This extension to Visual Studio Code provides:
-- Cordova to Capacitor Migration (based on analysis of package.json)
-- Deprecated plugins (based on known packages)
-- Common issues with config.xml, androidmanifest.xml and project configuration
+This extension for Visual Studio Code provides:
+- Cordova to Capacitor Migration (based on analysis of `package.json`)
+- Deprecated plugins (based on known node packages that are end of life or unsupported)
+- Common issues with `config.xml`, `androidmanifest.xml` and project configuration
 - Integration of Capacitor into web projects
-- Running scripts from package.json
+- Running scripts from `package.json`
 - Capacitor and Ionic commands
 - Creation of Capacitor based Ionic projects
 

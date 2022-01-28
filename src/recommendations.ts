@@ -189,11 +189,12 @@ export class Project {
 
 
 	public note(title: string, message: string, url?: string, tipType?: TipType, description?: string) {
+		const tip = new Tip(title, message, tipType, description, undefined, undefined, undefined, url);
 		const r = new Recommendation(description ? description : message, message, title, vscode.TreeItemCollapsibleState.None,
 			{
 				command: 'ionic.fix',
-				title: 'Do Things',
-				arguments: []
+				title: 'Information',
+				arguments: [tip]
 			}, undefined);
 
 		this.setIcon(tipType, r);
@@ -211,6 +212,7 @@ export class Project {
 			case TipType.Ionic: r.iconIonic(); break;
 			case TipType.Android: r.iconAndroid(); break;
 			case TipType.Run: r.iconRun(); break;
+			case TipType.Link: r.iconReplace(); break;
 		}
 	}
 
@@ -227,6 +229,15 @@ export class Project {
 				title: 'Run',
 				arguments: [tip]
 			};
+		}
+
+		if (tip.type == TipType.Link) {
+			cmd = {
+				command: 'ionic.link',
+				title: 'Open',
+				arguments: [tip]
+			};
+			tip.url = tip.description as string;
 		}
 
 		const r = new Recommendation(tip.message, tip.message, tip.title, vscode.TreeItemCollapsibleState.None, cmd, tip, tip.url);
@@ -269,8 +280,10 @@ export class Project {
 				message,
 				undefined,
 				`Upgrade ${name} from ${fromVersion} to ${toVersion}`,
-				`npm install ${name}@${toVersion} --save-exact`, `Update`,
-				`${name} updated to ${toVersion}`));
+				`npm install ${name}@${toVersion} --save-exact`, `Upgrade`,
+				`${name} updated to ${toVersion}`,
+				`https://www.npmjs.com/package/${name}`
+			));
 		}
 	}
 
@@ -540,6 +553,9 @@ export function reviewProject(folder: string): Recommendation[] {
 
 	reviewPackages(packages, project);
 	reviewPluginProperties(packages, project);
+
+	project.setGroup(`Support`, 'Feature requests and bug fixes', TipType.Ionic, true);
+	project.add(new Tip('Provide Feedback', '', TipType.Link, `https://github.com/ionic-team/vscode-extension/issues`));
 
 	return project.groups;
 }

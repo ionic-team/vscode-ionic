@@ -1,9 +1,9 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { IonicTreeProvider } from './ionicRecommendations';
+import { IonicTreeProvider } from './ionic-tree-provider';
 import { Recommendation } from './recommendation';
-import { Tip } from './tip';
+import { Tip, TipType } from './tip';
 import { CancelObject, run, getRunOutput, handleError } from './utilities';
 
 
@@ -50,7 +50,7 @@ async function selectDevice(command: string, rootPath: string, tip: Tip) {
 	const selected = await vscode.window.showQuickPick(names);
 	const device = devices.find(device => device.name == selected);
 	if (!device) return;
-	tip.commandTitle += ' on '+device?.name;
+	tip.commandTitle += ' on ' + device?.name;
 	return command.replace('--list', '--target=' + device?.target);
 }
 
@@ -63,7 +63,7 @@ async function showProgress(message: string, func: () => Promise<any>) {
 		},
 		async (progress, token) => {
 			await func();
-		}	
+		}
 	);
 }
 
@@ -87,10 +87,6 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 			cancellable: true,
 		},
 		async (progress, token) => {
-			progress.report({
-				message: `...`,
-			});
-
 			const cancelObject: CancelObject = { proc: undefined };
 
 			const interval = setInterval(() => {
@@ -138,7 +134,11 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log(tip);
 		const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
 		if (!tip.command) {
-			vscode.window.showInformationMessage(info, 'Ok');
+			if (tip.url && !tip.description) {
+				vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
+			} else {
+				vscode.window.showInformationMessage(info, 'Ok');
+			}
 		} else {
 			const urlBtn = tip.url ? 'Info' : undefined;
 			const selection = await vscode.window.showInformationMessage(info, urlBtn, tip.commandTitle);
@@ -164,5 +164,9 @@ export function activate(context: vscode.ExtensionContext) {
 				fixIssue(tip.command, rootPath, ionicProvider, undefined, tip.commandTitle);
 			}
 		}
+	});
+
+	vscode.commands.registerCommand('ionic.link', async (tip: Tip) => {
+		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
 	});
 }

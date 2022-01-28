@@ -294,9 +294,8 @@ function listPackages(project: Project, title: string, description: string, pack
 			if (v != packages[library].latest && (packages[library].latest != 'Unknown')) {
 				project.upgrade(library, `${v} → ${packages[library].latest}`, v, packages[library].latest);
 			} else {
-				project.note(`${packageName}`, `${v}`);// Last updated ${updated}. ${updated} ${description}`);
+				project.note(`${packageName}`, `${v}`, `https://www.npmjs.com/package/${packageName}`);// Last updated ${updated}. ${updated} ${description}`);
 			}
-			//mark(`| ${packageName} | ${v} | ${available} | ${updated} | ${description}`);
 		}
 	}
 }

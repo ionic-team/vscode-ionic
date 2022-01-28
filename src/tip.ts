@@ -19,6 +19,7 @@ export enum TipType {
 	Cordova,
 	Ionic,
 	Run,
+	Link,
 	Android,
 	Vue,
 	Angular,

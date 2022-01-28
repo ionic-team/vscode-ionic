@@ -86,7 +86,7 @@
 			"view/item/context": [
 				{
 					"command": "ionic.edit",
-					"when": "view == ionic && viewItem == recommendation",
+					"when": "view == ionic && viewItem == recommendation && false && 'enable if you want an info button link'",
 					"group": "inline"
 				}
 			]

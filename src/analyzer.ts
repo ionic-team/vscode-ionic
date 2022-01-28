@@ -127,8 +127,6 @@ export const warnMinVersion = (library: string, minVersion: string, reason?: str
 	}
 };
 
-
-
 export function exists(library: string) {
 	return !!allDependencies[library];
 }
