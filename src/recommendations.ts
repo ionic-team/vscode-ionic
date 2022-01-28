@@ -398,15 +398,15 @@ export function reviewProject(folder: string): Recommendation[] {
 		project.setGroup(`Capacitor`, 'Recommendations related to Capacitor', TipType.Capacitor, true);
 
 		project.add(new Tip('Serve', '(in default browser)', TipType.Run, 'Serve', `ionic serve`, 'Serving', `Project Served`));
-		project.add(new Tip('Run on Android', '(With Live Reload)', TipType.Run, 'Run', 'ionic cap run android -l --external --list', 'Running', 'Project is running'));
-		project.add(new Tip('Run on iOS', '(With Live Reload)', TipType.Run, 'Run', 'ionic cap run ios -l --external --list', 'Running', 'Project is running'));
+		project.add(new Tip('Run On Android', '(With Live Reload)', TipType.Run, 'Run', 'ionic cap run android -l --external --list', 'Running', 'Project is running'));
+		project.add(new Tip('Run On iOS', '(With Live Reload)', TipType.Run, 'Run', 'ionic cap run ios -l --external --list', 'Running', 'Project is running'));
 		project.add(new Tip('Build', '', TipType.Run, 'Build', `npm run build`, 'Building', `Project Built`));
 		project.add(new Tip('Sync', '', TipType.Run, 'Capacitor Sync', `npx cap sync`, 'Capacitor Sync', `Capacitor Dependencies Synced`));
 		if (exists('@capacitor/ios')) {
-			project.add(new Tip('Open XCode', '', TipType.Run, 'Open XCode', `npx cap open ios`, 'Open XCode', `XCode Opened`));
+			project.add(new Tip('Open In Xcode', '', TipType.Run, 'Open Xcode', `npx cap open ios`, 'Open Xcode', `Xcode Opened`));
 		}
 		if (exists('@capacitor/android')) {
-			project.add(new Tip('Open Android Studio', '', TipType.Run, 'Open Android Studio', `npx cap open android`, 'Open Android Studio', `Android Studio Opened`));
+			project.add(new Tip('Open In Android Studio', '', TipType.Run, 'Open Android Studio', `npx cap open android`, 'Open Android Studio', `Android Studio Opened`));
 		}
 	}
 

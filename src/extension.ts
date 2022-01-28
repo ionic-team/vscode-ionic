@@ -24,7 +24,10 @@ async function getDevices(command: string, rootPath: string) {
 		for (const line of lines) {
 			const data = line.split('|');
 			if (data.length == 3) {
-				devices.push({ name: data[0].trim(), target: data[2].trim() });
+				const target = data[2].trim();
+				if (target != '?') {
+					devices.push({ name: data[0].trim(), target: target });
+				}
 			}
 		}
 		return devices;

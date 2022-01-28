@@ -1,5 +1,6 @@
 ## Changelog
 ### Version 0.0.1
+- Fix iOS target device selection to filter unknown device
 - Remove recommendations group if no recommendations
 - Cleanup links to node packages and wording of 'upgrade' vs 'update'
 - Improve titles for running tasks
