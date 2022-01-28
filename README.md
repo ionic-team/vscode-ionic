@@ -10,10 +10,8 @@ This extension for Visual Studio Code provides:
 ## Submit Feedback
 [File an issue](https://github.com/ionic-team/vscode-extension/issues) to provide feedback on bugs and feature requests.
 
-## Overview
-This video shows opening a Cordova project in Visual Studio Code and using the Ionic extension to:
-1. Convert it to Capacitor
-2. Update and remove plugins and dependencies
+## Demo
+This [video](https://user-images.githubusercontent.com/84595830/142964859-ece2abfc-6954-4447-b3fd-0f6b781c5bae.mp4) shows opening a Cordova project in Visual Studio Code and using the Ionic extension to convert it to Capacitor and update and remove plugins and dependencies.
 
-https://user-images.githubusercontent.com/84595830/142964859-ece2abfc-6954-4447-b3fd-0f6b781c5bae.mp4
+
 
