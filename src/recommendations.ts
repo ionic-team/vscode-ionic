@@ -169,7 +169,7 @@ export class Project {
 	public setGroup(title: string, message: string, type?: TipType, expanded?: boolean) {
 
 		// If the last group has no items in it then remove it (eg if there are no recommendations for a project)
-		if (this.groups.length > 1 && this.groups[this.groups.length-1].children.length == 0) {
+		if (this.groups.length > 1 && this.groups[this.groups.length - 1].children.length == 0) {
 			this.groups.pop();
 		}
 		const r = new Recommendation(message, '', title, expanded ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.Collapsed);
@@ -216,8 +216,13 @@ export class Project {
 			case TipType.Capacitor: r.iconCapacitor(); break;
 			case TipType.Ionic: r.iconIonic(); break;
 			case TipType.Android: r.iconAndroid(); break;
-			//case TipType.Run: r.iconRun(); break;
+			case TipType.Comment: r.iconComment(); break;
+			case TipType.Settings: r.iconSettings(); break;
+			case TipType.Run: r.iconRun(); break;
 			case TipType.Link: r.iconReplace(); break;
+			case TipType.Sync: r.setIcon('sync'); break;
+			case TipType.Build: r.setIcon('build'); break;
+			case TipType.Edit: r.setIcon('edit'); break;
 		}
 	}
 
@@ -228,7 +233,7 @@ export class Project {
 			arguments: [tip]
 		};
 
-		if (tip.type == TipType.Run) {
+		if ([TipType.Run, TipType.Sync, TipType.Build, TipType.Edit].includes(tip.type)) {
 			cmd = {
 				command: 'ionic.run',
 				title: 'Run',
@@ -285,7 +290,7 @@ export class Project {
 				message,
 				undefined,
 				`Upgrade ${name} from ${fromVersion} to ${toVersion}`,
-				`npm install ${name}@${toVersion} --save-exact`, 
+				`npm install ${name}@${toVersion} --save-exact`,
 				`Upgrade`,
 				`${name} upgraded to ${toVersion}`,
 				`https://www.npmjs.com/package/${name}`,
@@ -389,6 +394,14 @@ export function reviewProject(folder: string): Recommendation[] {
 	const project: Project = new Project('My Project');
 	const packages = load(folder, project);
 
+	const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
+	const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
+	let flags = liveReload ? '-l ' : '';
+	if (externalIP) {
+		flags += '--external ';
+	}
+	flags = flags.trim();
+
 	project.type = isCapacitor() ? 'Capacitor' : 'Cordova';
 	project.folder = folder;
 
@@ -399,16 +412,16 @@ export function reviewProject(folder: string): Recommendation[] {
 		project.addScripts();
 		project.setGroup(`Capacitor`, 'Recommendations related to Capacitor', TipType.Capacitor, true);
 
-		project.add(new Tip('Serve', '(in default browser)', TipType.Run, 'Serve', `ionic serve`, 'Serving', `Project Served`));
-		project.add(new Tip('Run On Android', '(With Live Reload)', TipType.Run, 'Run', 'ionic cap run android -l --external --list', 'Running', 'Project is running'));
-		project.add(new Tip('Run On iOS', '(With Live Reload)', TipType.Run, 'Run', 'ionic cap run ios -l --external --list', 'Running', 'Project is running'));
-		project.add(new Tip('Build', '', TipType.Run, 'Build', `npm run build`, 'Building', `Project Built`));
-		project.add(new Tip('Sync', '', TipType.Run, 'Capacitor Sync', `npx cap sync`, 'Capacitor Sync', `Capacitor Dependencies Synced`));
+		project.add(new Tip('Run On Web', '', TipType.Run, 'Serve', `ionic serve`, 'Serving', `Project Served`));
+		project.add(new Tip('Run On Android', '', TipType.Run, 'Run', `ionic cap run android ${flags} --list`, 'Running', 'Project is running'));
+		project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', 'ionic cap run ios ${flags} --list', 'Running', 'Project is running'));
+		project.add(new Tip('Build', '', TipType.Build, 'Build', `npm run build`, 'Building', `Project Built`));
+		project.add(new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', `npx cap sync`, 'Capacitor Sync', `Capacitor Dependencies Synced`));
 		if (exists('@capacitor/ios')) {
-			project.add(new Tip('Open In Xcode', '', TipType.Run, 'Open Xcode', `npx cap open ios`, 'Opening project in Xcode', `Xcode Opened`));
+			project.add(new Tip('Open Xcode Project', '', TipType.Edit, 'Open Xcode', `npx cap open ios`, 'Opening project in Xcode', `Xcode Opened`));
 		}
 		if (exists('@capacitor/android')) {
-			project.add(new Tip('Open In Android Studio', '', TipType.Run, 'Opening project in Android Studio', `npx cap open android`, 'Open Android Studio', `Android Studio Opened`));
+			project.add(new Tip('Open Android Studio Project', '', TipType.Edit, 'Opening project in Android Studio', `npx cap open android`, 'Open Android Studio', `Android Studio Opened`));
 		}
 	}
 
@@ -562,7 +575,8 @@ export function reviewProject(folder: string): Recommendation[] {
 	reviewPluginProperties(packages, project);
 
 	project.setGroup(`Support`, 'Feature requests and bug fixes', TipType.Ionic, true);
-	project.add(new Tip('Provide Feedback', '', TipType.Link, `https://github.com/ionic-team/vscode-extension/issues`));
+	project.add(new Tip('Provide Feedback', '', TipType.Comment, undefined, undefined, undefined, undefined, `https://github.com/ionic-team/vscode-extension/issues`));
+	project.add(new Tip('Settings', '', TipType.Settings));
 
 	return project.groups;
 }

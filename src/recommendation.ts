@@ -69,7 +69,11 @@ export class Recommendation extends vscode.TreeItem {
 		this.setIcon('comment');
 	}
 
-	private setIcon(name: string) {
+	public iconSettings() {
+		this.setIcon('settings-gear');
+	}
+
+	public setIcon(name: string) {
 		this.iconPath = {
 			light: path.join(__filename, '..', '..', 'resources', 'light', name + '.svg'),
 			dark: path.join(__filename, '..', '..', 'resources', 'dark', name + '.svg')

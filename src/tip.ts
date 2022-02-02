@@ -13,7 +13,9 @@ export class Tip {
 }
 
 export enum TipType {
+	Build,
 	Error,
+	Edit,
 	Warning,
 	Idea,
 	Capacitor,
@@ -24,5 +26,8 @@ export enum TipType {
 	Android,
 	Vue,
 	Angular,
-	React
+	React,
+	Comment, 
+	Settings,
+	Sync
 }

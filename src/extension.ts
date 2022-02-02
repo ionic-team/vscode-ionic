@@ -107,7 +107,7 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 			}, 1000);
 
 			if (Array.isArray(command)) {
-				for (const cmd of command) {
+				for (const cmd of command) {					
 					channel.append(cmd);
 					channel.show();
 					await run(rootPath, cmd, channel, cancelObject);
@@ -145,16 +145,10 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
 	});
 
-	vscode.commands.registerCommand('ionic.fix', async (tip: Tip) => {
-		const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
-		if (!tip.command) {
-			if (tip.url && !tip.description) {
-				vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
-			} else {
-				vscode.window.showInformationMessage(info, 'Ok');
-			}
-		} else {
-			const urlBtn = tip.url ? 'Info' : undefined;			
+	vscode.commands.registerCommand('ionic.fix', async (tip: Tip) => {		
+		if (tip.command) {					
+			const urlBtn = tip.url ? 'Info' : undefined;
+			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
 			const selection = await vscode.window.showInformationMessage(info, urlBtn, tip.commandTitle);
 			if (selection == tip.commandTitle) {
 				fixIssue(tip.command, rootPath, ionicProvider, tip.commandSuccess, tip.commandTitle, tip.commandProgress);
@@ -162,7 +156,8 @@ export function activate(context: vscode.ExtensionContext) {
 			if (selection && selection == urlBtn) {
 				vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
 			}
-
+		} else {
+			execute(tip);
 		}
 	});
 
@@ -177,10 +172,21 @@ export function activate(context: vscode.ExtensionContext) {
 			} else {
 				fixIssue(tip.command, rootPath, ionicProvider, undefined, tip.commandTitle, tip.commandProgress);
 			}
+		} else {
+			execute(tip);
 		}
+
 	});
 
 	vscode.commands.registerCommand('ionic.link', async (tip: Tip) => {
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
 	});
+}
+
+function execute(tip: Tip) {
+	if (tip.title == 'Settings') {
+		vscode.commands.executeCommand('workbench.action.openSettings', 'Ionic');
+	} else if (tip.url) {
+		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
+	}
 }

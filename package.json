@@ -2,9 +2,15 @@
 	"name": "ionic",
 	"displayName": "Ionic",
 	"description": "Ionic & Capacitor project tooling and recommendations",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"icon": "media/ionic.png",
-	"publisher": "ionic",
+	"publisher": "Ionic",
+	"keywords": [
+		"Ionic",
+		"Capacitor",
+		"Ionic Framework",
+		"Cordova"
+	],
 	"private": true,
 	"license": "MIT",
 	"repository": {
@@ -91,12 +97,26 @@
 				}
 			]
 		},
-		"configuration": []
+		"configuration": {
+			"title": "Ionic",
+			"properties": {
+			  "ionic.liveReload": {
+				"type": "boolean",
+				"default": true,
+				"description": "Live Reload will refresh the app on the device when source code is changed in the editor."
+			  },
+			  "ionic.externalAddress": {
+				"type": "boolean",
+				"default": false,
+				"description": "Whether to use an external IP address when using Live Reload."
+			  }
+			}
+		  }
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
-		"package": "vsce package && cp ionic-0.0.2.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+		"package": "vsce package && cp ionic-0.0.3.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
 		"watch": "tsc -watch -p ./",
 		"lint": "eslint . --ext .ts,.tsx"
 	},
