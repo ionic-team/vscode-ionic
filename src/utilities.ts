@@ -7,22 +7,35 @@ export interface CancelObject {
 	proc: child_process.ChildProcess;
 }
 
+const opTiming = {};
+
+export function estimateRunTime(command: string) {
+	if (opTiming[command]) {
+		return opTiming[command];
+	} else {
+		return undefined;
+	}
+}
+
 export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject): Promise<void> {
 	if (command == 'rem-cordova') {
 		return removeCordovaFromPackageJSON(folder);
 	}
 	return new Promise((resolve, reject) => {
 		console.log(`exec ${command} (${folder})`);
+		const start_time = process.hrtime();
 		const proc = child_process.exec(command, { cwd: folder }, (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (error) {
 				console.error(error);
 			}
 
 			if (!error) {
+				const end_time = process.hrtime(start_time);
+				opTiming[command] = end_time[0]; // Number of seconds
 				resolve();
 			} else {
 				handleError(stderror);
-				reject(command + ' Failed');
+				reject(`${command} Failed`);
 			}
 		});
 		proc.stdout.on('data', (data) => {
@@ -31,6 +44,7 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 		});
 		proc.stderr.on('data', (data) => {
 			channel.append(data);
+			channel.show();
 		});
 		cancelObject.proc = proc;
 	});

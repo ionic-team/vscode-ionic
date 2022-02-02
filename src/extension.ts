@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { IonicTreeProvider } from './ionic-tree-provider';
 import { Recommendation } from './recommendation';
 import { Tip, TipType } from './tip';
-import { CancelObject, run, getRunOutput, handleError } from './utilities';
+import { CancelObject, run, getRunOutput, handleError, estimateRunTime } from './utilities';
 
 
 let channel: vscode.OutputChannel = undefined;
@@ -89,24 +89,35 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 			title: `${title ? title : command}`,
 			cancellable: true,
 		},
+
 		async (progress, token) => {
 			const cancelObject: CancelObject = { proc: undefined };
-
+			let increment = undefined;
 			const interval = setInterval(() => {
 				// Kill the process if the user cancels				
 				if (token.isCancellationRequested) {
 					clearInterval(interval);
 					cancelObject.proc.kill();
+				} else {
+					if (increment) {
+						progress.report({ increment: increment });
+					}
 				}
 			}, 1000);
 
 			if (Array.isArray(command)) {
 				for (const cmd of command) {
 					channel.append(cmd);
+					channel.show();
 					await run(rootPath, cmd, channel, cancelObject);
 				}
 			} else {
 				channel.append(command);
+				channel.show();
+				const secondsTotal = estimateRunTime(command);
+				if (secondsTotal) {
+					increment = 100.0 / secondsTotal;
+				}
 				await run(rootPath, command, channel, cancelObject);
 			}
 			return true;

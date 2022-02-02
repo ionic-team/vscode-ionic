@@ -1,4 +1,8 @@
 ## Changelog
+### Version 0.0.2
+- On commands with long logs (eg Sync or Build) make sure the bottom scrolls into view
+- Show estimated progress bar for operations that have been run more than once
+
 ### Version 0.0.1
 - Fix additional carriage returns in logging
 - Fix label when running on a device
