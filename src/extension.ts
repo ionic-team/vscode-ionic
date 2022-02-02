@@ -78,15 +78,16 @@ async function showProgress(message: string, func: () => Promise<any>) {
  * @param  {string} successMessage? Message to display if successful
  * @param  {string} title? Command title
  */
-async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, successMessage?: string, title?: string) {
+async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, successMessage?: string, title?: string, progressTitle?: string) {
 	//Create output channel
 	if (!channel) {
 		channel = vscode.window.createOutputChannel("Ionic");
 	}
+	const msg = progressTitle ? progressTitle : title ? title : command;
 	await vscode.window.withProgress(
 		{
 			location: vscode.ProgressLocation.Notification,
-			title: `${title ? title : command}`,
+			title: `${msg}`,
 			cancellable: true,
 		},
 
@@ -154,10 +155,10 @@ export function activate(context: vscode.ExtensionContext) {
 				vscode.window.showInformationMessage(info, 'Ok');
 			}
 		} else {
-			const urlBtn = tip.url ? 'Info' : undefined;
+			const urlBtn = tip.url ? 'Info' : undefined;			
 			const selection = await vscode.window.showInformationMessage(info, urlBtn, tip.commandTitle);
 			if (selection == tip.commandTitle) {
-				fixIssue(tip.command, rootPath, ionicProvider, tip.commandSuccess, tip.commandTitle);
+				fixIssue(tip.command, rootPath, ionicProvider, tip.commandSuccess, tip.commandTitle, tip.commandProgress);
 			}
 			if (selection && selection == urlBtn) {
 				vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
@@ -172,10 +173,10 @@ export function activate(context: vscode.ExtensionContext) {
 			if (tip.command.indexOf('--list') !== -1) {
 				const newCommand = await selectDevice(tip.command as string, rootPath, tip);
 				if (newCommand) {
-					fixIssue(newCommand, rootPath, undefined, undefined, tip.commandTitle);
+					fixIssue(newCommand, rootPath, undefined, undefined, tip.commandTitle, tip.commandProgress);
 				}
 			} else {
-				fixIssue(tip.command, rootPath, ionicProvider, undefined, tip.commandTitle);
+				fixIssue(tip.command, rootPath, ionicProvider, undefined, tip.commandTitle, tip.commandProgress);
 			}
 		}
 	});

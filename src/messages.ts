@@ -21,7 +21,9 @@ export const writeMinVersionError = (library, version, minVersion, reason): Tip 
 		library,
 		`${library} must be upgraded from ${version} to at least version ${minVersion}${reason ? ' ' + reason : ''}`,
 		TipType.Error, undefined,
-		`npm install ${library}@latest --save-exact`, 'Upgrade', `${library} successfully updated.`);
+		`npm install ${library}@latest --save-exact`, 
+		`Upgrade`, 
+		`${library} successfully updated.`);
 };
 
 export const writeMinVersionWarning = (library: string, version: string, minVersion: string, reason: string, url?: string): Tip => {
@@ -30,7 +32,9 @@ export const writeMinVersionWarning = (library: string, version: string, minVers
 	return new Tip(library,
 		`Update to at least ${minVersion}${reason ? ' ' + reason : ''}`, TipType.Idea,
 		`${library} ${version} should be updated to at least ${minVersion}${reason ? ' ' + reason : ''}`,
-		`npm install ${library}@latest --save-exact`, 'Update', `${library} successfully updated.`);
+		`npm install ${library}@latest --save-exact`, 
+		`Upgrade`, 
+		`${library} successfully updated.`);
 };
 
 export const writeConsistentVersionWarning = (lib1: string, ver1: string, lib2: string, ver2: string) => {
@@ -38,7 +42,9 @@ export const writeConsistentVersionWarning = (lib1: string, ver1: string, lib2: 
 		lib2,
 		`Version of ${libString(lib2, ver2)} should match ${libString(lib1, ver1)}`,
 		TipType.Error, undefined,
-		`npm install ${lib2}@${ver1} --save-exact`, 'Upgrade', `${lib2} successfully updated.`);
+		`npm install ${lib2}@${ver1} --save-exact`, 
+		`Upgrade`, 
+		`${lib2} successfully updated.`);
 };
 
 export const writeConsistentVersionError = (lib1: string, ver1: string, lib2: string, ver2: string): Tip => {
@@ -46,5 +52,7 @@ export const writeConsistentVersionError = (lib1: string, ver1: string, lib2: st
 		lib2,
 		`Version of ${libString(lib2, ver2)} must match ${libString(lib1, ver1)}`,
 		TipType.Error, undefined,
-		`npm install ${lib2}@${ver1} --save-exact`, 'Upgrade', `${lib2} successfully updated.`);
+		`npm install ${lib2}@${ver1} --save-exact`, 
+		`Upgrade`, 
+		`${lib2} successfully updated.`);
 };

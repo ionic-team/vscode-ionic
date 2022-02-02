@@ -7,7 +7,8 @@ export class Tip {
 		public readonly command?: string | string[],
 		public commandTitle?: string,
 		public readonly commandSuccess?: string,
-		public url?: string
+		public url?: string,
+		public commandProgress?: string
 	) { }	
 }
 

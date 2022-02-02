@@ -285,9 +285,11 @@ export class Project {
 				message,
 				undefined,
 				`Upgrade ${name} from ${fromVersion} to ${toVersion}`,
-				`npm install ${name}@${toVersion} --save-exact`, `Upgrade`,
-				`${name} updated to ${toVersion}`,
-				`https://www.npmjs.com/package/${name}`
+				`npm install ${name}@${toVersion} --save-exact`, 
+				`Upgrade`,
+				`${name} upgraded to ${toVersion}`,
+				`https://www.npmjs.com/package/${name}`,
+				`Upgrading ${name}`
 			));
 		}
 	}
