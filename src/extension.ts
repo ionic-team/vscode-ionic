@@ -146,7 +146,6 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand('ionic.fix', async (tip: Tip) => {
-		console.log(tip);
 		const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
 		if (!tip.command) {
 			if (tip.url && !tip.description) {

@@ -1,6 +1,7 @@
 ## Changelog
 ### Version 0.0.2
 - On commands with long logs (eg Sync or Build) make sure the bottom scrolls into view
+- If upgrading a package the dialog title is "Upgrade" rather than "Upgrading <package>"
 - Show estimated progress bar for operations that have been run more than once
 
 ### Version 0.0.1
