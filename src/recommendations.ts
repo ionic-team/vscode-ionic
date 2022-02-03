@@ -397,8 +397,10 @@ export function reviewProject(folder: string): Recommendation[] {
 	const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
 	const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
 	const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
+	const buildForProduction = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
 	let capRunFlags = liveReload ? ' -l' : '';
 	const serveFlags = httpsForWeb ? ' --ssl': '';
+	const buildFlags = buildForProduction ? ' --prod': '';
 	if (externalIP) {
 		capRunFlags += '--external ';
 	}
@@ -417,7 +419,7 @@ export function reviewProject(folder: string): Recommendation[] {
 		project.add(new Tip('Run On Web', '', TipType.Run, 'Serve', `ionic serve${serveFlags}`, 'Serving', `Project Served`));
 		project.add(new Tip('Run On Android', '', TipType.Run, 'Run', `ionic cap run android${capRunFlags} --list`, 'Running', 'Project is running'));
 		project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', 'ionic cap run ios ${flags} --list', 'Running', 'Project is running'));
-		project.add(new Tip('Build', '', TipType.Build, 'Build', `npm run build`, 'Building', `Project Built`));
+		project.add(new Tip('Build', '', TipType.Build, 'Build', `npm run build${buildFlags}`, 'Building', `Project Built`));
 		project.add(new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', `npx cap sync`, 'Capacitor Sync', `Capacitor Dependencies Synced`));
 		if (exists('@capacitor/ios')) {
 			project.add(new Tip('Open Xcode Project', '', TipType.Edit, 'Open Xcode', `npx cap open ios`, 'Opening project in Xcode', `Xcode Opened`));

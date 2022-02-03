@@ -1,5 +1,6 @@
 ## Changelog
 ### Version 0.0.2
+- Option added for building with the production flag 
 - Option added for Https when running on the web 
 - Standardized labels and icons
 - External IP Address and Live Reload as settings

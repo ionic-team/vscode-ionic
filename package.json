@@ -114,6 +114,11 @@
 				"type": "boolean",
 				"default": false,
 				"description": "Whether to use https (rather than http) when running the application for the web."
+			  },
+			  "ionic.buildForProduction": {
+				"type": "boolean",
+				"default": false,
+				"description": "Use the production configuration when building the application."
 			  }
 			}
 		  }
