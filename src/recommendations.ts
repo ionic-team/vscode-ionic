@@ -399,12 +399,12 @@ export function reviewProject(folder: string): Recommendation[] {
 	const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
 	const buildForProduction = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
 	let capRunFlags = liveReload ? ' -l' : '';
-	const serveFlags = httpsForWeb ? ' --ssl': '';
-	const buildFlags = buildForProduction ? ' --prod': '';
+	const serveFlags = httpsForWeb ? ' --ssl' : '';
+	const buildFlags = buildForProduction ? ' --prod' : '';
 	if (externalIP) {
+		if (capRunFlags.length > 0) capRunFlags += ' ';
 		capRunFlags += '--external ';
 	}
-	capRunFlags = capRunFlags.trim();
 
 	project.type = isCapacitor() ? 'Capacitor' : 'Cordova';
 	project.folder = folder;

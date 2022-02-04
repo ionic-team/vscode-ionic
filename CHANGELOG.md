@@ -1,4 +1,8 @@
 ## Changelog
+### Version 0.0.3
+- External address for live reload used by default
+- Bug fix for run on Android / iOS for live reload
+
 ### Version 0.0.2
 - Option added for building with the production flag 
 - Option added for Https when running on the web 

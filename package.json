@@ -2,7 +2,7 @@
 	"name": "ionic",
 	"displayName": "Ionic",
 	"description": "Ionic & Capacitor project tooling and recommendations",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"icon": "media/ionic.png",
 	"publisher": "Ionic",
 	"keywords": [
@@ -107,7 +107,7 @@
 			  },
 			  "ionic.externalAddress": {
 				"type": "boolean",
-				"default": false,
+				"default": true,
 				"description": "Whether to use an external IP address when using Live Reload."
 			  },
 			  "ionic.httpsForWeb": {
@@ -126,7 +126,7 @@
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
-		"package": "vsce package && cp ionic-0.0.2.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+		"package": "vsce package && cp ionic-0.0.3.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
 		"watch": "tsc -watch -p ./",
 		"lint": "eslint . --ext .ts,.tsx"
 	},
