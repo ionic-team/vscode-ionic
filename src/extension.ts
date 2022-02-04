@@ -2,6 +2,7 @@
 
 import * as vscode from 'vscode';
 import { IonicTreeProvider } from './ionic-tree-provider';
+import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { Tip, TipType } from './tip';
 import { CancelObject, run, getRunOutput, handleError, estimateRunTime } from './utilities';
@@ -156,7 +157,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const ionicProvider = new IonicTreeProvider(rootPath);
 	vscode.window.registerTreeDataProvider('ionic', ionicProvider);
-	vscode.commands.registerCommand('ionic.refresh', () => ionicProvider.refresh());
+	vscode.commands.registerCommand('ionic.refresh', () => { 
+		clearRefreshCache();
+		ionicProvider.refresh(); });
 	vscode.commands.registerCommand('ionic.add', () => vscode.window.showInformationMessage(`Successfully called add entry.`));
 	vscode.commands.registerCommand('ionic.edit', (node: Recommendation) => {
 		const url = node.url ? node.url : `https://www.npmjs.com/package/${node.label}`;

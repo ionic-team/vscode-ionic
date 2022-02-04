@@ -1,5 +1,4 @@
 # Insider Requests
-- Serve should not show the big dialog
 - Add features from Capacitor config
 
 # ToDo

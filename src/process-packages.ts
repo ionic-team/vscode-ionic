@@ -6,6 +6,13 @@ import * as path from 'path';
 import { Tip, TipType } from './tip';
 import { Project } from './recommendations';
 
+let outdatedCache: string;
+
+export function clearRefreshCache() {
+	outdatedCache = undefined;
+	console.log('Cached list of outdated packages cleared');
+}
+
 export function processPackages(folder: string, allDependencies, devDependencies) {
 	if (!fs.lstatSync(folder).isDirectory()) {
 		return {};
@@ -14,7 +21,13 @@ export function processPackages(folder: string, allDependencies, devDependencies
 	// npm outdated only shows dependencies and not dev dependencies if the node module isnt installed
 	let outdated = '[]';
 	try {
-		outdated = child_process.execSync('npm outdated --json', { cwd: folder }).toString();
+		if (!outdatedCache) {
+			outdated = child_process.execSync('npm outdated --json', { cwd: folder }).toString();
+			outdatedCache = outdated;
+		} else {
+			outdated = outdatedCache;
+		}
+		
 	} catch (err) {
 		console.error(err);
 	}

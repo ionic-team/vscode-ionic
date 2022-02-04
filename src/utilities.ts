@@ -2,6 +2,7 @@ import * as child_process from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
+import { clearRefreshCache } from './process-packages';
 
 export interface CancelObject {
 	proc: child_process.ChildProcess;
@@ -23,6 +24,9 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 	}
 	return new Promise((resolve, reject) => {
 		console.log(`exec ${command} (${folder})`);
+		if (command.includes('npm')) {
+			clearRefreshCache();
+		}
 		const start_time = process.hrtime();
 		const proc = child_process.exec(command, { cwd: folder }, (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (error) {
