@@ -233,7 +233,7 @@ export class Project {
 			arguments: [tip]
 		};
 
-		if ([TipType.Run, TipType.Sync, TipType.Build, TipType.Edit].includes(tip.type)) {
+		if ([TipType.Run, TipType.Sync, TipType.Build, TipType.Edit].includes(tip.type) || tip.doRun) {
 			cmd = {
 				command: 'ionic.run',
 				title: 'Run',
@@ -434,6 +434,11 @@ export function reviewProject(folder: string): Recommendation[] {
 
 	if (isCordova() && isCapacitor()) {
 		project.note('Remove Cordova', 'The project is using both Cordova and Capacitor. Dependencies on Cordova should be removed', undefined, TipType.Error);
+	}
+
+	const nmf = path.join(folder, 'node_modules');
+	if (!fs.existsSync(nmf)) {
+		project.add(new Tip('Install Node Modules', '', TipType.Idea, 'Install Node Modules', 'npm install', 'Installing').performRun());
 	}
 
 

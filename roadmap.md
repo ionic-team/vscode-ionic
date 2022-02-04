@@ -23,6 +23,7 @@
 - Use npm audit to list vulnerable packages
 
 # Bugs
+- Node 12.22.10 causes nothing to work
 - Errors reported back from code have coloring but showMessage in VS Code does not and shows markup for colors
 - Investigate colorization in the output window (eg a build will write color tags rather than colors)
 - Settings only apply after a refresh

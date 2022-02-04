@@ -1,5 +1,6 @@
 export class Tip {
 	public progressDialog: boolean;
+	public doRun: boolean;
 
 	constructor(
 		public readonly title: string,
@@ -15,6 +16,11 @@ export class Tip {
 
 	showProgressDialog() {
 		this.progressDialog = true;
+		return this;
+	}
+
+	performRun() {
+		this.doRun = true;
 		return this;
 	}
 }

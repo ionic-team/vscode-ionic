@@ -1,6 +1,7 @@
 ## Changelog
 ### Version 0.0.4
 - When running most tasks the progress dialog should be hidden
+- If node_modules folder is not found then recommendation given for npm install
 
 ### Version 0.0.3
 - External address for live reload used by default
