@@ -188,7 +188,7 @@ export class Project {
 	public addScripts() {
 		const packages: PackageFile = getPackageJSON(this.folder);
 		for (const script of Object.keys(packages.scripts)) {
-			this.add(new Tip(script, '', TipType.Run, '', `npm run ${script}`, 'Run', `Ran ${script}`));
+			this.add(new Tip(script, '', TipType.Run, '', `npm run ${script}`, `Running ${script}`, `Ran ${script}`));
 		}
 	}
 
@@ -417,15 +417,15 @@ export function reviewProject(folder: string): Recommendation[] {
 		project.setGroup(`Capacitor`, 'Recommendations related to Capacitor', TipType.Capacitor, true);
 
 		project.add(new Tip('Run On Web', '', TipType.Run, 'Serve', `ionic serve${serveFlags}`, 'Serving', `Project Served`));
-		project.add(new Tip('Run On Android', '', TipType.Run, 'Run', `ionic cap run android${capRunFlags} --list`, 'Running', 'Project is running'));
-		project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', 'ionic cap run ios ${flags} --list', 'Running', 'Project is running'));
-		project.add(new Tip('Build', '', TipType.Build, 'Build', `npm run build${buildFlags}`, 'Building', `Project Built`));
-		project.add(new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', `npx cap sync`, 'Capacitor Sync', `Capacitor Dependencies Synced`));
+		project.add(new Tip('Run On Android', '', TipType.Run, 'Run', `ionic cap run android${capRunFlags} --list`, 'Running', 'Project is running').showProgressDialog());
+		project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', 'ionic cap run ios ${flags} --list', 'Running', 'Project is running').showProgressDialog());
+		project.add(new Tip('Build', '', TipType.Build, 'Build', `npm run build${buildFlags}`, 'Building', undefined));
+		project.add(new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', `npx cap sync`, 'Syncing', undefined));
 		if (exists('@capacitor/ios')) {
-			project.add(new Tip('Open Xcode Project', '', TipType.Edit, 'Open Xcode', `npx cap open ios`, 'Opening project in Xcode', `Xcode Opened`));
+			project.add(new Tip('Open Xcode Project', '', TipType.Edit, 'Open Xcode', `npx cap open ios`, 'Opening project in Xcode').showProgressDialog());
 		}
 		if (exists('@capacitor/android')) {
-			project.add(new Tip('Open Android Studio Project', '', TipType.Edit, 'Opening project in Android Studio', `npx cap open android`, 'Open Android Studio', `Android Studio Opened`));
+			project.add(new Tip('Open Android Studio Project', '', TipType.Edit, 'Opening project in Android Studio', `npx cap open android`, 'Open Android Studio').showProgressDialog());
 		}
 	}
 

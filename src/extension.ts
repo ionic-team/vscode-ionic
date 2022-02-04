@@ -8,6 +8,7 @@ import { CancelObject, run, getRunOutput, handleError, estimateRunTime } from '.
 
 
 let channel: vscode.OutputChannel = undefined;
+let runningOperations = [];
 
 /**
  * Runs the command and obtains the stdout, parses it for the list of device names and target ids
@@ -70,23 +71,38 @@ async function showProgress(message: string, func: () => Promise<any>) {
 	);
 }
 
+function isRunning(tip: Tip) {
+	const found = runningOperations.find((found) => { return found.title == tip.title; });
+	return (found != undefined);
+}
+
+function completeOperation(tip: Tip) {
+	runningOperations = runningOperations.filter((op: Tip) => {
+		return op.title != tip.title;
+	});
+}
+
 /**
  * Runs the command while showing a vscode window that can be cancelled
  * @param  {string|string[]} command Node command
  * @param  {string} rootPath path to run the command
  * @param  {IonicTreeProvider} ionicProvider? the provide which will be refreshed on completion
- * @param  {string} successMessage? Message to display if successful
- * @param  {string} title? Command title
+ * @param  {string} successMessage? Message to display if successful 
  */
-async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, successMessage?: string, title?: string, progressTitle?: string) {
+async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, tip?: Tip) {
 	//Create output channel
 	if (!channel) {
 		channel = vscode.window.createOutputChannel("Ionic");
 	}
-	const msg = progressTitle ? progressTitle : title ? title : command;
+	if (isRunning(tip)) {
+		vscode.window.showInformationMessage(`The operation "${tip.title}" is already running. Click on the operation in the status bar to cancel it.`);
+		return;
+	}
+	runningOperations.push(tip);
+	const msg = tip.commandProgress ? tip.commandProgress : tip.commandTitle ? tip.commandTitle : command;	
 	await vscode.window.withProgress(
 		{
-			location: vscode.ProgressLocation.Notification,
+			location: tip.progressDialog ? vscode.ProgressLocation.Notification : vscode.ProgressLocation.Window,
 			title: `${msg}`,
 			cancellable: true,
 		},
@@ -98,6 +114,7 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 				// Kill the process if the user cancels				
 				if (token.isCancellationRequested) {
 					clearInterval(interval);
+					completeOperation(tip);
 					cancelObject.proc.kill();
 				} else {
 					if (increment) {
@@ -107,7 +124,7 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 			}, 1000);
 
 			if (Array.isArray(command)) {
-				for (const cmd of command) {					
+				for (const cmd of command) {
 					channel.append(cmd);
 					channel.show();
 					await run(rootPath, cmd, channel, cancelObject);
@@ -119,16 +136,17 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 				if (secondsTotal) {
 					increment = 100.0 / secondsTotal;
 				}
-				await run(rootPath, command, channel, cancelObject);
+				await run(rootPath, command, channel, cancelObject);				
 			}
 			return true;
 		}
 	);
+	completeOperation(tip);
 	if (ionicProvider) {
 		ionicProvider.refresh();
 	}
-	if (successMessage) {
-		vscode.window.showInformationMessage(`${successMessage}`);
+	if (tip.commandSuccess) {
+		vscode.window.showInformationMessage(`${tip.commandSuccess}`);
 	}
 }
 
@@ -145,13 +163,13 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
 	});
 
-	vscode.commands.registerCommand('ionic.fix', async (tip: Tip) => {		
-		if (tip.command) {					
+	vscode.commands.registerCommand('ionic.fix', async (tip: Tip) => {
+		if (tip.command) {
 			const urlBtn = tip.url ? 'Info' : undefined;
 			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
 			const selection = await vscode.window.showInformationMessage(info, urlBtn, tip.commandTitle);
 			if (selection == tip.commandTitle) {
-				fixIssue(tip.command, rootPath, ionicProvider, tip.commandSuccess, tip.commandTitle, tip.commandProgress);
+				fixIssue(tip.command, rootPath, ionicProvider, tip);
 			}
 			if (selection && selection == urlBtn) {
 				vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
@@ -167,10 +185,10 @@ export function activate(context: vscode.ExtensionContext) {
 			if (tip.command.indexOf('--list') !== -1) {
 				const newCommand = await selectDevice(tip.command as string, rootPath, tip);
 				if (newCommand) {
-					fixIssue(newCommand, rootPath, undefined, undefined, tip.commandTitle, tip.commandProgress);
+					fixIssue(newCommand, rootPath, undefined, tip);
 				}
 			} else {
-				fixIssue(tip.command, rootPath, ionicProvider, undefined, tip.commandTitle, tip.commandProgress);
+				fixIssue(tip.command, rootPath, ionicProvider, tip);
 			}
 		} else {
 			execute(tip);

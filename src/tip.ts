@@ -1,4 +1,6 @@
 export class Tip {
+	public progressDialog: boolean;
+
 	constructor(
 		public readonly title: string,
 		public readonly message: string,
@@ -9,7 +11,12 @@ export class Tip {
 		public readonly commandSuccess?: string,
 		public url?: string,
 		public commandProgress?: string
-	) { }	
+	) { }
+
+	showProgressDialog() {
+		this.progressDialog = true;
+		return this;
+	}
 }
 
 export enum TipType {
@@ -27,7 +34,7 @@ export enum TipType {
 	Vue,
 	Angular,
 	React,
-	Comment, 
+	Comment,
 	Settings,
 	Sync
 }

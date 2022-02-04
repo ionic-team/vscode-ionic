@@ -1,4 +1,7 @@
 ## Changelog
+### Version 0.0.4
+- When running most tasks the progress dialog should be hidden
+
 ### Version 0.0.3
 - External address for live reload used by default
 - Bug fix for run on Android / iOS for live reload
