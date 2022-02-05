@@ -5,6 +5,9 @@
 - Speed improvement between operations by caching npm outdated call
 - If @capacitor/core is upgraded then also upgrade @capacitor/ios and @capacitor/android
 - Test the minimum version of node when run
+- Application name can be changed when a new project is created
+- Fix for running iOS apps with live reload
+- Display version numbers when selecting iOS devices
 
 ### Version 0.0.3
 - External address for live reload used by default
