@@ -4,6 +4,7 @@
 - If node_modules folder is not found then recommendation given for npm install
 - Speed improvement between operations by caching npm outdated call
 - If @capacitor/core is upgraded then also upgrade @capacitor/ios and @capacitor/android
+- Test the minimum version of node when run
 
 ### Version 0.0.3
 - External address for live reload used by default

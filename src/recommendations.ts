@@ -399,10 +399,24 @@ function parseIonicStart(text: string): Array<any> {
 	return result;
 }
 
+function checkNodeVersion() {
+	try
+	{
+	const v = process.version.split('.');
+	const major = parseInt(v[0].substring(1));
+	if (major < 13) {
+		vscode.window.showErrorMessage(`This extension requires a minimum version of Node 14. ${process.version} is not supported.`, 'OK');
+	}
+	} catch {
+		// Do nothing
+	}
+}
+
 export function reviewProject(folder: string): Recommendation[] {
 	const project: Project = new Project('My Project');
 	const packages = load(folder, project);
 
+	checkNodeVersion();
 	const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
 	const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
 	const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
