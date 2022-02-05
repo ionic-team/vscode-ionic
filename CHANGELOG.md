@@ -3,6 +3,7 @@
 - When running most tasks the progress dialog should be hidden
 - If node_modules folder is not found then recommendation given for npm install
 - Speed improvement between operations by caching npm outdated call
+- If @capacitor/core is upgraded then also upgrade @capacitor/ios and @capacitor/android
 
 ### Version 0.0.3
 - External address for live reload used by default

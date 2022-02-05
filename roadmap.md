@@ -5,7 +5,6 @@
 - From packages have the option to uninstall
 - From packages have the option to update to any particular version found with `npm view package versions`
 - Option to hide particular recommendations
-- Handle upgrades of @Capacitor/core which require upgrading @capacitor/ios and android in unison
 - Detect Capacitor CLI and fallback to it for non-ionic projects
 - Update doc page of plugin with good descriptions and examples
 - Show icon change when running

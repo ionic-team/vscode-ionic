@@ -285,12 +285,21 @@ export class Project {
 
 	public upgrade(name: string, message: string, fromVersion: string, toVersion: string) {
 		if (exists(name)) {
+			let extra = '';
+			if (name == '@capacitor/core') {
+				if (exists('@capacitor/ios')) {
+					extra += ` @capacitor/ios@${toVersion}`;
+				}
+				if (exists('@capacitor/android')) {
+					extra += ` @capacitor/android@${toVersion}`;
+				}
+			}
 			this.add(new Tip(
 				name,
 				message,
 				undefined,
 				`Upgrade ${name} from ${fromVersion} to ${toVersion}`,
-				`npm install ${name}@${toVersion} --save-exact`,
+				`npm install ${name}@${toVersion}${extra} --save-exact`,
 				`Upgrade`,
 				`${name} upgraded to ${toVersion}`,
 				`https://www.npmjs.com/package/${name}`,
