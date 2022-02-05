@@ -52,7 +52,7 @@ async function selectDevice(command: string, rootPath: string, tip: Tip) {
 
 	//const devices = await getDevices(command, rootPath);
 	const names = devices.map(device => device.name);
-	const selected = await vscode.window.showQuickPick(names);
+	const selected = await vscode.window.showQuickPick(names, {placeHolder: 'Select a device to run application on'});
 	const device = devices.find(device => device.name == selected);
 	if (!device) return;
 	tip.commandTitle = 'Running on ' + device?.name;
