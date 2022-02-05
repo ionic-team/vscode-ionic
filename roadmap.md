@@ -18,6 +18,7 @@
 - Use npm audit to list vulnerable packages
 
 # Bugs
+- The option run on Android appears even if there Android integration is not installed
 - Settings only apply after a refresh
 
 # Known Issues

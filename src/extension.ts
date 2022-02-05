@@ -28,7 +28,7 @@ async function getDevices(command: string, rootPath: string) {
 			if (data.length == 3) {
 				const target = data[2].trim();
 				if (target != '?') {
-					devices.push({ name: data[0].trim(), target: target });
+					devices.push({ name: data[0].trim() + ' '+data[1].trim(), target: target });
 				}
 			}
 		}
@@ -52,17 +52,34 @@ async function selectDevice(command: string, rootPath: string, tip: Tip) {
 
 	//const devices = await getDevices(command, rootPath);
 	const names = devices.map(device => device.name);
-	const selected = await vscode.window.showQuickPick(names, {placeHolder: 'Select a device to run application on'});
+	const selected = await vscode.window.showQuickPick(names, { placeHolder: 'Select a device to run application on' });
 	const device = devices.find(device => device.name == selected);
 	if (!device) return;
 	tip.commandTitle = 'Running on ' + device?.name;
 	return command.replace('--list', '--target=' + device?.target);
 }
 
+async function requestAppName(tip: Tip) {
+	const name = await vscode.window.showInputBox({
+		title: 'Name of the application',
+		placeHolder: 'my-app',
+		value: 'my-app'
+	});
+	if (name && name.length > 1) {
+		const result = [];
+		for (const command of tip.command) {
+			result.push(command.replace('@app', name));
+		}
+		return result;
+	} else {
+		return undefined;
+	}
+}
+
 async function showProgress(message: string, func: () => Promise<any>) {
 	await vscode.window.withProgress(
 		{
-			location: vscode.ProgressLocation.Window,
+			location: vscode.ProgressLocation.Notification,
 			title: `${message}`,
 			cancellable: true,
 		},
@@ -100,7 +117,7 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 		return;
 	}
 	runningOperations.push(tip);
-	const msg = tip.commandProgress ? tip.commandProgress : tip.commandTitle ? tip.commandTitle : command;	
+	const msg = tip.commandProgress ? tip.commandProgress : tip.commandTitle ? tip.commandTitle : command;
 	await vscode.window.withProgress(
 		{
 			location: tip.progressDialog ? vscode.ProgressLocation.Notification : vscode.ProgressLocation.Window,
@@ -137,7 +154,7 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 				if (secondsTotal) {
 					increment = 100.0 / secondsTotal;
 				}
-				await run(rootPath, command, channel, cancelObject);				
+				await run(rootPath, command, channel, cancelObject);
 			}
 			return true;
 		}
@@ -157,9 +174,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const ionicProvider = new IonicTreeProvider(rootPath);
 	vscode.window.registerTreeDataProvider('ionic', ionicProvider);
-	vscode.commands.registerCommand('ionic.refresh', () => { 
+	vscode.commands.registerCommand('ionic.refresh', () => {
 		clearRefreshCache();
-		ionicProvider.refresh(); });
+		ionicProvider.refresh();
+	});
 	vscode.commands.registerCommand('ionic.add', () => vscode.window.showInformationMessage(`Successfully called add entry.`));
 	vscode.commands.registerCommand('ionic.edit', (node: Recommendation) => {
 		const url = node.url ? node.url : `https://www.npmjs.com/package/${node.label}`;
@@ -185,13 +203,16 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('ionic.run', async (tip: Tip) => {
 		if (tip.command) {
 			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
-			if (tip.command.indexOf('--list') !== -1) {
-				const newCommand = await selectDevice(tip.command as string, rootPath, tip);
-				if (newCommand) {
-					fixIssue(newCommand, rootPath, undefined, tip);
-				}
-			} else {
-				fixIssue(tip.command, rootPath, ionicProvider, tip);
+			let command = tip.command;
+			if (tip.doRequestAppName) {
+				command = await requestAppName(tip);
+			}
+			if (tip.doDeviceSelection) {
+				command = await selectDevice(tip.command as string, rootPath, tip);
+			}
+			if (command) {
+				fixIssue(command, rootPath, ionicProvider, tip);
+				return;
 			}
 		} else {
 			execute(tip);

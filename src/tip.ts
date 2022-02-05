@@ -1,6 +1,8 @@
 export class Tip {
 	public progressDialog: boolean;
 	public doRun: boolean;
+	public doRequestAppName: boolean;
+	public doDeviceSelection: boolean;
 
 	constructor(
 		public readonly title: string,
@@ -21,6 +23,16 @@ export class Tip {
 
 	performRun() {
 		this.doRun = true;
+		return this;
+	}
+
+	requestAppName() {
+		this.doRequestAppName = true;
+		return this;
+	}
+
+	requestDeviceSelection() {
+		this.doDeviceSelection = true;
 		return this;
 	}
 }

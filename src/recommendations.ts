@@ -356,18 +356,18 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
 			type = starter.type;
 			project.setGroup(`New ${type} Project`, '', TipType.Ionic, false);
 		}
-		const name = "my-app";
+		
 		project.add(new Tip(
 			`${starter.name}`,
 			`${starter.description}`,
 			TipType.Run,
 			'Create Project',
-			[`ionic start ${name} ${starter.name} --capacitor`,
-			`mv ${name}/{,.[^.]}* .`,
-			`rmdir ${name}`
+			[`ionic start @app ${starter.name} --capacitor`,
+			`mv @app/{,.[^.]}* .`,
+			`rmdir @app`
 			],
 			'Creating Project',
-			'Project Created'));
+			'Project Created').requestAppName().showProgressDialog());
 	}
 	return project.groups;
 }
@@ -440,8 +440,8 @@ export function reviewProject(folder: string): Recommendation[] {
 		project.setGroup(`Capacitor`, 'Recommendations related to Capacitor', TipType.Capacitor, true);
 
 		project.add(new Tip('Run On Web', '', TipType.Run, 'Serve', `ionic serve${serveFlags}`, 'Serving', `Project Served`));
-		project.add(new Tip('Run On Android', '', TipType.Run, 'Run', `ionic cap run android${capRunFlags} --list`, 'Running', 'Project is running').showProgressDialog());
-		project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', 'ionic cap run ios ${flags} --list', 'Running', 'Project is running').showProgressDialog());
+		project.add(new Tip('Run On Android', '', TipType.Run, 'Run', `ionic cap run android${capRunFlags} --list`, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection());
+		project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', `ionic cap run ios${capRunFlags} --list`, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection());
 		project.add(new Tip('Build', '', TipType.Build, 'Build', `npm run build${buildFlags}`, 'Building', undefined));
 		project.add(new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', `npx cap sync`, 'Syncing', undefined));
 		if (exists('@capacitor/ios')) {
