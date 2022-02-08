@@ -60,15 +60,16 @@ async function selectDevice(command: string, rootPath: string, tip: Tip) {
 }
 
 async function requestAppName(tip: Tip) {
-	const name = await vscode.window.showInputBox({
+	let name = await vscode.window.showInputBox({
 		title: 'Name of the application',
 		placeHolder: 'my-app',
 		value: 'my-app'
 	});
 	if (name && name.length > 1) {
 		const result = [];
+		name = name.replace(/ /g, '-');
 		for (const command of tip.command) {
-			result.push(command.replace('@app', name));
+			result.push(command.replace('@app', `${name.trim()}`));
 		}
 		return result;
 	} else {

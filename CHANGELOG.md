@@ -1,4 +1,7 @@
 ## Changelog
+### Version 0.0.5
+- Handle when a user uses spaces in an app name when creating a project
+
 ### Version 0.0.4
 - When running most tasks the progress dialog should be hidden
 - If node_modules folder is not found then recommendation given for npm install
