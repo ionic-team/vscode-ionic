@@ -4,6 +4,9 @@ export class Tip {
 	public doRequestAppName: boolean;
 	public doDeviceSelection: boolean;
 
+	private onAction: (...args) => unknown;
+	private actionArgs: any[];
+
 	constructor(
 		public readonly title: string,
 		public readonly message: string,
@@ -35,6 +38,17 @@ export class Tip {
 		this.doDeviceSelection = true;
 		return this;
 	}
+
+	setAction(func: (...argsIn) => unknown, ...args) {
+		this.onAction = func;
+		this.actionArgs = args;
+	}
+
+	async executeAction() {
+		if (this.onAction) {
+			await this.onAction(...this.actionArgs);
+		}
+	}
 }
 
 export enum TipType {
@@ -54,5 +68,6 @@ export enum TipType {
 	React,
 	Comment,
 	Settings,
-	Sync
+	Sync,
+	None
 }

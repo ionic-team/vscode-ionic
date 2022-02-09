@@ -1,6 +1,3 @@
-# Insider Requests
-- Add features from Capacitor config
-
 # ToDo
 - From packages have the option to uninstall
 - From packages have the option to update to any particular version found with `npm view package versions`

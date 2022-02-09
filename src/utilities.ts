@@ -85,6 +85,27 @@ export function getPackageJSON(folder: string): PackageFile {
 	return JSON.parse(fs.readFileSync(filename, 'utf8'));
 }
 
+export function getStringFrom(data: string, start: string, end: string): string {
+	const foundIdx = data.lastIndexOf(start);
+	if (foundIdx == -1) {
+		return undefined;
+	}
+	const idx = foundIdx + start.length;
+	return data.substring(
+		idx,
+		data.indexOf(end, idx)
+	);
+}
+
+export function setStringIn(data: string, start: string, end: string, replacement: string): string {
+	const foundIdx = data.lastIndexOf(start);
+	if (foundIdx == -1) {
+		return data;
+	}
+	const idx = foundIdx + start.length;
+	return data.substring(0, idx) + replacement + data.substring(data.indexOf(end, idx));
+}
+
 export interface PackageFile {
 	name: string;
 	displayName: string;

@@ -100,28 +100,28 @@
 		"configuration": {
 			"title": "Ionic",
 			"properties": {
-			  "ionic.liveReload": {
-				"type": "boolean",
-				"default": true,
-				"description": "Live Reload will refresh the app on the device when source code is changed in the editor."
-			  },
-			  "ionic.externalAddress": {
-				"type": "boolean",
-				"default": true,
-				"description": "Whether to use an external IP address when using Live Reload."
-			  },
-			  "ionic.httpsForWeb": {
-				"type": "boolean",
-				"default": false,
-				"description": "Whether to use https (rather than http) when running the application for the web."
-			  },
-			  "ionic.buildForProduction": {
-				"type": "boolean",
-				"default": false,
-				"description": "Use the production configuration when building the application."
-			  }
+				"ionic.liveReload": {
+					"type": "boolean",
+					"default": true,
+					"description": "Live Reload will refresh the app on the device when source code is changed in the editor."
+				},
+				"ionic.externalAddress": {
+					"type": "boolean",
+					"default": true,
+					"description": "Whether to use an external IP address when using Live Reload."
+				},
+				"ionic.httpsForWeb": {
+					"type": "boolean",
+					"default": false,
+					"description": "Whether to use https (rather than http) when running the application for the web."
+				},
+				"ionic.buildForProduction": {
+					"type": "boolean",
+					"default": false,
+					"description": "Use the production configuration when building the application."
+				}
 			}
-		  }
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
@@ -141,6 +141,7 @@
 		"typescript": "^4.4.3"
 	},
 	"dependencies": {
+		"@capacitor/project": "^1.0.28",
 		"fast-xml-parser": "^3.21.1",
 		"jsonc-parser": "^0.4.2",
 		"minimist": "^0.2.1",

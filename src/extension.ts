@@ -28,7 +28,7 @@ async function getDevices(command: string, rootPath: string) {
 			if (data.length == 3) {
 				const target = data[2].trim();
 				if (target != '?') {
-					devices.push({ name: data[0].trim() + ' '+data[1].trim(), target: target });
+					devices.push({ name: data[0].trim() + ' ' + data[1].trim(), target: target });
 				}
 			}
 		}
@@ -197,7 +197,11 @@ export function activate(context: vscode.ExtensionContext) {
 				vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
 			}
 		} else {
-			execute(tip);
+			await execute(tip);
+
+			if (ionicProvider) {
+				ionicProvider.refresh();
+			}
 		}
 	});
 
@@ -226,7 +230,8 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 }
 
-function execute(tip: Tip) {
+async function execute(tip: Tip) {
+	await tip.executeAction();
 	if (tip.title == 'Settings') {
 		vscode.commands.executeCommand('workbench.action.openSettings', 'Ionic');
 	} else if (tip.url) {

@@ -32,8 +32,7 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
 		} else {
 			const packageJsonPath = path.join(this.workspaceRoot, 'package.json');
 			if (this.pathExists(packageJsonPath)) {
-				return Promise.resolve(reviewProject(this.workspaceRoot)
-				);
+				return reviewProject(this.workspaceRoot);
 			} else {
 				return Promise.resolve(starterProject(this.workspaceRoot));
 			}
