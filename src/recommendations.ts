@@ -221,12 +221,9 @@ export class Project {
 			const appTarget = project.ios?.getAppTarget();
 			iosBundleId = project.ios.getBundleId(appTarget.name);
 			iosDisplayName = await project.ios.getDisplayName(appTarget.name);
-			//this.add(new Tip(await project.ios.getDisplayName(appTarget.name), '(Apple Display Name)', TipType.None));
 			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
 				iosVersion = project.ios?.getVersion(appTarget.name, buildConfig.name);
 				iosBuild = project.ios.getBuild(appTarget.name, buildConfig.name);
-				//				this.add(new Tip(project.ios?.getBuild(appTarget.name, buildConfig.name), `(Apple ${buildConfig.name} build)`, TipType.None));
-				//this.add(new Tip(project.ios?.getVersion(appTarget.name, buildConfig.name), `(Apple ${buildConfig.name} version)`, TipType.None));
 			}
 		}
 
@@ -236,12 +233,10 @@ export class Project {
 			androidBuild = await project.android?.getVersionCode();
 			const data = await project.android?.getResource('values', 'strings.xml');
 			androidDisplayName = getStringFrom(data as string, `<string name="app_name">`, `</string`);
-			//console.log(this.getValue(data as string, `<string name="title_activity_main">`, `</string`));
+		}
 
-			//console.log(this.setValue(data as string, `<string name="app_name">`, `</string>`, 'blar'));
-
-			//this.add(new Tip((await project.android?.getVersionCode()).toString(), '(Android version code)', TipType.None));
-			//this.add(new Tip(androidBundleId, '(Android package name)', TipType.None));
+		if (!project.ios && !project.android) {
+			return;
 		}
 
 		// Allow the user to set the bundle id
@@ -250,7 +245,6 @@ export class Project {
 			const tip = new Tip('Bundle Id', androidBundleId, TipType.None);
 			tip.setAction(this.setBundleId, androidBundleId, project);
 			this.add(tip);
-			//this.add(new Tip(androidBundleId, 'App Bundle Id', TipType.None, undefined, undefined, androidBundleId).setAction(this.setBundleId(androidBundleId)));
 		}
 
 		// Allow the user to edit the display name of the app
@@ -270,7 +264,7 @@ export class Project {
 
 		// Allow the user to increment the build
 		if (androidBuild == iosBuild || !iosBuild || !androidBuild) {
-			const tip = new Tip('Build Number', androidBuild.toString(), TipType.None);
+			const tip = new Tip('Build Number', androidBuild?.toString(), TipType.None);
 			tip.setAction(this.setBuild, androidBuild, project);
 			this.add(tip);
 		}

@@ -1,6 +1,7 @@
 ## Changelog
 ### Version 0.0.6
 - Operations that have errors should no longer cause "Operation X already running"
+- Fix for projects without iOS or Android integration (toString undefined error)
 
 ### Version 0.0.5
 - Ability to set Bundle Id, Version Number, Build Number and Display Name of app

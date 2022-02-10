@@ -28,7 +28,7 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 			clearRefreshCache();
 		}
 		const start_time = process.hrtime();
-		const proc = child_process.exec(command, { cwd: folder }, (error: child_process.ExecException, stdout: string, stderror: string) => {
+		const proc = child_process.exec(command, { cwd: folder, encoding: 'utf8' }, (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (error) {
 				console.error(error);
 			}
@@ -67,7 +67,7 @@ export async function getRunOutput(command: string, folder: string): Promise<str
 	return new Promise((resolve, reject) => {
 		let out = '';
 		console.log(`${command}...`);
-		child_process.exec(command, { cwd: folder }, (error: child_process.ExecException, stdout: string, stderror: string) => {
+		child_process.exec(command, { cwd: folder, encoding: 'utf8' }, (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (stdout) {
 				out += stdout;
 			}
