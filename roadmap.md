@@ -1,4 +1,7 @@
 # ToDo
+- Record video of changing display name, bundle id, version number, build number
+- Work out why packaging requires prettier
+- Support separated capacitor config properties between ios and android
 - From packages have the option to uninstall
 - From packages have the option to update to any particular version found with `npm view package versions`
 - Option to hide particular recommendations

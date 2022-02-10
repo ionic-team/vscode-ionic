@@ -13,4 +13,3 @@ site/videos/**
 site/**
 *.vsix
 node_modules/typescript
-node_modules/prettier
