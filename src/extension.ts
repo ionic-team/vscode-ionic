@@ -143,24 +143,33 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 			}, 1000);
 
 			if (Array.isArray(command)) {
-				for (const cmd of command) {
-					channel.append(cmd);
-					channel.show();
-					await run(rootPath, cmd, channel, cancelObject);
+				try {
+					for (const cmd of command) {
+						channel.appendLine(cmd);
+						channel.show();
+
+						await run(rootPath, cmd, channel, cancelObject);
+
+					}
+				} finally {
+					completeOperation(tip);
 				}
 			} else {
-				channel.append(command);
+				channel.appendLine(command);
 				channel.show();
 				const secondsTotal = estimateRunTime(command);
 				if (secondsTotal) {
 					increment = 100.0 / secondsTotal;
 				}
-				await run(rootPath, command, channel, cancelObject);
+				try {
+					await run(rootPath, command, channel, cancelObject);
+				} finally {
+					completeOperation(tip);
+				}
 			}
 			return true;
 		}
 	);
-	completeOperation(tip);
 	if (ionicProvider) {
 		ionicProvider.refresh();
 	}

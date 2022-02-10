@@ -222,7 +222,7 @@ export class Project {
 			iosBundleId = project.ios.getBundleId(appTarget.name);
 			iosDisplayName = await project.ios.getDisplayName(appTarget.name);
 			//this.add(new Tip(await project.ios.getDisplayName(appTarget.name), '(Apple Display Name)', TipType.None));
-			for (const buildConfig of project.ios?.getBuildConfigurations(appTarget.name)) {
+			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
 				iosVersion = project.ios?.getVersion(appTarget.name, buildConfig.name);
 				iosBuild = project.ios.getBuild(appTarget.name, buildConfig.name);
 				//				this.add(new Tip(project.ios?.getBuild(appTarget.name, buildConfig.name), `(Apple ${buildConfig.name} build)`, TipType.None));
@@ -295,7 +295,7 @@ export class Project {
 
 		if (project?.ios) {
 			const appTarget = project.ios?.getAppTarget();
-			for (const buildConfig of project.ios?.getBuildConfigurations(appTarget.name)) {
+			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
 				channel.appendLine(`Set iOS Bundle Id for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newBundleId}`);
 				project.ios.setBundleId(appTarget.name, buildConfig.name, newBundleId);
 			}
@@ -326,7 +326,7 @@ export class Project {
 
 		if (project?.ios) {
 			const appTarget = project.ios?.getAppTarget();
-			for (const buildConfig of project.ios?.getBuildConfigurations(appTarget.name)) {
+			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
 				channel.appendLine(`Set iOS Version for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newVersion}`);
 				await project.ios.setVersion(appTarget.name, buildConfig.name, newVersion);
 			}
@@ -353,7 +353,7 @@ export class Project {
 
 		if (project?.ios) {
 			const appTarget = project.ios?.getAppTarget();
-			for (const buildConfig of project.ios?.getBuildConfigurations(appTarget.name)) {
+			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
 				channel.appendLine(`Set iOS Version for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newBuild}`);
 				await project.ios.setBuild(appTarget.name, buildConfig.name, parseInt(newBuild));
 			}
@@ -380,7 +380,7 @@ export class Project {
 		console.log(`Display name changed to ${displayName}`);
 		if (project.ios != null) {
 			const appTarget = project.ios?.getAppTarget();
-			for (const buildConfig of project.ios?.getBuildConfigurations(appTarget.name)) {
+			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
 				channel.appendLine(`Set iOS Displayname for target ${appTarget.name} buildConfig.${buildConfig.name} to ${displayName}`);
 				await project.ios.setDisplayName(appTarget.name, buildConfig.name, displayName);
 			}
@@ -657,7 +657,7 @@ export async function reviewProject(folder: string): Promise<Recommendation[]> {
 
 		project.setGroup(`Capacitor`, 'Recommendations related to Capacitor', TipType.Capacitor, true);
 
-		project.add(new Tip('Run On Web', '', TipType.Run, 'Serve', `ionic serve${serveFlags}`, 'Serving', `Project Served`));
+		project.add(new Tip('Run On Web', '', TipType.Run, 'Serve', `ionic serve${serveFlags}`, 'Running on Web', `Project Served`));
 		project.add(new Tip('Run On Android', '', TipType.Run, 'Run', `ionic cap run android${capRunFlags} --list`, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection());
 		project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', `ionic cap run ios${capRunFlags} --list`, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection());
 		project.add(new Tip('Build', '', TipType.Build, 'Build', `npm run build${buildFlags}`, 'Building', undefined));
