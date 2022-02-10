@@ -10,3 +10,7 @@ vsc-extension-quickstart.md
 instructions.md
 roadmap.md
 site/videos/**
+site/**
+*.vsix
+node_modules/typescript
+node_modules/prettier
