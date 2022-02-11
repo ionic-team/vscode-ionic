@@ -1,4 +1,9 @@
 ## Changelog
+### Version 0.0.7
+- commands running sync will set an environment variable of LANG=en_US.UTF-8 (To avoid cocoapods error)
+- Sync option no longer shown if not using Capacitor
+- Option to run on native device not shown if @capacitor/ios or @capacitor/android not used
+
 ### Version 0.0.6
 - Operations that have errors should no longer cause "Operation X already running"
 - Fix for projects without iOS or Android integration (toString undefined error)

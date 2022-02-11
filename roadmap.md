@@ -19,7 +19,6 @@
 
 # Bugs
 - Validate input for bundle id (eg no java reserved words), display name and version and build (numbers)
-- The option run on Android appears even if there Android integration is not installed
 - Settings only apply after a refresh
 
 # Known Issues

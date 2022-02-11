@@ -651,15 +651,23 @@ export async function reviewProject(folder: string): Promise<Recommendation[]> {
 
 		project.setGroup(`Capacitor`, 'Recommendations related to Capacitor', TipType.Capacitor, true);
 
+		const hasCapIos = exists('@capacitor/ios');
+		const hasCapAndroid = exists('@capacitor/android');
 		project.add(new Tip('Run On Web', '', TipType.Run, 'Serve', `ionic serve${serveFlags}`, 'Running on Web', `Project Served`));
-		project.add(new Tip('Run On Android', '', TipType.Run, 'Run', `ionic cap run android${capRunFlags} --list`, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection());
-		project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', `ionic cap run ios${capRunFlags} --list`, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection());
+		if (hasCapAndroid) {
+			project.add(new Tip('Run On Android', '', TipType.Run, 'Run', `ionic cap run android${capRunFlags} --list`, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection());
+		}
+		if (hasCapIos) {
+			project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', `ionic cap run ios${capRunFlags} --list`, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection());
+		}
 		project.add(new Tip('Build', '', TipType.Build, 'Build', `npm run build${buildFlags}`, 'Building', undefined));
-		project.add(new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', `npx cap sync`, 'Syncing', undefined));
-		if (exists('@capacitor/ios')) {
+		if (exists('@capacitor/core')) {
+			project.add(new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', `npx cap sync`, 'Syncing', undefined));
+		}
+		if (hasCapIos) {
 			project.add(new Tip('Open Xcode Project', '', TipType.Edit, 'Open Xcode', `npx cap open ios`, 'Opening project in Xcode').showProgressDialog());
 		}
-		if (exists('@capacitor/android')) {
+		if (hasCapAndroid) {
 			project.add(new Tip('Open Android Studio Project', '', TipType.Edit, 'Opening project in Android Studio', `npx cap open android`, 'Open Android Studio').showProgressDialog());
 		}
 	}

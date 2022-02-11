@@ -1,4 +1,5 @@
 import * as child_process from 'child_process';
+import * as process from 'process';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
@@ -18,6 +19,13 @@ export function estimateRunTime(command: string) {
 	}
 }
 
+function runOptions(command: string, folder: string) {
+	if (command.includes('sync')) {
+		return { cwd: folder, encoding: 'utf8', env: { ...process.env, LANG: 'en_US.UTF-8' } };
+	}
+	return { cwd: folder };
+}
+
 export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject): Promise<void> {
 	if (command == 'rem-cordova') {
 		return removeCordovaFromPackageJSON(folder);
@@ -28,7 +36,7 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 			clearRefreshCache();
 		}
 		const start_time = process.hrtime();
-		const proc = child_process.exec(command, { cwd: folder, encoding: 'utf8' }, (error: child_process.ExecException, stdout: string, stderror: string) => {
+		const proc = child_process.exec(command, runOptions(command, folder), (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (error) {
 				console.error(error);
 			}
@@ -67,7 +75,7 @@ export async function getRunOutput(command: string, folder: string): Promise<str
 	return new Promise((resolve, reject) => {
 		let out = '';
 		console.log(`${command}...`);
-		child_process.exec(command, { cwd: folder, encoding: 'utf8' }, (error: child_process.ExecException, stdout: string, stderror: string) => {
+		child_process.exec(command, runOptions(command, folder), (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (stdout) {
 				out += stdout;
 			}
