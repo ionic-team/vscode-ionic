@@ -2,7 +2,7 @@
 	"name": "ionic",
 	"displayName": "Ionic",
 	"description": "Ionic & Capacitor project tooling and recommendations",
-	"version": "0.0.6",
+	"version": "0.0.8",
 	"icon": "media/ionic.png",
 	"publisher": "Ionic",
 	"keywords": [
@@ -126,7 +126,7 @@
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
-		"package": "vsce package && cp ionic-0.0.6.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+		"package": "vsce package && cp ionic-0.0.8.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
 		"watch": "tsc -watch -p ./",
 		"lint": "eslint . --ext .ts,.tsx"
 	},
@@ -142,6 +142,7 @@
 	},
 	"dependencies": {
 		"@capacitor/project": "^1.0.28",
+		"@ionic/cli": "^6.18.1",
 		"fast-xml-parser": "^3.21.1",
 		"mkdirp": "^0.5.1",
 		"rimraf": "^2.6.2",

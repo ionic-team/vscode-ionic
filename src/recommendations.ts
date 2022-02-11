@@ -28,6 +28,11 @@ import { CapacitorProject } from '@capacitor/project';
 import { CapacitorConfig } from '@capacitor/cli';
 import { getPackageJSON, getRunOutput, getStringFrom, PackageFile, setStringIn } from './utilities';
 
+enum NativePlatform {
+	iOSOnly,
+	AndroidOnly
+}
+
 function capacitorMigrationChecks(packages, project: Project) {
 	const tips: Tip[] = [];
 	project.setGroup(
@@ -245,6 +250,15 @@ export class Project {
 			const tip = new Tip('Bundle Id', androidBundleId, TipType.None);
 			tip.setAction(this.setBundleId, androidBundleId, project);
 			this.add(tip);
+		} else {
+			// Bundle Ids different
+			const tip = new Tip('Android Bundle Id', androidBundleId, TipType.None);
+			tip.setAction(this.setBundleId, androidBundleId, project, NativePlatform.AndroidOnly);
+			this.add(tip);
+
+			const tip2 = new Tip('iOS Bundle Id', iosBundleId, TipType.None);
+			tip2.setAction(this.setBundleId, iosBundleId, project, NativePlatform.iOSOnly);
+			this.add(tip2);
 		}
 
 		// Allow the user to edit the display name of the app
@@ -253,6 +267,14 @@ export class Project {
 			const tip = new Tip('Display Name', displayName, TipType.None);
 			tip.setAction(this.setDisplayName, displayName, project, this.folder);
 			this.add(tip);
+		} else {
+			const tip = new Tip('Android Display Name', androidDisplayName, TipType.None);
+			tip.setAction(this.setDisplayName, androidDisplayName, project, this.folder, NativePlatform.AndroidOnly);
+			this.add(tip);
+
+			const tip2 = new Tip('iOS Display Name', iosDisplayName, TipType.None);
+			tip2.setAction(this.setDisplayName, iosDisplayName, project, this.folder, NativePlatform.iOSOnly);
+			this.add(tip2);
 		}
 
 		// Allow the user to set the version
@@ -260,6 +282,14 @@ export class Project {
 			const tip = new Tip('Version Number', androidVersion, TipType.None);
 			tip.setAction(this.setVersion, androidVersion, project);
 			this.add(tip);
+		} else {
+			const tip = new Tip('Android Version Number', androidVersion, TipType.None);
+			tip.setAction(this.setVersion, androidVersion, project, NativePlatform.AndroidOnly);
+			this.add(tip);
+
+			const tip2 = new Tip('iOS Version Number', iosVersion, TipType.None);
+			tip2.setAction(this.setVersion, iosVersion, project, NativePlatform.iOSOnly);
+			this.add(tip2);
 		}
 
 		// Allow the user to increment the build
@@ -267,6 +297,14 @@ export class Project {
 			const tip = new Tip('Build Number', androidBuild?.toString(), TipType.None);
 			tip.setAction(this.setBuild, androidBuild, project);
 			this.add(tip);
+		} else {
+			const tip = new Tip('Android Build Number', androidBuild?.toString(), TipType.None);
+			tip.setAction(this.setBuild, androidBuild, project, NativePlatform.AndroidOnly);
+			this.add(tip);			
+
+			const tip2 = new Tip('iOS Build Number', iosBuild?.toString(), TipType.None);
+			tip2.setAction(this.setBuild, iosBuild, project, NativePlatform.iOSOnly);
+			this.add(tip2);				
 		}
 	}
 
@@ -274,8 +312,9 @@ export class Project {
 	 * Change the Bundle Id of an App in the iOS and Android projects
 	 * @param  {string} bundleId The original bundle id / package name
 	 * @param  {CapacitorProject} project The Capacitor project
+	 * @param  {NativePlatform} platform Whether iOS or Android only (default both)
 	 */
-	private async setBundleId(bundleId: string, project: CapacitorProject) {
+	private async setBundleId(bundleId: string, project: CapacitorProject, platform: NativePlatform) {
 		const newBundleId = await vscode.window.showInputBox({
 			title: 'Application Bundle Id',
 			placeHolder: bundleId,
@@ -287,14 +326,14 @@ export class Project {
 		}
 		const channel = vscode.window.createOutputChannel("Ionic");
 
-		if (project?.ios) {
+		if (project?.ios && platform != NativePlatform.AndroidOnly) {
 			const appTarget = project.ios?.getAppTarget();
 			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
 				channel.appendLine(`Set iOS Bundle Id for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newBundleId}`);
 				project.ios.setBundleId(appTarget.name, buildConfig.name, newBundleId);
 			}
 		}
-		if (project.android) {
+		if (project.android && platform != NativePlatform.iOSOnly) {
 			channel.appendLine(`Set Android Package Name to ${newBundleId}`);
 			await project.android?.setPackageName(newBundleId);
 		}
@@ -305,8 +344,9 @@ export class Project {
 	 * Set Version Number of iOS and Android Project
 	 * @param  {string} version
 	 * @param  {CapacitorProject} project
+	 * @param  {NativePlatform} platform Whether to apply for iOS only, Android only or both (default)
 	 */
-	private async setVersion(version: string, project: CapacitorProject) {
+	private async setVersion(version: string, project: CapacitorProject, platform: NativePlatform) {
 		const newVersion = await vscode.window.showInputBox({
 			title: 'Application Version Number',
 			placeHolder: version,
@@ -318,22 +358,27 @@ export class Project {
 		}
 		const channel = vscode.window.createOutputChannel("Ionic");
 
-		if (project?.ios) {
+		if (project?.ios && platform != NativePlatform.AndroidOnly) {
 			const appTarget = project.ios?.getAppTarget();
 			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
 				channel.appendLine(`Set iOS Version for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newVersion}`);
 				await project.ios.setVersion(appTarget.name, buildConfig.name, newVersion);
 			}
 		}
-		if (project.android) {
+		if (project.android && platform != NativePlatform.iOSOnly) {
 			channel.appendLine(`Set Android Version to ${newVersion}`);
 			await project.android?.setVersionName(newVersion);
 		}
 		project.commit();
 		channel.show();
 	}
-
-	private async setBuild(build: string, project: CapacitorProject) {
+	/**
+	 * Set the build number
+	 * @param  {string} build The build number
+	 * @param  {CapacitorProject} project The Capacitor project
+	 * @param  {NativePlatform} platform Whether to apply on iOS only, Android Only or both (default)
+	 */
+	private async setBuild(build: string, project: CapacitorProject, platform: NativePlatform) {
 		const newBuild = await vscode.window.showInputBox({
 			title: 'Application Build Number',
 			placeHolder: build,
@@ -345,22 +390,28 @@ export class Project {
 		}
 		const channel = vscode.window.createOutputChannel("Ionic");
 
-		if (project?.ios) {
+		if (project?.ios && platform != NativePlatform.AndroidOnly) {
 			const appTarget = project.ios?.getAppTarget();
 			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
 				channel.appendLine(`Set iOS Version for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newBuild}`);
 				await project.ios.setBuild(appTarget.name, buildConfig.name, parseInt(newBuild));
 			}
 		}
-		if (project.android) {
+		if (project.android && platform != NativePlatform.iOSOnly) {
 			channel.appendLine(`Set Android Version to ${newBuild}`);
 			await project.android?.setVersionCode(parseInt(newBuild));
 		}
 		project.commit();
 		channel.show();
 	}
-
-	private async setDisplayName(currentDisplayName: string, project: CapacitorProject, folder: string) {
+	/**
+	 * Set the display name of the app
+	 * @param  {string} currentDisplayName The current value for the display name
+	 * @param  {CapacitorProject} project The Capacitor project
+	 * @param  {string} folder Folder for the project
+	 * @param  {NativePlatform} platform Whether to apply to iOS only, Android only or both (default)
+	 */
+	private async setDisplayName(currentDisplayName: string, project: CapacitorProject, folder: string, platform: NativePlatform) {
 		const displayName = await vscode.window.showInputBox({
 			title: 'Application Display Name',
 			placeHolder: currentDisplayName,
@@ -372,14 +423,14 @@ export class Project {
 		}
 		const channel = vscode.window.createOutputChannel("Ionic");
 		console.log(`Display name changed to ${displayName}`);
-		if (project.ios != null) {
+		if (project.ios != null && platform != NativePlatform.AndroidOnly) {
 			const appTarget = project.ios?.getAppTarget();
 			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
 				channel.appendLine(`Set iOS Displayname for target ${appTarget.name} buildConfig.${buildConfig.name} to ${displayName}`);
 				await project.ios.setDisplayName(appTarget.name, buildConfig.name, displayName);
 			}
 		}
-		if (project.android != null) {
+		if (project.android != null && platform != NativePlatform.iOSOnly) {
 			let data = await project.android?.getResource('values', 'strings.xml');
 			if (!data) {
 				channel.appendLine(`Unable to set Android display name`);
