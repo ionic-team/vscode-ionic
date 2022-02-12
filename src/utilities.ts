@@ -23,7 +23,7 @@ function runOptions(command: string, folder: string) {
 	if (command.includes('sync')) {
 		return { cwd: folder, encoding: 'utf8', env: { ...process.env, LANG: 'en_US.UTF-8' } };
 	}
-	return { cwd: folder };
+	return { cwd: folder, encoding: 'utf8', env: { ...process.env } };
 }
 
 export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject): Promise<void> {

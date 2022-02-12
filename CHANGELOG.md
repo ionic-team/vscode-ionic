@@ -1,6 +1,7 @@
 ## Changelog
 ### Version 0.0.8
 - Handle scenarios with iOS and Android have different bundle ids, display names or version numbers
+- Fix for ensuring environment variables like JAVA_HOME are used when running tasks
 
 ### Version 0.0.7
 - commands running sync will set an environment variable of LANG=en_US.UTF-8 (To avoid cocoapods error)
