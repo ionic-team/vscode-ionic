@@ -7,6 +7,8 @@ This extension for Visual Studio Code provides:
 - Capacitor and Ionic commands
 - Creation of Capacitor based Ionic projects
 
+Note: If you would like the output of commands to be colorized we would recommend installing [this extension](https://marketplace.visualstudio.com/items?itemName=IBM.output-colorizer).
+
 ## Creating Ionic Projects
 - Open an Empty Folder
 - In the Ionic extension choose a starter project

@@ -16,6 +16,8 @@
 - Recommend applying exact version numbers in package.json rather than ~ or ^
 - From packages have an option to add (needs list of good packages)
 - Use npm audit to list vulnerable packages
+- Allow add of plugins: list all official capacitor, ionic enterprise, supported plugins
+- If using say @capacitor/camera then allow editing of info.plist and Android permissions (highlight if empty)
 
 # Bugs
 - Validate input for bundle id (eg no java reserved words), display name and version and build (numbers)
