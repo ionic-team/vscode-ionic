@@ -3,8 +3,10 @@ export class Tip {
 	public doRun: boolean;
 	public doRequestAppName: boolean;
 	public doDeviceSelection: boolean;
+	public doViewEditor: boolean;
 
 	private onAction: (...args) => unknown;
+	private onCommand: (...args) => string;
 	private actionArgs: any[];
 
 	constructor(
@@ -12,7 +14,7 @@ export class Tip {
 		public readonly message: string,
 		public readonly type?: TipType,
 		public readonly description?: string,
-		public readonly command?: string | string[],
+		public command?: string | string[],
 		public commandTitle?: string,
 		public readonly commandSuccess?: string,
 		public url?: string,
@@ -39,14 +41,32 @@ export class Tip {
 		return this;
 	}
 
+	requestViewEditor() {
+		this.doViewEditor = true;
+		return this;
+	}
+
 	setAction(func: (...argsIn) => unknown, ...args) {
 		this.onAction = func;
 		this.actionArgs = args;
+		return this;
+	}
+
+	setDynamicCommand(func: (...argsIn) => string, ...args) {
+		this.onCommand = func;
+		this.actionArgs = args;
+		return this;
 	}
 
 	async executeAction() {
 		if (this.onAction) {
 			await this.onAction(...this.actionArgs);
+		}
+	}
+
+	async generateCommand() {
+		if (this.onCommand) {
+			this.command = this.onCommand(...this.actionArgs);
 		}
 	}
 }

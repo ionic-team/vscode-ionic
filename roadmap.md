@@ -1,7 +1,6 @@
 # ToDo
 - Record video of changing display name, bundle id, version number, build number
-- Work out why packaging requires prettier
-- Support separated capacitor config properties between ios and android
+- Record video of previewing in editor
 - From packages have the option to uninstall
 - From packages have the option to update to any particular version found with `npm view package versions`
 - Option to hide particular recommendations
@@ -21,7 +20,6 @@
 
 # Bugs
 - Validate input for bundle id (eg no java reserved words), display name and version and build (numbers)
-- Settings only apply after a refresh
 
 # Known Issues
 - Colorization of the output window is not supported in VS Code Extensions

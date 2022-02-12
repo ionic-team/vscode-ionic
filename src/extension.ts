@@ -148,7 +148,7 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 						channel.appendLine(cmd);
 						channel.show();
 
-						await run(rootPath, cmd, channel, cancelObject);
+						await run(rootPath, cmd, channel, cancelObject, tip.doViewEditor);
 
 					}
 				} finally {
@@ -162,7 +162,7 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 					increment = 100.0 / secondsTotal;
 				}
 				try {
-					await run(rootPath, command, channel, cancelObject);
+					await run(rootPath, command, channel, cancelObject, tip.doViewEditor);
 				} finally {
 					completeOperation(tip);
 				}
@@ -195,6 +195,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand('ionic.fix', async (tip: Tip) => {
+		tip.generateCommand();
 		if (tip.command) {
 			const urlBtn = tip.url ? 'Info' : undefined;
 			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
@@ -215,6 +216,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand('ionic.run', async (tip: Tip) => {
+		tip.generateCommand();
 		if (tip.command) {
 			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
 			let command = tip.command;
@@ -225,6 +227,7 @@ export function activate(context: vscode.ExtensionContext) {
 				command = await selectDevice(tip.command as string, rootPath, tip);
 			}
 			if (command) {
+				execute(tip);
 				fixIssue(command, rootPath, ionicProvider, tip);
 				return;
 			}

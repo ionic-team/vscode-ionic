@@ -1,4 +1,10 @@
 ## Changelog
+### Version 0.0.9
+- Preview app in VS Code Editor added as an option
+- Settings are now applied immediated (do not require a refresh)
+- Build command now uses ionic build
+- Production flag setting now correctly works
+
 ### Version 0.0.8
 - Handle scenarios with iOS and Android have different bundle ids, display names or version numbers
 - Fix for ensuring environment variables like JAVA_HOME are used when running tasks

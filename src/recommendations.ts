@@ -300,11 +300,11 @@ export class Project {
 		} else {
 			const tip = new Tip('Android Build Number', androidBuild?.toString(), TipType.None);
 			tip.setAction(this.setBuild, androidBuild, project, NativePlatform.AndroidOnly);
-			this.add(tip);			
+			this.add(tip);
 
 			const tip2 = new Tip('iOS Build Number', iosBuild?.toString(), TipType.None);
 			tip2.setAction(this.setBuild, iosBuild, project, NativePlatform.iOSOnly);
-			this.add(tip2);				
+			this.add(tip2);
 		}
 	}
 
@@ -674,22 +674,69 @@ function checkNodeVersion() {
 	}
 }
 
+export function viewInEditor(url: string) {
+	const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
+	if (!previewInEditor) return;
+	const panel = vscode.window.createWebviewPanel(
+		'viewApp', // Identifies the type of the webview. Used internally
+		'Preview', // Title of the panel displayed to the user
+		vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
+		{ enableScripts: true } // Webview options. More on these later.
+	);
+
+	panel.webview.html = getWebviewContent(url);
+}
+
+function getWebviewContent(url: string) {
+	return `<!DOCTYPE html>
+  <html lang="en">
+  <head>
+	  <meta charset="UTF-8">
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	  <title>Preview App</title>
+  </head>
+  <body style="display: flex; align-items: center; justify-content: center;">
+	  <iframe src="${url}" width="375px" height="667px" frameBorder="0">
+  </body>
+  </html>`;
+}
+
+function ionicServe(): string {
+	const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
+	const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
+	let serveFlags = ' --consolelogs';
+	if (previewInEditor) {
+		serveFlags += ' --no-open';
+	}
+	if (httpsForWeb) {
+		serveFlags += ' --ssl';
+	}
+	return `ionic serve${serveFlags}`;
+}
+
+function capRun(platform: string) : string {
+	const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
+	const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
+	let capRunFlags = liveReload ? ' -l' : '';
+	if (externalIP) {
+		if (capRunFlags.length > 0) capRunFlags += ' ';
+		capRunFlags += '--external ';
+	}
+	return `ionic cap run ${platform}${capRunFlags} --list`;
+}
+
+function ionicBuild(): string {
+	const buildForProduction = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
+	const buildFlags = buildForProduction ? ' --prod' : '';
+	return `ionic build${buildFlags}`;
+}
+
 export async function reviewProject(folder: string): Promise<Recommendation[]> {
 	const project: Project = new Project('My Project');
 	const packages = load(folder, project);
 
 	checkNodeVersion();
-	const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
-	const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
-	const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
-	const buildForProduction = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
-	let capRunFlags = liveReload ? ' -l' : '';
-	const serveFlags = httpsForWeb ? ' --ssl' : '';
-	const buildFlags = buildForProduction ? ' --prod' : '';
-	if (externalIP) {
-		if (capRunFlags.length > 0) capRunFlags += ' ';
-		capRunFlags += '--external ';
-	}
+
 
 	project.type = isCapacitor() ? 'Capacitor' : 'Cordova';
 	project.folder = folder;
@@ -704,14 +751,14 @@ export async function reviewProject(folder: string): Promise<Recommendation[]> {
 
 		const hasCapIos = exists('@capacitor/ios');
 		const hasCapAndroid = exists('@capacitor/android');
-		project.add(new Tip('Run On Web', '', TipType.Run, 'Serve', `ionic serve${serveFlags}`, 'Running on Web', `Project Served`));
+		project.add(new Tip('Run On Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setDynamicCommand(ionicServe).requestViewEditor());
 		if (hasCapAndroid) {
-			project.add(new Tip('Run On Android', '', TipType.Run, 'Run', `ionic cap run android${capRunFlags} --list`, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection());
+			project.add(new Tip('Run On Android', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection().setDynamicCommand(capRun, 'android'));
 		}
 		if (hasCapIos) {
-			project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', `ionic cap run ios${capRunFlags} --list`, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection());
+			project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection().setDynamicCommand(capRun, 'ios'));
 		}
-		project.add(new Tip('Build', '', TipType.Build, 'Build', `npm run build${buildFlags}`, 'Building', undefined));
+		project.add(new Tip('Build', '', TipType.Build, 'Build', undefined, 'Building', undefined).setDynamicCommand(ionicBuild));
 		if (exists('@capacitor/core')) {
 			project.add(new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', `npx cap sync`, 'Syncing', undefined));
 		}

@@ -4,12 +4,14 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import { clearRefreshCache } from './process-packages';
+import { viewInEditor } from './recommendations';
 
 export interface CancelObject {
 	proc: child_process.ChildProcess;
 }
 
 const opTiming = {};
+let serverUrl = undefined;
 
 export function estimateRunTime(command: string) {
 	if (opTiming[command]) {
@@ -26,7 +28,7 @@ function runOptions(command: string, folder: string) {
 	return { cwd: folder, encoding: 'utf8', env: { ...process.env } };
 }
 
-export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject): Promise<void> {
+export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject, viewEditor: boolean): Promise<void> {
 	if (command == 'rem-cordova') {
 		return removeCordovaFromPackageJSON(folder);
 	}
@@ -51,6 +53,14 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 			}
 		});
 		proc.stdout.on('data', (data) => {
+			if (data && viewEditor) {
+				if (data.includes('Local: http')) {
+					serverUrl = getStringFrom(data, 'Local: ','\n');
+				} else if ((data.includes('Compiled successfully') || data.includes('No issues found.'))) {
+					viewInEditor(serverUrl);
+					serverUrl = undefined;
+				}
+			}
 			channel.append(data);
 			channel.show();
 		});

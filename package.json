@@ -119,6 +119,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Use the production configuration when building the application."
+				},
+				"ionic.previewInEditor": {
+					"type": "boolean",
+					"default": false,
+					"description": "Preview the application in the VS Code Editor."
 				}
 			}
 		}
