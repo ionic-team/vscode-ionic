@@ -4,6 +4,7 @@ export class Tip {
 	public doRequestAppName: boolean;
 	public doDeviceSelection: boolean;
 	public doViewEditor: boolean;
+	public cancelRequested: boolean;
 
 	private onAction: (...args) => unknown;
 	private onCommand: (...args) => string;

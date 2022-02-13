@@ -4,6 +4,7 @@
 - Settings are now applied immediated (do not require a refresh)
 - Build command now uses ionic build
 - Production flag setting now correctly works
+- When rerunning an operation the previous operation is cancelled
 
 ### Version 0.0.8
 - Handle scenarios with iOS and Android have different bundle ids, display names or version numbers

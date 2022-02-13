@@ -95,6 +95,14 @@ function isRunning(tip: Tip) {
 	return (found != undefined);
 }
 
+function cancelRunning(tip: Tip) : Promise<void> {
+	const found = runningOperations.find((found) => { return found.title == tip.title; });
+	if (found) {
+		found.cancelRequested = true;
+	}
+	return new Promise(resolve => setTimeout(resolve, 1000));
+}
+
 function completeOperation(tip: Tip) {
 	runningOperations = runningOperations.filter((op: Tip) => {
 		return op.title != tip.title;
@@ -114,8 +122,9 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 		channel = vscode.window.createOutputChannel("Ionic");
 	}
 	if (isRunning(tip)) {
-		vscode.window.showInformationMessage(`The operation "${tip.title}" is already running. Click on the operation in the status bar to cancel it.`);
-		return;
+		await cancelRunning(tip);
+		// vscode.window.showInformationMessage(`The operation "${tip.title}" is already running. Click on the operation in the status bar to cancel it.`);
+		// return;
 	}
 	runningOperations.push(tip);
 	const msg = tip.commandProgress ? tip.commandProgress : tip.commandTitle ? tip.commandTitle : command;
@@ -131,7 +140,9 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 			let increment = undefined;
 			const interval = setInterval(() => {
 				// Kill the process if the user cancels				
-				if (token.isCancellationRequested) {
+				if (token.isCancellationRequested || tip.cancelRequested) {
+					tip.cancelRequested = false;
+					channel.appendLine(`Canceled operation "${tip.title}"`);
 					clearInterval(interval);
 					completeOperation(tip);
 					cancelObject.proc.kill();
