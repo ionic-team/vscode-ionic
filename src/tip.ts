@@ -98,5 +98,6 @@ export enum TipType {
 	Comment,
 	Settings,
 	Sync,
+	Add,
 	None
 }

@@ -273,21 +273,14 @@ function listPackages(project: Project, title: string, description: string, pack
 	if (count == 0) return;
 
 	if (title) {
-		project.setGroup(`${count} ${title}`, description, tipType);
+		project.setGroup(`${count} ${title}`, description, tipType, undefined, 'packages');
 	}
-
-	//mark(`| ${depType}   | Current   | Available | Last Release | Description |`);
-	//mark(`| :----------- | --------: | --------: | :----------- | :---------- |`);
 
 	for (const library of Object.keys(packages)) {
 		if (packages[library].depType == depType) {
 			let v = `${packages[library].version}`;
 			if (v == 'null') v = '[custom]';
-			// if (packages[library].change == 'none') {
-			// 	mark(`${library} ${v}`);
-			// } else {
-			// 	mark(`${library} ${v} ${dark('(' + packages[library].latest + ' is available)')}`);
-			// }
+
 			let url = packages[library].url;
 			if (url) {
 				url = url.replace('git+', '');
@@ -301,7 +294,6 @@ function listPackages(project: Project, title: string, description: string, pack
 			} else if (packages[library].change == 'minor') {
 				update = `Minor update available to ${packages[library].latest}`;
 			}
-			// if (packages[library].isOld) {}
 			const packageName = markupLink(library, url);
 			const description = packages[library].description;
 			if (v != packages[library].latest && (packages[library].latest != 'Unknown')) {
@@ -317,19 +309,12 @@ function listChanges(project: Project, title, description, packages, changeType)
 	const count = Object.keys(packages).filter((library) => { return (packages[library].change == changeType); }).length;
 	project.setGroup(`${count} ${title}`, description);
 
-	// mark(`| Package      | Current   | Available |`);
-	// mark(`| :----------- | --------: | --------: |`);
 	for (const library of Object.keys(packages)) {
 		if (packages[library].change == changeType) {
 			let v = `${packages[library].version}`;
 			if (v == 'null') v = '[custom]';
 
-			//project.note(library, `${v} → ${packages[library].latest}`);
 			project.upgrade(library, `${v} → ${packages[library].latest}`, v, packages[library].latest);
-			// note('Recommendation',
-			// 	`Upgrade ${libString(library)} from ${v} to ${packages[library].latest}`,
-			// 	`| ${library} | ${v} | ${packages[library].latest} |`
-			// );
 		}
 	}
 }

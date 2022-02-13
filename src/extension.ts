@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import { IonicTreeProvider } from './ionic-tree-provider';
 import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
+import { installPackage } from './recommendations';
 import { Tip, TipType } from './tip';
 import { CancelObject, run, getRunOutput, handleError, estimateRunTime } from './utilities';
 
@@ -116,7 +117,7 @@ function completeOperation(tip: Tip) {
  * @param  {IonicTreeProvider} ionicProvider? the provide which will be refreshed on completion
  * @param  {string} successMessage? Message to display if successful 
  */
-async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, tip?: Tip, successMessage?: string) {
+export async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, tip?: Tip, successMessage?: string) {
 	//Create output channel
 	if (!channel) {
 		channel = vscode.window.createOutputChannel("Ionic");
@@ -193,13 +194,20 @@ export function activate(context: vscode.ExtensionContext) {
 	const rootPath = (vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 0))
 		? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 
-	const ionicProvider = new IonicTreeProvider(rootPath);
+	const ionicProvider = new IonicTreeProvider(rootPath, context.extensionPath);
 	vscode.window.registerTreeDataProvider('ionic', ionicProvider);
 	vscode.commands.registerCommand('ionic.refresh', () => {
 		clearRefreshCache();
 		ionicProvider.refresh();
 	});
-	vscode.commands.registerCommand('ionic.add', () => vscode.window.showInformationMessage(`Successfully called add entry.`));
+	
+	vscode.commands.registerCommand('ionic.add', async (tip: Tip) => {
+		await installPackage(context.extensionPath, rootPath);
+		if (ionicProvider) {
+			ionicProvider.refresh();
+		}
+	});
+
 	vscode.commands.registerCommand('ionic.edit', (node: Recommendation) => {
 		const url = node.url ? node.url : `https://www.npmjs.com/package/${node.label}`;
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));

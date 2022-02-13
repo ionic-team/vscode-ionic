@@ -65,7 +65,11 @@
 			},
 			{
 				"command": "ionic.add",
-				"title": "Add"
+				"title": "Add",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add.svg"
+				}
 			},
 			{
 				"command": "ionic.edit",
@@ -91,8 +95,8 @@
 			],
 			"view/item/context": [
 				{
-					"command": "ionic.edit",
-					"when": "view == ionic && viewItem == recommendation && false && 'enable if you want an info button link'",
+					"command": "ionic.add",
+					"when": "view == ionic && viewItem == packages",
 					"group": "inline"
 				}
 			]

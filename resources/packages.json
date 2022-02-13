@@ -1,0 +1,32 @@
+[
+	{
+		"label": "Auth Connect",
+		"description": "@ionic-enterprise/auth",
+		"detail": "Connect to your Authentication provider from any mobile device"
+	},
+	{
+		"label": "Identity Vault",
+		"description": "@ionic-enterprise/identity-vault",
+		"detail": "Lock down sensitive data with advanced biometrics"
+	},
+	{
+		"label": "Secure Storage",
+		"description": "@ionic-enterprise/secure-storage",
+		"detail": "High performance secure data storage"
+	},
+	{
+		"label": "Microsoft Intune",
+		"description": "@ionic-enterprise/intune",
+		"detail": "MDM and MAM solution for secure enterprise apps"
+	},
+	{
+		"label": "Apple Pay",
+		"description": "@ionic-enterprise/apple-pay",
+		"detail": "Secure payments with Apple Pay"
+	},
+	{
+		"label": "Google Pay",
+		"description": "@ionic-enterprise/google-pay",
+		"detail": "Secure payments with Google Pay"
+	}
+]

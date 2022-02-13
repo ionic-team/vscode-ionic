@@ -21,63 +21,15 @@ export class Recommendation extends vscode.TreeItem {
 		this.description = this.title;
 	}
 
-	public iconDependency() {
-		this.setIcon('dependency');
-	}
-
-	public iconCapacitor() {
-		this.setIcon('capacitor');
-	}
-
-	public iconCordova() {
-		this.setIcon('cordova');
-	}
-
-	public iconIonic() {
-		this.setIcon('ionic');
-	}
-
-	public iconAndroid() {
-		this.setIcon('android');
-	}
-
-	public iconVue() {
-		this.setIcon('vue');
-	}
-
-	public iconReplace() {
-		this.setIcon('files');
-	}
-
-	public iconRun() {
-		this.setIcon('run');
-	}
-
-	public iconError() {
-		this.setIcon('error');
-	}
-
-	public iconWarning() {
-		this.setIcon('warning');
-	}
-
-	public iconIdea() {
-		this.setIcon('lightbulb');
-	}
-
-	public iconComment() {
-		this.setIcon('comment');
-	}
-
-	public iconSettings() {
-		this.setIcon('settings-gear');
-	}
-
 	public setIcon(name: string) {
 		this.iconPath = {
 			light: path.join(__filename, '..', '..', 'resources', 'light', name + '.svg'),
 			dark: path.join(__filename, '..', '..', 'resources', 'dark', name + '.svg')
 		};
+	}
+
+	public setContext(value: string) {
+		this.contextValue = value;
 	}
 
 	iconPath = undefined;

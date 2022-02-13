@@ -27,6 +27,7 @@ import * as path from 'path';
 import { CapacitorProject } from '@capacitor/project';
 import { CapacitorConfig } from '@capacitor/cli';
 import { getPackageJSON, getRunOutput, getStringFrom, PackageFile, setStringIn } from './utilities';
+import { fixIssue } from './extension';
 
 enum NativePlatform {
 	iOSOnly,
@@ -174,20 +175,19 @@ export class Project {
 		this.name = _name;
 	}
 
-	public setGroup(title: string, message: string, type?: TipType, expanded?: boolean) {
+	public setGroup(title: string, message: string, type?: TipType, expanded?: boolean, contextValue?: string) {
 
 		// If the last group has no items in it then remove it (eg if there are no recommendations for a project)
 		if (this.groups.length > 1 && this.groups[this.groups.length - 1].children.length == 0) {
 			this.groups.pop();
 		}
 		const r = new Recommendation(message, '', title, expanded ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.Collapsed);
+		if (contextValue) {
+			r.setContext(contextValue);
+		}
 		r.children = [];
-		r.iconDependency();
-		if (type == TipType.Capacitor) r.iconCapacitor();
-		if (type == TipType.Cordova) r.iconCordova();
-		if (type == TipType.Ionic) r.iconIonic();
-		if (type == TipType.Android) r.iconAndroid();
-		if (type == TipType.Vue) r.iconVue();
+		r.setIcon('dependency');
+		this.setIcon(type, r);
 		this.group = r;
 		this.groups.push(this.group);
 	}
@@ -471,18 +471,19 @@ export class Project {
 
 	setIcon(tipType: TipType, r: Recommendation) {
 		switch (tipType) {
-			case TipType.Error: r.iconError(); break;
-			case TipType.Warning: r.iconWarning(); break;
-			case TipType.Idea: r.iconIdea(); break;
-			case TipType.Cordova: r.iconCordova(); break;
-			case TipType.Capacitor: r.iconCapacitor(); break;
-			case TipType.Ionic: r.iconIonic(); break;
-			case TipType.Android: r.iconAndroid(); break;
-			case TipType.Comment: r.iconComment(); break;
-			case TipType.Settings: r.iconSettings(); break;
-			case TipType.Run: r.iconRun(); break;
-			case TipType.Link: r.iconReplace(); break;
+			case TipType.Error: r.setIcon('error'); break;
+			case TipType.Warning: r.setIcon('warning'); break;
+			case TipType.Idea: r.setIcon('lightbulb'); break;
+			case TipType.Cordova: r.setIcon('cordova'); break;
+			case TipType.Capacitor: r.setIcon('capacitor'); break;
+			case TipType.Ionic: r.setIcon('ionic'); break;
+			case TipType.Android: r.setIcon('android'); break;
+			case TipType.Comment: r.setIcon('comment'); break;
+			case TipType.Settings: r.setIcon('settings-gear'); break;
+			case TipType.Run: r.setIcon('run'); break;
+			case TipType.Link: r.setIcon('files'); break;
 			case TipType.None: break;
+			case TipType.Add: r.setIcon('add'); break;
 			case TipType.Sync: r.setIcon('sync'); break;
 			case TipType.Build: r.setIcon('build'); break;
 			case TipType.Edit: r.setIcon('edit'); break;
@@ -690,6 +691,20 @@ function checkNodeVersion() {
 	}
 }
 
+export async function installPackage(extensionPath: string, folder: string) {
+	let items: Array<vscode.QuickPickItem> = [];
+	const filename = path.join(extensionPath, 'resources', 'packages.json');
+	items = JSON.parse(fs.readFileSync(filename) as any);
+	items.map(item => { item.description = item.detail; item.detail = undefined; });
+	//const selected = await vscode.window.showQuickPick(items, { placeHolder: 'Select a package to install' });
+	const selected = await vscode.window.showInputBox({ placeHolder: 'Enter package name to install' });
+	if (!selected) return;
+	await fixIssue(`npm install ${selected}`, folder, undefined,
+		new Tip(`Install ${selected}`, undefined, TipType.Run, undefined, undefined,
+			`Installing ${selected}`,
+			`Installed ${selected}`).showProgressDialog());
+}
+
 export function viewInEditor(url: string) {
 	const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
 	if (!previewInEditor) return;
@@ -747,7 +762,7 @@ function ionicBuild(): string {
 	return `ionic build${buildFlags}`;
 }
 
-export async function reviewProject(folder: string): Promise<Recommendation[]> {
+export async function reviewProject(folder: string, extensionPath: string): Promise<Recommendation[]> {
 	const project: Project = new Project('My Project');
 	const packages = load(folder, project);
 
@@ -940,7 +955,7 @@ export async function reviewProject(folder: string): Promise<Recommendation[]> {
 
 	if (isCapacitor() && !isCordova()) {
 		project.tips(capacitorRecommendations(project));
-	}
+	}	
 
 	reviewPackages(packages, project);
 	reviewPluginProperties(packages, project);
