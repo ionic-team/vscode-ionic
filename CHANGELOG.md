@@ -1,6 +1,7 @@
 ## Changelog
 ### Version 0.0.9
 - Preview app in VS Code Editor added as an option
+- Option to uninstall packages
 - Settings are now applied immediated (do not require a refresh)
 - Build command now uses ionic build
 - Production flag setting now correctly works

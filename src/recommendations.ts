@@ -567,6 +567,22 @@ export class Project {
 				`${name} upgraded to ${toVersion}`,
 				`https://www.npmjs.com/package/${name}`,
 				`Upgrading ${name}`
+			).setSecondCommand('Uninstall', `npm uninstall ${name}`));
+		}
+	}
+
+	public package(name: string, message: string) {
+		if (exists(name)) {
+			this.add(new Tip(
+				name,
+				message,
+				undefined,
+				`Uninstall`,
+				`npm uninstall ${name}`,
+				`Uninstall`,
+				`${name} Uninstalled`,
+				`https://www.npmjs.com/package/${name}`,
+				`Uninstalling ${name}`
 			));
 		}
 	}
@@ -714,7 +730,7 @@ function ionicServe(): string {
 	return `ionic serve${serveFlags}`;
 }
 
-function capRun(platform: string) : string {
+function capRun(platform: string): string {
 	const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
 	const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
 	let capRunFlags = liveReload ? ' -l' : '';

@@ -5,6 +5,8 @@ export class Tip {
 	public doDeviceSelection: boolean;
 	public doViewEditor: boolean;
 	public cancelRequested: boolean;
+	public secondCommand: string;
+	public secondTitle: string;
 
 	private onAction: (...args) => unknown;
 	private onCommand: (...args) => string;
@@ -56,6 +58,12 @@ export class Tip {
 	setDynamicCommand(func: (...argsIn) => string, ...args) {
 		this.onCommand = func;
 		this.actionArgs = args;
+		return this;
+	}
+
+	setSecondCommand(title: string, command: string) : Tip {
+		this.secondCommand = command;
+		this.secondTitle = title;
 		return this;
 	}
 

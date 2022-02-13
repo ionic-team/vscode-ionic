@@ -95,7 +95,7 @@ function isRunning(tip: Tip) {
 	return (found != undefined);
 }
 
-function cancelRunning(tip: Tip) : Promise<void> {
+function cancelRunning(tip: Tip): Promise<void> {
 	const found = runningOperations.find((found) => { return found.title == tip.title; });
 	if (found) {
 		found.cancelRequested = true;
@@ -116,7 +116,7 @@ function completeOperation(tip: Tip) {
  * @param  {IonicTreeProvider} ionicProvider? the provide which will be refreshed on completion
  * @param  {string} successMessage? Message to display if successful 
  */
-async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, tip?: Tip) {
+async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, tip?: Tip, successMessage?: string) {
 	//Create output channel
 	if (!channel) {
 		channel = vscode.window.createOutputChannel("Ionic");
@@ -184,8 +184,8 @@ async function fixIssue(command: string | string[], rootPath: string, ionicProvi
 	if (ionicProvider) {
 		ionicProvider.refresh();
 	}
-	if (tip.commandSuccess) {
-		vscode.window.showInformationMessage(`${tip.commandSuccess}`);
+	if (successMessage) {
+		vscode.window.showInformationMessage(successMessage);
 	}
 }
 
@@ -210,9 +210,12 @@ export function activate(context: vscode.ExtensionContext) {
 		if (tip.command) {
 			const urlBtn = tip.url ? 'Info' : undefined;
 			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
-			const selection = await vscode.window.showInformationMessage(info, urlBtn, tip.commandTitle);
+			const selection = await vscode.window.showInformationMessage(info, urlBtn, tip.secondTitle, tip.commandTitle);
 			if (selection == tip.commandTitle) {
-				fixIssue(tip.command, rootPath, ionicProvider, tip);
+				fixIssue(tip.command, rootPath, ionicProvider, tip, tip.commandSuccess);
+			}
+			if (selection == tip.secondTitle) {
+				fixIssue(tip.secondCommand, rootPath, ionicProvider, tip);
 			}
 			if (selection && selection == urlBtn) {
 				vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));

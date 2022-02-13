@@ -1,7 +1,6 @@
 # ToDo
 - Record video of changing display name, bundle id, version number, build number
 - Record video of previewing in editor
-- From packages have the option to uninstall
 - From packages have the option to update to any particular version found with `npm view package versions`
 - Option to hide particular recommendations
 - Detect Capacitor CLI and fallback to it for non-ionic projects
