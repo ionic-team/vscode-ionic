@@ -742,7 +742,7 @@ function ionicServe(): string {
 	if (httpsForWeb) {
 		serveFlags += ' --ssl';
 	}
-	return `ionic serve${serveFlags}`;
+	return `npx ionic serve${serveFlags}`;
 }
 
 function capRun(platform: string): string {
@@ -753,7 +753,7 @@ function capRun(platform: string): string {
 		if (capRunFlags.length > 0) capRunFlags += ' ';
 		capRunFlags += '--external ';
 	}
-	return `ionic cap run ${platform}${capRunFlags} --list`;
+	return `npx ionic cap run ${platform}${capRunFlags} --list`;
 }
 
 function ionicBuild(folder: string): string {
@@ -762,7 +762,7 @@ function ionicBuild(folder: string): string {
 
 	const nmf = path.join(folder, 'node_modules');
 	const preop = (!fs.existsSync(nmf)) ? 'npm install && ' : '';
-	return `${preop}ionic build${buildFlags}`;
+	return `${preop}npx ionic build${buildFlags}`;
 }
 
 export async function reviewProject(folder: string, extensionPath: string): Promise<Recommendation[]> {

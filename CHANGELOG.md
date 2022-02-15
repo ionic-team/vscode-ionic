@@ -2,6 +2,7 @@
 ### Version 0.0.10
 - When building/syncing show percentage (eg Building 65%)
 - When building Will perform npm install if no node_modules folder present
+- Ionic ClI comands are prefixed with npx to ensure that the local cli is used before global
 
 
 ### Version 0.0.9
