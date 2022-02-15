@@ -22,10 +22,16 @@ export function estimateRunTime(command: string) {
 }
 
 function runOptions(command: string, folder: string) {
+	const env = { ...process.env };
+	const javaHome: string = vscode.workspace.getConfiguration('ionic').get('javaHome');
 	if (command.includes('sync')) {
-		return { cwd: folder, encoding: 'utf8', env: { ...process.env, LANG: 'en_US.UTF-8' } };
+		env.LANG = 'en_US.UTF-8';
 	}
-	return { cwd: folder, encoding: 'utf8', env: { ...process.env } };
+	if (javaHome) {
+		env.JAVA_HOME = javaHome;
+	}
+
+	return { cwd: folder, encoding: 'utf8', env: env };
 }
 
 export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject, viewEditor: boolean): Promise<void> {

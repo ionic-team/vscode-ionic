@@ -194,6 +194,13 @@ export function activate(context: vscode.ExtensionContext) {
 	const rootPath = (vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 0))
 		? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 
+
+	let javaHome: string = vscode.workspace.getConfiguration('ionic').get('javaHome');
+	if (!javaHome || javaHome.length === 1) {
+		javaHome = process.env['JAVA_HOME'];
+		vscode.workspace.getConfiguration('ionic').update('javaHome',javaHome, vscode.ConfigurationTarget.Global);		
+	}
+
 	const ionicProvider = new IonicTreeProvider(rootPath, context.extensionPath);
 	vscode.window.registerTreeDataProvider('ionic', ionicProvider);
 	vscode.commands.registerCommand('ionic.refresh', () => {

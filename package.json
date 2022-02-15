@@ -128,6 +128,12 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Preview the application in the VS Code Editor."
+				},
+				"ionic.javaHome": {
+					"type": "string",
+					"scope": "application",
+					"default": "",
+					"description": "Location of JAVA_HOME. Used to specify how Android will be built"
 				}
 			}
 		}
