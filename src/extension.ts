@@ -235,10 +235,10 @@ export function activate(context: vscode.ExtensionContext) {
 			const urlBtn = tip.url ? 'Info' : undefined;
 			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
 			const selection = await vscode.window.showInformationMessage(info, urlBtn, tip.secondTitle, tip.commandTitle);
-			if (selection == tip.commandTitle) {
+			if (selection && selection == tip.commandTitle) {
 				fixIssue(tip.command, rootPath, ionicProvider, tip, tip.commandSuccess);
 			}
-			if (selection == tip.secondTitle) {
+			if (selection && selection == tip.secondTitle) {
 				fixIssue(tip.secondCommand, rootPath, ionicProvider, tip);
 			}
 			if (selection && selection == urlBtn) {

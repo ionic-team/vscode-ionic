@@ -3,7 +3,8 @@
 - When building/syncing show percentage (eg Building 65%)
 - When building Will perform npm install if no node_modules folder present
 - Ionic ClI comands are prefixed with npx to ensure that the local cli is used before global
-
+- Scoped packages are placed in a subfolder. Eg @capacitor, @ionic etc
+- Packages are sorted alphabetically
 
 ### Version 0.0.9
 - Preview app in VS Code Editor added as an option

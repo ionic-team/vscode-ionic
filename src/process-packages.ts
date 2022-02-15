@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Tip, TipType } from './tip';
 import { Project } from './recommendations';
-import { getRunOutput } from './utilities';
+import { getRunOutput, getStringFrom } from './utilities';
 
 let outdatedCache: string;
 
@@ -24,12 +24,12 @@ export async function processPackages(folder: string, allDependencies, devDepend
 	try {
 		if (!outdatedCache) {
 			outdated = await getRunOutput('npm outdated --json', folder);
-//			outdated = child_process.execSync('npm outdated --json', { cwd: folder, encoding: 'utf8' }).toString();
+			//			outdated = child_process.execSync('npm outdated --json', { cwd: folder, encoding: 'utf8' }).toString();
 			outdatedCache = outdated;
 		} else {
 			outdated = outdatedCache;
 		}
-		
+
 	} catch (err) {
 		console.error(err);
 	}
@@ -266,10 +266,6 @@ function findAll(content, search: string, endsearch: string): Array<any> {
 	return result;
 }
 
-function markupLink(message, url) {
-	return url ? `[${message}](${url})` : message;
-}
-
 function listPackages(project: Project, title: string, description: string, packages, depType: string, tipType?: TipType) {
 	const count = Object.keys(packages).filter((library) => { return (packages[library].depType == depType); }).length;
 	if (count == 0) return;
@@ -278,7 +274,8 @@ function listPackages(project: Project, title: string, description: string, pack
 		project.setGroup(`${count} ${title}`, description, tipType, undefined, 'packages');
 	}
 
-	for (const library of Object.keys(packages)) {
+	let lastScope;
+	for (const library of Object.keys(packages).sort()) {
 		if (packages[library].depType == depType) {
 			let v = `${packages[library].version}`;
 			if (v == 'null') v = '[custom]';
@@ -288,7 +285,6 @@ function listPackages(project: Project, title: string, description: string, pack
 				url = url.replace('git+', '');
 			}
 			const updated = packages[library].updated;
-
 			const available = packages[library].latest;
 			let update = '';
 			if (packages[library].change == 'major') {
@@ -296,12 +292,25 @@ function listPackages(project: Project, title: string, description: string, pack
 			} else if (packages[library].change == 'minor') {
 				update = `Minor update available to ${packages[library].latest}`;
 			}
-			const packageName = markupLink(library, url);
+
 			const description = packages[library].description;
+			const scope = getStringFrom(library, '@', '/');
+			if (scope != lastScope) {
+				if (scope) {
+					project.addSubGroup(scope);
+					lastScope = scope;
+				} else {
+					project.clearSubgroup();
+				}
+			}
+			let libraryTitle = library;
+			if (scope) {
+				libraryTitle = library.substring(scope.length + 2);
+			}
 			if (v != packages[library].latest && (packages[library].latest != 'Unknown')) {
-				project.upgrade(library, `${v} → ${packages[library].latest}`, v, packages[library].latest);
+				project.upgrade(library, libraryTitle, `${v} → ${packages[library].latest}`, v, packages[library].latest);
 			} else {
-				project.package(`${packageName}`, `${v}`);
+				project.package(library, libraryTitle, `${v}`);
 			}
 		}
 	}
@@ -316,7 +325,7 @@ function listChanges(project: Project, title, description, packages, changeType)
 			let v = `${packages[library].version}`;
 			if (v == 'null') v = '[custom]';
 
-			project.upgrade(library, `${v} → ${packages[library].latest}`, v, packages[library].latest);
+			project.upgrade(library, library, `${v} → ${packages[library].latest}`, v, packages[library].latest);
 		}
 	}
 }
