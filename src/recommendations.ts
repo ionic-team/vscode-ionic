@@ -29,6 +29,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 import { getPackageJSON, getRunOutput, getStringFrom, PackageFile, setStringIn } from './utilities';
 import { fixIssue } from './extension';
 
+
 enum NativePlatform {
 	iOSOnly,
 	AndroidOnly
@@ -168,6 +169,7 @@ export class Project {
 	type: string = undefined;
 	folder: string;
 	group: Recommendation;
+	subgroup: Recommendation;
 	groups: Recommendation[] = [];
 	capConfig: CapacitorConfig;
 
@@ -516,7 +518,22 @@ export class Project {
 
 		const r = new Recommendation(tip.message, tip.message, tip.title, vscode.TreeItemCollapsibleState.None, cmd, tip, tip.url);
 		this.setIcon(tip.type, r);
+		if (this.subgroup) {
+			this.subgroup.children.push(r);
+		} else {
+			this.group.children.push(r);
+		}
+	}
+
+	public addSubGroup(title: string) {
+		const r = new Recommendation(undefined, undefined, '@' + title, vscode.TreeItemCollapsibleState.Expanded);		
+		r.children = [];
 		this.group.children.push(r);
+		this.subgroup = r;
+	}
+
+	public clearSubgroup() {
+		this.subgroup = undefined;
 	}
 
 	public recommendReplace(name: string, title: string, message: string, description: string, replacement: string) {
@@ -547,7 +564,7 @@ export class Project {
 		}
 	}
 
-	public upgrade(name: string, message: string, fromVersion: string, toVersion: string) {
+	public upgrade(name: string, title: string, message: string, fromVersion: string, toVersion: string) {
 		if (exists(name)) {
 			let extra = '';
 			if (name == '@capacitor/core') {
@@ -559,7 +576,7 @@ export class Project {
 				}
 			}
 			this.add(new Tip(
-				name,
+				title,
 				message,
 				undefined,
 				`Upgrade ${name} from ${fromVersion} to ${toVersion}`,
@@ -568,17 +585,17 @@ export class Project {
 				`${name} upgraded to ${toVersion}`,
 				`https://www.npmjs.com/package/${name}`,
 				`Upgrading ${name}`
-			).setSecondCommand('Uninstall', `npm uninstall ${name}`));
+			).setSecondCommand(`Uninstall`, `npm uninstall ${name}`));
 		}
 	}
 
-	public package(name: string, message: string) {
+	public package(name: string, title: string, message: string) {
 		if (exists(name)) {
 			this.add(new Tip(
-				name,
+				title,
 				message,
 				undefined,
-				`Uninstall`,
+				`Uninstall ${name}`,
 				`npm uninstall ${name}`,
 				`Uninstall`,
 				`${name} Uninstalled`,
@@ -643,7 +660,7 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
 			TipType.Run,
 			'Create Project',
 			[`ionic start @app ${starter.name} --capacitor`,
-				process.platform === "win32" ? `move @app .`: `mv @app/{,.[^.]}* .`,
+			process.platform === "win32" ? `move @app .` : `mv @app/{,.[^.]}* .`,
 				`rmdir @app`
 			],
 			'Creating Project',
@@ -959,7 +976,7 @@ export async function reviewProject(folder: string, extensionPath: string): Prom
 
 	if (isCapacitor() && !isCordova()) {
 		project.tips(capacitorRecommendations(project));
-	}	
+	}
 
 	reviewPackages(packages, project);
 	reviewPluginProperties(packages, project);
