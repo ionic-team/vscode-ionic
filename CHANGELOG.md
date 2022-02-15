@@ -1,4 +1,9 @@
 ## Changelog
+### Version 0.0.10
+- When building/syncing show percentage (eg Building 65%)
+- When building Will perform npm install if no node_modules folder present
+
+
 ### Version 0.0.9
 - Preview app in VS Code Editor added as an option
 - Option to install new packages

@@ -756,10 +756,13 @@ function capRun(platform: string): string {
 	return `ionic cap run ${platform}${capRunFlags} --list`;
 }
 
-function ionicBuild(): string {
+function ionicBuild(folder: string): string {
 	const buildForProduction = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
 	const buildFlags = buildForProduction ? ' --prod' : '';
-	return `ionic build${buildFlags}`;
+
+	const nmf = path.join(folder, 'node_modules');
+	const preop = (!fs.existsSync(nmf)) ? 'npm install && ' : '';
+	return `${preop}ionic build${buildFlags}`;
 }
 
 export async function reviewProject(folder: string, extensionPath: string): Promise<Recommendation[]> {
@@ -789,7 +792,8 @@ export async function reviewProject(folder: string, extensionPath: string): Prom
 		if (hasCapIos) {
 			project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection().setDynamicCommand(capRun, 'ios'));
 		}
-		project.add(new Tip('Build', '', TipType.Build, 'Build', undefined, 'Building', undefined).setDynamicCommand(ionicBuild));
+
+		project.add(new Tip('Build', '', TipType.Build, 'Build', undefined, 'Building', undefined).setDynamicCommand(ionicBuild, folder));
 		if (exists('@capacitor/core')) {
 			project.add(new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', `npx cap sync`, 'Syncing', undefined));
 		}

@@ -140,6 +140,7 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 		async (progress, token) => {
 			const cancelObject: CancelObject = { proc: undefined };
 			let increment = undefined;
+			let percentage = undefined;
 			const interval = setInterval(() => {
 				// Kill the process if the user cancels				
 				if (token.isCancellationRequested || tip.cancelRequested) {
@@ -150,7 +151,8 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 					cancelObject.proc.kill();
 				} else {
 					if (increment) {
-						progress.report({ increment: increment });
+						percentage += increment;
+						progress.report({message: `${parseInt(percentage)}%`,  increment: increment });						
 					}
 				}
 			}, 1000);
@@ -173,6 +175,7 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 				const secondsTotal = estimateRunTime(command);
 				if (secondsTotal) {
 					increment = 100.0 / secondsTotal;
+					percentage = 0;					
 				}
 				try {
 					await run(rootPath, command, channel, cancelObject, tip.doViewEditor);
@@ -196,15 +199,16 @@ export function activate(context: vscode.ExtensionContext) {
 		? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
 
 
-	let javaHome: string = vscode.workspace.getConfiguration('ionic').get('javaHome');
-	if (!javaHome || javaHome.length === 1) {
-		javaHome = process.env['JAVA_HOME'];
-		const jre = '/Applications/Android Studio.app/Contents/jre/Contents/Home';
-		if (fs.lstatSync(jre).isDirectory()) {
-			javaHome = jre;
-		}
-		vscode.workspace.getConfiguration('ionic').update('javaHome',javaHome, vscode.ConfigurationTarget.Global);		
-	}
+	// let javaHome: string = vscode.workspace.getConfiguration('ionic').get('javaHome');
+	// if (!javaHome || javaHome.length === 1) {
+	// 	javaHome = process.env['JAVA_HOME'];
+
+	// 	const jre = '/Applications/Android Studio.app/Contents/jre/Contents/Home';
+	// 	if (fs.lstatSync(jre).isDirectory()) {
+	// 		javaHome = jre;
+	// 	}
+	// 	vscode.workspace.getConfiguration('ionic').update('javaHome',javaHome, vscode.ConfigurationTarget.Global);		
+	// }
 
 	const ionicProvider = new IonicTreeProvider(rootPath, context.extensionPath);
 	vscode.window.registerTreeDataProvider('ionic', ionicProvider);

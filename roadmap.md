@@ -13,6 +13,8 @@
 - Recommend: Capacitor 2 to 3 migration
 - Recommend applying exact version numbers in package.json rather than ~ or ^
 - From packages have an option to add (needs list of good packages)
+- When building/syncing show percentage (eg Building 65%)
+- On a build if node_modules is not found then add npm i (hence removing the install node_modules step)
 - Use npm audit to list vulnerable packages
 - Allow add of plugins: list all official capacitor, ionic enterprise, supported plugins
 - If using say @capacitor/camera then allow editing of info.plist and Android permissions (highlight if empty)
