@@ -6,6 +6,7 @@ import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './recommendations';
 import { Tip, TipType } from './tip';
+import * as fs from 'fs';
 import { CancelObject, run, getRunOutput, handleError, estimateRunTime } from './utilities';
 
 
@@ -198,6 +199,10 @@ export function activate(context: vscode.ExtensionContext) {
 	let javaHome: string = vscode.workspace.getConfiguration('ionic').get('javaHome');
 	if (!javaHome || javaHome.length === 1) {
 		javaHome = process.env['JAVA_HOME'];
+		const jre = '/Applications/Android Studio.app/Contents/jre/Contents/Home';
+		if (fs.lstatSync(jre).isDirectory()) {
+			javaHome = jre;
+		}
 		vscode.workspace.getConfiguration('ionic').update('javaHome',javaHome, vscode.ConfigurationTarget.Global);		
 	}
 
