@@ -83,8 +83,7 @@ export async function handleError(error: string): Promise<string> {
 
 export async function getRunOutput(command: string, folder: string): Promise<string> {
 	return new Promise((resolve, reject) => {
-		let out = '';
-		console.log(`${command}...`);
+		let out = '';		
 		child_process.exec(command, runOptions(command, folder), (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (stdout) {
 				out += stdout;
@@ -92,7 +91,12 @@ export async function getRunOutput(command: string, folder: string): Promise<str
 			if (!error) {
 				resolve(out);
 			} else {
+				if (stderror) {
 				reject(stderror);
+				} else {
+					// This is to fix a bug in npm outdated where it returns an exit code when it succeeds
+					resolve(out);
+				}
 			}
 		});
 	});

@@ -84,7 +84,7 @@ export const isCapacitor = () => !!allDependencies['@capacitor/core'];
 export const isCordova = () =>
 	!!(allDependencies['cordova-ios'] || allDependencies['cordova-android'] || packageFile.cordova);
 
-export const load = (fn: string, project) => {
+export const load = async (fn: string, project) => {
 	let packageJsonFilename = fn;
 	if (fs.lstatSync(fn).isDirectory()) {
 		packageJsonFilename = fn + '/package.json';
@@ -104,7 +104,7 @@ export const load = (fn: string, project) => {
 		...packageFile.devDependencies,
 	};
 	console.log(`Inspecting ${Object.keys(allDependencies).length} packages...`);
-	return processPackages(fn, allDependencies, packageFile.devDependencies);
+	return await processPackages(fn, allDependencies, packageFile.devDependencies);
 };
 
 

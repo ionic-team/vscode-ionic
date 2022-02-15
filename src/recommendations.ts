@@ -643,7 +643,7 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
 			TipType.Run,
 			'Create Project',
 			[`ionic start @app ${starter.name} --capacitor`,
-				`mv @app/{,.[^.]}* .`,
+				process.platform === "win32" ? `move @app .`: `mv @app/{,.[^.]}* .`,
 				`rmdir @app`
 			],
 			'Creating Project',
@@ -764,7 +764,7 @@ function ionicBuild(): string {
 
 export async function reviewProject(folder: string, extensionPath: string): Promise<Recommendation[]> {
 	const project: Project = new Project('My Project');
-	const packages = load(folder, project);
+	const packages = await load(folder, project);
 
 	checkNodeVersion();
 

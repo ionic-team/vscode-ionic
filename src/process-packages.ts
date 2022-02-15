@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Tip, TipType } from './tip';
 import { Project } from './recommendations';
+import { getRunOutput } from './utilities';
 
 let outdatedCache: string;
 
@@ -13,7 +14,7 @@ export function clearRefreshCache() {
 	console.log('Cached list of outdated packages cleared');
 }
 
-export function processPackages(folder: string, allDependencies, devDependencies) {
+export async function processPackages(folder: string, allDependencies, devDependencies): Promise<any> {
 	if (!fs.lstatSync(folder).isDirectory()) {
 		return {};
 	}
@@ -22,7 +23,8 @@ export function processPackages(folder: string, allDependencies, devDependencies
 	let outdated = '[]';
 	try {
 		if (!outdatedCache) {
-			outdated = child_process.execSync('npm outdated --json', { cwd: folder }).toString();
+			outdated = await getRunOutput('npm outdated --json', folder);
+//			outdated = child_process.execSync('npm outdated --json', { cwd: folder, encoding: 'utf8' }).toString();
 			outdatedCache = outdated;
 		} else {
 			outdated = outdatedCache;
