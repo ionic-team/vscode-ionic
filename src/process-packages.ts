@@ -314,6 +314,7 @@ function listPackages(project: Project, title: string, description: string, pack
 			}
 		}
 	}
+	project.clearSubgroup();
 }
 
 function listChanges(project: Project, title, description, packages, changeType) {
