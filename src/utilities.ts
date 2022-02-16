@@ -61,9 +61,13 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 		proc.stdout.on('data', (data) => {
 			if (data && viewEditor) {
 				if (data.includes('Local: http')) {
-					serverUrl = getStringFrom(data, 'Local: ','\n');
+					serverUrl = getStringFrom(data, 'Local: ', '\n');
 				} else if ((data.includes('Compiled successfully') || data.includes('No issues found.'))) {
-					viewInEditor(serverUrl);
+					// Give time for the dev server to start up
+					if (serverUrl) {
+						const url = serverUrl;
+						setTimeout(() => viewInEditor(url), 500);
+					}
 					serverUrl = undefined;
 				}
 			}
@@ -89,7 +93,7 @@ export async function handleError(error: string): Promise<string> {
 
 export async function getRunOutput(command: string, folder: string): Promise<string> {
 	return new Promise((resolve, reject) => {
-		let out = '';		
+		let out = '';
 		child_process.exec(command, runOptions(command, folder), (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (stdout) {
 				out += stdout;
@@ -98,7 +102,7 @@ export async function getRunOutput(command: string, folder: string): Promise<str
 				resolve(out);
 			} else {
 				if (stderror) {
-				reject(stderror);
+					reject(stderror);
 				} else {
 					// This is to fix a bug in npm outdated where it returns an exit code when it succeeds
 					resolve(out);

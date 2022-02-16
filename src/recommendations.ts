@@ -726,10 +726,10 @@ export function viewInEditor(url: string) {
 	const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
 	if (!previewInEditor) return;
 	const panel = vscode.window.createWebviewPanel(
-		'viewApp', // Identifies the type of the webview. Used internally
-		'Preview', // Title of the panel displayed to the user
-		vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
-		{ enableScripts: true } // Webview options. More on these later.
+		'viewApp',
+		'Preview', 
+		vscode.ViewColumn.Beside,
+		{ enableScripts: true } 
 	);
 
 	panel.webview.html = getWebviewContent(url);
@@ -743,8 +743,8 @@ function getWebviewContent(url: string) {
 	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 	  <title>Preview App</title>
   </head>
-  <body style="display: flex; align-items: center; justify-content: center;">
-	  <iframe src="${url}" width="375px" height="667px" frameBorder="0">
+  <body style="display: flex; align-items: center; justify-content: center; margin-top:20px;">
+	  <iframe src="${url}" width="375px" height="667px" frameBorder="0" />
   </body>
   </html>`;
 }
@@ -802,7 +802,7 @@ export async function reviewProject(folder: string, extensionPath: string): Prom
 
 		const hasCapIos = exists('@capacitor/ios');
 		const hasCapAndroid = exists('@capacitor/android');
-		project.add(new Tip('Run On Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setDynamicCommand(ionicServe).requestViewEditor());
+		project.add(new Tip('Run On Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setDynamicCommand(ionicServe).requestViewEditor());		
 		if (hasCapAndroid) {
 			project.add(new Tip('Run On Android', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection().setDynamicCommand(capRun, 'android'));
 		}

@@ -5,6 +5,7 @@
 - Ionic ClI comands are prefixed with npx to ensure that the local cli is used before global
 - Scoped packages are placed in a subfolder. Eg @capacitor, @ionic etc
 - Packages are sorted alphabetically
+- Fix for preview of app in Editor (2 panes opened)
 
 ### Version 0.0.9
 - Preview app in VS Code Editor added as an option

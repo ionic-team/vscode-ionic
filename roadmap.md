@@ -21,3 +21,4 @@
 - Colorization of the output window is not supported in VS Code Extensions
 - Badge option is not available for VS Code Extensions
 - Show icon change when running is not supported by treeview without full refresh
+- links to external content cannot open in VS Code editor window (must be browser)
