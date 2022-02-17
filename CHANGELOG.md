@@ -1,4 +1,7 @@
 ## Changelog
+### Version 0.0.11
+- For install/uninstall/update write to output instead of a window that requires closing
+
 ### Version 0.0.10
 - When building/syncing show percentage (eg Building 65%)
 - When building Will perform npm install if no node_modules folder present

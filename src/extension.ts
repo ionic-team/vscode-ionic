@@ -190,7 +190,7 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 		ionicProvider.refresh();
 	}
 	if (successMessage) {
-		vscode.window.showInformationMessage(successMessage);
+		channel.appendLine(successMessage);
 	}
 }
 
