@@ -526,7 +526,7 @@ export class Project {
 	}
 
 	public addSubGroup(title: string) {
-		const r = new Recommendation(undefined, undefined, '@' + title, vscode.TreeItemCollapsibleState.Expanded);		
+		const r = new Recommendation(undefined, undefined, '@' + title, vscode.TreeItemCollapsibleState.Expanded);
 		r.children = [];
 		this.group.children.push(r);
 		this.subgroup = r;
@@ -727,9 +727,9 @@ export function viewInEditor(url: string) {
 	if (!previewInEditor) return;
 	const panel = vscode.window.createWebviewPanel(
 		'viewApp',
-		'Preview', 
+		'Preview',
 		vscode.ViewColumn.Beside,
-		{ enableScripts: true } 
+		{ enableScripts: true }
 	);
 
 	panel.webview.html = getWebviewContent(url);
@@ -737,16 +737,23 @@ export function viewInEditor(url: string) {
 
 function getWebviewContent(url: string) {
 	return `<!DOCTYPE html>
-  <html lang="en">
-  <head>
-	  <meta charset="UTF-8">
-	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	  <title>Preview App</title>
-  </head>
-  <body style="display: flex; align-items: center; justify-content: center; margin-top:20px;">
-	  <iframe src="${url}" width="375px" height="667px" frameBorder="0" />
-  </body>
-  </html>`;
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Preview App</title>
+	</head>
+	<body style="display: flex; align-items: center; justify-content: center; margin-top:20px;">
+		<div style="width: 375px; height: 717px; border: 2px solid #333; border-radius:10px; padding:10px; display: flex; align-items: center; flex-direction: column;">
+		   <div style="width: 100%; height: 667px;">
+				<iframe id="frame" src="${url}" width="100%" height="100%" frameBorder="0"></iframe>
+		   </div>
+		  <div style="width: 100%; height: 50px; display: flex; align-items: center; justify-content: center;">
+			<div style="background-color: #333; cursor: pointer; height: 25px; width:25px; border-radius:30px; padding:5px" onclick="document.getElementById('frame').src = '${url}'"></div>
+		  </div>  
+		 </div>
+	</body>
+	</html>`;
 }
 
 function ionicServe(): string {
@@ -802,7 +809,8 @@ export async function reviewProject(folder: string, extensionPath: string): Prom
 
 		const hasCapIos = exists('@capacitor/ios');
 		const hasCapAndroid = exists('@capacitor/android');
-		project.add(new Tip('Run On Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setDynamicCommand(ionicServe).requestViewEditor());		
+		project.add(new Tip('Run On Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setDynamicCommand(ionicServe).requestViewEditor());
+		// project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
 		if (hasCapAndroid) {
 			project.add(new Tip('Run On Android', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection().setDynamicCommand(capRun, 'android'));
 		}

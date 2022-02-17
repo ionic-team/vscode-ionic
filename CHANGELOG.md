@@ -6,6 +6,7 @@
 - Scoped packages are placed in a subfolder. Eg @capacitor, @ionic etc
 - Packages are sorted alphabetically
 - Fix for preview of app in Editor (2 panes opened)
+- Add phone layout to web preview with button for app restart
 
 ### Version 0.0.9
 - Preview app in VS Code Editor added as an option
