@@ -163,7 +163,7 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 						channel.appendLine(cmd);
 						channel.show();
 
-						await run(rootPath, cmd, channel, cancelObject, tip.doViewEditor);
+						await run(rootPath, cmd, channel, cancelObject, tip.doViewEditor, tip.runPoints, progress);
 
 					}
 				} finally {
@@ -178,7 +178,7 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 					percentage = 0;					
 				}
 				try {
-					await run(rootPath, command, channel, cancelObject, tip.doViewEditor);
+					await run(rootPath, command, channel, cancelObject, tip.doViewEditor, tip.runPoints, progress);
 				} finally {
 					completeOperation(tip);
 				}

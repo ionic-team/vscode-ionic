@@ -1,6 +1,5 @@
 # ToDo
 - (bug) Validate input for bundle id (eg no java reserved words), display name and version and build (numbers)
-- (bug) First run for web doesnt show the preview pane
 - (docs) Record video of changing display name, bundle id, version number, build number
 - (docs) Record video of previewing in editor
 - (feat) From packages have the option to update to any particular version found with `npm view package versions`

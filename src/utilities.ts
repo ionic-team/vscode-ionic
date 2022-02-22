@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as vscode from 'vscode';
 import { clearRefreshCache } from './process-packages';
 import { viewInEditor } from './recommendations';
+import { RunPoint } from './tip';
 
 export interface CancelObject {
 	proc: child_process.ChildProcess;
@@ -34,7 +35,7 @@ function runOptions(command: string, folder: string) {
 	return { cwd: folder, encoding: 'utf8', env: env };
 }
 
-export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject, viewEditor: boolean): Promise<void> {
+export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject, viewEditor: boolean, runPoints: Array<RunPoint>, progress: any): Promise<void> {
 	if (command == 'rem-cordova') {
 		return removeCordovaFromPackageJSON(folder);
 	}
@@ -59,18 +60,27 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 			}
 		});
 		proc.stdout.on('data', (data) => {
-			if (data && viewEditor) {
-				if (data.includes('Local: http')) {
-					serverUrl = getStringFrom(data, 'Local: ', '\n');
-				} else if ((data.includes('Compiled successfully') || data.includes('No issues found.'))) {
-					// Give time for the dev server to start up
-					if (serverUrl) {
+			if (data) {
+				if (viewEditor) {
+					if (data.includes('Local: http')) {
+						serverUrl = getStringFrom(data, 'Local: ', '\n');
 						const url = serverUrl;
+						channel.appendLine(`Launching editor for ${url}`);
+						viewEditor = false;
 						setTimeout(() => viewInEditor(url), 500);
 					}
-					serverUrl = undefined;
+				}
+
+				// Based on found text logged change the progress message in the status bar
+				if (runPoints) {
+					for (const runPoint of runPoints) {
+						if (data.includes(runPoint.text)) {
+							progress.report({ message: runPoint.title });
+						}
+					}
 				}
 			}
+
 			channel.append(data);
 			channel.show();
 		});

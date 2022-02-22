@@ -1,6 +1,7 @@
 ## Changelog
 ### Version 0.0.11
 - For install/uninstall/update write to output instead of a window that requires closing
+- First run for web now shows the preview tab
 
 ### Version 0.0.10
 - When building/syncing show percentage (eg Building 65%)

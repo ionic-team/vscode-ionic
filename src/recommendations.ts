@@ -809,7 +809,16 @@ export async function reviewProject(folder: string, extensionPath: string): Prom
 
 		const hasCapIos = exists('@capacitor/ios');
 		const hasCapAndroid = exists('@capacitor/android');
-		project.add(new Tip('Run On Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setDynamicCommand(ionicServe).requestViewEditor());
+		project.add(
+			new Tip(
+				'Run On Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`)
+				.setDynamicCommand(ionicServe)
+				.requestViewEditor()
+				.setRunPoints([
+					{ title: 'Building...', text: 'Generating browser application bundles' },
+					{ title: 'Serving', text: 'Development server running' }
+				])
+		);
 		// project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
 		if (hasCapAndroid) {
 			project.add(new Tip('Run On Android', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection().setDynamicCommand(capRun, 'android'));

@@ -7,6 +7,7 @@ export class Tip {
 	public cancelRequested: boolean;
 	public secondCommand: string;
 	public secondTitle: string;
+	public runPoints: Array<RunPoint>;
 
 	private onAction: (...args) => unknown;
 	private onCommand: (...args) => string;
@@ -67,6 +68,11 @@ export class Tip {
 		return this;
 	}
 
+	setRunPoints(runPoints: Array<RunPoint>): Tip {
+		this.runPoints = runPoints;
+		return this;
+	}
+
 	async executeAction() {
 		if (this.onAction) {
 			await this.onAction(...this.actionArgs);
@@ -100,4 +106,9 @@ export enum TipType {
 	Sync,
 	Add,
 	None
+}
+
+export interface RunPoint {
+	text: string; // Search text in the log entry
+	title: string; // Title used for progress
 }
