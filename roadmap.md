@@ -6,7 +6,6 @@
 - (feat) Option to hide particular recommendations
 - (feat) Add queue points on a running command so that you can get progress like: "building...", "deploying...", "running app.."
 - (feat) On clicking action show the action in the output window
-- (perf) Cache outdated in workspace storage for use on first startup
 - (perf) Run first refresh without "npm outdated", re-refresh after completion
 - (perf) Only run capacitor config commands when "Configuration" is expanded
 - Preview app - add option to switch size for common screen sizes
@@ -26,6 +25,9 @@
 - Detect Capacitor CLI and fallback to it for non-ionic projects. This may make some functions impossible or non standard (eg build), current check ensures Ionic CLI is installed
 
 # Bugs
+
+- `package.json` -> ionic backend
+
 
 
 # Known Issues

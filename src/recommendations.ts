@@ -28,7 +28,10 @@ import { CapacitorProject } from '@capacitor/project';
 import { CapacitorConfig } from '@capacitor/cli';
 import { getPackageJSON, getRunOutput, getStringFrom, PackageFile, setStringIn } from './utilities';
 import { fixIssue } from './extension';
+import { CapacitorProjectState } from './cap-project';
 
+
+let useCapProjectCache = true;
 
 enum NativePlatform {
 	iOSOnly,
@@ -171,7 +174,6 @@ export class Project {
 	group: Recommendation;
 	subgroup: Recommendation;
 	groups: Recommendation[] = [];
-	capConfig: CapacitorConfig;
 
 	constructor(_name: string) {
 		this.name = _name;
@@ -202,10 +204,8 @@ export class Project {
 		}
 	}
 
-
-
-	public async reviewCapacitorConfig() {
-		this.capConfig = {
+	private async getCapacitorProject(): Promise<CapacitorProject> {
+		const capConfig: CapacitorConfig = {
 			ios: {
 				path: path.join(this.folder, 'ios'),
 			},
@@ -213,99 +213,122 @@ export class Project {
 				path: path.join(this.folder, 'android'),
 			},
 		};
-		const project = new CapacitorProject(this.capConfig);
+		const project = new CapacitorProject(capConfig);
 		await project.load();
-		let iosBundleId;
-		let androidBundleId;
-		let iosVersion;
-		let androidVersion;
-		let iosBuild;
-		let androidBuild;
-		let iosDisplayName;
-		let androidDisplayName;
+		return project;
+	}
+
+	private clearCapProjectCache() {
+		useCapProjectCache = false;
+	}
+
+	private async getCapacitorProjectState(context: vscode.ExtensionContext): Promise<CapacitorProjectState> {
+		let state: CapacitorProjectState = {};
+
+		const tmp: string = context.workspaceState.get('CapacitorProject');
+		if (tmp) {
+			if (useCapProjectCache) {
+				state = JSON.parse(tmp);
+				return state;
+			} else {
+				useCapProjectCache = true;
+			}
+		}
+
+		const project = await this.getCapacitorProject();
 
 		if (project.ios) {
 			const appTarget = project.ios?.getAppTarget();
-			iosBundleId = project.ios.getBundleId(appTarget.name);
-			iosDisplayName = await project.ios.getDisplayName(appTarget.name);
+			state.iosBundleId = project.ios.getBundleId(appTarget.name);
+			state.iosDisplayName = await project.ios.getDisplayName(appTarget.name);
 			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
-				iosVersion = project.ios?.getVersion(appTarget.name, buildConfig.name);
-				iosBuild = project.ios.getBuild(appTarget.name, buildConfig.name);
+				state.iosVersion = project.ios?.getVersion(appTarget.name, buildConfig.name);
+				state.iosBuild = project.ios.getBuild(appTarget.name, buildConfig.name);
 			}
 		}
 
 		if (project.android) {
-			androidBundleId = project.android?.getPackageName();
-			androidVersion = await project.android?.getVersionName();
-			androidBuild = await project.android?.getVersionCode();
+			state.androidBundleId = project.android?.getPackageName();
+			state.androidVersion = await project.android?.getVersionName();
+			state.androidBuild = await project.android?.getVersionCode();
 			const data = await project.android?.getResource('values', 'strings.xml');
-			androidDisplayName = getStringFrom(data as string, `<string name="app_name">`, `</string`);
+			state.androidDisplayName = getStringFrom(data as string, `<string name="app_name">`, `</string`);
 		}
 
 		if (!project.ios && !project.android) {
+			return undefined;
+		}
+
+		context.workspaceState.update('CapacitorProject', JSON.stringify(state));
+		return state;
+	}
+
+	public async reviewCapacitorConfig(context: vscode.ExtensionContext) {
+		const state = await this.getCapacitorProjectState(context);
+		if (!state) {
 			return;
 		}
 
 		// Allow the user to set the bundle id
-		if (androidBundleId == iosBundleId || !iosBundleId || !androidBundleId) {
+		if (state.androidBundleId == state.iosBundleId || !state.iosBundleId || !state.androidBundleId) {
 			// Create a single Bundle Id the user can edit
-			const tip = new Tip('Bundle Id', androidBundleId, TipType.None);
-			tip.setAction(this.setBundleId, androidBundleId, project);
+			const tip = new Tip('Bundle Id', state.androidBundleId, TipType.None);
+			tip.setAction(this.setBundleId, state.androidBundleId, this);
 			this.add(tip);
 		} else {
 			// Bundle Ids different
-			const tip = new Tip('Android Bundle Id', androidBundleId, TipType.None);
-			tip.setAction(this.setBundleId, androidBundleId, project, NativePlatform.AndroidOnly);
+			const tip = new Tip('Android Bundle Id', state.androidBundleId, TipType.None);
+			tip.setAction(this.setBundleId, state.androidBundleId, this, NativePlatform.AndroidOnly);
 			this.add(tip);
 
-			const tip2 = new Tip('iOS Bundle Id', iosBundleId, TipType.None);
-			tip2.setAction(this.setBundleId, iosBundleId, project, NativePlatform.iOSOnly);
+			const tip2 = new Tip('iOS Bundle Id', state.iosBundleId, TipType.None);
+			tip2.setAction(this.setBundleId, state.iosBundleId, this, NativePlatform.iOSOnly);
 			this.add(tip2);
 		}
 
 		// Allow the user to edit the display name of the app
-		if (androidDisplayName == iosDisplayName || !iosDisplayName || !androidDisplayName) {
-			const displayName = androidDisplayName ? androidDisplayName : iosDisplayName;
+		if (state.androidDisplayName == state.iosDisplayName || !state.iosDisplayName || !state.androidDisplayName) {
+			const displayName = state.androidDisplayName ? state.androidDisplayName : state.iosDisplayName;
 			const tip = new Tip('Display Name', displayName, TipType.None);
-			tip.setAction(this.setDisplayName, displayName, project, this.folder);
+			tip.setAction(this.setDisplayName, displayName, this, this.folder);
 			this.add(tip);
 		} else {
-			const tip = new Tip('Android Display Name', androidDisplayName, TipType.None);
-			tip.setAction(this.setDisplayName, androidDisplayName, project, this.folder, NativePlatform.AndroidOnly);
+			const tip = new Tip('Android Display Name', state.androidDisplayName, TipType.None);
+			tip.setAction(this.setDisplayName, state.androidDisplayName, this, this.folder, NativePlatform.AndroidOnly);
 			this.add(tip);
 
-			const tip2 = new Tip('iOS Display Name', iosDisplayName, TipType.None);
-			tip2.setAction(this.setDisplayName, iosDisplayName, project, this.folder, NativePlatform.iOSOnly);
+			const tip2 = new Tip('iOS Display Name', state.iosDisplayName, TipType.None);
+			tip2.setAction(this.setDisplayName, state.iosDisplayName, this, this.folder, NativePlatform.iOSOnly);
 			this.add(tip2);
 		}
 
 		// Allow the user to set the version
-		if (androidVersion == iosVersion || !iosVersion || !androidVersion) {
-			const tip = new Tip('Version Number', androidVersion, TipType.None);
-			tip.setAction(this.setVersion, androidVersion, project);
+		if (state.androidVersion == state.iosVersion || !state.iosVersion || !state.androidVersion) {
+			const tip = new Tip('Version Number', state.androidVersion, TipType.None);
+			tip.setAction(this.setVersion, state.androidVersion, this);
 			this.add(tip);
 		} else {
-			const tip = new Tip('Android Version Number', androidVersion, TipType.None);
-			tip.setAction(this.setVersion, androidVersion, project, NativePlatform.AndroidOnly);
+			const tip = new Tip('Android Version Number', state.androidVersion, TipType.None);
+			tip.setAction(this.setVersion, state.androidVersion, this, NativePlatform.AndroidOnly);
 			this.add(tip);
 
-			const tip2 = new Tip('iOS Version Number', iosVersion, TipType.None);
-			tip2.setAction(this.setVersion, iosVersion, project, NativePlatform.iOSOnly);
+			const tip2 = new Tip('iOS Version Number', state.iosVersion, TipType.None);
+			tip2.setAction(this.setVersion, state.iosVersion, this, NativePlatform.iOSOnly);
 			this.add(tip2);
 		}
 
 		// Allow the user to increment the build
-		if (androidBuild == iosBuild || !iosBuild || !androidBuild) {
-			const tip = new Tip('Build Number', androidBuild?.toString(), TipType.None);
-			tip.setAction(this.setBuild, androidBuild, project);
+		if (state.androidBuild == state.iosBuild || !state.iosBuild || !state.androidBuild) {
+			const tip = new Tip('Build Number', state.androidBuild?.toString(), TipType.None);
+			tip.setAction(this.setBuild, state.androidBuild, this);
 			this.add(tip);
 		} else {
-			const tip = new Tip('Android Build Number', androidBuild?.toString(), TipType.None);
-			tip.setAction(this.setBuild, androidBuild, project, NativePlatform.AndroidOnly);
+			const tip = new Tip('Android Build Number', state.androidBuild?.toString(), TipType.None);
+			tip.setAction(this.setBuild, state.androidBuild, this, NativePlatform.AndroidOnly);
 			this.add(tip);
 
-			const tip2 = new Tip('iOS Build Number', iosBuild?.toString(), TipType.None);
-			tip2.setAction(this.setBuild, iosBuild, project, NativePlatform.iOSOnly);
+			const tip2 = new Tip('iOS Build Number', state.iosBuild?.toString(), TipType.None);
+			tip2.setAction(this.setBuild, state.iosBuild, this, NativePlatform.iOSOnly);
 			this.add(tip2);
 		}
 	}
@@ -313,10 +336,9 @@ export class Project {
 	/**
 	 * Change the Bundle Id of an App in the iOS and Android projects
 	 * @param  {string} bundleId The original bundle id / package name
-	 * @param  {CapacitorProject} project The Capacitor project
 	 * @param  {NativePlatform} platform Whether iOS or Android only (default both)
 	 */
-	private async setBundleId(bundleId: string, project: CapacitorProject, platform: NativePlatform) {
+	private async setBundleId(bundleId: string, _this: any, platform: NativePlatform) {
 		const newBundleId = await vscode.window.showInputBox({
 			title: 'Application Bundle Id',
 			placeHolder: bundleId,
@@ -326,6 +348,9 @@ export class Project {
 		if (!newBundleId) {
 			return; // User cancelled
 		}
+
+		const project = await _this.getCapacitorProject();
+
 		const channel = vscode.window.createOutputChannel("Ionic");
 
 		if (project?.ios && platform != NativePlatform.AndroidOnly) {
@@ -339,16 +364,16 @@ export class Project {
 			channel.appendLine(`Set Android Package Name to ${newBundleId}`);
 			await project.android?.setPackageName(newBundleId);
 		}
-		project.commit();
+		await project.commit();
 		channel.show();
+		_this.clearCapProjectCache();
 	}
 	/**
 	 * Set Version Number of iOS and Android Project
 	 * @param  {string} version
-	 * @param  {CapacitorProject} project
 	 * @param  {NativePlatform} platform Whether to apply for iOS only, Android only or both (default)
 	 */
-	private async setVersion(version: string, project: CapacitorProject, platform: NativePlatform) {
+	private async setVersion(version: string, _this: any, platform: NativePlatform) {
 		const newVersion = await vscode.window.showInputBox({
 			title: 'Application Version Number',
 			placeHolder: version,
@@ -358,6 +383,8 @@ export class Project {
 		if (!newVersion) {
 			return; // User cancelled
 		}
+
+		const project = await _this.getCapacitorProject();
 		const channel = vscode.window.createOutputChannel("Ionic");
 
 		if (project?.ios && platform != NativePlatform.AndroidOnly) {
@@ -371,16 +398,18 @@ export class Project {
 			channel.appendLine(`Set Android Version to ${newVersion}`);
 			await project.android?.setVersionName(newVersion);
 		}
-		project.commit();
+		await project.commit();
 		channel.show();
+		_this.clearCapProjectCache();
 	}
+
 	/**
 	 * Set the build number
 	 * @param  {string} build The build number
 	 * @param  {CapacitorProject} project The Capacitor project
 	 * @param  {NativePlatform} platform Whether to apply on iOS only, Android Only or both (default)
 	 */
-	private async setBuild(build: string, project: CapacitorProject, platform: NativePlatform) {
+	private async setBuild(build: string, _this: any, platform: NativePlatform) {
 		const newBuild = await vscode.window.showInputBox({
 			title: 'Application Build Number',
 			placeHolder: build,
@@ -390,6 +419,8 @@ export class Project {
 		if (!newBuild) {
 			return; // User cancelled
 		}
+
+		const project = await _this.getCapacitorProject();
 		const channel = vscode.window.createOutputChannel("Ionic");
 
 		if (project?.ios && platform != NativePlatform.AndroidOnly) {
@@ -403,17 +434,18 @@ export class Project {
 			channel.appendLine(`Set Android Version to ${newBuild}`);
 			await project.android?.setVersionCode(parseInt(newBuild));
 		}
-		project.commit();
+		await project.commit();
+		_this.clearCapProjectCache();
 		channel.show();
 	}
+
 	/**
 	 * Set the display name of the app
 	 * @param  {string} currentDisplayName The current value for the display name
-	 * @param  {CapacitorProject} project The Capacitor project
 	 * @param  {string} folder Folder for the project
 	 * @param  {NativePlatform} platform Whether to apply to iOS only, Android only or both (default)
 	 */
-	private async setDisplayName(currentDisplayName: string, project: CapacitorProject, folder: string, platform: NativePlatform) {
+	private async setDisplayName(currentDisplayName: string, _this: any, folder: string, platform: NativePlatform) {
 		const displayName = await vscode.window.showInputBox({
 			title: 'Application Display Name',
 			placeHolder: currentDisplayName,
@@ -423,6 +455,9 @@ export class Project {
 		if (!displayName) {
 			return; // User cancelled
 		}
+
+		const project = await _this.getCapacitorProject();
+
 		const channel = vscode.window.createOutputChannel("Ionic");
 		console.log(`Display name changed to ${displayName}`);
 		if (project.ios != null && platform != NativePlatform.AndroidOnly) {
@@ -437,11 +472,8 @@ export class Project {
 			if (!data) {
 				channel.appendLine(`Unable to set Android display name`);
 			}
-			console.log('setValue');
 			data = setStringIn(data as string, `<string name="app_name">`, `</string>`, displayName);
-			console.log('setValue', data);
 			data = setStringIn(data as string, `<string name="title_activity_main">`, `</string>`, displayName);
-			console.log('setValue', data);
 			const filename = path.join(folder, 'android/app/src/main/res/values/strings.xml');
 			if (fs.existsSync(filename)) {
 				fs.writeFileSync(filename, data);
@@ -454,8 +486,8 @@ export class Project {
 		}
 		channel.show();
 		project.commit();
+		_this.clearCapProjectCache();
 	}
-
 
 	public note(title: string, message: string, url?: string, tipType?: TipType, description?: string) {
 		const tip = new Tip(title, message, tipType, description, undefined, undefined, undefined, url);
@@ -789,9 +821,9 @@ function ionicBuild(folder: string): string {
 	return `${preop}npx ionic build${buildFlags}`;
 }
 
-export async function reviewProject(folder: string, extensionPath: string): Promise<Recommendation[]> {
+export async function reviewProject(folder: string, context: vscode.ExtensionContext): Promise<Recommendation[]> {
 	const project: Project = new Project('My Project');
-	const packages = await load(folder, project);
+	const packages = await load(folder, project, context);
 
 	checkNodeVersion();
 
@@ -841,7 +873,7 @@ export async function reviewProject(folder: string, extensionPath: string): Prom
 
 	if (isCapacitor()) {
 		project.setGroup(`Configuration`, 'Configurations for native project', TipType.Capacitor, false);
-		await project.reviewCapacitorConfig();
+		await project.reviewCapacitorConfig(context);
 	}
 
 	project.setGroup(

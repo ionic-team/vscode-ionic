@@ -6,15 +6,21 @@ import * as path from 'path';
 import { Tip, TipType } from './tip';
 import { Project } from './recommendations';
 import { getRunOutput, getStringFrom } from './utilities';
+import * as vscode from 'vscode';
 
-let outdatedCache: string;
+let useOutdatedCache = true;
 
-export function clearRefreshCache() {
-	outdatedCache = undefined;
+export function clearRefreshCache(context?: vscode.ExtensionContext) {
+	if (context) {
+		context.workspaceState.update('npmOutdated', undefined);
+	} else {
+		useOutdatedCache = false;
+	}
+
 	console.log('Cached list of outdated packages cleared');
 }
 
-export async function processPackages(folder: string, allDependencies, devDependencies): Promise<any> {
+export async function processPackages(folder: string, allDependencies, devDependencies, context: vscode.ExtensionContext): Promise<any> {
 	if (!fs.lstatSync(folder).isDirectory()) {
 		return {};
 	}
@@ -22,14 +28,13 @@ export async function processPackages(folder: string, allDependencies, devDepend
 	// npm outdated only shows dependencies and not dev dependencies if the node module isnt installed
 	let outdated = '[]';
 	try {
-		if (!outdatedCache) {
+		outdated = context.workspaceState.get('npmOutdated');
+		if (!outdated || useOutdatedCache === false) {
 			outdated = await getRunOutput('npm outdated --json', folder);
 			//			outdated = child_process.execSync('npm outdated --json', { cwd: folder, encoding: 'utf8' }).toString();
-			outdatedCache = outdated;
-		} else {
-			outdated = outdatedCache;
+			context.workspaceState.update('npmOutdated', outdated);
+			useOutdatedCache = true;
 		}
-
 	} catch (err) {
 		console.error(err);
 	}

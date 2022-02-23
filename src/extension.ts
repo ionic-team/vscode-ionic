@@ -210,10 +210,11 @@ export function activate(context: vscode.ExtensionContext) {
 	// 	vscode.workspace.getConfiguration('ionic').update('javaHome',javaHome, vscode.ConfigurationTarget.Global);		
 	// }
 
-	const ionicProvider = new IonicTreeProvider(rootPath, context.extensionPath);
+	const ionicProvider = new IonicTreeProvider(rootPath, context);
 	vscode.window.registerTreeDataProvider('ionic', ionicProvider);
 	vscode.commands.registerCommand('ionic.refresh', () => {
-		clearRefreshCache();
+		clearRefreshCache(context);
+		context.workspaceState.update('CapacitorProject', undefined);
 		ionicProvider.refresh();
 	});
 	

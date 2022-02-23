@@ -3,6 +3,7 @@
 import { coerce, compare, lt, gte, lte } from 'semver';
 import * as fs from 'fs';
 import { parse } from 'fast-xml-parser';
+import * as vscode from 'vscode';
 
 import {
 	writeConsistentVersionError,
@@ -84,7 +85,7 @@ export const isCapacitor = () => !!allDependencies['@capacitor/core'];
 export const isCordova = () =>
 	!!(allDependencies['cordova-ios'] || allDependencies['cordova-android'] || packageFile.cordova);
 
-export const load = async (fn: string, project) => {
+export const load = async (fn: string, project, context: vscode.ExtensionContext) => {
 	let packageJsonFilename = fn;
 	if (fs.lstatSync(fn).isDirectory()) {
 		packageJsonFilename = fn + '/package.json';
@@ -104,7 +105,7 @@ export const load = async (fn: string, project) => {
 		...packageFile.devDependencies,
 	};
 	console.log(`Inspecting ${Object.keys(allDependencies).length} packages...`);
-	return await processPackages(fn, allDependencies, packageFile.devDependencies);
+	return await processPackages(fn, allDependencies, packageFile.devDependencies, context);
 };
 
 
