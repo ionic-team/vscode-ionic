@@ -1,4 +1,7 @@
 ## Changelog
+### Version 0.0.12
+- Validation is now done on bundle identifiers, build numbers and version numbers
+
 ### Version 0.0.11
 - For install/uninstall/update write to output instead of a window that requires closing
 - First run for web now shows the preview tab

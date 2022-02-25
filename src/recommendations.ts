@@ -345,7 +345,14 @@ export class Project {
 		const newBundleId = await vscode.window.showInputBox({
 			title: 'Application Bundle Id',
 			placeHolder: bundleId,
-			value: bundleId
+			value: bundleId,
+			validateInput: (value: string) => {
+				const regexp =  /^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]$/i;
+				if (!regexp.test(value)) {
+					return "You cannot use spaces and some special characters like -.";
+				}
+				return null;
+			}
 		});
 
 		if (!newBundleId) {
@@ -380,7 +387,14 @@ export class Project {
 		const newVersion = await vscode.window.showInputBox({
 			title: 'Application Version Number',
 			placeHolder: version,
-			value: version
+			value: version,
+			validateInput: (value: string) => {
+				const regexp = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+				if (!regexp.test(value)) {
+					return "This version number is not valid";
+				}
+				return null;
+			}
 		});
 
 		if (!newVersion) {
@@ -416,7 +430,14 @@ export class Project {
 		const newBuild = await vscode.window.showInputBox({
 			title: 'Application Build Number',
 			placeHolder: build,
-			value: build
+			value: build,
+			validateInput: (value: string) => {
+				const regexp =  /^\d+$/;
+				if (!regexp.test(value)) {
+					return "You can only use the digits 0 to 9";
+				}
+				return null;
+			}
 		});
 
 		if (!newBuild) {
