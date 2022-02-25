@@ -29,6 +29,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 import { getPackageJSON, getRunOutput, getStringFrom, PackageFile, setStringIn } from './utilities';
 import { fixIssue } from './extension';
 import { CapacitorProjectState } from './cap-project';
+import { getGlobalIonicConfig, getIonicConfig, sendTelemetry } from './telemetry';
 
 
 let useCapProjectCache = true;
@@ -825,6 +826,32 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 	const project: Project = new Project('My Project');
 	const packages = await load(folder, project, context);
 
+	getGlobalIonicConfig();
+	const config = getIonicConfig(folder);
+	if (config.telemetry) {
+		const sessionId = config['tokens.telemetry'];
+
+		const sent = context.workspaceState.get(`packages-${project.name}`);
+		if (!sent) {
+			const packageList = [];
+			for (const library of Object.keys(packages)) {
+				packageList.push(library);
+			}
+			sendTelemetry(config.telemetry, sessionId, 'VS Code Extension Packages', {
+				extension: context.extension.packageJSON.version,
+				name: project.name,
+				packages: packageList
+			});
+			context.workspaceState.update(`packages-${project.name}`, true);
+		}
+		const sentUsage = context.globalState.get(`lastusage`);
+		if (!sentUsage || new Date().toLocaleDateString() !== sentUsage) {
+			sendTelemetry(config.telemetry, sessionId, 'VS Code Extension Usage', {
+				extension: context.extension.packageJSON.version
+			});
+			context.globalState.update(`lastusage`, new Date().toLocaleDateString());
+		}
+	}
 	checkNodeVersion();
 
 

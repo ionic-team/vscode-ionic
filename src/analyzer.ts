@@ -85,7 +85,7 @@ export const isCapacitor = () => !!allDependencies['@capacitor/core'];
 export const isCordova = () =>
 	!!(allDependencies['cordova-ios'] || allDependencies['cordova-android'] || packageFile.cordova);
 
-export const load = async (fn: string, project, context: vscode.ExtensionContext) => {
+export async function load(fn: string, project: any, context: vscode.ExtensionContext): Promise<any> {
 	let packageJsonFilename = fn;
 	if (fs.lstatSync(fn).isDirectory()) {
 		packageJsonFilename = fn + '/package.json';
@@ -106,9 +106,7 @@ export const load = async (fn: string, project, context: vscode.ExtensionContext
 	};
 	console.log(`Inspecting ${Object.keys(allDependencies).length} packages...`);
 	return await processPackages(fn, allDependencies, packageFile.devDependencies, context);
-};
-
-
+}
 
 export const checkMinVersion = (library: string, minVersion: string, reason?: string, url?: string): Tip => {
 	const v = coerce(allDependencies[library]);
@@ -122,7 +120,7 @@ export const checkMinVersion = (library: string, minVersion: string, reason?: st
 export const warnMinVersion = (library: string, minVersion: string, reason?: string, url?: string): Tip => {
 	const v = coerce(allDependencies[library]);
 	if (v && lt(v, minVersion)) {
-		const tip =  writeMinVersionWarning(library, v, minVersion, reason, url);
+		const tip = writeMinVersionWarning(library, v, minVersion, reason, url);
 		tip.url = url;
 		return tip;
 	}

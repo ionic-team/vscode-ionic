@@ -5,8 +5,7 @@ import { IonicTreeProvider } from './ionic-tree-provider';
 import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './recommendations';
-import { Tip, TipType } from './tip';
-import * as fs from 'fs';
+import { Tip } from './tip';
 import { CancelObject, run, getRunOutput, handleError, estimateRunTime } from './utilities';
 
 
