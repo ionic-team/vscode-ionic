@@ -794,7 +794,7 @@ function getWebviewContent(url: string) {
 function ionicServe(): string {
 	const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
 	const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
-	let serveFlags = ' --consolelogs';
+	let serveFlags = '';
 	if (previewInEditor) {
 		serveFlags += ' --no-open';
 	}
@@ -808,6 +808,7 @@ function capRun(platform: string): string {
 	const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
 	const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
 	let capRunFlags = liveReload ? ' -l' : '';
+	
 	if (externalIP) {
 		if (capRunFlags.length > 0) capRunFlags += ' ';
 		capRunFlags += '--external ';
