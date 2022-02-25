@@ -1,10 +1,8 @@
 # ToDo
-- (bug) Validate input for bundle id (eg no java reserved words), display name and version and build (numbers)
 - (docs) Record video of changing display name, bundle id, version number, build number
 - (docs) Record video of previewing in editor
 - (feat) From packages have the option to update to any particular version found with `npm view package versions`
 - (feat) Option to hide particular recommendations
-- (feat) Add queue points on a running command so that you can get progress like: "building...", "deploying...", "running app.."
 - (feat) On clicking action show the action in the output window
 - (perf) Run first refresh without "npm outdated", re-refresh after completion
 - (perf) Only run capacitor config commands when "Configuration" is expanded
