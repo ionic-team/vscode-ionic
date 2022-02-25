@@ -26,10 +26,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CapacitorProject } from '@capacitor/project';
 import { CapacitorConfig } from '@capacitor/cli';
-import { getPackageJSON, getRunOutput, getStringFrom, PackageFile, setStringIn } from './utilities';
+import { generateUUID, getPackageJSON, getRunOutput, getStringFrom, PackageFile, setStringIn } from './utilities';
 import { fixIssue } from './extension';
 import { CapacitorProjectState } from './cap-project';
-import { getGlobalIonicConfig, getIonicConfig, sendTelemetry } from './telemetry';
+import { getGlobalIonicConfig, getIonicConfig, IonicConfig, sendTelemetry } from './telemetry';
+import { PackageInfo } from './package-info';
 
 
 let useCapProjectCache = true;
@@ -172,6 +173,7 @@ export class Project {
 	name: string;
 	type: string = undefined;
 	folder: string;
+	modified: Date; // Last modified date of package.json
 	group: Recommendation;
 	subgroup: Recommendation;
 	groups: Recommendation[] = [];
@@ -822,27 +824,34 @@ function ionicBuild(folder: string): string {
 	return `${preop}npx ionic build${buildFlags}`;
 }
 
-export async function reviewProject(folder: string, context: vscode.ExtensionContext): Promise<Recommendation[]> {
-	const project: Project = new Project('My Project');
-	const packages = await load(folder, project, context);
-
-	getGlobalIonicConfig();
-	const config = getIonicConfig(folder);
+function sendTelemetryEvents(config: IonicConfig, project: Project, packages: any, context: vscode.ExtensionContext) {	
 	if (config.telemetry) {
-		const sessionId = config['tokens.telemetry'];
+		let sessionId = config['tokens.telemetry'];
+		if (!sessionId) {
+			sessionId = generateUUID();
+		}
 
 		const sent = context.workspaceState.get(`packages-${project.name}`);
-		if (!sent) {
+		if (sent != project.modified.toUTCString()) {
 			const packageList = [];
+			const packageVersions = [];
+			const plugins = [];
 			for (const library of Object.keys(packages)) {
+				const info: PackageInfo = packages[library];
+				packageVersions.push(`${library}@${info.version}`);
 				packageList.push(library);
+				if (info.depType.includes('Plugin')) {
+					plugins.push(library);
+				}
 			}
 			sendTelemetry(config.telemetry, sessionId, 'VS Code Extension Packages', {
 				extension: context.extension.packageJSON.version,
 				name: project.name,
-				packages: packageList
+				packages: packageList,
+				packageVersions: packageVersions,
+				plugins: plugins
 			});
-			context.workspaceState.update(`packages-${project.name}`, true);
+			context.workspaceState.update(`packages-${project.name}`, project.modified.toUTCString());
 		}
 		const sentUsage = context.globalState.get(`lastusage`);
 		if (!sentUsage || new Date().toLocaleDateString() !== sentUsage) {
@@ -852,6 +861,16 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 			context.globalState.update(`lastusage`, new Date().toLocaleDateString());
 		}
 	}
+}
+
+export async function reviewProject(folder: string, context: vscode.ExtensionContext): Promise<Recommendation[]> {
+	const project: Project = new Project('My Project');
+	const packages = await load(folder, project, context);
+
+	getGlobalIonicConfig();
+	const config = getIonicConfig(folder);
+	sendTelemetryEvents(config, project, packages, context);
+
 	checkNodeVersion();
 
 

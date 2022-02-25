@@ -15,6 +15,7 @@ import {
 } from './messages';
 import { processPackages } from './process-packages';
 import { Tip, TipType } from './tip';
+import { Project } from './recommendations';
 
 let packageFile;
 let allDependencies;
@@ -85,7 +86,7 @@ export const isCapacitor = () => !!allDependencies['@capacitor/core'];
 export const isCordova = () =>
 	!!(allDependencies['cordova-ios'] || allDependencies['cordova-android'] || packageFile.cordova);
 
-export async function load(fn: string, project: any, context: vscode.ExtensionContext): Promise<any> {
+export async function load(fn: string, project: Project, context: vscode.ExtensionContext): Promise<any> {
 	let packageJsonFilename = fn;
 	if (fs.lstatSync(fn).isDirectory()) {
 		packageJsonFilename = fn + '/package.json';
@@ -98,6 +99,7 @@ export async function load(fn: string, project: any, context: vscode.ExtensionCo
 		packageFile = {};
 		return undefined;
 	}
+	project.modified = fs.statSync(packageJsonFilename).mtime;
 	packageFile = JSON.parse(fs.readFileSync(packageJsonFilename, 'utf8'));
 	project.name = packageFile.name;
 	allDependencies = {

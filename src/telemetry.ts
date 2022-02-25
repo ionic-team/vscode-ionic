@@ -16,7 +16,7 @@ interface TelemetryEvent {
 	sent_at: string
 }
 
-interface IonicConfig {
+export interface IonicConfig {
 	telemetry: boolean;
 	npmClient?: string;
 	'git.setup'?: boolean;
