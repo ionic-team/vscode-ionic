@@ -112,9 +112,12 @@ function capacitorRecommendations(project: Project): Tip[] {
 	tips.push(incompatiblePlugin('cordova-plugin-code-push', 'https://github.com/microsoft/code-push/issues/615'));
 	tips.push(incompatiblePlugin('cordova-plugin-fcm', 'https://github.com/ionic-team/capacitor/issues/584'));
 	tips.push(incompatiblePlugin('cordova-plugin-firebase', 'https://github.com/ionic-team/capacitor/issues/815'));
+	tips.push(incompatiblePlugin('cordova-plugin-firebasex', 'https://github.com/dpa99c/cordova-plugin-firebasex/issues/610#issuecomment-810236545'));
 	tips.push(incompatiblePlugin('cordova-plugin-music-controls', 'It causes build failures, skipped'));
 	tips.push(incompatiblePlugin('cordova-plugin-qrscanner', 'https://github.com/ionic-team/capacitor/issues/1213'));
 	tips.push(incompatiblePlugin('cordova-plugin-googlemaps', 'It causes build failures on iOS, skipped for iOS only'));
+	tips.push(incompatiblePlugin('cordova-plugin-swrve', 'It relies on Cordova specific feature CDVViewController'));
+
 	tips.push(incompatiblePlugin('newrelic-cordova-plugin', 'It relies on Cordova hooks. https://github.com/newrelic/newrelic-cordova-plugin/issues/15'));
 	//tips.push(incompatiblePlugin('phonegap-plugin-push', 'It will not compile but can be replaced with the plugin cordova-plugin-push'));
 	tips.push(replacementPlugin('phonegap-plugin-push', 'cordova-plugin-push', 'It will not compile but can be replaced with the plugin cordova-plugin-push'));
@@ -133,6 +136,8 @@ function capacitorRecommendations(project: Project): Tip[] {
 	tips.push(notRequiredPlugin('cordova-plugin-androidx', 'This was required for Cordova Android 10 support but isnt required by Capacitor'));
 	tips.push(notRequiredPlugin('cordova-android-support-gradle-release', 'Capacitor provides control to set library versions'));
 	tips.push(notRequiredPlugin('cordova-plugin-add-swift-support', 'Swift is supported out-of-the-box with Capacitor'));
+	tips.push(notRequiredPlugin('cordova-plugin-enable-multidex', 'Multidex is handled by Android Stuido and doesnt requiure a plugin'));
+	tips.push(notRequiredPlugin('cordova-support-android-plugin', 'This plugin is used to simplify Cordova plugin development and is not required for Capacitor'));
 	tips.push(notRequiredPlugin('cordova-plugin-androidx-adapter', 'Android Studio patches plugins for AndroidX without requiring this plugin'));
 	tips.push(notRequiredPlugin('cordova-custom-config', 'Configuration achieved through native projects'));
 	tips.push(notRequiredPlugin('cordova-plugin-cocoapod-support', 'Pod dependencies supported in Capacitor'));
@@ -150,6 +155,7 @@ function capacitorRecommendations(project: Project): Tip[] {
 	tips.push(replacementPlugin('@ionic-enterprise/statusbar', '@capacitor/status-bar', 'https://capacitorjs.com/docs/apis/status-bar'));
 	tips.push(replacementPlugin('cordova-plugin-firebase', '@capacitor-community/fcm', 'https://github.com/capacitor-community/fcm'));
 	tips.push(replacementPlugin('cordova-plugin-firebase-messaging', '@capacitor/push-notifications', 'https://capacitorjs.com/docs/apis/push-notifications'));
+	tips.push(replacementPlugin('cordova-plugin-firebase-analytics', '@capacitor-community/firebase-analytics', 'https://github.com/capacitor-community/firebase-analytics'));
 	tips.push(replacementPlugin('cordova-plugin-app-version', '@capacitor/device', 'https://capacitorjs.com/docs/apis/device'));
 	tips.push(replacementPlugin('cordova-plugin-dialogs', '@capacitor/dialog', 'https://capacitorjs.com/docs/apis/dialog'));
 	tips.push(replacementPlugin('cordova-plugin-file', '@capacitor/filesystem', 'https://capacitorjs.com/docs/apis/filesystem'));
@@ -346,7 +352,7 @@ export class Project {
 			placeHolder: bundleId,
 			value: bundleId,
 			validateInput: (value: string) => {
-				const regexp =  /^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]$/i;
+				const regexp = /^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]$/i;
 				if (!regexp.test(value)) {
 					return "You cannot use spaces and some special characters like -.";
 				}
@@ -388,7 +394,7 @@ export class Project {
 			placeHolder: version,
 			value: version,
 			validateInput: (value: string) => {
-				const regexp = /^\S+$/;				
+				const regexp = /^\S+$/;
 				if (!regexp.test(value)) {
 					return "This version number is not valid";
 				}
@@ -431,7 +437,7 @@ export class Project {
 			placeHolder: build,
 			value: build,
 			validateInput: (value: string) => {
-				const regexp =  /^\d+$/;
+				const regexp = /^\d+$/;
 				if (!regexp.test(value)) {
 					return "You can only use the digits 0 to 9";
 				}
@@ -715,7 +721,7 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
 			TipType.Run,
 			'Create Project',
 			[`ionic start @app ${starter.name} --capacitor`,
-			process.platform === "win32" ? `robocopy @app . /MOVE /E /NFL /NDL /NJH /NJS /nc /ns /np` : `mv @app/{,.[^.]}* . && rmdir @app`,				
+			process.platform === "win32" ? `robocopy @app . /MOVE /E /NFL /NDL /NJH /NJS /nc /ns /np` : `mv @app/{,.[^.]}* . && rmdir @app`,
 			],
 			'Creating Project',
 			'Project Created').requestAppName().showProgressDialog());
@@ -827,7 +833,7 @@ function capRun(platform: string): string {
 	const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
 	const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
 	let capRunFlags = liveReload ? ' -l' : '';
-	
+
 	if (externalIP) {
 		if (capRunFlags.length > 0) capRunFlags += ' ';
 		capRunFlags += '--external ';
@@ -844,7 +850,7 @@ function ionicBuild(folder: string): string {
 	return `${preop}npx ionic build${buildFlags}`;
 }
 
-function sendTelemetryEvents(config: IonicConfig, project: Project, packages: any, context: vscode.ExtensionContext) {	
+function sendTelemetryEvents(config: IonicConfig, project: Project, packages: any, context: vscode.ExtensionContext) {
 	if (config.telemetry) {
 		let sessionId = config['tokens.telemetry'];
 		if (!sessionId) {

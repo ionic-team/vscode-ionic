@@ -4,6 +4,10 @@
 - Fix for duplicate commands when installed with Microsoft Cordova Tools extension
 - Fix to allow setting version numbers to non-semver strings
 - Fix for unrequired plugin cordova-plugin-add-swift-support is reported twice
+- Add recommendation for Capacitor migration for cordova-plugin-firebase-analytics
+- Add recommendaton for Capacitor migration of removal of cordova-plugin-enable-multidex
+- Add cordova-plugin-firebasex to incompatible list for Capacitor
+- Add cordova-plugin-swrve to imcompatible list for Capacitor
 
 ### Version 1.0.0
 - First Release
