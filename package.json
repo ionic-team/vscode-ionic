@@ -13,6 +13,18 @@
 	],
 	"private": true,
 	"license": "MIT",
+	"scripts": {
+		"build": "npm run esbuild && npm run vsix-package",
+		"vsix-package": "vsce package",
+		"vscode:prepublish": "npm run esbuild-base -- --minify",
+		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --external:prettier --format=cjs --platform=node",
+		"esbuild": "npm run esbuild-base -- --sourcemap",
+		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+		"compile": "tsc -p ./",
+		"package": "npm run vsix-package && cp ionic-1.0.1.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+		"watch": "tsc -watch -p ./",
+		"lint": "eslint . --ext .ts,.tsx"
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://ionic.io"
@@ -138,16 +150,6 @@
 			}
 		}
 	},
-	"scripts": {
-		"vscode:prepublish": "npm run esbuild-base -- --minify",
-		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
-		"esbuild": "npm run esbuild-base -- --sourcemap",
-		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
-		"compile": "tsc -p ./",
-		"package": "vsce package && cp ionic-1.0.1.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
-		"watch": "tsc -watch -p ./",
-		"lint": "eslint . --ext .ts,.tsx"
-	},
 	"devDependencies": {
 		"@types/node": "14.x",
 		"@types/rimraf": "3.0.2",
@@ -161,7 +163,7 @@
 		"typescript": "4.5.5"
 	},
 	"dependencies": {
-		"@capacitor/project": "^1.0.28",
+		"@capacitor/project": "^1.0.31",
 		"fast-xml-parser": "^3.21.1",
 		"mkdirp": "^0.5.1",
 		"rimraf": "^2.6.2",
