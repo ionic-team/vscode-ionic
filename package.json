@@ -57,7 +57,7 @@
 		"commands": [
 			{
 				"command": "ionic.refresh",
-				"title": "Refresh",
+				"title": "Ionic: Refresh",
 				"icon": {
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
@@ -65,7 +65,7 @@
 			},
 			{
 				"command": "ionic.add",
-				"title": "Add",
+				"title": "Ionic: Add",
 				"icon": {
 					"light": "resources/light/add.svg",
 					"dark": "resources/dark/add.svg"
@@ -73,7 +73,7 @@
 			},
 			{
 				"command": "ionic.edit",
-				"title": "Info",
+				"title": "Ionic: Info",
 				"icon": {
 					"light": "resources/light/info.svg",
 					"dark": "resources/dark/info.svg"
@@ -81,7 +81,7 @@
 			},
 			{
 				"command": "ionic.fix",
-				"title": "Fix Issue"
+				"title": "Ionic: Fix Issue"
 			}
 		],
 		"menus": {
