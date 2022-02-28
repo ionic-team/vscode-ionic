@@ -3,6 +3,7 @@
 - Windows support added (fix for creating new Ionic/Capacitor projects)
 - Fix for duplicate commands when installed with Microsoft Cordova Tools extension
 - Fix to allow setting version numbers to non-semver strings
+- Fix for unrequired plugin cordova-plugin-add-swift-support is reported twice
 
 ### Version 1.0.0
 - First Release
