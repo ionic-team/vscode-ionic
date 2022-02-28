@@ -868,6 +868,7 @@ function sendTelemetryEvents(config: IonicConfig, project: Project, packages: an
 			sendTelemetry(config.telemetry, sessionId, 'VS Code Extension Packages', {
 				extension: context.extension.packageJSON.version,
 				name: project.name,
+				projectType: project.type,
 				packages: packageList,
 				packageVersions: packageVersions,
 				plugins: plugins
