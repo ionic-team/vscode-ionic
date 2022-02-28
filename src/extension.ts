@@ -70,7 +70,7 @@ async function requestAppName(tip: Tip) {
 		const result = [];
 		name = name.replace(/ /g, '-');
 		for (const command of tip.command) {
-			result.push(command.replace('@app', `${name.trim()}`));
+			result.push(command.replace(new RegExp('@app', 'g'), `${name.trim()}`));
 		}
 		return result;
 	} else {
@@ -253,7 +253,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	vscode.commands.registerCommand('ionic.run', async (tip: Tip) => {
+	vscode.commands.registerCommand('ionic.runapp', async (tip: Tip) => {
 		tip.generateCommand();
 		if (tip.command) {
 			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;

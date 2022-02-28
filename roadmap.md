@@ -18,13 +18,8 @@
 - Allow add of plugins: list all official capacitor, ionic enterprise, supported plugins
 - Use npm audit to list vulnerable packages
 - If using say @capacitor/camera then allow editing of info.plist and Android permissions (highlight if empty)
-
-# In Review
-- Detect Capacitor CLI and fallback to it for non-ionic projects. This may make some functions impossible or non standard (eg build), current check ensures Ionic CLI is installed
-
-# Bugs
-
-- `package.json` -> ionic backend
+- (bug) Creating a new Ionic project should allow changing version number/bundleid (see bug WN-276 in Capacitor project)
+- (feat) Detect project type (capacitor/cordova/web) and report in telemetry
 
 
 

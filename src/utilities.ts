@@ -50,7 +50,8 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 				console.error(error);
 			}
 
-			if (!error) {
+			// Quirk of windows robocopy is that it logs errors/exit code on success
+			if (!error || (command.includes('robocopy'))) {
 				const end_time = process.hrtime(start_time);
 				opTiming[command] = end_time[0]; // Number of seconds
 				resolve();

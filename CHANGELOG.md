@@ -1,4 +1,12 @@
 ## Changelog
+### Version 1.0.1
+- Windows support added (fix for creating new Ionic/Capacitor projects)
+- Fix for duplicate commands when installed with Microsoft Cordova Tools extension
+- Fix to allow setting version numbers to non-semver strings
+
+### Version 1.0.0
+- First Release
+
 ### Version 0.0.12
 - Validation is now done on bundle identifiers, build numbers and version numbers
 

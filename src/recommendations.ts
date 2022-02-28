@@ -389,7 +389,7 @@ export class Project {
 			placeHolder: version,
 			value: version,
 			validateInput: (value: string) => {
-				const regexp = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
+				const regexp = /^\S+$/;				
 				if (!regexp.test(value)) {
 					return "This version number is not valid";
 				}
@@ -557,7 +557,7 @@ export class Project {
 
 		if ([TipType.Run, TipType.Sync, TipType.Build, TipType.Edit].includes(tip.type) || tip.doRun) {
 			cmd = {
-				command: 'ionic.run',
+				command: 'ionic.runapp',
 				title: 'Run',
 				arguments: [tip]
 			};
@@ -716,8 +716,7 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
 			TipType.Run,
 			'Create Project',
 			[`ionic start @app ${starter.name} --capacitor`,
-			process.platform === "win32" ? `move @app .` : `mv @app/{,.[^.]}* .`,
-				`rmdir @app`
+			process.platform === "win32" ? `robocopy @app . /MOVE /E /NFL /NDL /NJH /NJS /nc /ns /np` : `mv @app/{,.[^.]}* . && rmdir @app`,				
 			],
 			'Creating Project',
 			'Project Created').requestAppName().showProgressDialog());
