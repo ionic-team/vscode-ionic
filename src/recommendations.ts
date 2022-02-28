@@ -121,8 +121,7 @@ function capacitorRecommendations(project: Project): Tip[] {
 
 	tips.push(incompatiblePlugin('cordova-plugin-appsflyer-sdk', 'It will not compile but can be replaced with the plugin appsflyer-capacitor-plugin'));
 
-	// Plugins that are not required
-	tips.push(notRequiredPlugin('cordova-plugin-add-swift-support'));
+	// Plugins that are not required	
 	tips.push(notRequiredPlugin('cordova-plugin-compat'));
 	if (!exists('cordova-plugin-file-transfer')) {
 		// Note: If you still use cordova-plugin-file-transfer it requires the whitelist plugin (https://github.com/ionic-team/capacitor/issues/1199)
