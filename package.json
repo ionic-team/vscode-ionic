@@ -2,7 +2,7 @@
 	"name": "ionic",
 	"displayName": "Ionic",
 	"description": "Ionic & Capacitor project tooling and recommendations",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"icon": "media/ionic.png",
 	"publisher": "Ionic",
 	"keywords": [
@@ -21,7 +21,7 @@
 		"esbuild": "npm run esbuild-base -- --sourcemap",
 		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
 		"compile": "tsc -p ./",
-		"package": "npm run vsix-package && cp ionic-1.0.1.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+		"package": "npm run vsix-package && cp ionic-1.0.2.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
 		"watch": "tsc -watch -p ./",
 		"lint": "eslint . --ext .ts,.tsx"
 	},
@@ -121,7 +121,8 @@
 				"title": "Ionic: login"
 			},
 			{ 
-				"command": "ionic.skipLogin"				
+				"command": "ionic.skipLogin",
+				"title": "Ionic: Skip Login"				
 			}
 		],
 		"menus": {

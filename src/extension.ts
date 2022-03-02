@@ -230,13 +230,13 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand('ionic.signUp', async () => {
-		await ionicSignup(context.extensionPath);
+		await ionicSignup(context.extensionPath, context);
 		ionicProvider.refresh();
 	});
 
 	vscode.commands.registerCommand('ionic.login', async () => {
 		await vscode.commands.executeCommand('setContext', Context.isLoggingIn, true);
-		await ionicLogin(context.extensionPath);
+		await ionicLogin(context.extensionPath, context);
 		ionicProvider.refresh();
 	});
 

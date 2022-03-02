@@ -2,6 +2,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import * as http from 'https';
+import * as vscode from 'vscode';
+
+import { PackageInfo } from './package-info';
+import { generateUUID } from './utilities';
+import { Project } from './recommendations';
 
 interface TelemetryMetric {
 	name: string;
@@ -16,6 +21,13 @@ interface TelemetryEvent {
 	sent_at: string
 }
 
+export enum TelemetryEventType {
+	Packages = 'VS Code Extension Packages',
+	Usage = 'VS Code Extension Usage',
+	Login = 'VS Code Extension Login',
+	SignUp = 'VS Code Extension Sign Up'
+}
+
 export interface IonicConfig {
 	telemetry: boolean;
 	npmClient?: string;
@@ -24,6 +36,57 @@ export interface IonicConfig {
 	'user.email'?: string;
 	'user.id'?: string;
 	'version'?: string;
+	sessionId: string; // Generated
+}
+
+export function sendTelemetryEvent(folder: string, name: string, context: vscode.ExtensionContext) {
+	const config = getIonicConfig(folder);
+	if (!config.telemetry) return;
+	sendTelemetry(config.telemetry, config.sessionId, name, {
+		extension: context.extension.packageJSON.version
+	});
+}
+
+export function sendTelemetryEvents(folder: string, project: Project, packages: any, context: vscode.ExtensionContext) {
+	const config = getIonicConfig(folder);
+	if (!config.telemetry) return;
+
+	const sent = context.workspaceState.get(`packages-${project.name}`);
+	if (sent != project.modified.toUTCString()) {
+		const packageList = [];
+		const packageVersions = [];
+		const plugins = [];
+		for (const library of Object.keys(packages)) {
+			const info: PackageInfo = packages[library];
+			packageVersions.push(`${library}@${info.version}`);
+			packageList.push(library);
+			if (info.depType.includes('Plugin')) {
+				plugins.push(library);
+			}
+		}
+		sendTelemetry(config.telemetry, config.sessionId, TelemetryEventType.Packages, {
+			extension: context.extension.packageJSON.version,
+			name: project.name,
+			projectType: project.type,
+			packages: packageList,
+			packageVersions: packageVersions,
+			plugins: plugins
+		});
+
+		// Store the last time the package.json was modified so that we can send if it changes
+		context.workspaceState.update(`packages-${project.name}`, project.modified.toUTCString());
+	}
+
+	const sentUsage = context.globalState.get(`lastusage`);
+	if (!sentUsage || new Date().toLocaleDateString() !== sentUsage) {
+		sendTelemetry(config.telemetry, config.sessionId, TelemetryEventType.Usage, {
+			extension: context.extension.packageJSON.version
+		});
+
+		// Store the last time the extension was used so we can report it daily
+		context.globalState.update(`lastusage`, new Date().toLocaleDateString());
+	}
+
 }
 
 /**
@@ -33,7 +96,7 @@ export interface IonicConfig {
  * @param  {string} event_type Name of the event to send
  * @param  {any} payload Javascript object containing information to send
  */
-export function sendTelemetry(telemetry: boolean, sessionId: string, event_type: string, payload: any) {
+function sendTelemetry(telemetry: boolean, sessionId: string, event_type: string, payload: any) {
 	if (!telemetry) return;
 
 	try {
@@ -44,7 +107,7 @@ export function sendTelemetry(telemetry: boolean, sessionId: string, event_type:
 		// Call POST https://api.ionicjs.com/events/metrics
 		const now = new Date().toISOString();
 		const metric: TelemetryMetric = {
-			name: 'vscode_ext', //'vscode_ext_metrics', // Needs to be added https://github.com/ionic-team/appflow-events/blob/04173db00f0a9ef6c2798166bfda8f4b3d53a89a/ionic_api_events/settings.py#L52
+			name: 'vscode_ext',
 			timestamp: now,
 			session_id: sessionId,
 			source: 'vscode_ext',
@@ -68,9 +131,8 @@ export function sendTelemetry(telemetry: boolean, sessionId: string, event_type:
 		};
 
 		const req = http.request(options, res => {
-			//console.log(`statusCode: ${res.statusCode}`);
 			res.on('data', d => {
-				console.log(d.toString());				
+				console.log(d.toString());
 			});
 		});
 
@@ -98,7 +160,11 @@ export function getIonicConfig(folder: string): IonicConfig {
 		if (data.telemetry) {
 			config.telemetry = data.telemetry; // Override global with local setting
 		}
-	}	
+	}
+	config.sessionId = config['tokens.telemetry'];
+	if (!config.sessionId) {
+		config.sessionId = generateUUID();
+	}
 	return config;
 }
 
@@ -111,14 +177,14 @@ export function getGlobalIonicConfig(): IonicConfig {
 	const configFile = path.join(configPath, 'config.json');
 
 	if (fs.existsSync(configFile)) {
-		const json: any = fs.readFileSync(configFile);		
+		const json: any = fs.readFileSync(configFile);
 		const data: IonicConfig = JSON.parse(json);
 		if (!data.telemetry) {
 			data.telemetry = true; // Default is true for telemetry
 		}
 		return data;
 	} else {
-		return { telemetry: false };
+		return { telemetry: false, sessionId: undefined };
 	}
 }
 

@@ -18,7 +18,7 @@ import {
 } from './analyzer';
 
 import * as vscode from 'vscode';
-import { error, libString } from './messages';
+import { libString } from './messages';
 import { reviewPackages, reviewPluginsWithHooks, reviewPluginProperties } from './process-packages';
 import { Recommendation } from './recommendation';
 import { Tip, TipType } from './tip';
@@ -26,11 +26,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CapacitorProject } from '@capacitor/project';
 import { CapacitorConfig } from '@capacitor/cli';
-import { generateUUID, getPackageJSON, getRunOutput, getStringFrom, PackageFile, setStringIn } from './utilities';
+import { getPackageJSON, getRunOutput, getStringFrom, PackageFile, setStringIn } from './utilities';
 import { fixIssue } from './extension';
 import { CapacitorProjectState } from './cap-project';
-import { getGlobalIonicConfig, getIonicConfig, IonicConfig, sendTelemetry } from './telemetry';
-import { PackageInfo } from './package-info';
+import { getGlobalIonicConfig, sendTelemetryEvents  } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
 import { Context } from './context-variables';
 
@@ -852,46 +851,6 @@ function ionicBuild(folder: string): string {
 	return `${preop}npx ionic build${buildFlags}`;
 }
 
-function sendTelemetryEvents(config: IonicConfig, project: Project, packages: any, context: vscode.ExtensionContext) {
-	if (config.telemetry) {
-		let sessionId = config['tokens.telemetry'];
-		if (!sessionId) {
-			sessionId = generateUUID();
-		}
-
-		const sent = context.workspaceState.get(`packages-${project.name}`);
-		if (sent != project.modified.toUTCString()) {
-			const packageList = [];
-			const packageVersions = [];
-			const plugins = [];
-			for (const library of Object.keys(packages)) {
-				const info: PackageInfo = packages[library];
-				packageVersions.push(`${library}@${info.version}`);
-				packageList.push(library);
-				if (info.depType.includes('Plugin')) {
-					plugins.push(library);
-				}
-			}
-			sendTelemetry(config.telemetry, sessionId, 'VS Code Extension Packages', {
-				extension: context.extension.packageJSON.version,
-				name: project.name,
-				projectType: project.type,
-				packages: packageList,
-				packageVersions: packageVersions,
-				plugins: plugins
-			});
-			context.workspaceState.update(`packages-${project.name}`, project.modified.toUTCString());
-		}
-		const sentUsage = context.globalState.get(`lastusage`);
-		if (!sentUsage || new Date().toLocaleDateString() !== sentUsage) {
-			sendTelemetry(config.telemetry, sessionId, 'VS Code Extension Usage', {
-				extension: context.extension.packageJSON.version
-			});
-			context.globalState.update(`lastusage`, new Date().toLocaleDateString());
-		}
-	}
-}
-
 export async function reviewProject(folder: string, context: vscode.ExtensionContext): Promise<Recommendation[]> {
 	vscode.commands.executeCommand('setContext', Context.inspectedProject, false);
 	vscode.commands.executeCommand('setContext', Context.isLoggingIn, false);
@@ -909,22 +868,14 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 		vscode.commands.executeCommand('setContext', Context.isAnonymous, false);
 	}
 
-
-	const config = getIonicConfig(folder);
-	sendTelemetryEvents(config, project, packages, context);
+	sendTelemetryEvents(folder, project, packages, context);
 
 	checkNodeVersion();
-
 
 	project.type = isCapacitor() ? 'Capacitor' : 'Cordova';
 	project.folder = folder;
 
 	if (isCapacitor() && !isCordova()) {
-		project.setGroup(
-			`Scripts`, ``, TipType.Ionic, false);
-
-		project.addScripts();
-
 		project.setGroup(`Capacitor`, 'Recommendations related to Capacitor', TipType.Capacitor, true);
 
 		const hasCapIos = exists('@capacitor/ios');
@@ -957,6 +908,10 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 		if (hasCapAndroid) {
 			project.add(new Tip('Open Android Studio Project', '', TipType.Edit, 'Opening project in Android Studio', `npx cap open android`, 'Open Android Studio').showProgressDialog());
 		}
+
+		project.setGroup(
+			`Scripts`, ``, TipType.Ionic, false);
+		project.addScripts();
 	}
 
 	if (isCapacitor()) {

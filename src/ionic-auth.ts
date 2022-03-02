@@ -2,16 +2,28 @@ import * as child_process from 'child_process';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
-export async function ionicLogin(folder: string) {
+import { Context } from './context-variables';
+import { ionicState } from './ionic-tree-provider';
+import { sendTelemetryEvent, TelemetryEventType } from './telemetry';
+
+export async function ionicLogin(folder: string, context: vscode.ExtensionContext) {
 	const ifolder = path.join(folder, 'node_modules', '@ionic', 'cli', 'bin');
 	const channel = vscode.window.createOutputChannel("Ionic");
-	await run('npx ionic login', ifolder, channel);
+	try {		
+		await run(`npx ionic login`, ifolder, channel);
+		sendTelemetryEvent(folder, TelemetryEventType.Login, context);
+	} catch (err) {
+		vscode.window.showErrorMessage(err);
+		ionicState.skipAuth = true;
+		await vscode.commands.executeCommand('setContext', Context.isAnonymous, false);
+	}
 }
 
-export async function ionicSignup(folder: string) {
+export async function ionicSignup(folder: string, context: vscode.ExtensionContext) {
 	const ifolder = path.join(folder, 'node_modules', '@ionic', 'cli', 'bin');
 	const channel = vscode.window.createOutputChannel("Ionic");
 	await run('npx ionic signup', ifolder, channel);
+	sendTelemetryEvent(folder, TelemetryEventType.SignUp, context);
 }
 
 async function run(command: string, folder: string, channel: vscode.OutputChannel): Promise<string> {
