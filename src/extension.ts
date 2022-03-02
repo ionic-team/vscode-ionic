@@ -1,7 +1,9 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { IonicTreeProvider } from './ionic-tree-provider';
+import { Context } from './context-variables';
+import { ionicLogin, ionicSignup } from './ionic-auth';
+import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './recommendations';
@@ -210,7 +212,10 @@ export function activate(context: vscode.ExtensionContext) {
 	// }
 
 	const ionicProvider = new IonicTreeProvider(rootPath, context);
-	vscode.window.registerTreeDataProvider('ionic', ionicProvider);
+	//vscode.window.registerTreeDataProvider('ionic', ionicProvider);
+	const view = vscode.window.createTreeView('ionic', {treeDataProvider: ionicProvider});
+	ionicState.view = view;
+	
 	vscode.commands.registerCommand('ionic.refresh', () => {
 		clearRefreshCache(context);
 		context.workspaceState.update('CapacitorProject', undefined);
@@ -222,6 +227,24 @@ export function activate(context: vscode.ExtensionContext) {
 		if (ionicProvider) {
 			ionicProvider.refresh();
 		}
+	});
+
+	vscode.commands.registerCommand('ionic.signUp', async () => {
+		await ionicSignup(context.extensionPath);
+		ionicProvider.refresh();
+	});
+
+	vscode.commands.registerCommand('ionic.login', async () => {
+		await vscode.commands.executeCommand('setContext', Context.isLoggingIn, true);
+		await ionicLogin(context.extensionPath);
+		ionicProvider.refresh();
+	});
+
+	vscode.commands.registerCommand('ionic.skipLogin', async () => {
+		ionicState.skipAuth = true;
+		await vscode.commands.executeCommand('setContext', Context.inspectedProject, false);
+		await vscode.commands.executeCommand('setContext', Context.isAnonymous, false);
+		ionicProvider.refresh();
 	});
 
 	vscode.commands.registerCommand('ionic.edit', (node: Recommendation) => {

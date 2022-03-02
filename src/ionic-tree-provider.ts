@@ -6,6 +6,8 @@ import * as path from 'path';
 import { reviewProject, starterProject } from './recommendations';
 import { Recommendation } from './recommendation';
 
+export const ionicState = { view: undefined, skipAuth: false };
+
 export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {
 	private _onDidChangeTreeData: vscode.EventEmitter<Recommendation | undefined | void> = new vscode.EventEmitter<Recommendation | undefined | void>();
 	readonly onDidChangeTreeData: vscode.Event<Recommendation | undefined | void> = this._onDidChangeTreeData.event;
@@ -29,7 +31,7 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
 
 		if (element) {
 			return Promise.resolve(element.children);
-		} else {			
+		} else {
 			const packageJsonPath = path.join(this.workspaceRoot, 'package.json');
 			if (this.pathExists(packageJsonPath)) {
 				return reviewProject(this.workspaceRoot, this.context);

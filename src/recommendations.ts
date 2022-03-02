@@ -31,6 +31,8 @@ import { fixIssue } from './extension';
 import { CapacitorProjectState } from './cap-project';
 import { getGlobalIonicConfig, getIonicConfig, IonicConfig, sendTelemetry } from './telemetry';
 import { PackageInfo } from './package-info';
+import { ionicState } from './ionic-tree-provider';
+import { Context } from './context-variables';
 
 
 let useCapProjectCache = true;
@@ -891,10 +893,23 @@ function sendTelemetryEvents(config: IonicConfig, project: Project, packages: an
 }
 
 export async function reviewProject(folder: string, context: vscode.ExtensionContext): Promise<Recommendation[]> {
+	vscode.commands.executeCommand('setContext', Context.inspectedProject, false);
+	vscode.commands.executeCommand('setContext', Context.isLoggingIn, false);
+
 	const project: Project = new Project('My Project');
 	const packages = await load(folder, project, context);
+	ionicState.view.title = project.name;
 
-	getGlobalIonicConfig();
+	const gConfig = getGlobalIonicConfig();
+
+	if (!gConfig['user.id'] && !ionicState.skipAuth) {
+		vscode.commands.executeCommand('setContext', Context.isAnonymous, true);
+		return undefined;
+	} else {
+		vscode.commands.executeCommand('setContext', Context.isAnonymous, false);
+	}
+
+
 	const config = getIonicConfig(folder);
 	sendTelemetryEvents(config, project, packages, context);
 
@@ -906,7 +921,7 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 
 	if (isCapacitor() && !isCordova()) {
 		project.setGroup(
-			`${project.name}`, ``, TipType.Ionic, false);
+			`Scripts`, ``, TipType.Ionic, false);
 
 		project.addScripts();
 
@@ -960,7 +975,6 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 	if (!fs.existsSync(nmf)) {
 		project.add(new Tip('Install Node Modules', '', TipType.Idea, 'Install Node Modules', 'npm install', 'Installing').performRun());
 	}
-
 
 	// Replace momentjs with date-fns
 	project.recommendReplace('moment',
@@ -1107,5 +1121,6 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 	project.add(new Tip('Provide Feedback', '', TipType.Comment, undefined, undefined, undefined, undefined, `https://github.com/ionic-team/vscode-extension/issues`));
 	project.add(new Tip('Settings', '', TipType.Settings));
 
+	vscode.commands.executeCommand('setContext', Context.inspectedProject, true);
 	return project.groups;
 }

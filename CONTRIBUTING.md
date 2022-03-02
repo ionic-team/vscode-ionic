@@ -5,6 +5,11 @@ Ensure Visual Studio Extension Manager:
 For this project install dependencies:
 - `npm install`
 
+Hacking the CLI is required:
+- Open `node_modules/@ionic/cli/commands/login.js`
+- Comment out lines 146,147 and 151-156
+- This is to allow sign in to work
+
 # Debugging
 - Press F5 in VSCode to start debugging the extension. It will open a VS Code window with the extension installed.
 

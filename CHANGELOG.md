@@ -8,6 +8,7 @@
 - Add recommendaton for Capacitor migration of removal of cordova-plugin-enable-multidex
 - Add cordova-plugin-firebasex to incompatible list for Capacitor
 - Add cordova-plugin-swrve to imcompatible list for Capacitor
+- App title is displayed above the tree view
 
 ### Version 1.0.0
 - First Release
