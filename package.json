@@ -2,7 +2,7 @@
 	"name": "ionic",
 	"displayName": "Ionic",
 	"description": "Ionic & Capacitor project tooling and recommendations",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"icon": "media/ionic.png",
 	"publisher": "Ionic",
 	"keywords": [
@@ -21,7 +21,7 @@
 		"esbuild": "npm run esbuild-base -- --sourcemap",
 		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
 		"compile": "tsc -p ./",
-		"package": "npm run vsix-package && cp ionic-1.0.3.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+		"package": "npm run build && cp ionic-1.0.4.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
 		"watch": "tsc -watch -p ./",
 		"lint": "eslint . --ext .ts,.tsx"
 	},
@@ -54,7 +54,7 @@
 			},
 			{
 				"view": "ionic",
-				"contents": "To get started with Ionic open an empty folder in Visual Studio Code.",
+				"contents": "To get started with Ionic open an [empty folder](command:vscode.openFolder) or your projects folder.",
 				"when": "noProjectFound == true"
 			},
 			{

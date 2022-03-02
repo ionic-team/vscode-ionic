@@ -106,10 +106,24 @@ function cancelRunning(tip: Tip): Promise<void> {
 	return new Promise(resolve => setTimeout(resolve, 1000));
 }
 
-function completeOperation(tip: Tip) {
+function finishCommand(tip: Tip) {
 	runningOperations = runningOperations.filter((op: Tip) => {
 		return op.title != tip.title;
 	});
+
+	if (tip.title) {
+		channel.appendLine(`[Ionic] ${tip.title} Completed.`);
+		channel.appendLine('');
+		channel.show();
+	}	
+}
+
+function startCommand(tip: Tip, cmd: string) {
+	if (tip.title) {
+		const message = tip.commandTitle ? tip.commandTitle : tip.title;
+		channel.appendLine(`[Ionic] ${message} (${cmd})...`);		
+		channel.show();
+	}	
 }
 
 /**
@@ -148,12 +162,12 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 					tip.cancelRequested = false;
 					channel.appendLine(`Canceled operation "${tip.title}"`);
 					clearInterval(interval);
-					completeOperation(tip);
+					finishCommand(tip);
 					cancelObject.proc.kill();
 				} else {
 					if (increment) {
 						percentage += increment;
-						progress.report({message: `${parseInt(percentage)}%`,  increment: increment });						
+						progress.report({ message: `${parseInt(percentage)}%`, increment: increment });
 					}
 				}
 			}, 1000);
@@ -161,27 +175,24 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 			if (Array.isArray(command)) {
 				try {
 					for (const cmd of command) {
-						channel.appendLine(cmd);
-						channel.show();
-
+						startCommand(tip, cmd);
 						await run(rootPath, cmd, channel, cancelObject, tip.doViewEditor, tip.runPoints, progress);
 
 					}
 				} finally {
-					completeOperation(tip);
+					finishCommand(tip);
 				}
 			} else {
-				channel.appendLine(command);
-				channel.show();
+				startCommand(tip, command);
 				const secondsTotal = estimateRunTime(command);
 				if (secondsTotal) {
 					increment = 100.0 / secondsTotal;
-					percentage = 0;					
+					percentage = 0;
 				}
 				try {
 					await run(rootPath, command, channel, cancelObject, tip.doViewEditor, tip.runPoints, progress);
 				} finally {
-					completeOperation(tip);
+					finishCommand(tip);
 				}
 			}
 			return true;
@@ -213,15 +224,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const ionicProvider = new IonicTreeProvider(rootPath, context);
 	//vscode.window.registerTreeDataProvider('ionic', ionicProvider);
-	const view = vscode.window.createTreeView('ionic', {treeDataProvider: ionicProvider});
+	const view = vscode.window.createTreeView('ionic', { treeDataProvider: ionicProvider });
 	ionicState.view = view;
-	
+
 	vscode.commands.registerCommand('ionic.refresh', () => {
 		clearRefreshCache(context);
 		context.workspaceState.update('CapacitorProject', undefined);
 		ionicProvider.refresh();
 	});
-	
+
 	vscode.commands.registerCommand('ionic.add', async (tip: Tip) => {
 		await installPackage(context.extensionPath, rootPath);
 		if (ionicProvider) {

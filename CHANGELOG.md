@@ -1,4 +1,7 @@
 ## Changelog
+### Version 1.0.4
+- Actions are logged in the output window when they start and end
+
 ### Version 1.0.3
 - Fix for Ionic Sign In
 - Fix when Visual Studio Code does not have a folder open

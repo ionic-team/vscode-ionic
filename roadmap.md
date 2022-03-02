@@ -19,11 +19,7 @@
 - Use npm audit to list vulnerable packages
 - If using say @capacitor/camera then allow editing of info.plist and Android permissions (highlight if empty)
 - (bug) Creating a new Ionic project should allow changing version number/bundleid (see bug WN-276 in Capacitor project)
-- (feat) Detect project type (capacitor/cordova/web) and report in telemetry
-- (feat) When running for web, if you close the browser, a button for "Open Browser" should allow opening it again.
-- (feat) Send the action you are doing to the output window along with a new line 
-
-
+- (feat) When running for web, if you close the browser, a button for "Open Browser" should allow opening it again. 
 
 # Known Issues
 - Colorization of the output window is not supported in VS Code Extensions
