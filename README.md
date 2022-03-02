@@ -1,36 +1,42 @@
-This extension for Visual Studio Code provides:
-- Cordova to Capacitor Migration (based on analysis of `package.json`)
-- Deprecated plugins (based on known node packages that are end of life or unsupported)
-- Common issues with `config.xml`, `androidmanifest.xml` and project configuration
-- Integration of Capacitor into web projects
-- Running scripts from `package.json`
-- Capacitor and Ionic commands
-- Creation of Capacitor based Ionic projects
-
-Note: If you would like the output of commands to be colorized we would recommend installing [this extension](https://marketplace.visualstudio.com/items?itemName=IBM.output-colorizer).
+This extension for Visual Studio Code features:
+- [Create a project](#creating-ionic-projects) - Start a project for `Angular`, `React` or `Vue`
+- [Run Commands](#creating-ionic-projects) - Such as build, sync, serve and test
+- [Run Apps](#running-on-android) - Launch on a real or emulated iOS or Android device
+- [Migrate to Capacitor](#capacitor-migration) - Actions and recommendations to migrate from Cordova
+- [Find Deprecated plugins]() - Identify known end of life or deprecated packages and plugins
+- [Set native projects](#native-project-settings) - Set Bundle id, display name, version number and build number of the native project
+- [Outdated Packages](#upgrading-packages) - Provides easy upgrade to the latest version
+`androidmanifest.xml`
+- [Configuration Issues](#upgrading-packages) - Recommends changes to `config.xml` and - [Integrate Capacitor](#adding-capacitor) into web projects
+- [Run Scripts](#upgrading-packages) from `package.json`
 
 ## Creating Ionic Projects
 - Open an Empty Folder
-- In the Ionic extension choose a starter project
+- Choose a starter project
 - Your project will be created ready to run
 ![Video of creating a project](https://vs-ionic.netlify.app/videos/new-project.gif)
 
 ## Running on Android
-- Run your app on your chosen simulator or connected Android device
-- Changes to source code is instantly updated using Live Reload
+- Choose `Run On Android`
+- Select the chosen emulator or connected Android device
+- Changes to source code are instantly updated in the app using Live Reload
 ![Video of running on Android](https://vs-ionic.netlify.app/videos/run-on-android.gif)
 
 ## Running on iOS
-- Run your app on your chosen simulator or connected iOS device
-- Changes to source code is instantly updated using Live Reload
+- Choose `Run On iOS`
+- Select the chosen simulator or connected iOS device
+- Changes to source code are instantly updated in the app using Live Reload
 ![Video of running on iOS](https://vs-ionic.netlify.app/videos/run-on-ios.gif)
 
 ## Adding Capacitor
-- Integrate Capacitor into an existing web application or SPA
+- Choose `Integrate Capacitor`
+- Required packages and setup will be applied to your web application or SPA
 ![Video of adding Capacitor](https://vs-ionic.netlify.app/videos/web-native.gif)
 
 ## Upgrading Packages
-- Upgrade dependencies to the latest version
+- Select a package from `Packages` section
+- Choose to `Upgrade` or `Install`
+- The `Info` option will launch the packages home page on npm
 ![Video of upgrading packages](https://vs-ionic.netlify.app/videos/upgrade-packages.gif)
 
 ## Capacitor Migration
@@ -40,12 +46,11 @@ Note: If you would like the output of commands to be colorized we would recommen
 - Unrequired plugins are removed
 ![Video of migrating to Capacitor](https://vs-ionic.netlify.app/videos/cap-migration.gif)
 
+## Native Project Settings
+By opening the `Configuration` item you can set a projects Display Name, Version Number and Build Number. A change in settings will be applied to both the iOS and Android project.
 
 ## Submit Feedback
 [File an issue](https://github.com/ionic-team/vscode-extension/issues) to provide feedback on bugs and feature requests.
-
-## Demo
-This [video](https://user-images.githubusercontent.com/84595830/142964859-ece2abfc-6954-4447-b3fd-0f6b781c5bae.mp4) shows opening a Cordova project in Visual Studio Code and using the Ionic extension to convert it to Capacitor and update and remove plugins and dependencies.
 
 
 
