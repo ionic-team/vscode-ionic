@@ -50,7 +50,7 @@
 			{
 				"view": "ionic",
 				"contents": "Please wait while inspecting project...",
-				"when": "inspectedProject == false && isAnonymous == false"
+				"when": "inspectedProject == false && isAnonymous == false && noProjectFound == false"
 			},
 			{
 				"view": "ionic",
