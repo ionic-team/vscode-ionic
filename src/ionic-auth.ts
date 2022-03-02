@@ -10,7 +10,7 @@ export async function ionicLogin(folder: string, context: vscode.ExtensionContex
 	const ifolder = path.join(folder, 'node_modules', '@ionic', 'cli', 'bin');
 	const channel = vscode.window.createOutputChannel("Ionic");
 	try {		
-		await run(`npx ionic login`, ifolder, channel);
+		await run(`node ionic login`, ifolder, channel);
 		sendTelemetryEvent(folder, TelemetryEventType.Login, context);
 	} catch (err) {
 		vscode.window.showErrorMessage(err);

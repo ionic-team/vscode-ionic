@@ -6,5 +6,8 @@ export enum Context {
 	isLoggingIn = 'isLoggingIn',
 
 	// Whether the current user is not known (true)
-	isAnonymous = 'isAnonymous'
+	isAnonymous = 'isAnonymous',
+
+	// VS Code hasnt opened a folder
+	noProjectFound = 'noProjectFound'
 }

@@ -1,4 +1,11 @@
 ## Changelog
+### Version 1.0.3
+- Fix for Ionic Sign In
+- Fix when Visual Studio Code does not have a folder open
+
+### Version 1.0.2
+- Scripts moved below Capacitor features
+
 ### Version 1.0.1
 - Windows support added (fix for creating new Ionic/Capacitor projects)
 - Fix for duplicate commands when installed with Microsoft Cordova Tools extension
