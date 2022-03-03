@@ -41,7 +41,6 @@
 		"onLanguage:jsonc",
 		"onCommand:ionic.refresh",
 		"onCommand:ionic.add",
-		"onCommand:ionic.edit",
 		"onCommand:ionic.fix"
 	],
 	"main": "./out/extension.js",
@@ -103,14 +102,6 @@
 				"icon": {
 					"light": "resources/light/add.svg",
 					"dark": "resources/dark/add.svg"
-				}
-			},
-			{
-				"command": "ionic.edit",
-				"title": "Ionic: Info",
-				"icon": {
-					"light": "resources/light/info.svg",
-					"dark": "resources/dark/info.svg"
 				}
 			},
 			{

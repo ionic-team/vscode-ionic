@@ -258,11 +258,6 @@ export function activate(context: vscode.ExtensionContext) {
 		ionicProvider.refresh();
 	});
 
-	vscode.commands.registerCommand('ionic.edit', (node: Recommendation) => {
-		const url = node.url ? node.url : `https://www.npmjs.com/package/${node.label}`;
-		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(url));
-	});
-
 	vscode.commands.registerCommand('ionic.fix', async (tip: Tip) => {
 		tip.generateCommand();
 		if (tip.command) {
