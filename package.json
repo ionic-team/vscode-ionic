@@ -98,7 +98,7 @@
 			},
 			{
 				"command": "ionic.add",
-				"title": "Ionic: Add",
+				"title": "Ionic: Install Package",
 				"icon": {
 					"light": "resources/light/add.svg",
 					"dark": "resources/dark/add.svg"
@@ -114,7 +114,7 @@
 			},
 			{ 
 				"command": "ionic.login",
-				"title": "Ionic: login"
+				"title": "Ionic: Login"
 			},
 			{ 
 				"command": "ionic.skipLogin",
@@ -122,7 +122,20 @@
 			}
 		],
 		"menus": {
-			"commandPalette": [],
+			"commandPalette": [
+				{
+					"command": "ionic.skipLogin",
+					"when": "false"
+				},
+				{
+					"command": "ionic.refresh",
+					"when": "false"
+				},				
+				{
+					"command": "ionic.fix",
+					"when": "false"
+				}
+			],
 			"view/title": [
 				{
 					"command": "ionic.refresh",
