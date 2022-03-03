@@ -1,13 +1,14 @@
 This extension for Visual Studio Code features:
-- [Create a project](#creating-ionic-projects) - Start a project for `Angular`, `React` or `Vue`
+- [Create a Project](#creating-ionic-projects) - Start a project for `Angular`, `React` or `Vue`
 - [Run Commands](#creating-ionic-projects) - Such as build, sync, serve and test
 - [Run Apps](#running-on-android) - Launch on a real or emulated iOS or Android device
 - [Migrate to Capacitor](#capacitor-migration) - Actions and recommendations to migrate from Cordova
-- [Find Deprecated plugins]() - Identify known end of life or deprecated packages and plugins
-- [Set native projects](#native-project-settings) - Set Bundle id, display name, version number and build number of the native project
+- [Find Deprecated Plugins]() - Identify known end of life or deprecated packages and plugins
+- [Native Projects Settings](#native-project-settings) - Set Bundle id, display name, version number and build number of the native project
 - [Outdated Packages](#upgrading-packages) - Provides easy upgrade to the latest version
 `androidmanifest.xml`
-- [Configuration Issues](#upgrading-packages) - Recommends changes to `config.xml` and - [Integrate Capacitor](#adding-capacitor) into web projects
+- [Configuration Issues](#upgrading-packages) - Recommends changes to `config.xml` and `androidmanifest.xml`
+- [Integrate Capacitor](#adding-capacitor) into web projects
 - [Run Scripts](#upgrading-packages) from `package.json`
 
 ## Creating Ionic Projects
