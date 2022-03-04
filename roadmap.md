@@ -22,6 +22,9 @@
 - (feat) When running for web, if you close the browser, a button for "Open Browser" should allow opening it again. 
 - (feat) Add "Build", "Sync", "Run" etc to commmand palette with keyboard shortcut
 
+# Milestones
+- Debugger for browser, iOS and Android (add breakpoints, inspection etc)
+
 # Known Issues
 - Colorization of the output window is not supported in VS Code Extensions
 - Badge option is not available for VS Code Extensions

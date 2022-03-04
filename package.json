@@ -2,7 +2,7 @@
 	"name": "ionic",
 	"displayName": "Ionic",
 	"description": "Ionic & Capacitor project tooling and recommendations",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"icon": "media/ionic.png",
 	"publisher": "Ionic",
 	"keywords": [
@@ -21,7 +21,7 @@
 		"esbuild": "npm run esbuild-base -- --sourcemap",
 		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
 		"compile": "tsc -p ./",
-		"package": "npm run build && cp ionic-1.0.4.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+		"package": "npm run build && cp ionic-1.0.5.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
 		"watch": "tsc -watch -p ./",
 		"lint": "eslint . --ext .ts,.tsx"
 	},
@@ -57,16 +57,16 @@
 				"when": "noProjectFound == true"
 			},
 			{
-			  "view": "ionic",
-			  "contents": "A free Ionic account is required to unlock all extension features or [Skip for Now](command:ionic.skipLogin).\n[Login](command:ionic.login)\n[Sign Up](command:ionic.signUp)\n",
-			  "when": "isAnonymous == true && isLoggingIn == false"
+				"view": "ionic",
+				"contents": "A free Ionic account is required to unlock all extension features or [Skip for Now](command:ionic.skipLogin).\n[Login](command:ionic.login)\n[Sign Up](command:ionic.signUp)\n",
+				"when": "isAnonymous == true && isLoggingIn == false"
 			},
 			{
 				"view": "ionic",
 				"contents": "Complete the login in the web browser. This view will change as soon as you login.",
 				"when": "isAnonymous == true && isLoggingIn == true"
 			}
-		  ],
+		],
 		"viewsContainers": {
 			"activitybar": [
 				{
@@ -112,13 +112,13 @@
 				"command": "ionic.signUp",
 				"title": "Ionic: Sign Up"
 			},
-			{ 
+			{
 				"command": "ionic.login",
 				"title": "Ionic: Login"
 			},
-			{ 
+			{
 				"command": "ionic.skipLogin",
-				"title": "Ionic: Skip Login"				
+				"title": "Ionic: Skip Login"
 			}
 		],
 		"menus": {
@@ -130,7 +130,7 @@
 				{
 					"command": "ionic.refresh",
 					"when": "false"
-				},				
+				},
 				{
 					"command": "ionic.fix",
 					"when": "false"
@@ -202,7 +202,7 @@
 	},
 	"dependencies": {
 		"@capacitor/project": "^1.0.31",
-		"@ionic/cli": "^6.18.1",
+		"@ionic/cli": "6.18.2",
 		"fast-xml-parser": "^3.21.1",
 		"mkdirp": "^0.5.1",
 		"rimraf": "^2.6.2",

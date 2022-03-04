@@ -1,4 +1,7 @@
 ## Changelog
+### Version 1.0.5
+- hide commands that are not needed in command palette
+
 ### Version 1.0.4
 - Actions are logged in the output window when they start and end
 
