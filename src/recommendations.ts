@@ -538,6 +538,7 @@ export class Project {
 			case TipType.Error: r.setIcon('error'); break;
 			case TipType.Warning: r.setIcon('warning'); break;
 			case TipType.Idea: r.setIcon('lightbulb'); break;
+			case TipType.Files: r.setIcon('files'); break;
 			case TipType.Cordova: r.setIcon('cordova'); break;
 			case TipType.Capacitor: r.setIcon('capacitor'); break;
 			case TipType.Ionic: r.setIcon('ionic'); break;
@@ -910,7 +911,7 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 		}
 
 		project.setGroup(
-			`Scripts`, ``, TipType.Ionic, false);
+			`Scripts`, ``, TipType.Files, false);
 		project.addScripts();
 	}
 

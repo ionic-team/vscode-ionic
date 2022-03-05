@@ -103,6 +103,7 @@ export enum TipType {
 	React,
 	Comment,
 	Settings,
+	Files,
 	Sync,
 	Add,
 	None

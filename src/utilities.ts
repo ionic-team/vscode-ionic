@@ -41,9 +41,6 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 	}
 	return new Promise((resolve, reject) => {
 		console.log(`exec ${command} (${folder})`);
-		if (command.includes('npm')) {
-			clearRefreshCache();
-		}
 		const start_time = process.hrtime();
 		const proc = child_process.exec(command, runOptions(command, folder), (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (error) {

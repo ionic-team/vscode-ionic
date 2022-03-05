@@ -107,7 +107,7 @@ export async function load(fn: string, project: Project, context: vscode.Extensi
 		...packageFile.devDependencies,
 	};
 	console.log(`Inspecting ${Object.keys(allDependencies).length} packages...`);
-	return await processPackages(fn, allDependencies, packageFile.devDependencies, context);
+	return await processPackages(fn, allDependencies, packageFile.devDependencies, context, project.modified);
 }
 
 export const checkMinVersion = (library: string, minVersion: string, reason?: string, url?: string): Tip => {

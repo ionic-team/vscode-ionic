@@ -8,19 +8,15 @@ import { Project } from './recommendations';
 import { getRunOutput, getStringFrom } from './utilities';
 import * as vscode from 'vscode';
 
-let useOutdatedCache = true;
-
-export function clearRefreshCache(context?: vscode.ExtensionContext) {
+export function clearRefreshCache(context: vscode.ExtensionContext) {
 	if (context) {
-		context.workspaceState.update('npmOutdated', undefined);
-	} else {
-		useOutdatedCache = false;
+		context.workspaceState.update('npmOutdatedData', undefined);
 	}
 
 	console.log('Cached list of outdated packages cleared');
 }
 
-export async function processPackages(folder: string, allDependencies, devDependencies, context: vscode.ExtensionContext): Promise<any> {
+export async function processPackages(folder: string, allDependencies, devDependencies, context: vscode.ExtensionContext, packagesModified: Date): Promise<any> {
 	if (!fs.lstatSync(folder).isDirectory()) {
 		return {};
 	}
@@ -28,12 +24,21 @@ export async function processPackages(folder: string, allDependencies, devDepend
 	// npm outdated only shows dependencies and not dev dependencies if the node module isnt installed
 	let outdated = '[]';
 	try {
-		outdated = context.workspaceState.get('npmOutdated');
-		if (!outdated || useOutdatedCache === false) {
-			outdated = await getRunOutput('npm outdated --json', folder);
-			//			outdated = child_process.execSync('npm outdated --json', { cwd: folder, encoding: 'utf8' }).toString();
-			context.workspaceState.update('npmOutdated', outdated);
-			useOutdatedCache = true;
+		const packageModifiedLast = context.workspaceState.get('packagesModified');
+		const changed = packagesModified.toUTCString() != packageModifiedLast;
+		if (changed) {
+			outdated = await getRunOutput('npm outdated --json', folder);			
+			context.workspaceState.update('npmOutdatedData', outdated);
+			context.workspaceState.update('packagesModified', packagesModified.toUTCString());
+		} else {
+			// Use the cached value
+			outdated = context.workspaceState.get('npmOutdatedData');
+
+			// But also get a copy of the latest packages for updating later
+			getRunOutput('npm outdated --json', folder).then((outdatedFresh) => {
+				context.workspaceState.update('npmOutdatedData', outdatedFresh);
+				context.workspaceState.update('packagesModified', packagesModified.toUTCString());
+			});
 		}
 	} catch (err) {
 		console.error(err);

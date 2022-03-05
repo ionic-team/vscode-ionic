@@ -7,10 +7,10 @@
 - (perf) Run first refresh without "npm outdated", re-refresh after completion
 - (perf) Only run capacitor config commands when "Configuration" is expanded
 - Preview app - add option to switch size for common screen sizes
-- Preview app - switch between ios and android (	url += '?ionic:mode=ios';)
+- Preview app - switch between ios and android ( url += '?ionic:mode=ios';)
 - For web based projects have "Run on Web" under an Ionic Project
 - Push console log from iframe to vscode output
-- Bundle Analyser button, use stats.json for own report
+- (feat) Bundle Analyser button, use stats.json for own report
 - Support @angular project upgrades (ie multiple package update)
 - On Web projects that are Angular based hook up dist or configured folder
 - Recommend: Capacitor 2 to 3 migration
