@@ -5,7 +5,6 @@ import { Context } from './context-variables';
 import { ionicLogin, ionicSignup } from './ionic-auth';
 import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { clearRefreshCache } from './process-packages';
-import { Recommendation } from './recommendation';
 import { installPackage } from './recommendations';
 import { Tip } from './tip';
 import { CancelObject, run, getRunOutput, handleError, estimateRunTime } from './utilities';

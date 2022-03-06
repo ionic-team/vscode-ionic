@@ -784,40 +784,6 @@ export async function installPackage(extensionPath: string, folder: string) {
 			`Installed ${selected}`).showProgressDialog());
 }
 
-export function viewInEditor(url: string) {
-	const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
-	if (!previewInEditor) return;
-	const panel = vscode.window.createWebviewPanel(
-		'viewApp',
-		'Preview',
-		vscode.ViewColumn.Beside,
-		{ enableScripts: true }
-	);
-
-	panel.webview.html = getWebviewContent(url);
-}
-
-function getWebviewContent(url: string) {
-	return `<!DOCTYPE html>
-	<html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Preview App</title>
-	</head>
-	<body style="display: flex; align-items: center; justify-content: center; margin-top:20px;">
-		<div style="width: 375px; height: 717px; border: 2px solid #333; border-radius:10px; padding:10px; display: flex; align-items: center; flex-direction: column;">
-		   <div style="width: 100%; height: 667px;">
-				<iframe id="frame" src="${url}" width="100%" height="100%" frameBorder="0"></iframe>
-		   </div>
-		  <div style="width: 100%; height: 50px; display: flex; align-items: center; justify-content: center;">
-			<div style="background-color: #333; cursor: pointer; height: 25px; width:25px; border-radius:30px; padding:5px" onclick="document.getElementById('frame').src = '${url}'"></div>
-		  </div>  
-		 </div>
-	</body>
-	</html>`;
-}
-
 function ionicServe(): string {
 	const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
 	const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');

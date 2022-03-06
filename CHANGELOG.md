@@ -1,6 +1,7 @@
 ## Changelog
 ### Version 1.0.6
 - Fix for caching detection of outdated packages
+- Common device types can be selected in the Preview App window (select power button)
 
 ### Version 1.0.5
 - hide commands that are not needed in command palette

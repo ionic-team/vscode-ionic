@@ -3,9 +3,9 @@ import * as process from 'process';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
-import { clearRefreshCache } from './process-packages';
-import { viewInEditor } from './recommendations';
+
 import { RunPoint } from './tip';
+import { viewInEditor } from './editor-preview';
 
 export interface CancelObject {
 	proc: child_process.ChildProcess;
