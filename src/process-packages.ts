@@ -25,15 +25,14 @@ export async function processPackages(folder: string, allDependencies, devDepend
 	let outdated = '[]';
 	try {
 		const packageModifiedLast = context.workspaceState.get('packagesModified');
+		outdated = context.workspaceState.get('npmOutdatedData');
 		const changed = packagesModified.toUTCString() != packageModifiedLast;
-		if (changed) {
+		if (changed || !outdated) {
 			outdated = await getRunOutput('npm outdated --json', folder);			
 			context.workspaceState.update('npmOutdatedData', outdated);
 			context.workspaceState.update('packagesModified', packagesModified.toUTCString());
 		} else {
 			// Use the cached value
-			outdated = context.workspaceState.get('npmOutdatedData');
-
 			// But also get a copy of the latest packages for updating later
 			getRunOutput('npm outdated --json', folder).then((outdatedFresh) => {
 				context.workspaceState.update('npmOutdatedData', outdatedFresh);

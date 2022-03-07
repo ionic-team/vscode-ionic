@@ -27,7 +27,7 @@ import * as path from 'path';
 import { CapacitorProject } from '@capacitor/project';
 import { CapacitorConfig } from '@capacitor/cli';
 import { getPackageJSON, getRunOutput, getStringFrom, PackageFile, setStringIn } from './utilities';
-import { fixIssue } from './extension';
+import { fixIssue, getOutputChannel } from './extension';
 import { CapacitorProjectState } from './cap-project';
 import { getGlobalIonicConfig, sendTelemetryEvents  } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
@@ -365,9 +365,8 @@ export class Project {
 			return; // User cancelled
 		}
 
-		const project = await _this.getCapacitorProject();
-
-		const channel = vscode.window.createOutputChannel("Ionic");
+		const project = await _this.getCapacitorProject();		
+		const channel = getOutputChannel();	
 
 		if (project?.ios && platform != NativePlatform.AndroidOnly) {
 			const appTarget = project.ios?.getAppTarget();
@@ -408,7 +407,7 @@ export class Project {
 		}
 
 		const project = await _this.getCapacitorProject();
-		const channel = vscode.window.createOutputChannel("Ionic");
+		const channel = getOutputChannel();
 
 		if (project?.ios && platform != NativePlatform.AndroidOnly) {
 			const appTarget = project.ios?.getAppTarget();
@@ -451,7 +450,7 @@ export class Project {
 		}
 
 		const project = await _this.getCapacitorProject();
-		const channel = vscode.window.createOutputChannel("Ionic");
+		const channel = getOutputChannel();
 
 		if (project?.ios && platform != NativePlatform.AndroidOnly) {
 			const appTarget = project.ios?.getAppTarget();
@@ -487,8 +486,8 @@ export class Project {
 		}
 
 		const project = await _this.getCapacitorProject();
+		const channel = getOutputChannel();	
 
-		const channel = vscode.window.createOutputChannel("Ionic");
 		console.log(`Display name changed to ${displayName}`);
 		if (project.ios != null && platform != NativePlatform.AndroidOnly) {
 			const appTarget = project.ios?.getAppTarget();

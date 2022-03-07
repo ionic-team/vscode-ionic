@@ -125,6 +125,13 @@ function startCommand(tip: Tip, cmd: string) {
 	}	
 }
 
+export function getOutputChannel(): vscode.OutputChannel {
+	if (!channel) {
+		channel = vscode.window.createOutputChannel("Ionic");
+	}
+	return channel;
+}
+
 /**
  * Runs the command while showing a vscode window that can be cancelled
  * @param  {string|string[]} command Node command
@@ -133,15 +140,13 @@ function startCommand(tip: Tip, cmd: string) {
  * @param  {string} successMessage? Message to display if successful 
  */
 export async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, tip?: Tip, successMessage?: string) {
-	//Create output channel
-	if (!channel) {
-		channel = vscode.window.createOutputChannel("Ionic");
-	}
+	const channel = getOutputChannel();
+
+	// If the task is already running then cancel it
 	if (isRunning(tip)) {
 		await cancelRunning(tip);
-		// vscode.window.showInformationMessage(`The operation "${tip.title}" is already running. Click on the operation in the status bar to cancel it.`);
-		// return;
 	}
+
 	runningOperations.push(tip);
 	const msg = tip.commandProgress ? tip.commandProgress : tip.commandTitle ? tip.commandTitle : command;
 	await vscode.window.withProgress(
@@ -308,7 +313,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 }
 
-async function execute(tip: Tip) {
+async function execute(tip: Tip): Promise<void> {
 	await tip.executeAction();
 	if (tip.title == 'Settings') {
 		vscode.commands.executeCommand('workbench.action.openSettings', 'Ionic');
