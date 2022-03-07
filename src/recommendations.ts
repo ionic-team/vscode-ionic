@@ -29,7 +29,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 import { getPackageJSON, getRunOutput, getStringFrom, PackageFile, setStringIn } from './utilities';
 import { fixIssue, getOutputChannel } from './extension';
 import { CapacitorProjectState } from './cap-project';
-import { getGlobalIonicConfig, sendTelemetryEvents  } from './telemetry';
+import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
 import { Context } from './context-variables';
 
@@ -365,8 +365,8 @@ export class Project {
 			return; // User cancelled
 		}
 
-		const project = await _this.getCapacitorProject();		
-		const channel = getOutputChannel();	
+		const project = await _this.getCapacitorProject();
+		const channel = getOutputChannel();
 
 		if (project?.ios && platform != NativePlatform.AndroidOnly) {
 			const appTarget = project.ios?.getAppTarget();
@@ -486,7 +486,7 @@ export class Project {
 		}
 
 		const project = await _this.getCapacitorProject();
-		const channel = getOutputChannel();	
+		const channel = getOutputChannel();
 
 		console.log(`Display name changed to ${displayName}`);
 		if (project.ios != null && platform != NativePlatform.AndroidOnly) {
@@ -803,7 +803,14 @@ function capRun(platform: string): string {
 
 	if (externalIP) {
 		if (capRunFlags.length > 0) capRunFlags += ' ';
-		capRunFlags += '--external ';
+
+		// @ionic-enterprise/auth gets a crypt error when running with an external IP address. So avoid the issue
+		if (!exists('@ionic-enterprise/auth')) {
+			capRunFlags += '--external ';
+		} else {
+			const channel = getOutputChannel();
+			channel.appendLine('Note: External Ip Address option ignored as you have @ionic-enterprise/auth included in your project');
+		}
 	}
 	return `npx ionic cap run ${platform}${capRunFlags} --list`;
 }

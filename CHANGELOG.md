@@ -1,4 +1,7 @@
 ## Changelog
+### Version 1.0.8
+- When Auth Connect is detected disable the --external parameter
+
 ### Version 1.0.7
 - Fix for cocoapods error when run on iOS is called
 
