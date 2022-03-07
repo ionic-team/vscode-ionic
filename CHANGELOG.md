@@ -1,4 +1,7 @@
 ## Changelog
+### Version 1.0.7
+- Fix for cocoapods error when run on iOS is called
+
 ### Version 1.0.6
 - Fix for caching detection of outdated packages
 - Common device types can be selected in the Preview App window (select power button)
