@@ -32,6 +32,7 @@ import { CapacitorProjectState } from './cap-project';
 import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
 import { Context } from './context-variables';
+import { AssetType, getAssetTitle, setAssetResource } from './splash-icon';
 
 
 let useCapProjectCache = true;
@@ -340,7 +341,15 @@ export class Project {
 			tip2.setAction(this.setBuild, state.iosBuild, this, NativePlatform.iOSOnly);
 			this.add(tip2);
 		}
+
+		const hasCordovaRes = exists('cordova-res');
+		const ios = exists('@capacitor/ios');
+		const android = exists('@capacitor/android');
+		this.add(new Tip('Splash Screen', getAssetTitle(this.folder, AssetType.splash), TipType.None).setAction(setAssetResource, this.folder, AssetType.splash, hasCordovaRes, ios, android));
+		this.add(new Tip('Icon', getAssetTitle(this.folder, AssetType.icon), TipType.None).setAction(setAssetResource, this.folder, AssetType.icon, hasCordovaRes, ios, android));
 	}
+
+
 
 	/**
 	 * Change the Bundle Id of an App in the iOS and Android projects
