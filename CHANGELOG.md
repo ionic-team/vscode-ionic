@@ -1,6 +1,7 @@
 ## Changelog
 ### Version 1.1.0
 - Allow Splash screen and icon to be set (and assets rebuilt)
+- Add Capacitor recommendation for cordova-plugin-actionsheet to @capacitor/action-sheet
 
 ### Version 1.0.8
 - When Auth Connect is detected disable the --external parameter
