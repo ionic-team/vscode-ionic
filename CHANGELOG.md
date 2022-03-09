@@ -1,4 +1,7 @@
 ## Changelog
+### Version 1.1.0
+- Allow Splash screen and icon to be set (and assets rebuilt)
+
 ### Version 1.0.8
 - When Auth Connect is detected disable the --external parameter
 

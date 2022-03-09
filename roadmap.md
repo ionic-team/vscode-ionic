@@ -23,6 +23,7 @@
 ## Docs
 - (docs) Record video of changing display name, bundle id, version number, build number
 - (docs) Record video of previewing in editor
+- (docs) Show splashscreen and icon assets
 
 # Milestones
 - (feat) Bundle Analyser button, use stats.json for own report
