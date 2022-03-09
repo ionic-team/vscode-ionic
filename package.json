@@ -2,7 +2,7 @@
 	"name": "ionic",
 	"displayName": "Ionic",
 	"description": "Ionic & Capacitor project tooling and recommendations",
-	"version": "1.0.7",
+	"version": "1.1.0",
 	"icon": "media/ionic.png",
 	"publisher": "Ionic",
 	"keywords": [

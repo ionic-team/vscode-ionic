@@ -817,17 +817,18 @@ function capRun(platform: string): string {
 	const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
 	let capRunFlags = liveReload ? ' -l' : '';
 
+	if (exists('@ionic-enterprise/auth') && liveReload) {
+		capRunFlags = '';
+		// @ionic-enterprise/auth gets a crypt error when running with an external IP address. So avoid the issue
+		const channel = getOutputChannel();
+		channel.appendLine('Note: Live Update was ignored as you have @ionic-enterprise/auth included in your project');
+	}
+
 	if (externalIP) {
 		if (capRunFlags.length > 0) capRunFlags += ' ';
-
-		// @ionic-enterprise/auth gets a crypt error when running with an external IP address. So avoid the issue
-		if (!exists('@ionic-enterprise/auth')) {
-			capRunFlags += '--external ';
-		} else {
-			const channel = getOutputChannel();
-			channel.appendLine('Note: External Ip Address option ignored as you have @ionic-enterprise/auth included in your project');
-		}
+		capRunFlags += '--external';
 	}
+
 	return `npx ionic cap run ${platform}${capRunFlags} --list`;
 }
 
