@@ -2,6 +2,8 @@
 ### Version 1.1.0
 - Allow Splash screen and icon to be set (and assets rebuilt)
 - Add Capacitor recommendation for cordova-plugin-actionsheet to @capacitor/action-sheet
+- Recommendations for codelyzer replacement
+- Recommendation for ionicons removal if @ionic/angular used
 
 ### Version 1.0.8
 - When Auth Connect is detected disable the --external parameter

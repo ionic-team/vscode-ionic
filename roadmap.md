@@ -13,6 +13,12 @@
 - (feat) When running for web, if you close the browser, a button for "Open Browser" should allow opening it again. 
 - (feat) Add "Build", "Sync", "Run" etc to commmand palette with keyboard shortcut
 - (feat) Show preview as soon as "Run on Web" is clicked and show progress until app is ready
+- (feat) Option to export package/plugin list: version, latest, and dev dep or regular dep
+- (feat) Highlight dev dependencies in some way
+- (feat) Option to ignore particular update
+- (feat) Evaluate age of packages: when current version was released, when latest was released. If latest > 365 then warn. If latest - current > 365 then warn
+- (feat) Amp eslink rules to 11: using https://gist.github.com/dtarnawsky/7c42cec330443c7093976136286b5473
+- (feat) Open selection of an update check versions and provide option to update to the latest minor version. Eg 12.1 -> 12.x or 12.1.0 -> 12.1.x
 
 ## Performance
 - (perf) Only run capacitor config commands when "Configuration" is expanded

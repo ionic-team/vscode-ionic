@@ -1060,6 +1060,12 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 		project.tips(capacitorRecommendations(project));
 	}
 
+	if (isGreaterOrEqual('@angular/core', '11.0.0')) {
+		project.checkNotExists('codelyzer', 'Codelyzer was popular in Angular projects before version 11 but has been superceded by angular-eslint. You can remove this dependency.');
+	}
+	if (exists('@ionic/angular')) {
+		project.checkNotExists('ionicons', 'The @ionic/angular packages includes icons so the "ionicons" package is not required.');
+	}
 	reviewPackages(packages, project);
 	reviewPluginProperties(packages, project);
 
