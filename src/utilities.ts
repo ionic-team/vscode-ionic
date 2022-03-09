@@ -154,6 +154,19 @@ export function setStringIn(data: string, start: string, end: string, replacemen
 export function generateUUID(): string {
 	return (new Date()).getTime().toString(36) + Math.random().toString(36).slice(2);
 }
+/**
+ * Given user input convert to a usuable app identifier
+ * @param  {string} name
+ * @returns string
+ */
+export function asAppId(name: string): string {
+	name = name.split('-').join('.');
+	name = name.split(' ').join('.');
+	if (!name.includes('.')) {
+		name = 'com.' + name; // Must have at least a . in the name
+	}
+	return name;
+}
 
 export interface PackageFile {
 	name: string;

@@ -8,174 +8,30 @@ import {
 	checkCordovaAndroidPreference,
 	checkCordovaAndroidPreferenceMinimum,
 	checkCordovaIosPreference,
-	notRequiredPlugin,
-	replacementPlugin,
-	incompatiblePlugin,
-	reviewPlugin,
-	warnMinVersion,
-	checkAndroidManifest,
+	warnMinVersion,	
 	exists
 } from './analyzer';
 
 import * as vscode from 'vscode';
-import { libString } from './messages';
-import { reviewPackages, reviewPluginsWithHooks, reviewPluginProperties } from './process-packages';
-import { Recommendation } from './recommendation';
-import { Tip, TipType } from './tip';
 import * as fs from 'fs';
 import * as path from 'path';
-import { CapacitorProject } from '@capacitor/project';
-import { CapacitorConfig } from '@capacitor/cli';
-import { getPackageJSON, getRunOutput, getStringFrom, PackageFile, setStringIn } from './utilities';
-import { fixIssue, getOutputChannel } from './extension';
-import { CapacitorProjectState } from './cap-project';
+
+import { libString } from './messages';
+import { reviewPackages, reviewPluginProperties } from './process-packages';
+import { Recommendation } from './recommendation';
+import { Tip, TipType } from './tip';
+
+import { asAppId, getPackageJSON, PackageFile } from './utilities';
+import { fixIssue } from './extension';
 import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
 import { Context } from './context-variables';
 import { addSplashAndIconFeatures } from './splash-icon';
-
-
-let useCapProjectCache = true;
-
-enum NativePlatform {
-	iOSOnly,
-	AndroidOnly
-}
-
-function capacitorMigrationChecks(packages, project: Project) {
-	const tips: Tip[] = [];
-	project.setGroup(
-		'Capacitor Migration',
-		'Your Cordova application ' + project.name + ' can be migrated to Capacitor (see [guide](https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor)). The following recommendations will help with the migration:',
-		TipType.Capacitor, true
-	);
-
-	tips.push(...capacitorRecommendations(project));
-
-	// Plugins with Hooks
-	tips.push(...reviewPluginsWithHooks(packages, project));
-
-	// Requires evaluation to determine compatibility
-	tips.push(reviewPlugin('cordova-wheel-selector-plugin'));
-	tips.push(reviewPlugin('cordova-plugin-secure-storage'));
-	tips.push(reviewPlugin('newrelic-cordova-plugin'));
-
-	if (exists('cordova-ios') || (exists('cordova-android') || (project.fileExists('config.xml')))) {
-		tips.push(new Tip('Remove Cordova Integration', '', TipType.Capacitor, 'Remove the Cordova integration',
-			['npm uninstall cordova-ios', 'npm uninstall cordova-android', 'mv config.xml config.xml.bak', 'rem-cordova'],
-			'Remove Cordova', 'Removing Cordova', 'Successfully removed Cordova'));
-	}
-	project.tips(tips);
-}
-
-function asAppId(name: string): string {
-	name = name.split('-').join('.');
-	name = name.split(' ').join('.');
-	if (!name.includes('.')) {
-		name = 'com.' + name; // Must have at least a . in the name
-	}
-	return name;
-}
-
-function capacitorRecommendations(project: Project): Tip[] {
-	const tips: Tip[] = [];
-
-	// Capacitor Integrations
-	if (!project.fileExists('capacitor.config.ts') && (!project.fileExists('capacitor.config.json'))) {
-		tips.push(new Tip(
-			'Add Capacitor Integration', '', TipType.Capacitor, 'Add the Capacitor integration to this project',
-			[
-				`npm install --save -E @capacitor/core@latest`,
-				`npm install -D -E @capacitor/cli@latest`,
-				`npm install @capacitor/app @capacitor/core @capacitor/haptics @capacitor/keyboard @capacitor/status-bar --save-exact`,
-				`npx capacitor init "${project.name}" "${asAppId(project.name)}" --web-dir www`
-			],
-			'Add Capacitor', 'Capacitor added to this project',
-			'https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor'
-		));
-	} else {
-		if (!exists('@capacitor/android')) {
-			tips.push(new Tip(
-				'Add Android Integration', '', TipType.Capacitor, 'Add Android support to your Capacitor project',
-				['npm install @capacitor/android --save-exact', 'npx cap add android'], 'Add Android', 'Android support added to your project'));
-		}
-
-		if (!exists('@capacitor/ios')) {
-			tips.push(new Tip(
-				'Add iOS Integration', '', TipType.Capacitor, 'Add iOS support to your Capacitor project',
-				['npm install @capacitor/ios --save-exact', 'npx cap add ios'], 'Add iOS', 'iOS support added to your project'));
-		}
-	}
-
-
-	// List of incompatible plugins
-	tips.push(incompatiblePlugin('cordova-plugin-admobpro', 'https://github.com/ionic-team/capacitor/issues/1101'));
-	tips.push(incompatiblePlugin('cordova-plugin-braintree', 'https://github.com/ionic-team/capacitor/issues/1415'));
-	tips.push(incompatiblePlugin('cordova-plugin-code-push', 'https://github.com/microsoft/code-push/issues/615'));
-	tips.push(incompatiblePlugin('cordova-plugin-fcm', 'https://github.com/ionic-team/capacitor/issues/584'));
-	tips.push(incompatiblePlugin('cordova-plugin-firebase', 'https://github.com/ionic-team/capacitor/issues/815'));
-	tips.push(incompatiblePlugin('cordova-plugin-firebasex', 'https://github.com/dpa99c/cordova-plugin-firebasex/issues/610#issuecomment-810236545'));
-	tips.push(incompatiblePlugin('cordova-plugin-music-controls', 'It causes build failures, skipped'));
-	tips.push(incompatiblePlugin('cordova-plugin-qrscanner', 'https://github.com/ionic-team/capacitor/issues/1213'));
-	tips.push(incompatiblePlugin('cordova-plugin-googlemaps', 'It causes build failures on iOS, skipped for iOS only'));
-	tips.push(incompatiblePlugin('cordova-plugin-swrve', 'It relies on Cordova specific feature CDVViewController'));
-
-	tips.push(incompatiblePlugin('newrelic-cordova-plugin', 'It relies on Cordova hooks. https://github.com/newrelic/newrelic-cordova-plugin/issues/15'));
-	//tips.push(incompatiblePlugin('phonegap-plugin-push', 'It will not compile but can be replaced with the plugin cordova-plugin-push'));
-	tips.push(replacementPlugin('phonegap-plugin-push', 'cordova-plugin-push', 'It will not compile but can be replaced with the plugin cordova-plugin-push'));
-
-	tips.push(incompatiblePlugin('cordova-plugin-appsflyer-sdk', 'It will not compile but can be replaced with the plugin appsflyer-capacitor-plugin'));
-
-	// Plugins that are not required	
-	tips.push(notRequiredPlugin('cordova-plugin-compat'));
-	if (!exists('cordova-plugin-file-transfer')) {
-		// Note: If you still use cordova-plugin-file-transfer it requires the whitelist plugin (https://github.com/ionic-team/capacitor/issues/1199)
-		tips.push(notRequiredPlugin('cordova-plugin-whitelist', 'The functionality is built into Capacitors configuration file'));
-	}
-	tips.push(notRequiredPlugin('cordova-plugin-crosswalk-webview', 'Capacitor doesn’t allow to change the webview'));
-	tips.push(notRequiredPlugin('cordova-plugin-ionic-webview', 'An App store compliant Webview is built into Capacitor'));
-	tips.push(notRequiredPlugin('cordova-plugin-wkwebview-engine', 'An App store compliant Webview is built into Capacitor'));
-	tips.push(notRequiredPlugin('cordova-plugin-androidx', 'This was required for Cordova Android 10 support but isnt required by Capacitor'));
-	tips.push(notRequiredPlugin('cordova-android-support-gradle-release', 'Capacitor provides control to set library versions'));
-	tips.push(notRequiredPlugin('cordova-plugin-add-swift-support', 'Swift is supported out-of-the-box with Capacitor'));
-	tips.push(notRequiredPlugin('cordova-plugin-enable-multidex', 'Multidex is handled by Android Stuido and doesnt requiure a plugin'));
-	tips.push(notRequiredPlugin('cordova-support-android-plugin', 'This plugin is used to simplify Cordova plugin development and is not required for Capacitor'));
-	tips.push(notRequiredPlugin('cordova-plugin-androidx-adapter', 'Android Studio patches plugins for AndroidX without requiring this plugin'));
-	tips.push(notRequiredPlugin('cordova-custom-config', 'Configuration achieved through native projects'));
-	tips.push(notRequiredPlugin('cordova-plugin-cocoapod-support', 'Pod dependencies supported in Capacitor'));
-	tips.push(notRequiredPlugin('phonegap-plugin-multidex', 'Android Studio handles compilation'));
-
-	// Plugins which have a minimum versions
-	tips.push(checkMinVersion('cordova-plugin-inappbrowser', '5.0.0', 'to compile in a Capacitor project'));
-	tips.push(checkMinVersion('cordova-plugin-camera', '6.0.0', 'to compile in a Capacitor project'));
-	tips.push(checkMinVersion('branch-cordova-sdk', '4.0.0', 'Requires update. See: https://help.branch.io/developers-hub/docs/capacitor'));
-
-	// Plugins to recommend replacement with a Capacitor equivalent
-	tips.push(replacementPlugin('cordova-plugin-actionsheet', '@capacitor/action-sheet', 'https://capacitorjs.com/docs/apis/action-sheet'));	
-	tips.push(replacementPlugin('cordova-plugin-camera', '@capacitor/camera', 'https://capacitorjs.com/docs/apis/camera'));
-	tips.push(replacementPlugin('@ionic-enterprise/clipboard', '@capacitor/clipboard', 'https://capacitorjs.com/docs/apis/clipboard'));
-	tips.push(replacementPlugin('@ionic-enterprise/deeplinks', '@capacitor/app', 'https://capacitorjs.com/docs/guides/deep-links'));
-	tips.push(replacementPlugin('@ionic-enterprise/statusbar', '@capacitor/status-bar', 'https://capacitorjs.com/docs/apis/status-bar'));
-	tips.push(replacementPlugin('cordova-plugin-firebase', '@capacitor-community/fcm', 'https://github.com/capacitor-community/fcm'));
-	tips.push(replacementPlugin('cordova-plugin-firebase-messaging', '@capacitor/push-notifications', 'https://capacitorjs.com/docs/apis/push-notifications'));
-	tips.push(replacementPlugin('cordova-plugin-firebase-analytics', '@capacitor-community/firebase-analytics', 'https://github.com/capacitor-community/firebase-analytics'));
-	tips.push(replacementPlugin('cordova-plugin-app-version', '@capacitor/device', 'https://capacitorjs.com/docs/apis/device'));
-	tips.push(replacementPlugin('cordova-plugin-dialogs', '@capacitor/dialog', 'https://capacitorjs.com/docs/apis/dialog'));
-	tips.push(replacementPlugin('cordova-plugin-file', '@capacitor/filesystem', 'https://capacitorjs.com/docs/apis/filesystem'));
-	tips.push(replacementPlugin('cordova-plugin-file-transfer', '@capacitor/filesystem', 'https://capacitorjs.com/docs/apis/filesystem'));
-	tips.push(replacementPlugin('cordova-plugin-datepicker', '@capacitor-community/date-picker', 'https://github.com/capacitor-community/date-picker'));
-	tips.push(replacementPlugin('cordova-plugin-geolocation', '@capacitor/geolocation', 'https://capacitorjs.com/docs/apis/geolocation'));
-	tips.push(replacementPlugin('cordova-sqlite-storage', '@capacitor-community/sqlite', 'https://github.com/capacitor-community/sqlite'));
-	tips.push(replacementPlugin('cordova-plugin-safariviewcontroller', '@capacitor/browser', 'https://capacitorjs.com/docs/apis/browser'));
-	tips.push(replacementPlugin('cordova-plugin-appavailability', '@capacitor/app', 'https://capacitorjs.com/docs/apis/app'));
-	tips.push(replacementPlugin('cordova-plugin-network-information', '@capacitor/network', 'https://capacitorjs.com/docs/apis/network'));
-	tips.push(replacementPlugin('cordova-plugin-device', '@capacitor/device', 'https://capacitorjs.com/docs/apis/device'));
-	tips.push(replacementPlugin('cordova-plugin-ionic-keyboard', '@capacitor/keyboard', 'https://capacitorjs.com/docs/apis/keyboard'));
-	tips.push(replacementPlugin('cordova-plugin-splashscreen', '@capacitor/splash-screen', 'https://capacitorjs.com/docs/apis/splash-screen'));
-	tips.push(replacementPlugin('cordova-plugin-statusbar', '@capacitor/status-bar', 'https://capacitorjs.com/docs/apis/status-bar'));
-	tips.push(replacementPlugin('phonegap-plugin-push', '@capacitor/push-notifications', 'https://capacitorjs.com/docs/apis/push-notifications'));
-	return tips;
-}
+import { capacitorMigrationChecks, capacitorRecommendations } from './capacitor-migration';
+import { CapacitorPlatform, capRun } from './capacitor-run';
+import { ionicBuild } from './ionic-build';
+import { reviewCapacitorConfig } from './capacitor-configure';
+import { ionicServe } from './ionic-serve';
 
 export class Project {
 	name: string;
@@ -214,317 +70,6 @@ export class Project {
 		for (const script of Object.keys(packages.scripts)) {
 			this.add(new Tip(script, '', TipType.Run, '', `npm run ${script}`, `Running ${script}`, `Ran ${script}`));
 		}
-	}
-
-	private async getCapacitorProject(): Promise<CapacitorProject> {
-		const capConfig: CapacitorConfig = {
-			ios: {
-				path: path.join(this.folder, 'ios'),
-			},
-			android: {
-				path: path.join(this.folder, 'android'),
-			},
-		};
-		const project = new CapacitorProject(capConfig);
-		await project.load();
-		return project;
-	}
-
-	private clearCapProjectCache() {
-		useCapProjectCache = false;
-	}
-
-	private async getCapacitorProjectState(context: vscode.ExtensionContext): Promise<CapacitorProjectState> {
-		let state: CapacitorProjectState = {};
-
-		const tmp: string = context.workspaceState.get('CapacitorProject');
-		if (tmp) {
-			if (useCapProjectCache) {
-				state = JSON.parse(tmp);
-				return state;
-			} else {
-				useCapProjectCache = true;
-			}
-		}
-
-		const project = await this.getCapacitorProject();
-
-		if (project.ios) {
-			const appTarget = project.ios?.getAppTarget();
-			state.iosBundleId = project.ios.getBundleId(appTarget.name);
-			state.iosDisplayName = await project.ios.getDisplayName(appTarget.name);
-			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
-				state.iosVersion = project.ios?.getVersion(appTarget.name, buildConfig.name);
-				state.iosBuild = project.ios.getBuild(appTarget.name, buildConfig.name);
-			}
-		}
-
-		if (project.android) {
-			state.androidBundleId = project.android?.getPackageName();
-			state.androidVersion = await project.android?.getVersionName();
-			state.androidBuild = await project.android?.getVersionCode();
-			const data = await project.android?.getResource('values', 'strings.xml');
-			state.androidDisplayName = getStringFrom(data as string, `<string name="app_name">`, `</string`);
-		}
-
-		if (!project.ios && !project.android) {
-			return undefined;
-		}
-
-		context.workspaceState.update('CapacitorProject', JSON.stringify(state));
-		return state;
-	}
-
-	public async reviewCapacitorConfig(context: vscode.ExtensionContext) {
-		const state = await this.getCapacitorProjectState(context);
-		if (!state) {
-			return;
-		}
-
-		// Allow the user to set the bundle id
-		if (state.androidBundleId == state.iosBundleId || !state.iosBundleId || !state.androidBundleId) {
-			// Create a single Bundle Id the user can edit
-			const tip = new Tip('Bundle Id', state.androidBundleId, TipType.None);
-			tip.setAction(this.setBundleId, state.androidBundleId, this);
-			this.add(tip);
-		} else {
-			// Bundle Ids different
-			const tip = new Tip('Android Bundle Id', state.androidBundleId, TipType.None);
-			tip.setAction(this.setBundleId, state.androidBundleId, this, NativePlatform.AndroidOnly);
-			this.add(tip);
-
-			const tip2 = new Tip('iOS Bundle Id', state.iosBundleId, TipType.None);
-			tip2.setAction(this.setBundleId, state.iosBundleId, this, NativePlatform.iOSOnly);
-			this.add(tip2);
-		}
-
-		// Allow the user to edit the display name of the app
-		if (state.androidDisplayName == state.iosDisplayName || !state.iosDisplayName || !state.androidDisplayName) {
-			const displayName = state.androidDisplayName ? state.androidDisplayName : state.iosDisplayName;
-			const tip = new Tip('Display Name', displayName, TipType.None);
-			tip.setAction(this.setDisplayName, displayName, this, this.folder);
-			this.add(tip);
-		} else {
-			const tip = new Tip('Android Display Name', state.androidDisplayName, TipType.None);
-			tip.setAction(this.setDisplayName, state.androidDisplayName, this, this.folder, NativePlatform.AndroidOnly);
-			this.add(tip);
-
-			const tip2 = new Tip('iOS Display Name', state.iosDisplayName, TipType.None);
-			tip2.setAction(this.setDisplayName, state.iosDisplayName, this, this.folder, NativePlatform.iOSOnly);
-			this.add(tip2);
-		}
-
-		// Allow the user to set the version
-		if (state.androidVersion == state.iosVersion || !state.iosVersion || !state.androidVersion) {
-			const tip = new Tip('Version Number', state.androidVersion, TipType.None);
-			tip.setAction(this.setVersion, state.androidVersion, this);
-			this.add(tip);
-		} else {
-			const tip = new Tip('Android Version Number', state.androidVersion, TipType.None);
-			tip.setAction(this.setVersion, state.androidVersion, this, NativePlatform.AndroidOnly);
-			this.add(tip);
-
-			const tip2 = new Tip('iOS Version Number', state.iosVersion, TipType.None);
-			tip2.setAction(this.setVersion, state.iosVersion, this, NativePlatform.iOSOnly);
-			this.add(tip2);
-		}
-
-		// Allow the user to increment the build
-		if (state.androidBuild == state.iosBuild || !state.iosBuild || !state.androidBuild) {
-			const tip = new Tip('Build Number', state.androidBuild?.toString(), TipType.None);
-			tip.setAction(this.setBuild, state.androidBuild, this);
-			this.add(tip);
-		} else {
-			const tip = new Tip('Android Build Number', state.androidBuild?.toString(), TipType.None);
-			tip.setAction(this.setBuild, state.androidBuild, this, NativePlatform.AndroidOnly);
-			this.add(tip);
-
-			const tip2 = new Tip('iOS Build Number', state.iosBuild?.toString(), TipType.None);
-			tip2.setAction(this.setBuild, state.iosBuild, this, NativePlatform.iOSOnly);
-			this.add(tip2);
-		}
-
-
-		// Splash Screen and Icon Features
-		addSplashAndIconFeatures(this);
-	}
-
-
-
-	/**
-	 * Change the Bundle Id of an App in the iOS and Android projects
-	 * @param  {string} bundleId The original bundle id / package name
-	 * @param  {NativePlatform} platform Whether iOS or Android only (default both)
-	 */
-	private async setBundleId(bundleId: string, _this: any, platform: NativePlatform) {
-		const newBundleId = await vscode.window.showInputBox({
-			title: 'Application Bundle Id',
-			placeHolder: bundleId,
-			value: bundleId,
-			validateInput: (value: string) => {
-				const regexp = /^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]$/i;
-				if (!regexp.test(value)) {
-					return "You cannot use spaces and some special characters like -.";
-				}
-				return null;
-			}
-		});
-
-		if (!newBundleId) {
-			return; // User cancelled
-		}
-
-		const project = await _this.getCapacitorProject();
-		const channel = getOutputChannel();
-
-		if (project?.ios && platform != NativePlatform.AndroidOnly) {
-			const appTarget = project.ios?.getAppTarget();
-			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
-				channel.appendLine(`Set iOS Bundle Id for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newBundleId}`);
-				project.ios.setBundleId(appTarget.name, buildConfig.name, newBundleId);
-			}
-		}
-		if (project.android && platform != NativePlatform.iOSOnly) {
-			channel.appendLine(`Set Android Package Name to ${newBundleId}`);
-			await project.android?.setPackageName(newBundleId);
-		}
-		await project.commit();
-		channel.show();
-		_this.clearCapProjectCache();
-	}
-	/**
-	 * Set Version Number of iOS and Android Project
-	 * @param  {string} version
-	 * @param  {NativePlatform} platform Whether to apply for iOS only, Android only or both (default)
-	 */
-	private async setVersion(version: string, _this: any, platform: NativePlatform) {
-		const newVersion = await vscode.window.showInputBox({
-			title: 'Application Version Number',
-			placeHolder: version,
-			value: version,
-			validateInput: (value: string) => {
-				const regexp = /^\S+$/;
-				if (!regexp.test(value)) {
-					return "This version number is not valid";
-				}
-				return null;
-			}
-		});
-
-		if (!newVersion) {
-			return; // User cancelled
-		}
-
-		const project = await _this.getCapacitorProject();
-		const channel = getOutputChannel();
-
-		if (project?.ios && platform != NativePlatform.AndroidOnly) {
-			const appTarget = project.ios?.getAppTarget();
-			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
-				channel.appendLine(`Set iOS Version for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newVersion}`);
-				await project.ios.setVersion(appTarget.name, buildConfig.name, newVersion);
-			}
-		}
-		if (project.android && platform != NativePlatform.iOSOnly) {
-			channel.appendLine(`Set Android Version to ${newVersion}`);
-			await project.android?.setVersionName(newVersion);
-		}
-		await project.commit();
-		channel.show();
-		_this.clearCapProjectCache();
-	}
-
-	/**
-	 * Set the build number
-	 * @param  {string} build The build number
-	 * @param  {CapacitorProject} project The Capacitor project
-	 * @param  {NativePlatform} platform Whether to apply on iOS only, Android Only or both (default)
-	 */
-	private async setBuild(build: string, _this: any, platform: NativePlatform) {
-		const newBuild = await vscode.window.showInputBox({
-			title: 'Application Build Number',
-			placeHolder: build,
-			value: build,
-			validateInput: (value: string) => {
-				const regexp = /^\d+$/;
-				if (!regexp.test(value)) {
-					return "You can only use the digits 0 to 9";
-				}
-				return null;
-			}
-		});
-
-		if (!newBuild) {
-			return; // User cancelled
-		}
-
-		const project = await _this.getCapacitorProject();
-		const channel = getOutputChannel();
-
-		if (project?.ios && platform != NativePlatform.AndroidOnly) {
-			const appTarget = project.ios?.getAppTarget();
-			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
-				channel.appendLine(`Set iOS Version for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newBuild}`);
-				await project.ios.setBuild(appTarget.name, buildConfig.name, parseInt(newBuild));
-			}
-		}
-		if (project.android && platform != NativePlatform.iOSOnly) {
-			channel.appendLine(`Set Android Version to ${newBuild}`);
-			await project.android?.setVersionCode(parseInt(newBuild));
-		}
-		await project.commit();
-		_this.clearCapProjectCache();
-		channel.show();
-	}
-
-	/**
-	 * Set the display name of the app
-	 * @param  {string} currentDisplayName The current value for the display name
-	 * @param  {string} folder Folder for the project
-	 * @param  {NativePlatform} platform Whether to apply to iOS only, Android only or both (default)
-	 */
-	private async setDisplayName(currentDisplayName: string, _this: any, folder: string, platform: NativePlatform) {
-		const displayName = await vscode.window.showInputBox({
-			title: 'Application Display Name',
-			placeHolder: currentDisplayName,
-			value: currentDisplayName
-		});
-
-		if (!displayName) {
-			return; // User cancelled
-		}
-
-		const project = await _this.getCapacitorProject();
-		const channel = getOutputChannel();
-
-		console.log(`Display name changed to ${displayName}`);
-		if (project.ios != null && platform != NativePlatform.AndroidOnly) {
-			const appTarget = project.ios?.getAppTarget();
-			for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
-				channel.appendLine(`Set iOS Displayname for target ${appTarget.name} buildConfig.${buildConfig.name} to ${displayName}`);
-				await project.ios.setDisplayName(appTarget.name, buildConfig.name, displayName);
-			}
-		}
-		if (project.android != null && platform != NativePlatform.iOSOnly) {
-			let data = await project.android?.getResource('values', 'strings.xml');
-			if (!data) {
-				channel.appendLine(`Unable to set Android display name`);
-			}
-			data = setStringIn(data as string, `<string name="app_name">`, `</string>`, displayName);
-			data = setStringIn(data as string, `<string name="title_activity_main">`, `</string>`, displayName);
-			const filename = path.join(folder, 'android/app/src/main/res/values/strings.xml');
-			if (fs.existsSync(filename)) {
-				fs.writeFileSync(filename, data);
-				channel.appendLine(`Set Android app_name to ${displayName}`);
-				channel.appendLine(`Set Android title_activity_main to ${displayName}`);
-			} else {
-				vscode.window.showErrorMessage('Unable to write to ' + filename);
-			}
-
-		}
-		channel.show();
-		project.commit();
-		_this.clearCapProjectCache();
 	}
 
 	public note(title: string, message: string, url?: string, tipType?: TipType, description?: string) {
@@ -721,59 +266,6 @@ function webProject(project: Project) {
 	));
 }
 
-export async function starterProject(folder: string): Promise<Recommendation[]> {
-	const project: Project = new Project('New Project');
-
-	const out = await getRunOutput('ionic start -l', folder);
-	const projects = parseIonicStart(out);
-	let type = undefined;
-	for (const starter of projects) {
-		if (type != starter.type) {
-			type = starter.type;
-			project.setGroup(`New ${type} Project`, '', TipType.Ionic, false);
-		}
-
-		project.add(new Tip(
-			`${starter.name}`,
-			`${starter.description}`,
-			TipType.Run,
-			'Create Project',
-			[`ionic start @app ${starter.name} --capacitor`,
-			process.platform === "win32" ? `robocopy @app . /MOVE /E /NFL /NDL /NJH /NJS /nc /ns /np` : `mv @app/{,.[^.]}* . && rmdir @app`,
-			],
-			'Creating Project',
-			'Project Created').requestAppName().showProgressDialog());
-	}
-	return project.groups;
-}
-
-function parseIonicStart(text: string): Array<any> {
-	const lines = text.split('\n');
-	let type = undefined;
-	let result = [];
-	for (const line of lines) {
-		if (line.includes('--type=')) {
-			const t = line.split('=');
-			type = t[1].replace(')', '');
-			switch (type) {
-				case 'ionic-angular': type = 'Angular'; break;
-				case 'react': type = 'React'; break;
-				case 'vue': type = 'Vue'; break;
-			}
-		}
-		if (line.includes('|')) {
-			const t = line.split('|');
-			const name = t[0].trim();
-			const description = t[1].trim();
-			if (name != 'name') {
-				result.push({ type: type, name: name, description: description });
-			}
-		}
-	}
-	result = result.filter((project) => { return (project.type != 'ionic1') && (project.type != 'angular'); });
-	return result;
-}
-
 function checkNodeVersion() {
 	try {
 		const v = process.version.split('.');
@@ -798,48 +290,6 @@ export async function installPackage(extensionPath: string, folder: string) {
 		new Tip(`Install ${selected}`, undefined, TipType.Run, undefined, undefined,
 			`Installing ${selected}`,
 			`Installed ${selected}`).showProgressDialog());
-}
-
-function ionicServe(): string {
-	const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
-	const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
-	let serveFlags = '';
-	if (previewInEditor) {
-		serveFlags += ' --no-open';
-	}
-	if (httpsForWeb) {
-		serveFlags += ' --ssl';
-	}
-	return `npx ionic serve${serveFlags}`;
-}
-
-function capRun(platform: string): string {
-	const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
-	const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
-	let capRunFlags = liveReload ? ' -l' : '';
-
-	if (exists('@ionic-enterprise/auth') && liveReload) {
-		capRunFlags = '';
-		// @ionic-enterprise/auth gets a crypt error when running with an external IP address. So avoid the issue
-		const channel = getOutputChannel();
-		channel.appendLine('Note: Live Update was ignored as you have @ionic-enterprise/auth included in your project');
-	}
-
-	if (externalIP) {
-		if (capRunFlags.length > 0) capRunFlags += ' ';
-		capRunFlags += '--external';
-	}
-
-	return `npx ionic cap run ${platform}${capRunFlags} --list`;
-}
-
-function ionicBuild(folder: string): string {
-	const buildForProduction = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
-	const buildFlags = buildForProduction ? ' --prod' : '';
-
-	const nmf = path.join(folder, 'node_modules');
-	const preop = (!fs.existsSync(nmf)) ? 'npm install && ' : '';
-	return `${preop}npx ionic build${buildFlags}`;
 }
 
 export async function reviewProject(folder: string, context: vscode.ExtensionContext): Promise<Recommendation[]> {
@@ -883,10 +333,10 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 		);
 		// project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
 		if (hasCapAndroid) {
-			project.add(new Tip('Run On Android', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection().setDynamicCommand(capRun, 'android'));
+			project.add(new Tip('Run On Android', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection().setDynamicCommand(capRun, CapacitorPlatform.android));
 		}
 		if (hasCapIos) {
-			project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection().setDynamicCommand(capRun, 'ios'));
+			project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection().setDynamicCommand(capRun, CapacitorPlatform.ios));
 		}
 
 		project.add(new Tip('Build', '', TipType.Build, 'Build', undefined, 'Building', undefined).setDynamicCommand(ionicBuild, folder));
@@ -907,7 +357,10 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 
 	if (isCapacitor()) {
 		project.setGroup(`Configuration`, 'Configurations for native project', TipType.Capacitor, false);
-		await project.reviewCapacitorConfig(context);
+		await reviewCapacitorConfig(project, context);
+
+		// Splash Screen and Icon Features
+		addSplashAndIconFeatures(project);
 	}
 
 	project.setGroup(

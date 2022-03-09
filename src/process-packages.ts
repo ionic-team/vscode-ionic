@@ -1,12 +1,13 @@
 import * as child_process from 'child_process';
-import { coerce, major } from 'semver';
-import { libString } from './messages';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as vscode from 'vscode';
+
+import { coerce, major } from 'semver';
+import { libString } from './messages';
 import { Tip, TipType } from './tip';
 import { Project } from './recommendations';
 import { getRunOutput, getStringFrom } from './utilities';
-import * as vscode from 'vscode';
 
 export function clearRefreshCache(context: vscode.ExtensionContext) {
 	if (context) {
@@ -81,7 +82,7 @@ export function reviewPackages(packages, project) {
 }
 
 // List any plugins that use Cordova Hooks as potential issue
-export function reviewPluginsWithHooks(packages, project): Tip[] {
+export function reviewPluginsWithHooks(packages): Tip[] {
 	const tips = [];
 	// List of packages that don't need to be reported to the user because they would be dropped in a Capacitor migration
 	const dontReport = [
