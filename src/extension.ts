@@ -1,10 +1,13 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+
 import { Context } from './context-variables';
 import { ionicLogin, ionicSignup } from './ionic-auth';
 import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { clearRefreshCache } from './process-packages';
+import { Recommendation } from './recommendation';
 import { installPackage } from './recommendations';
 import { Tip } from './tip';
 import { CancelObject, run, getRunOutput, handleError, estimateRunTime } from './utilities';
@@ -114,15 +117,15 @@ function finishCommand(tip: Tip) {
 		channel.appendLine(`[Ionic] ${tip.title} Completed.`);
 		channel.appendLine('');
 		channel.show();
-	}	
+	}
 }
 
 function startCommand(tip: Tip, cmd: string) {
 	if (tip.title) {
 		const message = tip.commandTitle ? tip.commandTitle : tip.title;
-		channel.appendLine(`[Ionic] ${message} (${cmd})...`);		
+		channel.appendLine(`[Ionic] ${message} (${cmd})...`);
 		channel.show();
-	}	
+	}
 }
 
 export function getOutputChannel(): vscode.OutputChannel {
@@ -237,7 +240,7 @@ export function activate(context: vscode.ExtensionContext) {
 		ionicProvider.refresh();
 	});
 
-	vscode.commands.registerCommand('ionic.add', async (tip: Tip) => {
+	vscode.commands.registerCommand('ionic.add', async () => {
 		await installPackage(context.extensionPath, rootPath);
 		if (ionicProvider) {
 			ionicProvider.refresh();
@@ -259,6 +262,17 @@ export function activate(context: vscode.ExtensionContext) {
 		ionicState.skipAuth = true;
 		await vscode.commands.executeCommand('setContext', Context.inspectedProject, false);
 		await vscode.commands.executeCommand('setContext', Context.isAnonymous, false);
+		ionicProvider.refresh();
+	});
+
+	vscode.commands.registerCommand('ionic.open', async (recommendation: Recommendation) => {
+		if (fs.existsSync(recommendation.tip.secondCommand)) {
+			vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(recommendation.tip.secondCommand));
+		}
+	});
+
+	vscode.commands.registerCommand('ionic.rebuild', async (recommendation: Recommendation) => {
+		await recommendation.tip.executeAction();
 		ionicProvider.refresh();
 	});
 

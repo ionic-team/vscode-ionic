@@ -31,7 +31,6 @@
 - (feat) Debugger for browser, iOS and Android (add breakpoints, inspection etc)
 - (feat) Use npm audit to list vulnerable packages
 - (feat) info.plist editing
-- (feat) Splash screen and icon setting
 
 # Known Issues
 - Colorization of the output window is not supported in VS Code Extensions

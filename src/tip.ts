@@ -7,7 +7,9 @@ export class Tip {
 	public cancelRequested: boolean;
 	public secondCommand: string;
 	public secondTitle: string;
+	public tooltip: string;
 	public runPoints: Array<RunPoint>;
+	public contextValue?: string;
 
 	private onAction: (...args) => unknown;
 	private onCommand: (...args) => string;
@@ -53,6 +55,11 @@ export class Tip {
 	setAction(func: (...argsIn) => unknown, ...args) {
 		this.onAction = func;
 		this.actionArgs = args;
+		return this;
+	}
+
+	setContextValue(contextValue: string) {
+		this.contextValue = contextValue;
 		return this;
 	}
 
@@ -106,6 +113,7 @@ export enum TipType {
 	Files,
 	Sync,
 	Add,
+	Media,
 	None
 }
 

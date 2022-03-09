@@ -88,7 +88,9 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 			channel.append(data);
 			channel.show();
 		});
-		cancelObject.proc = proc;
+		if (cancelObject) {
+			cancelObject.proc = proc;
+		}
 	});
 }
 
