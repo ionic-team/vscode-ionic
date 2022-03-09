@@ -106,6 +106,7 @@ export enum TipType {
 	Files,
 	Sync,
 	Add,
+	Media,
 	None
 }
 

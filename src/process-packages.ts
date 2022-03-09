@@ -54,23 +54,18 @@ export async function processPackages(folder: string, allDependencies, devDepend
 export function reviewPackages(packages, project) {
 	if (Object.keys(packages).length == 0) return;
 
-	listChanges(
-		project,
-		"Major Updates Available",
-		'These project dependencies have major releases that you should consider updating to.',
-		packages, "major");
+	// Uncomment to show packages that have a major bump
+	// listChanges(
+	// 	project,
+	// 	"Major Updates Available",
+	// 	'These project dependencies have major releases that you should consider updating to.',
+	// 	packages, "major");
 
 	listPackages(
 		project,
 		"Packages",
 		'Your ' + project.type + ' project relies on these packages. Consider packages which have not had updates in more than a year to be a candidate for replacement in favor of a project that is actively maintained.',
 		packages, 'Dependency');
-
-	// listPackages(
-	// 	project,
-	// 	"Dev Dependencies",
-	// 	'Your ' + project.type + ' project relies on these packages to build. Consider packages which have not had updates in more than a year to be a candidate for replacement in favor of a project that is actively maintained.',
-	// 	packages, 'Dev Dependency');
 
 	listPackages(
 		project,

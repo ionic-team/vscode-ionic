@@ -3,6 +3,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { run } from './utilities';
 import { getOutputChannel } from './extension';
+import { Tip, TipType } from './tip';
+import { Project } from './recommendations';
+import { exists } from './analyzer';
 
 export enum AssetType {
 	splash = 'splash.png',
@@ -12,12 +15,30 @@ export enum AssetType {
 
 }
 
-export function getAssetTitle(folder: string, filename: AssetType): string {
+export function addSplashAndIconFeatures(project: Project) {
+	project.setGroup(`Splash Screen & Icon`, '', TipType.Media, false);
+	const hasCordovaRes = exists('cordova-res');
+	const ios = exists('@capacitor/ios');
+	const android = exists('@capacitor/android');
+	project.add(new Tip('Splash Screen', undefined, getAssetTipType(project.folder, AssetType.splash)).setAction(setAssetResource, project.folder, AssetType.splash, hasCordovaRes, ios, android));
+	project.add(new Tip('Icon', undefined, getAssetTipType(project.folder, AssetType.icon)).setAction(setAssetResource, project.folder, AssetType.icon, hasCordovaRes, ios, android));
+	project.add(new Tip('Icon Foreground', undefined, getAssetTipType(project.folder, AssetType.adaptiveForeground)).setAction(setAssetResource, project.folder, AssetType.adaptiveForeground, hasCordovaRes, ios, android));
+	project.add(new Tip('Icon Background', undefined, getAssetTipType(project.folder, AssetType.adaptiveBackground)).setAction(setAssetResource, project.folder, AssetType.adaptiveBackground, hasCordovaRes, ios, android));
+
+}
+
+function getAssetTipType(folder: string, filename: AssetType): TipType {
 	const assetfilename = path.join(getResourceFolder(folder, filename), filename);
 	if (fs.existsSync(assetfilename)) {
-		return filename;
+		return TipType.Media;
 	} else {
-		return 'none';
+		return TipType.Warning;
+	}
+}
+
+function getAssetTitle(folder: string, filename: AssetType): string {
+	if (getAssetTipType(folder, filename) == TipType.Warning) {
+		return 'None';
 	}
 }
 
@@ -35,16 +56,16 @@ function getResourceFolder(folder: string, filename: AssetType): string {
 	return resourceFolder;
 }
 
-export async function setAssetResource(folder: string, filename: AssetType, hasCordovaRes: boolean, ios: boolean, android: boolean) {
+async function setAssetResource(folder: string, filename: AssetType, hasCordovaRes: boolean, ios: boolean, android: boolean) {
 	const name = filename == AssetType.splash ? 'Splash Screen' : 'Icon';
 	let title = undefined;
 	switch (filename) {
-		case AssetType.splash: title = 'The splash screen should be a 2732×2732px png file. It will be used as the original asset to create suitable splash screen assets for iOS and Android.'; break;
-		case AssetType.icon: title = 'The icon should be a 1024×1024px png file. It will be used as the original asset to create suitable icon assets for iOS and Android.'; break;
-		case AssetType.adaptiveForeground: title = 'The icon should be at least 432x432 png file. It will be used as the original asset to create suitable adaptive icons for Android.'; break;
-		case AssetType.adaptiveBackground: title = 'The icon should be at least 432x432 png file. It will be used as the original asset to create suitable adaptive icons for Android.'; break;
+		case AssetType.splash: title = 'Your splash screen should be a 2732×2732px png file. It will be used as the original asset to create suitably sized splash screens for iOS and Android.'; break;
+		case AssetType.icon: title = 'Your icon should be a 1024×1024px png file. It will be used as the original asset to create suitably sized icons for iOS and Android.'; break;
+		case AssetType.adaptiveForeground: title = 'The icon should be at least 432x432 png file. It will be used as the original asset to create suitably sized adaptive icons for Android.'; break;
+		case AssetType.adaptiveBackground: title = 'The icon should be at least 432x432 png file. It will be used as the original asset to create suitably sized adaptive icons for Android.'; break;
 	}
-	const buttonTitle = (getAssetTitle(folder, filename) == 'none') ? `Select ${name} File` : `Update ${name} File`;
+	const buttonTitle = (getAssetTipType(folder, filename) == TipType.Warning) ? `Select File` : `Update File`;
 	const rebuildTitle = 'Rebuild';
 
 	const selected = await vscode.window.showInformationMessage(title, rebuildTitle, buttonTitle);
@@ -93,19 +114,34 @@ export async function setAssetResource(folder: string, filename: AssetType, hasC
 
 async function runCordovaRes(folder: string, hasCordovaRes: boolean, ios: boolean, android: boolean) {
 	const channel = getOutputChannel();
-	if (!hasCordovaRes) {
-		channel.appendLine('[Ionic] Installing Asset Generator...');
-		await run(folder, 'npm install cordova-res --save-dev --save-exact', channel, undefined, false, undefined, undefined);
-	}
-	if (ios) {
-		channel.appendLine('[Ionic] Generating iOS Assets...');
-		await run(folder, 'npx cordova-res ios --skip-config --copy', channel, undefined, false, undefined, undefined);
-	}
-	if (android) {
-		channel.appendLine('[Ionic] Generating Android Assets...');
-		await run(folder, 'npx cordova-res android --skip-config --copy', channel, undefined, false, undefined, undefined);
-	}
+	channel.appendLine('[Ionic] Generating Splash Screen and Icon Assets...');
+	channel.show();
+	await showProgress('Generating Splash Screen and Icon Assets',
+		async () => {
+			if (!hasCordovaRes) {
+				await run(folder, 'npm install cordova-res --save-dev --save-exact', channel, undefined, false, undefined, undefined);
+			}
+			if (ios) {
+				await run(folder, 'npx cordova-res ios --skip-config --copy', channel, undefined, false, undefined, undefined);
+			}
+			if (android) {
+				await run(folder, 'npx cordova-res android --skip-config --copy', channel, undefined, false, undefined, undefined);
+			}
 
-	// TODO: cordova-res errors if files exist due to copy function in @ionic/utils-fs (which also eats error)
+		});
 	channel.appendLine('[Ionic] Completed created Splash Screen and Icon Assets');
+	channel.show();
+}
+
+async function showProgress(message: string, func: () => Promise<any>) {
+	await vscode.window.withProgress(
+		{
+			location: vscode.ProgressLocation.Notification,
+			title: `${message}`,
+			cancellable: false,
+		},
+		async (progress, token) => {
+			await func();
+		}
+	);
 }

@@ -32,7 +32,7 @@ import { CapacitorProjectState } from './cap-project';
 import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
 import { Context } from './context-variables';
-import { AssetType, getAssetTitle, setAssetResource } from './splash-icon';
+import { addSplashAndIconFeatures } from './splash-icon';
 
 
 let useCapProjectCache = true;
@@ -342,13 +342,9 @@ export class Project {
 			this.add(tip2);
 		}
 
-		const hasCordovaRes = exists('cordova-res');
-		const ios = exists('@capacitor/ios');
-		const android = exists('@capacitor/android');
-		this.add(new Tip('Splash Screen', getAssetTitle(this.folder, AssetType.splash), TipType.None).setAction(setAssetResource, this.folder, AssetType.splash, hasCordovaRes, ios, android));
-		this.add(new Tip('Icon', getAssetTitle(this.folder, AssetType.icon), TipType.None).setAction(setAssetResource, this.folder, AssetType.icon, hasCordovaRes, ios, android));
-		this.add(new Tip('Android Adaptive Icon Foreground', getAssetTitle(this.folder, AssetType.adaptiveForeground), TipType.None).setAction(setAssetResource, this.folder, AssetType.adaptiveForeground, hasCordovaRes, ios, android));
-		this.add(new Tip('Android Adaptive Icon Background', getAssetTitle(this.folder, AssetType.adaptiveBackground), TipType.None).setAction(setAssetResource, this.folder, AssetType.adaptiveBackground, hasCordovaRes, ios, android));
+
+		// Splash Screen and Icon Features
+		addSplashAndIconFeatures(this);
 	}
 
 
@@ -549,6 +545,7 @@ export class Project {
 			case TipType.Warning: r.setIcon('warning'); break;
 			case TipType.Idea: r.setIcon('lightbulb'); break;
 			case TipType.Files: r.setIcon('files'); break;
+			case TipType.Media: r.setIcon('file-media'); break;
 			case TipType.Cordova: r.setIcon('cordova'); break;
 			case TipType.Capacitor: r.setIcon('capacitor'); break;
 			case TipType.Ionic: r.setIcon('ionic'); break;
