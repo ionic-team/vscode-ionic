@@ -32,15 +32,6 @@
 - (feat) Use npm audit to list vulnerable packages
 - (feat) info.plist editing
 
-- (feat) Splash screen and icon setting
-  - Red Icon for missing, Checkmark for set
-  - On splashscreen but missing Icon just show message rather then rebuild
-  - On setting default for Icon show message about adaptive icons
-  - Rebuild button if assets are set ??
-  - Group for Splash Screen, Icon
-  - Size of files ??
-  - Pixel size ??
-
 # Known Issues
 - Colorization of the output window is not supported in VS Code Extensions
 - Badge option is not available for VS Code Extensions
