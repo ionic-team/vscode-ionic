@@ -12,7 +12,6 @@ export enum AssetType {
 	icon = 'icon.png',
 	adaptiveForeground = 'icon-foreground.png',
 	adaptiveBackground = 'icon-background.png',
-
 }
 
 export function addSplashAndIconFeatures(project: Project) {
@@ -112,7 +111,24 @@ async function setAssetResource(folder: string, filename: AssetType, hasCordovaR
 	}
 }
 
+function hasNeededAssets(folder: string): string {
+	const icon = path.join(getResourceFolder(folder, AssetType.icon), AssetType.icon);
+	const splash = path.join(getResourceFolder(folder, AssetType.splash), AssetType.splash);
+	if (!fs.existsSync(icon)) {
+		return 'An icon needs to be specified next.';
+	}
+	if (!fs.existsSync(splash)) {
+		return 'A splash screen needs to be specified next.';
+	}
+}
+
 async function runCordovaRes(folder: string, hasCordovaRes: boolean, ios: boolean, android: boolean) {
+	const neededMessage = hasNeededAssets(folder);
+	if (neededMessage) {
+		await vscode.window.showInformationMessage(neededMessage);
+		return;
+	}
+
 	const channel = getOutputChannel();
 	channel.appendLine('[Ionic] Generating Splash Screen and Icon Assets...');
 	channel.show();
