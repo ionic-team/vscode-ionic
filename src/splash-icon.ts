@@ -15,30 +15,34 @@ export enum AssetType {
 }
 
 export function addSplashAndIconFeatures(project: Project) {
-	project.setGroup(`Splash Screen & Icon`, '', TipType.Media, false);
-	const hasCordovaRes = exists('cordova-res');
-	const ios = exists('@capacitor/ios');
-	const android = exists('@capacitor/android');
-	project.add(new Tip('Splash Screen', undefined, getAssetTipType(project.folder, AssetType.splash)).setAction(setAssetResource, project.folder, AssetType.splash, hasCordovaRes, ios, android));
-	project.add(new Tip('Icon', undefined, getAssetTipType(project.folder, AssetType.icon)).setAction(setAssetResource, project.folder, AssetType.icon, hasCordovaRes, ios, android));
-	project.add(new Tip('Icon Foreground', undefined, getAssetTipType(project.folder, AssetType.adaptiveForeground)).setAction(setAssetResource, project.folder, AssetType.adaptiveForeground, hasCordovaRes, ios, android));
-	project.add(new Tip('Icon Background', undefined, getAssetTipType(project.folder, AssetType.adaptiveBackground)).setAction(setAssetResource, project.folder, AssetType.adaptiveBackground, hasCordovaRes, ios, android));
-
+	project.setGroup(`Splash Screen & Icon`, '', TipType.Media, false, 'rebuild').tip = new Tip('Rebuild Assets',undefined).setAction(
+		async () => {
+			await runCordovaRes(project.folder);
+		}
+	);
+	project.add(createFeature('Splash Screen', AssetType.splash, project));
+	project.add(createFeature('Icon', AssetType.icon, project));
+	project.add(createFeature('Icon Foreground', AssetType.adaptiveForeground, project));
+	project.add(createFeature('Icon Background', AssetType.adaptiveBackground, project));
 }
 
 function getAssetTipType(folder: string, filename: AssetType): TipType {
 	const assetfilename = path.join(getResourceFolder(folder, filename), filename);
 	if (fs.existsSync(assetfilename)) {
-		return TipType.Media;
+		return TipType.None;
 	} else {
 		return TipType.Warning;
 	}
 }
 
-function getAssetTitle(folder: string, filename: AssetType): string {
-	if (getAssetTipType(folder, filename) == TipType.Warning) {
-		return 'None';
-	}
+function createFeature(title: string, assetType: AssetType, project: Project): Tip {
+	const tip = new Tip(title, undefined, getAssetTipType(project.folder, assetType));
+	tip.setAction(setAssetResource, project.folder, assetType);
+	tip.setContextValue('asset');
+	const filename = path.join(getResourceFolder(project.folder, assetType), assetType);
+	tip.setSecondCommand('Open Asset', filename);
+	tip.tooltip = getAssetTooltip(project.folder, assetType);
+	return tip;
 }
 
 function getResourceFolder(folder: string, filename: AssetType): string {
@@ -55,26 +59,26 @@ function getResourceFolder(folder: string, filename: AssetType): string {
 	return resourceFolder;
 }
 
-async function setAssetResource(folder: string, filename: AssetType, hasCordovaRes: boolean, ios: boolean, android: boolean) {
-	const name = filename == AssetType.splash ? 'Splash Screen' : 'Icon';
-	let title = undefined;
+function getAssetTooltip(folder: string, filename: AssetType): string {
 	switch (filename) {
-		case AssetType.splash: title = 'Your splash screen should be a 2732×2732px png file. It will be used as the original asset to create suitably sized splash screens for iOS and Android.'; break;
-		case AssetType.icon: title = 'Your icon should be a 1024×1024px png file. It will be used as the original asset to create suitably sized icons for iOS and Android.'; break;
-		case AssetType.adaptiveForeground: title = 'The icon should be at least 432x432 png file. It will be used as the original asset to create suitably sized adaptive icons for Android.'; break;
-		case AssetType.adaptiveBackground: title = 'The icon should be at least 432x432 png file. It will be used as the original asset to create suitably sized adaptive icons for Android.'; break;
+		case AssetType.splash: return 'Your splash screen should be a 2732×2732px png file. It will be used as the original asset to create suitably sized splash screens for iOS and Android.'; break;
+		case AssetType.icon: return 'Your icon should be a 1024×1024px png file that does not contain transparency. It will be used as the original asset to create suitably sized icons for iOS and Android.'; break;
+		case AssetType.adaptiveForeground: return 'The icon should be at least 432x432 png file. It will be used as the original asset to create suitably sized adaptive icons for Android.'; break;
+		case AssetType.adaptiveBackground: return 'The icon should be at least 432x432 png file. It will be used as the original asset to create suitably sized adaptive icons for Android.'; break;
 	}
-	const buttonTitle = (getAssetTipType(folder, filename) == TipType.Warning) ? `Select File` : `Update File`;
-	const rebuildTitle = 'Rebuild';
+}
 
-	const selected = await vscode.window.showInformationMessage(title, rebuildTitle, buttonTitle);
+async function setAssetResource(folder: string, filename: AssetType) {
+	const title = getAssetTooltip(folder, filename);
+	const buttonTitle = (getAssetTipType(folder, filename) == TipType.Warning) ? `Select File` : `Update File`;
+	const selected = await vscode.window.showInformationMessage(title, buttonTitle);
 	if (!selected) return;
 
 	try {
 		// Copy newfilename to resources/splash.png
 		const resourceFolder = getResourceFolder(folder, filename);
 
-		if (selected != rebuildTitle) {
+
 			const files = await vscode.window.showOpenDialog({ canSelectFiles: true, canSelectMany: false });
 			if (!files || files.length !== 1) return;
 			const copyfilename = files[0].fsPath;
@@ -103,9 +107,8 @@ async function setAssetResource(folder: string, filename: AssetType, hasCordovaR
 				}
 			}
 
-		}
 
-		await runCordovaRes(folder, hasCordovaRes, ios, android);
+		await runCordovaRes(folder);
 	} catch (err) {
 		vscode.window.showErrorMessage(`Operation failed ${err}`);
 	}
@@ -114,6 +117,10 @@ async function setAssetResource(folder: string, filename: AssetType, hasCordovaR
 function hasNeededAssets(folder: string): string {
 	const icon = path.join(getResourceFolder(folder, AssetType.icon), AssetType.icon);
 	const splash = path.join(getResourceFolder(folder, AssetType.splash), AssetType.splash);
+	if (!fs.existsSync(icon) || (!fs.existsSync(splash))) {
+		return 'The Splash screen and icon need to be set before you can rebuild generated assets.';
+	}
+
 	if (!fs.existsSync(icon)) {
 		return 'An icon needs to be specified next.';
 	}
@@ -122,7 +129,10 @@ function hasNeededAssets(folder: string): string {
 	}
 }
 
-async function runCordovaRes(folder: string, hasCordovaRes: boolean, ios: boolean, android: boolean) {
+async function runCordovaRes(folder: string) {
+	const hasCordovaRes = exists('cordova-res');
+	const ios = exists('@capacitor/ios');
+	const android = exists('@capacitor/android');
 	const neededMessage = hasNeededAssets(folder);
 	if (neededMessage) {
 		await vscode.window.showInformationMessage(neededMessage);

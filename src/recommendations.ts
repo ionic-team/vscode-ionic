@@ -189,7 +189,7 @@ export class Project {
 		this.name = _name;
 	}
 
-	public setGroup(title: string, message: string, type?: TipType, expanded?: boolean, contextValue?: string) {
+	public setGroup(title: string, message: string, type?: TipType, expanded?: boolean, contextValue?: string): Recommendation {
 
 		// If the last group has no items in it then remove it (eg if there are no recommendations for a project)
 		if (this.groups.length > 1 && this.groups[this.groups.length - 1].children.length == 0) {
@@ -204,6 +204,7 @@ export class Project {
 		this.setIcon(type, r);
 		this.group = r;
 		this.groups.push(this.group);
+		return r;
 	}
 
 	// Look in package.json for scripts and add options to execute
@@ -586,8 +587,15 @@ export class Project {
 			tip.url = tip.description as string;
 		}
 
-		const r = new Recommendation(tip.message, tip.message, tip.title, vscode.TreeItemCollapsibleState.None, cmd, tip, tip.url);
+		const tooltip = tip.tooltip ? tip.tooltip : tip.message;
+		const r = new Recommendation(tooltip, tip.message, tip.title, vscode.TreeItemCollapsibleState.None, cmd, tip, tip.url);
 		this.setIcon(tip.type, r);
+
+		// Context values are used for the when condition for vscode commands (see ionic.open in package.json)
+		if (tip.contextValue) {
+			r.setContext(tip.contextValue);
+		}
+
 		if (this.subgroup) {
 			this.subgroup.children.push(r);
 		} else {

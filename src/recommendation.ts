@@ -12,7 +12,7 @@ export class Recommendation extends vscode.TreeItem {
 		public readonly label: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command,
-		public readonly tip?: Tip,
+		public tip?: Tip,
 		public readonly url?: string
 	) {
 		super(label, collapsibleState);
