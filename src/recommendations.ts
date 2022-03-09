@@ -347,6 +347,8 @@ export class Project {
 		const android = exists('@capacitor/android');
 		this.add(new Tip('Splash Screen', getAssetTitle(this.folder, AssetType.splash), TipType.None).setAction(setAssetResource, this.folder, AssetType.splash, hasCordovaRes, ios, android));
 		this.add(new Tip('Icon', getAssetTitle(this.folder, AssetType.icon), TipType.None).setAction(setAssetResource, this.folder, AssetType.icon, hasCordovaRes, ios, android));
+		this.add(new Tip('Android Adaptive Icon Foreground', getAssetTitle(this.folder, AssetType.adaptiveForeground), TipType.None).setAction(setAssetResource, this.folder, AssetType.adaptiveForeground, hasCordovaRes, ios, android));
+		this.add(new Tip('Android Adaptive Icon Background', getAssetTitle(this.folder, AssetType.adaptiveBackground), TipType.None).setAction(setAssetResource, this.folder, AssetType.adaptiveBackground, hasCordovaRes, ios, android));
 	}
 
 
