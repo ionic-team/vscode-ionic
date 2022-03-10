@@ -266,6 +266,8 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 	const project: Project = new Project('My Project');
 	const packages = await load(folder, project, context);
 	ionicState.view.title = project.name;
+	project.type = isCapacitor() ? 'Capacitor' : 'Cordova';
+	project.folder = folder;
 
 	const gConfig = getGlobalIonicConfig();
 
@@ -279,9 +281,6 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 	sendTelemetryEvents(folder, project, packages, context);
 
 	checkNodeVersion();
-
-	project.type = isCapacitor() ? 'Capacitor' : 'Cordova';
-	project.folder = folder;
 
 	await getRecommendations(project, context, packages);
 

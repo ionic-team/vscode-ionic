@@ -3,7 +3,11 @@ import { Project } from "./project";
 import { Tip, TipType } from "./tip";
 import { getRunOutput } from "./utilities";
 
-
+/**
+ * Creates ionic start commands
+ * @param  {string} folder
+ * @returns Promise
+ */
 export async function starterProject(folder: string): Promise<Recommendation[]> {
 	const project: Project = new Project('New Project');
 

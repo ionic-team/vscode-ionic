@@ -7,6 +7,11 @@ import { getOutputChannel } from './extension';
 import { ionicState } from './ionic-tree-provider';
 import { sendTelemetryEvent, TelemetryEventType } from './telemetry';
 
+/**
+ * ionic login and signup commands
+ * @param  {string} folder
+ * @param  {vscode.ExtensionContext} context
+ */
 export async function ionicLogin(folder: string, context: vscode.ExtensionContext) {
 	const ifolder = path.join(folder, 'node_modules', '@ionic', 'cli', 'bin');
 	const channel = getOutputChannel();

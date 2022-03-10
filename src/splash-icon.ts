@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+
 import { run } from './utilities';
 import { getOutputChannel } from './extension';
 import { Tip, TipType } from './tip';
