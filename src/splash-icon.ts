@@ -4,7 +4,7 @@ import * as path from 'path';
 import { run } from './utilities';
 import { getOutputChannel } from './extension';
 import { Tip, TipType } from './tip';
-import { Project } from './recommendations';
+import { Project } from './project';
 import { exists } from './analyzer';
 
 export enum AssetType {

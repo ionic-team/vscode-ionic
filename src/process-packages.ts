@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { coerce, major } from 'semver';
 import { libString } from './messages';
 import { Tip, TipType } from './tip';
-import { Project } from './recommendations';
+import { Project } from './project';
 import { getRunOutput, getStringFrom } from './utilities';
 
 export function clearRefreshCache(context: vscode.ExtensionContext) {

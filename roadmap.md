@@ -24,6 +24,8 @@
 - (perf) Only run capacitor config commands when "Configuration" is expanded
 
 ## Bugs
+- (bug) Bundle id validate doesnt accept "stuff"
+- (bug) New project cannot set bundleid, version number
 - (bug) Creating a new Ionic project should allow changing version number/bundleid (see bug WN-276 in Capacitor project)
 
 ## Docs

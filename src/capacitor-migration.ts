@@ -1,6 +1,6 @@
 import { checkMinVersion, exists, incompatiblePlugin, notRequiredPlugin, replacementPlugin, reviewPlugin } from "./analyzer";
 import { reviewPluginsWithHooks } from "./process-packages";
-import { Project } from "./recommendations";
+import { Project } from "./project";
 import { Tip, TipType } from "./tip";
 import { asAppId } from "./utilities";
 
@@ -51,13 +51,13 @@ export function capacitorRecommendations(project: Project): Tip[] {
 		if (!exists('@capacitor/android')) {
 			tips.push(new Tip(
 				'Add Android Integration', '', TipType.Capacitor, 'Add Android support to your Capacitor project',
-				['npm install @capacitor/android --save-exact', 'npx cap add android'], 'Add Android', 'Android support added to your project'));
+				['npm install @capacitor/android --save-exact', 'npx cap add android'], 'Add Android', 'Android support added to your project').showProgressDialog());
 		}
 
 		if (!exists('@capacitor/ios')) {
 			tips.push(new Tip(
 				'Add iOS Integration', '', TipType.Capacitor, 'Add iOS support to your Capacitor project',
-				['npm install @capacitor/ios --save-exact', 'npx cap add ios'], 'Add iOS', 'iOS support added to your project'));
+				['npm install @capacitor/ios --save-exact', 'npx cap add ios'], 'Add iOS', 'iOS support added to your project').showProgressDialog());
 		}
 	}
 

@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { reviewProject } from './recommendations';
+import { reviewProject } from './project';
 import { Recommendation } from './recommendation';
 import { Context } from './context-variables';
 import { starterProject } from './ionic-start';

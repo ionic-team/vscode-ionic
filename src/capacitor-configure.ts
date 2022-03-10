@@ -6,7 +6,7 @@ import { CapacitorProject } from '@capacitor/project';
 import { CapacitorConfig } from '@capacitor/cli';
 import { CapacitorProjectState } from './cap-project';
 import { getOutputChannel } from './extension';
-import { Project } from './recommendations';
+import { Project } from './project';
 import { Tip, TipType } from './tip';
 import { getStringFrom, setStringIn } from './utilities';
 
@@ -146,7 +146,7 @@ async function getCapacitorProjectState(prj: Project, context: vscode.ExtensionC
 			validateInput: (value: string) => {
 				const regexp = /^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+[0-9a-z_]$/i;
 				if (!regexp.test(value)) {
-					return "You cannot use spaces and some special characters like -.";
+					return "You cannot use spaces and some special characters like -. Must contain at least one full stop";
 				}
 				return null;
 			}

@@ -15,7 +15,7 @@ import {
 } from './messages';
 import { processPackages } from './process-packages';
 import { Tip, TipType } from './tip';
-import { Project } from './recommendations';
+import { Project } from './project';
 
 let packageFile;
 let allDependencies;

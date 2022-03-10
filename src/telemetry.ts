@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 
 import { PackageInfo } from './package-info';
 import { generateUUID } from './utilities';
-import { Project } from './recommendations';
+import { Project } from './project';
 
 interface TelemetryMetric {
 	name: string;

@@ -1,5 +1,5 @@
 import { Recommendation } from "./recommendation";
-import { Project } from "./recommendations";
+import { Project } from "./project";
 import { Tip, TipType } from "./tip";
 import { getRunOutput } from "./utilities";
 
