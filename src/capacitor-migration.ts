@@ -24,8 +24,9 @@ export function capacitorMigrationChecks(packages, project: Project) {
 	tips.push(reviewPlugin('newrelic-cordova-plugin'));
 
 	if (exists('cordova-ios') || (exists('cordova-android') || (project.fileExists('config.xml')))) {
+		const movecmd = process.platform === "win32" ? 'rename config.xml config.xml.bak' : 'mv config.xml config.xml.bak';
 		tips.push(new Tip('Remove Cordova Integration', '', TipType.Capacitor, 'Remove the Cordova integration',
-			['npm uninstall cordova-ios', 'npm uninstall cordova-android', 'mv config.xml config.xml.bak', 'rem-cordova'],
+			['npm uninstall cordova-ios', 'npm uninstall cordova-android', movecmd, 'rem-cordova'],
 			'Remove Cordova', 'Removing Cordova', 'Successfully removed Cordova'));
 	}
 	project.tips(tips);

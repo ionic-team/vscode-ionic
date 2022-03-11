@@ -24,6 +24,7 @@
 - (perf) Only run capacitor config commands when "Configuration" is expanded
 
 ## Bugs
+- (bug) Bug capturing of inspection with telemetry reporting on exception
 - (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
 - (bug) Bundle id validate doesnt accept "stuff"
 - (bug) New project cannot set bundleid, version number
@@ -31,6 +32,7 @@
 - (bug) If a project has not been built and you try running on ios/android it could build for you beforehand
 - (bug) Add android/ios integration should show progress
 - (bug) Detect if Android Studio not installed
+- (bug) Install node modules should show progress
 
 
 ## Docs
@@ -45,6 +47,7 @@
 - (feat) Debugger for browser, iOS and Android (add breakpoints, inspection etc)
 - (feat) Use npm audit to list vulnerable packages
 - (feat) info.plist editing
+- (feat) pnpm monorepo support
 
 # Known Issues
 - Colorization of the output window is not supported in VS Code Extensions
