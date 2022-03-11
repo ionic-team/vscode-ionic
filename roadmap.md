@@ -27,10 +27,8 @@
 - (bug) Bug capturing of inspection with telemetry reporting on exception
 - (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
 - (bug) Bundle id validate doesnt accept "stuff"
-- (bug) New project cannot set bundleid, version number
 - (bug) Creating a new Ionic project should allow changing version number/bundleid (see bug WN-276 in Capacitor project)
 - (bug) If a project has not been built and you try running on ios/android it could build for you beforehand
-- (bug) Add android/ios integration should show progress
 - (bug) Detect if Android Studio not installed
 
 

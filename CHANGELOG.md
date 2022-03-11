@@ -1,6 +1,7 @@
 ## Changelog
 ### Version 1.1.1
 - Remove cordova feature now works on Windows
+- Bug fix when semver encounters an invalid version
 - Installing node modules now shows progress
 
 ### Version 1.1.0

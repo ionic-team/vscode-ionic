@@ -29,7 +29,7 @@ export async function processPackages(folder: string, allDependencies, devDepend
 		outdated = context.workspaceState.get('npmOutdatedData');
 		const changed = packagesModified.toUTCString() != packageModifiedLast;
 		if (changed || !outdated) {
-			outdated = await getRunOutput('npm outdated --json', folder);			
+			outdated = await getRunOutput('npm outdated --json', folder);
 			context.workspaceState.update('npmOutdatedData', outdated);
 			context.workspaceState.update('packagesModified', packagesModified.toUTCString());
 		} else {
@@ -352,14 +352,21 @@ function processDependencies(allDependencies, outdated, devDependencies) {
 		const version = `${v}`;
 		const isDev = devDependencies && (library in devDependencies);
 		let change = 'none';
-		if (latest) {
-			const latestv = coerce(latest);
-			if (major(v) !== major(latestv)) {
-				change = 'major';
-			} else if (version != latest) {
-				change = 'minor';
+		try {
+			if (latest) {
+				const latestv = coerce(latest);
+				if (latestv && latestv !== null) {
+					if (major(v) !== major(latestv)) {
+						change = 'major';
+					} else if (version != latest) {
+						change = 'minor';
+					}
+				} else { latest = 'Unknown'; }
+			} else {
+				latest = 'Unknown';
 			}
-		} else {
+		} catch (err) {
+			console.error(`${library} latest version of "${latest}" is invalid`, err);
 			latest = 'Unknown';
 		}
 
