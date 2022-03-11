@@ -5,6 +5,7 @@
 - Fix for handling authentication issue when running npm outdated
 - Fix for new Angular projects which listed unavailable Ionic 2/3 starters
 - Fix to move codelyzer recommendation into the correct area
+- Avoid creating the resources folder if there are no splash/icons set
 
 ### Version 1.1.1
 - Remove cordova feature now works on Windows

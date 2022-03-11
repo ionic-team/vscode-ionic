@@ -46,14 +46,14 @@ function createFeature(title: string, assetType: AssetType, project: Project): T
 	return tip;
 }
 
-function getResourceFolder(folder: string, filename: AssetType): string {
+function getResourceFolder(folder: string, filename: AssetType, createIfMissing?: boolean): string {
 	let resourceFolder = path.join(folder, 'resources');
-	if (!fs.existsSync(resourceFolder)) {
+	if (createIfMissing && !fs.existsSync(resourceFolder)) {
 		fs.mkdirSync(resourceFolder);
 	}
 	if (filename == AssetType.adaptiveBackground || filename == AssetType.adaptiveForeground) {
 		resourceFolder = path.join(resourceFolder, 'android');
-		if (!fs.existsSync(resourceFolder)) {
+		if (createIfMissing && !fs.existsSync(resourceFolder)) {
 			fs.mkdirSync(resourceFolder);
 		}
 	}
@@ -77,7 +77,7 @@ async function setAssetResource(folder: string, filename: AssetType) {
 
 	try {
 		// Copy newfilename to resources/splash.png
-		const resourceFolder = getResourceFolder(folder, filename);
+		const resourceFolder = getResourceFolder(folder, filename, true);
 
 
 			const files = await vscode.window.showOpenDialog({ canSelectFiles: true, canSelectMany: false });
@@ -98,8 +98,8 @@ async function setAssetResource(folder: string, filename: AssetType) {
 
 			// If its an icon file and no adaptive icons then use the icon
 			if (filename == AssetType.icon) {
-				const adaptiveBackground = path.join(getResourceFolder(folder, AssetType.adaptiveBackground), AssetType.adaptiveBackground);
-				const adaptiveForeground = path.join(getResourceFolder(folder, AssetType.adaptiveForeground), AssetType.adaptiveForeground);
+				const adaptiveBackground = path.join(getResourceFolder(folder, AssetType.adaptiveBackground, true), AssetType.adaptiveBackground);
+				const adaptiveForeground = path.join(getResourceFolder(folder, AssetType.adaptiveForeground, true), AssetType.adaptiveForeground);
 				if (!fs.existsSync(adaptiveBackground)) {
 					fs.copyFileSync(copyfilename, adaptiveBackground);
 				}
@@ -136,7 +136,7 @@ async function runCordovaRes(folder: string) {
 	const android = exists('@capacitor/android');
 	const neededMessage = hasNeededAssets(folder);
 	if (neededMessage) {
-		await vscode.window.showInformationMessage(neededMessage);
+		await vscode.window.showInformationMessage(neededMessage, 'OK');
 		return;
 	}
 

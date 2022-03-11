@@ -31,8 +31,6 @@
 - (bug) Creating a new Ionic project should allow changing version number/bundleid (see bug WN-276 in Capacitor project)
 - (bug) If a project has not been built and you try running on ios/android it could build for you beforehand
 - (bug) Detect if Android Studio not installed
-- (bug) Avoid creating the resources folder if there are no splash/icons set
-
 
 ## Docs
 - (docs) Record video of changing display name, bundle id, version number, build number
