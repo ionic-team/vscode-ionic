@@ -237,7 +237,7 @@ export function replacementPlugin(name: string, replacement: string, url?: strin
 	if (exists(name)) {
 		return new Tip(name,
 			`Replace with ${replacement}${url ? ' (' + url + ')' : ''}`, TipType.Idea,
-			`The plugin ${libString(name)} should be replaced with ${libString(replacement)}${url ? ' (' + url + ')' : ''}`,
+			`The plugin ${libString(name)} can be replaced with ${libString(replacement)}${url ? ' (' + url + ')' : ''}`,
 			`npm install ${replacement} && npm uninstall ${name}`,
 			'Replace Plugin',
 			`${name} replaced with ${replacement}`,

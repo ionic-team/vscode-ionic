@@ -47,7 +47,7 @@ export function capacitorRecommendations(project: Project): Tip[] {
 			],
 			'Add Capacitor', 'Capacitor added to this project',
 			'https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor'
-		));
+		).showProgressDialog());
 	} else {
 		if (!exists('@capacitor/android')) {
 			tips.push(new Tip(
