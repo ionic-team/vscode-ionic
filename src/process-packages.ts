@@ -41,6 +41,10 @@ export async function processPackages(folder: string, allDependencies, devDepend
 			});
 		}
 	} catch (err) {
+		outdated = '[]';
+		if (err && err.includes('401')) {
+			vscode.window.showInformationMessage(`Unable to run 'npm outdated' due to authentication error. Check .npmrc`, 'OK');
+		}
 		console.error(err);
 	}
 
