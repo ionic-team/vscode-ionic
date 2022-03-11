@@ -1,6 +1,7 @@
 ## Changelog
 ### Version 1.1.1
 - Remove cordova feature now works on Windows
+- Installing node modules now shows progress
 
 ### Version 1.1.0
 - Allow Splash screen and icon to be set (and assets rebuilt)

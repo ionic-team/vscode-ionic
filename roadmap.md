@@ -32,7 +32,6 @@
 - (bug) If a project has not been built and you try running on ios/android it could build for you beforehand
 - (bug) Add android/ios integration should show progress
 - (bug) Detect if Android Studio not installed
-- (bug) Install node modules should show progress
 
 
 ## Docs

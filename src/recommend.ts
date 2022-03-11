@@ -73,7 +73,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 
 	const nmf = path.join(project.folder, 'node_modules');
 	if (!fs.existsSync(nmf)) {
-		project.add(new Tip('Install Node Modules', '', TipType.Idea, 'Install Node Modules', 'npm install', 'Installing').performRun());
+		project.add(new Tip('Install Node Modules', '', TipType.Idea, 'Install Node Modules', 'npm install', 'Installing').performRun().showProgressDialog());
 	}
 
 	// Replace momentjs with date-fns
