@@ -160,6 +160,7 @@ export function generateUUID(): string {
  * @returns string
  */
 export function asAppId(name: string): string {
+	if (!name) return 'Unknown';
 	name = name.split('-').join('.');
 	name = name.split(' ').join('.');
 	if (!name.includes('.')) {

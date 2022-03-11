@@ -50,11 +50,11 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 		if (hasCapAndroid) {
 			project.add(new Tip('Open Android Studio Project', '', TipType.Edit, 'Opening project in Android Studio', `npx cap open android`, 'Open Android Studio').showProgressDialog());
 		}
-
-		project.setGroup(
-			`Scripts`, ``, TipType.Files, false);
-		project.addScripts();
 	}
+
+	project.setGroup(
+		`Scripts`, ``, TipType.Files, false);
+	project.addScripts();
 
 	if (isCapacitor()) {
 		project.setGroup(`Configuration`, 'Configurations for native project', TipType.Capacitor, false);

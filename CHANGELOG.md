@@ -1,4 +1,8 @@
 ## Changelog
+### Version 1.1.2
+- Fix for package.json that has a missing name
+- Fix to all script running on a vanilla web project
+
 ### Version 1.1.1
 - Remove cordova feature now works on Windows
 - Bug fix when semver encounters an invalid version
