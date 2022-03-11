@@ -1,5 +1,6 @@
 ## Changelog
 ### Version 1.1.2
+- Add ability to ignore recommendations
 - Fix for package.json that has a missing name
 - Fix to all script running on a vanilla web project
 - Fix for handling authentication issue when running npm outdated

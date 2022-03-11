@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 
 import { coerce, major } from 'semver';
 import { libString } from './messages';
-import { Tip, TipType } from './tip';
+import { Command, Tip, TipType } from './tip';
 import { Project } from './project';
 import { getRunOutput, getStringFrom } from './utilities';
 
@@ -103,7 +103,7 @@ export function reviewPluginsWithHooks(packages): Tip[] {
 			tips.push(new Tip(library,
 				`contains Cordova hooks that may require manual migration to use with Capacitor.`,
 				TipType.Warning,
-				`${libString(library)} contains Cordova hooks that may to require manual migration to use with Capacitor.`
+				`${libString(library)} contains Cordova hooks that may to require manual migration to use with Capacitor.`, Command.NoOp, 'OK'
 			));
 		}
 	}

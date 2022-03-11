@@ -1,3 +1,5 @@
+import * as vscode from 'vscode';
+
 import { checkMinVersion, exists, incompatiblePlugin, notRequiredPlugin, replacementPlugin, reviewPlugin } from "./analyzer";
 import { reviewPluginsWithHooks } from "./process-packages";
 import { Project } from "./project";

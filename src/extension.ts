@@ -9,8 +9,9 @@ import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './project';
-import { Tip } from './tip';
+import { Command, Tip } from './tip';
 import { CancelObject, run, getRunOutput, handleError, estimateRunTime } from './utilities';
+import { ignore } from './ignore';
 
 
 let channel: vscode.OutputChannel = undefined;
@@ -144,6 +145,8 @@ export function getOutputChannel(): vscode.OutputChannel {
  */
 export async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, tip?: Tip, successMessage?: string) {
 	const channel = getOutputChannel();
+
+	if (command == Command.NoOp) return;
 
 	// If the task is already running then cancel it
 	if (isRunning(tip)) {
@@ -281,7 +284,8 @@ export function activate(context: vscode.ExtensionContext) {
 		if (tip.command) {
 			const urlBtn = tip.url ? 'Info' : undefined;
 			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
-			const selection = await vscode.window.showInformationMessage(info, urlBtn, tip.secondTitle, tip.commandTitle);
+			const ignoreTitle = tip.ignorable ? 'Ignore' : undefined;
+			const selection = await vscode.window.showInformationMessage(info, urlBtn, ignoreTitle, tip.secondTitle, tip.commandTitle);
 			if (selection && selection == tip.commandTitle) {
 				fixIssue(tip.command, rootPath, ionicProvider, tip, tip.commandSuccess);
 			}
@@ -290,6 +294,12 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			if (selection && selection == urlBtn) {
 				vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
+			}
+			if (selection && selection == ignoreTitle) {
+				ignore(tip, context);
+				if (ionicProvider) {
+					ionicProvider.refresh();
+				}
 			}
 		} else {
 			await execute(tip);

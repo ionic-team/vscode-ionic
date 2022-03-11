@@ -10,6 +10,7 @@ export class Tip {
 	public tooltip: string;
 	public runPoints: Array<RunPoint>;
 	public contextValue?: string;
+	public ignorable: boolean;
 
 	private onAction: (...args) => unknown;
 	private onCommand: (...args) => string;
@@ -52,6 +53,11 @@ export class Tip {
 		return this;
 	}
 
+	canIgnore() {
+		this.ignorable = true;
+		return this;
+	}
+
 	setAction(func: (...argsIn) => unknown, ...args) {
 		this.onAction = func;
 		this.actionArgs = args;
@@ -91,6 +97,10 @@ export class Tip {
 			this.command = this.onCommand(...this.actionArgs);
 		}
 	}
+}
+
+export enum Command {
+	NoOp = ' '
 }
 
 export enum TipType {

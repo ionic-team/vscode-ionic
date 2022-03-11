@@ -11,6 +11,7 @@ import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
 import { Context } from './context-variables';
 import { getRecommendations } from './recommend';
+import { excludeIgnoredTips, getIgnored } from './ignore';
 
 export class Project {
 	name: string;
@@ -20,9 +21,14 @@ export class Project {
 	group: Recommendation;
 	subgroup: Recommendation;
 	groups: Recommendation[] = [];
+	ignored: Array<string>;
 
 	constructor(_name: string) {
 		this.name = _name;
+	}
+
+	public getIgnored(context: vscode.ExtensionContext) {
+		this.ignored = getIgnored(context);
 	}
 
 	public setGroup(title: string, message: string, type?: TipType, expanded?: boolean, contextValue?: string): Recommendation {
@@ -88,7 +94,15 @@ export class Project {
 		}
 	}
 
+	private isIgnored(tip: Tip) {
+		if (!tip) return true;
+		const txt = `${tip.message}+${tip.title}`;
+		return (this.ignored.includes(txt));
+	}
+
 	public add(tip: Tip) {
+		if (this.isIgnored(tip)) return;
+
 		let cmd: vscode.Command = {
 			command: 'ionic.fix',
 			title: 'Fix',
@@ -147,7 +161,7 @@ export class Project {
 
 	public recommendRemove(name: string, title: string, message: string, description?: string, url?: string) {
 		if (exists(name)) {
-			this.add(new Tip(title, message, TipType.Warning, description, `npm uninstall ${name}`, 'Uninstall', `Uninstalled ${name}`, url));
+			this.add(new Tip(title, message, TipType.Warning, description, `npm uninstall ${name}`, 'Uninstall', `Uninstalled ${name}`, url).canIgnore());
 		}
 	}
 
@@ -281,6 +295,7 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 	sendTelemetryEvents(folder, project, packages, context);
 
 	checkNodeVersion();
+	project.getIgnored(context);
 
 	await getRecommendations(project, context, packages);
 

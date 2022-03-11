@@ -14,7 +14,7 @@ import {
 	writeConsistentVersionWarning
 } from './messages';
 import { processPackages } from './process-packages';
-import { Tip, TipType } from './tip';
+import { Command, Tip, TipType } from './tip';
 import { Project } from './project';
 
 let packageFile;
@@ -229,7 +229,7 @@ export function notRequiredPlugin(name: string, message?: string): Tip {
 			`The plugin ${libString(name)} is not required with Capacitor${msg}`,
 			`npm uninstall ${name}`,
 			'Uninstall',
-			`${name} was uninstalled`);
+			`${name} was uninstalled`).canIgnore();
 	}
 }
 
@@ -248,11 +248,17 @@ export function replacementPlugin(name: string, replacement: string, url?: strin
 
 export function incompatiblePlugin(name: string, url?: string): Tip {
 	if (exists(name)) {
-		const msg = (url.startsWith('http')) ? `See ${url}` : url;
+		const isUrl = url.startsWith('http');
+		const msg = (isUrl) ? `See ${url}` : url;
 		const tip = new Tip(name,
 			`Incompatible with Capacitor. ${msg}`, TipType.Error,
-			`The plugin ${libString(name)} is incompatible with Capacitor. ${msg}`);
-		tip.url = url;
+			`The plugin ${libString(name)} is incompatible with Capacitor. ${msg}`, Command.NoOp, 'OK').canIgnore();
+		if (isUrl) {
+			tip.url = url;
+		} else {
+			tip.command = Command.NoOp;
+			tip.url = `https://www.npmjs.com/package/${name}`;
+		}
 		return tip;
 	}
 }
