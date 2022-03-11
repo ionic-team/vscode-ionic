@@ -19,6 +19,7 @@
 - (feat) Evaluate age of packages: when current version was released, when latest was released. If latest > 365 then warn. If latest - current > 365 then warn
 - (feat) Amp eslink rules to 11: using https://gist.github.com/dtarnawsky/7c42cec330443c7093976136286b5473
 - (feat) Open selection of an update check versions and provide option to update to the latest minor version. Eg 12.1 -> 12.x or 12.1.0 -> 12.1.x
+- (feat) Check for leftover platforms and plugins folders when removing cordova or when capacitor is detected
 
 ## Performance
 - (perf) Only run capacitor config commands when "Configuration" is expanded
@@ -30,6 +31,7 @@
 - (bug) Creating a new Ionic project should allow changing version number/bundleid (see bug WN-276 in Capacitor project)
 - (bug) If a project has not been built and you try running on ios/android it could build for you beforehand
 - (bug) Detect if Android Studio not installed
+- (bug) Avoid creating the resources folder if there are no splash/icons set
 
 
 ## Docs

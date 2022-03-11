@@ -43,7 +43,8 @@ function parseIonicStart(text: string): Array<any> {
 			const t = line.split('=');
 			type = t[1].replace(')', '');
 			switch (type) {
-				case 'ionic-angular': type = 'Angular'; break;
+				case 'ionic-angular': type = 'ionic2'; break;
+				case 'angular': type = 'Angular'; break;
 				case 'react': type = 'React'; break;
 				case 'vue': type = 'Vue'; break;
 			}
@@ -57,6 +58,7 @@ function parseIonicStart(text: string): Array<any> {
 			}
 		}
 	}
-	result = result.filter((project) => { return (project.type != 'ionic1') && (project.type != 'angular'); });
+	result = result.filter((project) => { return (project.type != 'ionic1') && (project.type != 'ionic2'); });
+	result = result.sort((a, b) => (a.type > b.type) ? 1 : -1);
 	return result;
 }

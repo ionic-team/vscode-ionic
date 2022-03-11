@@ -3,6 +3,7 @@
 - Fix for package.json that has a missing name
 - Fix to all script running on a vanilla web project
 - Fix for handling authentication issue when running npm outdated
+- Fix for new Angular projects which listed unavailable Ionic 2/3 starters
 - Fix to move codelyzer recommendation into the correct area
 
 ### Version 1.1.1
