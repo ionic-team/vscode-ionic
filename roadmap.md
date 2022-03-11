@@ -44,7 +44,10 @@
 - (feat) Debugger for browser, iOS and Android (add breakpoints, inspection etc)
 - (feat) Use npm audit to list vulnerable packages
 - (feat) info.plist editing
+- (feat) pnpm support
 - (feat) pnpm monorepo support
+- (feat) nx support
+- (feat) lerna support
 
 # Known Issues
 - Colorization of the output window is not supported in VS Code Extensions

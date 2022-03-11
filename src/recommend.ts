@@ -123,7 +123,12 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 
 	// Angular 10 is in LTS until December 2021
 	project.tip(warnMinVersion('@angular/core', '10.0.0', '. Your version is no longer supported.', 'https://angular.io/guide/releases#support-policy-and-schedule'));
-
+	if (isGreaterOrEqual('@angular/core', '11.0.0')) {
+		project.checkNotExists('codelyzer', 'Codelyzer was popular in Angular projects before version 11 but has been superceded by angular-eslint. You can remove this dependency.');
+	}
+	if (exists('@ionic/angular')) {
+		project.checkNotExists('ionicons', 'The @ionic/angular packages includes icons so the "ionicons" package is not required.');
+	}
 
 	if (isCordova()) {
 		project.tip(warnMinVersion('cordova-android', '10.0.1', 'to be able to target Android SDK v30 which is required for all submissions to the Play Store'));
@@ -214,12 +219,6 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 		project.tips(capacitorRecommendations(project));
 	}
 
-	if (isGreaterOrEqual('@angular/core', '11.0.0')) {
-		project.checkNotExists('codelyzer', 'Codelyzer was popular in Angular projects before version 11 but has been superceded by angular-eslint. You can remove this dependency.');
-	}
-	if (exists('@ionic/angular')) {
-		project.checkNotExists('ionicons', 'The @ionic/angular packages includes icons so the "ionicons" package is not required.');
-	}
 	reviewPackages(packages, project);
 	reviewPluginProperties(packages, project);
 
