@@ -1,6 +1,10 @@
 # ToDo
 
 ## Features
+- (feat) @ionic/native should move to @awesome-cordova-plugins
+- (feat) For errors in a build, need a better way to go to code, fix error and rebuild
+- (feat) On a build that fails indicate red
+- (feat) If you sync but the build didnt work then show suitable error
 - (feat) From packages have the option to update to any particular version found with `npm view package versions`
 - (feat) For web based projects have "Run on Web" under an Ionic Project
 - (feat) On Web projects that are Angular based hook up dist or configured folder
