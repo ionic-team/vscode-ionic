@@ -97,6 +97,7 @@ export class Project {
 	private isIgnored(tip: Tip) {
 		if (!tip) return true;
 		const txt = `${tip.message}+${tip.title}`;
+		if (!this.ignored) return false;
 		return (this.ignored.includes(txt));
 	}
 

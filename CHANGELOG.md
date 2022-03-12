@@ -2,6 +2,7 @@
 
 ### Version 1.1.3
 - Add recommendation for required replacement of sentry-cordova for Capacitor
+- Fix for new projects
 
 ### Version 1.1.2
 - Add ability to ignore recommendations
