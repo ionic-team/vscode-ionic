@@ -67,10 +67,6 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 	project.setGroup(
 		`Recommendations`, `The following recommendations were made by analyzing the package.json file of your ${project.type} app.`, TipType.Idea, true);
 
-	if (isCordova() && isCapacitor()) {
-		project.note('Remove Cordova', 'The project is using both Cordova and Capacitor. Dependencies on Cordova should be removed', undefined, TipType.Error);
-	}
-
 	const nmf = path.join(project.folder, 'node_modules');
 	if (!fs.existsSync(nmf)) {
 		project.add(new Tip('Install Node Modules', '', TipType.Idea, 'Install Node Modules', 'npm install', 'Installing').performRun().showProgressDialog());

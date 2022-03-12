@@ -36,11 +36,29 @@ async function getDevices(command: string, rootPath: string) {
 				if (target != '?') {
 					devices.push({ name: data[0].trim() + ' ' + data[1].trim(), target: target });
 				}
+			} else {
+				const device = parseDevice(line);
+				if (device) {
+					devices.push(device);
+				}
+
 			}
 		}
 		return devices;
 	} catch (error) {
 		handleError(error);
+	}
+}
+
+function parseDevice(line: string) {
+	try {
+		const name = line.substring(0, line.indexOf('  ')).trim();
+		line = line.substring(line.indexOf('  ')).trim();
+		const args = line.replace('  ', '|').split('|');
+		return { name: name + ' ' + args[0].trim(), target: args[1].trim() };
+	} catch
+	{
+		return undefined;
 	}
 }
 

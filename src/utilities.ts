@@ -109,11 +109,13 @@ export async function getRunOutput(command: string, folder: string): Promise<str
 		child_process.exec(command, runOptions(command, folder), (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (stdout) {
 				out += stdout;
+				console.log(stdout);
 			}
 			if (!error) {
 				resolve(out);
 			} else {
 				if (stderror) {
+					console.error(stderror);
 					reject(stderror);
 				} else {
 					// This is to fix a bug in npm outdated where it returns an exit code when it succeeds

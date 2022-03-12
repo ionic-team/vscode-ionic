@@ -30,5 +30,5 @@ export function capRun(platform: CapacitorPlatform): string {
 		capRunFlags += '--external';
 	}
 
-	return `npx ionic cap run ${platform}${capRunFlags} --list`;
+	return `npx cap run ${platform}${capRunFlags} --list`;
 }
