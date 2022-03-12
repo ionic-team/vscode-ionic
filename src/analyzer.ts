@@ -225,7 +225,7 @@ export function notRequiredPlugin(name: string, message?: string): Tip {
 	if (exists(name)) {
 		const msg = message ? '. ' + message : '';
 		return new Tip(name,
-			`Not required with Capacitor${msg}`, TipType.Idea,
+			`Not required with Capacitor${msg}`, TipType.Error,
 			`The plugin ${libString(name)} is not required with Capacitor${msg}`,
 			`npm uninstall ${name}`,
 			'Uninstall',
@@ -237,12 +237,25 @@ export function replacementPlugin(name: string, replacement: string, url?: strin
 	if (exists(name)) {
 		return new Tip(name,
 			`Replace with ${replacement}${url ? ' (' + url + ')' : ''}`, TipType.Idea,
-			`The plugin ${libString(name)} can be replaced with ${libString(replacement)}${url ? ' (' + url + ')' : ''}`,
+			`The plugin ${libString(name)} could be replaced with ${libString(replacement)}${url ? ' (' + url + ')' : ''}`,
 			`npm install ${replacement} && npm uninstall ${name}`,
 			'Replace Plugin',
 			`${name} replaced with ${replacement}`,
 			url
-		);
+		).canIgnore();
+	}
+}
+
+export function incompatibleReplacementPlugin(name: string, replacement: string, url?: string): Tip {
+	if (exists(name)) {
+		return new Tip(name,
+			`Replace with ${replacement}${url ? ' (' + url + ')' : ''}`, TipType.Error,
+			`The plugin ${libString(name)} is incompatible with Capacitor and must be replaced with ${libString(replacement)}${url ? ' (' + url + ')' : ''}`,
+			`npm install ${replacement} && npm uninstall ${name}`,
+			'Replace Plugin',
+			`${name} replaced with ${replacement}`,
+			url
+		).canIgnore();
 	}
 }
 

@@ -1,4 +1,8 @@
 ## Changelog
+
+### Version 1.1.3
+- Add recommendation for required replacement of sentry-cordova for Capacitor
+
 ### Version 1.1.2
 - Add ability to ignore recommendations
 - Fix for package.json that has a missing name

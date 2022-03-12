@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { checkMinVersion, exists, incompatiblePlugin, notRequiredPlugin, replacementPlugin, reviewPlugin } from "./analyzer";
+import { checkMinVersion, exists, incompatiblePlugin, incompatibleReplacementPlugin, notRequiredPlugin, replacementPlugin, reviewPlugin } from "./analyzer";
 import { reviewPluginsWithHooks } from "./process-packages";
 import { Project } from "./project";
 import { Tip, TipType } from "./tip";
@@ -108,6 +108,7 @@ export function capacitorRecommendations(project: Project): Tip[] {
 	tips.push(checkMinVersion('branch-cordova-sdk', '4.0.0', 'Requires update. See: https://help.branch.io/developers-hub/docs/capacitor'));
 
 	// Plugins to recommend replacement with a Capacitor equivalent
+	tips.push(incompatibleReplacementPlugin('sentry-cordova', '@sentry/capacitor'));
 	tips.push(replacementPlugin('cordova-plugin-actionsheet', '@capacitor/action-sheet', 'https://capacitorjs.com/docs/apis/action-sheet'));
 	tips.push(replacementPlugin('cordova-plugin-camera', '@capacitor/camera', 'https://capacitorjs.com/docs/apis/camera'));
 	tips.push(replacementPlugin('@ionic-enterprise/clipboard', '@capacitor/clipboard', 'https://capacitorjs.com/docs/apis/clipboard'));
