@@ -2,7 +2,6 @@
 
 ## Features
 - (feat) From packages have the option to update to any particular version found with `npm view package versions`
-- (feat) Option to hide particular recommendations
 - (feat) For web based projects have "Run on Web" under an Ionic Project
 - (feat) On Web projects that are Angular based hook up dist or configured folder
 - (feat) Support @angular project upgrades (ie multiple package update)
