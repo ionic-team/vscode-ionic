@@ -1,7 +1,8 @@
 ## Changelog
 
-### Version 1.1.3
+### Version 1.1.4
 - Add recommendation for required replacement of sentry-cordova for Capacitor
+- Fix for projects without ionic/cli local
 - Fix for new projects
 
 ### Version 1.1.2
