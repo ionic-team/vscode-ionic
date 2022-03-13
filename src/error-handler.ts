@@ -40,18 +40,16 @@ function extractErrors(errorText: string, logs: Array<string>): Array<ErrorLine>
 		// Look for code lines
 		let line = undefined; // Lint style errors
 		let rcline = undefined; // React style Typescript errors
+		let vueline = undefined; // Vue style errors
+		let tsline = undefined; // Vue style typescript error
 		for (const log of logs) {
 			// Lint style errors
 			if (log.endsWith('.ts')) {
 				line = log;
 			} else {
 				if (line) {
-					const pos = parsePosition(log);
-					const errormsg = extractErrorMessage(log);
-					errors.push({ error: errormsg, uri: line, line: pos.line, position: pos.character });
+					errors.push(extractErrorLineFrom(line, log));
 					line = undefined;
-					// Found an error to go to
-
 				}
 			}
 
@@ -60,9 +58,20 @@ function extractErrors(errorText: string, logs: Array<string>): Array<ErrorLine>
 				rcline = log;
 			} else {
 				if (rcline) {
-					const errormsg = log.trim();
-					errors.push(extractTypescriptErrorFrom(rcline, errormsg));
+					errors.push(extractTypescriptErrorFrom(rcline, log.trim()));
 					rcline = undefined;
+				}
+			}
+
+			// Vue style typescript error
+			if (log.includes('error  in ')) {
+				tsline = log;
+			} else {
+				if (tsline) {
+					if (log.trim().length > 0) {
+						errors.push(extractVueTypescriptErrorFrom(tsline, log.trim()));
+						tsline = undefined;
+					}
 				}
 			}
 
@@ -71,6 +80,17 @@ function extractErrors(errorText: string, logs: Array<string>): Array<ErrorLine>
 			if (log.startsWith('SyntaxError:')) {
 				errors.push(extractSyntaxError(log));
 			}
+
+			if (log.endsWith('.vue')) {
+				vueline = log;
+			} else {
+				if (vueline) {
+					errors.push(extractVueErrorFrom(vueline, log.trim()));
+					vueline = undefined;
+				}
+			}
+
+
 		}
 	}
 
@@ -93,11 +113,19 @@ function extractErrorFrom(line: string): ErrorLine {
 		const args = line.split(':');
 		const linenumber = parseInt(args[2]) - 1;
 		const position = parseInt(args[3].substring(0, args[3].indexOf(' ')) + 2) - 1;
-		const errormsg = line.substring(line.indexOf('- ', codeline.length + 7));
+		const errormsg = line.substring(line.indexOf('- ', codeline.length + 7) + 2);
 		return { line: linenumber, position: position, uri: codeline, error: errormsg };
 	} catch {
 		// Couldnt parse the line. Continue
 	}
+}
+
+// Parse an error like:
+// "  13:1  error blar"
+function extractErrorLineFrom(msg: string, filename: string): ErrorLine {
+	const pos = parsePosition(msg);
+	const errormsg = extractErrorMessage(msg);
+	return { error: errormsg, uri: filename, line: pos.line, position: pos.character };
 }
 
 
@@ -183,6 +211,31 @@ function extractTypescriptErrorFrom(msg: string, errorText: string): ErrorLine {
 		return;
 	}
 }
+
+// Extract code filename, line number, position
+//  error  in src/router/index.ts:35:12
+// TS2552: Cannot find name 'createWebHistory2'. Did you mean 'createWebHistory'?
+function extractVueTypescriptErrorFrom(msg: string, errorText: string): ErrorLine {
+	try {
+		msg = msg.replace(' error  in ', '');
+		const filename = msg.substring(0, msg.indexOf(':'));
+		const args = msg.substring(msg.indexOf(':') + 1).split(':');
+		const linenumber = parseInt(args[0]);
+		const position = parseInt(args[1]);
+		return { line: linenumber, position: position, error: errorText, uri: filename };
+	} catch
+	{
+		return;
+	}
+}
+
+// Extract code filename, line number, position
+// /Users/damian/Code/blank-vue2/src/components/ExploreContainer.vue
+//  15:12  error  The "bnlar" property should be a constructor  vue/require-prop-type-constructor
+function extractVueErrorFrom(filename: string, msg: string): ErrorLine {
+	return extractErrorLineFrom(msg, filename);
+}
+
 
 // Extract code filename, line number, position
 // SyntaxError: /Users/damian/Code/demo-intune-react/src/pages/Login.tsx: 'await' is only allowed within async functions and at the top levels of modules. (29:19)

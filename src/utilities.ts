@@ -106,7 +106,6 @@ export async function getRunOutput(command: string, folder: string): Promise<str
 		child_process.exec(command, runOptions(command, folder), (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (stdout) {
 				out += stdout;
-				console.log(stdout);
 			}
 			if (!error) {
 				resolve(out);
