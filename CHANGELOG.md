@@ -1,4 +1,6 @@
 ## Changelog
+### Version 1.1.5
+- Fix for starter projects with React and Vue
 
 ### Version 1.1.4
 - Add recommendation for required replacement of sentry-cordova for Capacitor
