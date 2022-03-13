@@ -1,12 +1,16 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 
 interface ErrorLine {
 	uri: string;
 	error: string;
+	line: number;
+	position: number
 }
 
-export async function handleError(error: string, logs: Array<string>): Promise<string> {
-	const errors: Array<ErrorLine> = [];
+export async function handleError(error: string, logs: Array<string>, folder: string): Promise<string> {
+
 
 	if (error.includes('ionic: command not found')) {
 		const selection = await vscode.window.showErrorMessage('The Ionic CLI is not installed. Get started by running npm install -g @ionic/cli at the terminal.', 'More Information');
@@ -21,6 +25,19 @@ export async function handleError(error: string, logs: Array<string>): Promise<s
 		}
 	}
 
+	const errors = extractErrors(error, logs);
+
+
+	if (errors.length == 0) {
+		vscode.window.showErrorMessage(errorMessage, 'Ok');
+	} else {
+		handleErrorLine(0, errors, folder);
+	}
+}
+
+function extractErrors(errorText: string, logs: Array<string>): Array<ErrorLine> {
+	const errors: Array<ErrorLine> = [];
+
 	if (logs.length > 0) {
 		// Look for code lines
 		let line = undefined;
@@ -29,7 +46,9 @@ export async function handleError(error: string, logs: Array<string>): Promise<s
 				line = log;
 			} else {
 				if (line) {
-					errors.push({ error: log, uri: line });
+					const pos = parsePosition(log);
+					const errormsg = extractErrorMessage(log);
+					errors.push({ error: errormsg, uri: line, line: pos.line, position: pos.character });
 					line = undefined;
 					// Found an error to go to
 
@@ -39,31 +58,53 @@ export async function handleError(error: string, logs: Array<string>): Promise<s
 	}
 
 	if (errors.length == 0) {
-		vscode.window.showErrorMessage(errorMessage, 'Ok');
-	} else {
-		handleErrorLine(0, errors);
+		const lines = errorText.split('\n');
+		for (const line of lines) {
+			if (line.startsWith('Error: ')) {
+				try {
+					// Parse an error like this one for the line, position and error message
+					// Error: src/app/app.module.ts:18:3 - error TS2391: Function implementation is missing or not immediately following the declaration.
+					const codeline = line.replace('Error: ', '').split(':')[0];
+					const args = line.split(':');
+					const linenumber = parseInt(args[2]) - 1;
+					const position = parseInt(args[3].substring(0, args[3].indexOf(' ')) + 2) - 1;
+					const errormsg = line.substring(line.indexOf('- ', codeline.length + 7));
+					errors.push({ line: linenumber, position: position, uri: codeline, error: errormsg });
+				} catch {
+					// Couldnt parse the line. Continue
+				}
+			}
+		}
 	}
+	return errors;
 }
 
-async function handleErrorLine(number: number, errors: Array<ErrorLine>) {
+async function handleErrorLine(number: number, errors: Array<ErrorLine>, folder: string) {
 	const msg = extractErrorMessage(errors[number].error);
 	const nextButton = (number + 1 == errors.length) ? undefined : 'Next';
 	const prevButton = (number == 0) ? undefined : 'Previous';
 	const title = (errors.length > 1) ? `Error ${number + 1} of ${errors.length}: ` : '';
 	vscode.window.showErrorMessage(`${title}${msg}`, prevButton, nextButton, 'Ok').then((result) => {
 		if (result == 'Next') {
-			handleErrorLine(number + 1, errors);
+			handleErrorLine(number + 1, errors, folder);
 			return;
 		}
 		if (result == 'Previous') {
-			handleErrorLine(number - 1, errors);
+			handleErrorLine(number - 1, errors, folder);
 			return;
 		}
 	});
-	await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(errors[number].uri));
-	const myPos = parsePosition(errors[number].error);
+	let uri = errors[number].uri;
+	if (!fs.existsSync(uri)) {
+		// Might be a relative path
+		if (fs.existsSync(path.join(folder, uri))) {
+			uri = path.join(folder, uri);
+		}
+	}
+	await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(uri));
+	const myPos = new vscode.Position(errors[number].line, errors[number].position);
 	vscode.window.activeTextEditor.selection = new vscode.Selection(myPos, myPos);
-	vscode.commands.executeCommand('revealLine', { lineNumber: 12, at: 'bottom' });
+	vscode.commands.executeCommand('revealLine', { lineNumber: myPos.line, at: 'bottom' });
 }
 
 // Given "  13:1  error blar" return "blar"

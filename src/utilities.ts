@@ -57,7 +57,7 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 				opTiming[command] = end_time[0]; // Number of seconds
 				resolve();
 			} else {
-				handleError(stderror, logs);
+				handleError(stderror, logs, folder);
 				reject(`${command} Failed`);
 			}
 		});

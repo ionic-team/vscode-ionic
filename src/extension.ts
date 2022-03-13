@@ -47,7 +47,7 @@ async function getDevices(command: string, rootPath: string) {
 		}
 		return devices;
 	} catch (error) {
-		handleError(error, []);
+		handleError(error, [], rootPath);
 	}
 }
 
