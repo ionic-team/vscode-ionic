@@ -26,7 +26,7 @@ export async function handleError(error: string, logs: Array<string>, folder: st
 		}
 	}
 
-	const errors = extractErrors(error, logs);
+	const errors = extractErrors(error, logs, folder);
 
 
 	if (errors.length == 0) {
@@ -56,7 +56,7 @@ function timeout(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function extractErrors(errorText: string, logs: Array<string>): Array<ErrorLine> {
+function extractErrors(errorText: string, logs: Array<string>, folder: string): Array<ErrorLine> {
 	const errors: Array<ErrorLine> = [];
 
 	if (logs.length > 0) {
@@ -65,6 +65,7 @@ function extractErrors(errorText: string, logs: Array<string>): Array<ErrorLine>
 		let rcline = undefined; // React style Typescript errors
 		let vueline = undefined; // Vue style errors
 		let tsline = undefined; // Vue style typescript error
+		let javaLine = undefined; // Java style errors
 		for (const log of logs) {
 			// Lint style errors
 			if (log.endsWith('.ts')) {
@@ -102,6 +103,16 @@ function extractErrors(errorText: string, logs: Array<string>): Array<ErrorLine>
 			// SyntaxError: /Users/damian/Code/demo-intune-react/src/pages/Login.tsx: 'await' is only allowed within async functions and at the top levels of modules. (29:19)
 			if (log.startsWith('SyntaxError:')) {
 				errors.push(extractSyntaxError(log));
+			}
+
+			// Java errors
+			if (log.includes('error:') && log.includes(folder)) {
+				javaLine = log;
+			} else {
+				if (javaLine) {
+					errors.push(extractJavaError(javaLine, log));
+					javaLine = undefined;
+				}
 			}
 
 			if (log.endsWith('.vue')) {
@@ -151,6 +162,20 @@ function extractErrorLineFrom(msg: string, filename: string): ErrorLine {
 	return { error: errormsg, uri: filename, line: pos.line, position: pos.character };
 }
 
+// Parse an error like this one for the line, position and error message
+// /Users/damian/Code/blank12/android/app/src/main/java/io/ionic/starter/MainActivity.java:5: error: cannot find symbol
+// public class MainActivity extends BridgeActivity2 {}
+function extractJavaError(line1: string, line2: string): ErrorLine {
+	try {
+		const args = line1.split(' error: ');
+		const filename = args[0].split(':')[0].trim();
+		const linenumber = parseInt(args[0].split(':')[1]) - 1;
+		return { uri: filename, line: linenumber, position: 0, error: args[1].trim() + ' ' + line2.trim() };
+	}
+	catch {
+		return;
+	}
+}
 
 async function handleErrorLine(number: number, errors: Array<ErrorLine>, folder: string) {
 	if (!errors[number]) return;
