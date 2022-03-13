@@ -15,8 +15,8 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
 	const projects = parseIonicStart(out);
 	let type = undefined;
 	for (const starter of projects) {
-		if (type != starter.type) {
-			type = starter.type;
+		if (type != starter.typeName) {
+			type = starter.typeName;
 			project.setGroup(`New ${type} Project`, '', TipType.Ionic, false);
 		}
 
@@ -25,7 +25,7 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
 			`${starter.description}`,
 			TipType.Run,
 			'Create Project',
-			[`ionic start @app ${starter.name} --capacitor`,
+			[`ionic start @app ${starter.name} --type=${starter.type} --capacitor`,
 			process.platform === "win32" ? `robocopy @app . /MOVE /E /NFL /NDL /NJH /NJS /nc /ns /np` : `mv @app/{,.[^.]}* . && rmdir @app`,
 			],
 			'Creating Project',
@@ -37,16 +37,18 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
 function parseIonicStart(text: string): Array<any> {
 	const lines = text.split('\n');
 	let type = undefined;
+	let typeName = undefined;
 	let result = [];
 	for (const line of lines) {
 		if (line.includes('--type=')) {
 			const t = line.split('=');
-			type = t[1].replace(')', '');
-			switch (type) {
-				case 'ionic-angular': type = 'ionic2'; break;
-				case 'angular': type = 'Angular'; break;
-				case 'react': type = 'React'; break;
-				case 'vue': type = 'Vue'; break;
+			typeName = t[1].replace(')', '');
+			type = typeName;
+			switch (typeName) {
+				case 'ionic-angular': typeName = 'ionic2'; break;
+				case 'angular': typeName = 'Angular'; break;
+				case 'react': typeName = 'React'; break;
+				case 'vue': typeName = 'Vue'; break;
 			}
 		}
 		if (line.includes('|')) {
@@ -54,11 +56,11 @@ function parseIonicStart(text: string): Array<any> {
 			const name = t[0].trim();
 			const description = t[1].trim();
 			if (name != 'name') {
-				result.push({ type: type, name: name, description: description });
+				result.push({ type: type, typeName: typeName, name: name, description: description });
 			}
 		}
 	}
-	result = result.filter((project) => { return (project.type != 'ionic1') && (project.type != 'ionic2'); });
+	result = result.filter((project) => { return (project.type != 'ionic1') && (project.type != 'ionic-angular'); });
 	result = result.sort((a, b) => (a.type > b.type) ? 1 : -1);
 	return result;
 }
