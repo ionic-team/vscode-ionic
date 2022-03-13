@@ -10,8 +10,9 @@ import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './project';
 import { Command, Tip } from './tip';
-import { CancelObject, run, getRunOutput, handleError, estimateRunTime } from './utilities';
+import { CancelObject, run, getRunOutput, estimateRunTime } from './utilities';
 import { ignore } from './ignore';
+import { handleError } from './error-handler';
 
 
 let channel: vscode.OutputChannel = undefined;
@@ -46,7 +47,7 @@ async function getDevices(command: string, rootPath: string) {
 		}
 		return devices;
 	} catch (error) {
-		handleError(error);
+		handleError(error, []);
 	}
 }
 
