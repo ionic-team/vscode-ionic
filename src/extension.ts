@@ -17,6 +17,7 @@ import { handleError } from './error-handler';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
+export let lastOperation: Tip;
 
 /**
  * Runs the command and obtains the stdout, parses it for the list of device names and target ids
@@ -173,6 +174,7 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 	}
 
 	runningOperations.push(tip);
+	lastOperation = tip;
 	const msg = tip.commandProgress ? tip.commandProgress : tip.commandTitle ? tip.commandTitle : command;
 	await vscode.window.withProgress(
 		{

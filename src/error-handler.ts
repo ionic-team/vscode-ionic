@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { lastOperation } from './extension';
 
 interface ErrorLine {
 	uri: string;
@@ -8,6 +9,8 @@ interface ErrorLine {
 	line: number;
 	position: number
 }
+
+let currentErrorFilename: string;
 
 export async function handleError(error: string, logs: Array<string>, folder: string): Promise<string> {
 	if (error.includes('ionic: command not found')) {
@@ -30,7 +33,27 @@ export async function handleError(error: string, logs: Array<string>, folder: st
 		vscode.window.showErrorMessage(errorMessage, 'Ok');
 	} else {
 		handleErrorLine(0, errors, folder);
+		// When the user fixes the error and saves the file then re-run
+		const onSave = vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
+			if (document.fileName == currentErrorFilename) {
+				onSave.dispose();
+				const title = lastOperation.title;
+				vscode.commands.executeCommand('ionic.runapp', lastOperation);
+				vscode.window.withProgress(
+					{
+						location: vscode.ProgressLocation.Notification,
+						title: `Lets try to ${title} again...`,
+						cancellable: false
+					}, async () => {
+						await timeout(3000); // Show the message for 3 seconds
+					});
+			}
+		});
 	}
+}
+
+function timeout(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function extractErrors(errorText: string, logs: Array<string>): Array<ErrorLine> {
@@ -48,7 +71,7 @@ function extractErrors(errorText: string, logs: Array<string>): Array<ErrorLine>
 				line = log;
 			} else {
 				if (line) {
-					errors.push(extractErrorLineFrom(line, log));
+					errors.push(extractErrorLineFrom(log, line));
 					line = undefined;
 				}
 			}
@@ -151,6 +174,7 @@ async function handleErrorLine(number: number, errors: Array<ErrorLine>, folder:
 			uri = path.join(folder, uri);
 		}
 	}
+	currentErrorFilename = uri;
 	await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(uri));
 	const myPos = new vscode.Position(errors[number].line, errors[number].position);
 	vscode.window.activeTextEditor.selection = new vscode.Selection(myPos, myPos);
