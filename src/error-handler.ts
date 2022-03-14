@@ -28,7 +28,6 @@ export async function handleError(error: string, logs: Array<string>, folder: st
 
 	const errors = extractErrors(error, logs, folder);
 
-
 	if (errors.length == 0) {
 		vscode.window.showErrorMessage(errorMessage, 'Ok');
 	} else {
@@ -66,6 +65,7 @@ function extractErrors(errorText: string, logs: Array<string>, folder: string): 
 		let vueline = undefined; // Vue style errors
 		let tsline = undefined; // Vue style typescript error
 		let javaLine = undefined; // Java style errors
+		let jasmineLine = undefined; // Jasmine test errors
 		for (const log of logs) {
 			// Lint style errors
 			if (log.endsWith('.ts')) {
@@ -112,6 +112,20 @@ function extractErrors(errorText: string, logs: Array<string>, folder: string): 
 				if (javaLine) {
 					errors.push(extractJavaError(javaLine, log));
 					javaLine = undefined;
+				}
+			}
+
+			// Jasmine errors
+			if (log.includes('Error:') && !log.includes(folder)) {
+				jasmineLine = log;
+			} else {
+				if (jasmineLine) {
+					if (!log.includes('<Jasmine>')) {
+						// First stack line: eg at UserContext.<anonymous> (src/app/app.component.spec.ts:20:17)
+						errors.push(extractJasmineError(jasmineLine, log));
+						jasmineLine = undefined;
+					}
+
 				}
 			}
 
@@ -173,6 +187,26 @@ function extractJavaError(line1: string, line2: string): ErrorLine {
 		return { uri: filename, line: linenumber, position: 0, error: args[1].trim() + ' ' + line2.trim() };
 	}
 	catch {
+		return;
+	}
+}
+
+// Parse an error like this one for the line, position and error message
+// Error: Expected AppComponent({ __ngContext__: [ null, TView({ type: 0, bluepr ... to be falsy.
+// 	    at UserContext.<anonymous> (src/app/app.component.spec.ts:20:17)
+function extractJasmineError(line1: string, line2: string): ErrorLine {
+	try {
+		let txt = line1.replace('Error: ', '');
+		if (txt.length > 100) {
+			txt = txt.substring(0,80) + '...' + txt.substring(txt.length - 16, txt.length);
+		}
+		const place = line2.substring(line2.indexOf('(') + 1);
+		const args = place.split(':');
+		const filename = args[0];
+		const linenumber = parseInt(args[1]) - 1;
+		const position = parseInt(args[2].replace(')', '')) - 1;
+		return { uri: filename, line: linenumber, position: position, error: txt };
+	} catch {
 		return;
 	}
 }
