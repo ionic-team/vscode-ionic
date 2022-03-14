@@ -11,9 +11,10 @@ interface ErrorLine {
 }
 
 let currentErrorFilename: string;
+let onSave;
 
 export async function handleError(error: string, logs: Array<string>, folder: string): Promise<string> {
-	if (error.includes('ionic: command not found')) {
+	if (error && error.includes('ionic: command not found')) {
 		const selection = await vscode.window.showErrorMessage('The Ionic CLI is not installed. Get started by running npm install -g @ionic/cli at the terminal.', 'More Information');
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse('https://ionicframework.com/docs/intro/cli#install-the-ionic-cli'));
 		return;
@@ -22,18 +23,21 @@ export async function handleError(error: string, logs: Array<string>, folder: st
 	if (!errorMessage || error.length == 0) {
 		if (logs.length > 0) {
 			const txt = logs.find((log) => log.startsWith('[error]'));
-			errorMessage = txt.replace('[error]', '');
+			errorMessage = txt ? txt.replace('[error]', '') : undefined;
 		}
 	}
 
 	const errors = extractErrors(error, logs, folder);
 
-	if (errors.length == 0) {
+	if (errors.length == 0 && errorMessage) {
 		vscode.window.showErrorMessage(errorMessage, 'Ok');
 	} else {
 		handleErrorLine(0, errors, folder);
 		// When the user fixes the error and saves the file then re-run
-		const onSave = vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
+		if (onSave) {
+			onSave.dispose();
+		}
+		onSave = vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
 			if (document.fileName == currentErrorFilename) {
 				onSave.dispose();
 				const title = lastOperation.title;
@@ -67,13 +71,17 @@ function extractErrors(errorText: string, logs: Array<string>, folder: string): 
 		let javaLine = undefined; // Java style errors
 		let jasmineLine = undefined; // Jasmine test errors
 		for (const log of logs) {
-			// Lint style errors
-			if (log.endsWith('.ts')) {
+			// Lint style errors, ESLint style errors
+			if (log.endsWith('.ts') || log.endsWith('.tsx')) {
 				line = log;
 			} else {
 				if (line) {
-					errors.push(extractErrorLineFrom(log, line));
-					line = undefined;
+					const error = extractErrorLineFrom(log, line);
+					if (error) {
+						errors.push(error);
+					} else {
+						line = undefined;
+					}
 				}
 			}
 
@@ -137,16 +145,24 @@ function extractErrors(errorText: string, logs: Array<string>, folder: string): 
 					vueline = undefined;
 				}
 			}
-
-
 		}
 	}
 
-	if (errors.length == 0) {
+	if (errors.length == 0 && errorText) {
 		const lines = errorText.split('\n');
+		let fail: string;
 		for (const line of lines) {
 			if (line.startsWith('Error: ')) {
 				errors.push(extractErrorFrom(line));
+			}
+			if (line.startsWith('FAIL')) {
+				fail = line;
+
+			} else {
+				if (fail) {
+					errors.push(extractJestErrorFrom(fail, line));
+					fail = undefined;
+				}
 			}
 		}
 	}
@@ -168,11 +184,24 @@ function extractErrorFrom(line: string): ErrorLine {
 	}
 }
 
+function extractJestErrorFrom(line: string, testError: string): ErrorLine {
+	try {
+		const filename = line.replace('FAIL ', '').trim();
+		testError = testError.replace('  ● ', '');
+		return { line: 0, position: 0, uri: filename, error: testError };
+	} catch {
+		// Couldnt parse the line. Continue
+	}
+}
+
 // Parse an error like:
 // "  13:1  error blar"
 function extractErrorLineFrom(msg: string, filename: string): ErrorLine {
 	const pos = parsePosition(msg);
 	const errormsg = extractErrorMessage(msg);
+	if (!errormsg || errormsg.length == 0) {
+		return;
+	}
 	return { error: errormsg, uri: filename, line: pos.line, position: pos.character };
 }
 
@@ -198,7 +227,7 @@ function extractJasmineError(line1: string, line2: string): ErrorLine {
 	try {
 		let txt = line1.replace('Error: ', '');
 		if (txt.length > 100) {
-			txt = txt.substring(0,80) + '...' + txt.substring(txt.length - 16, txt.length);
+			txt = txt.substring(0, 80) + '...' + txt.substring(txt.length - 16, txt.length);
 		}
 		const place = line2.substring(line2.indexOf('(') + 1);
 		const args = place.split(':');
@@ -251,6 +280,9 @@ function extractErrorMessage(msg: string): string {
 			msg = msg.substring(msg.indexOf('  ')).trim();
 			if (msg.startsWith('error')) {
 				msg = msg.replace('error', '');
+				return msg.trim();
+			} else if (msg.startsWith('warning')) {
+				msg = msg.replace('warning', '');
 				return msg.trim();
 			}
 		}
