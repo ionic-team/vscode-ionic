@@ -33,22 +33,42 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 				])
 		);
 		// project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
+		const runPoints = [
+			{ text: 'ng run app:build', title: 'Building Web...' },
+			{ text: 'capacitor run', title: 'Syncing...' },
+			{ text: '✔ update ios', title: 'Building Native...' },
+			{ text: '✔ update android', title: 'Building Native...' },
+			{ text: 'Running Gradle build', title: 'Deploying...' },
+			{ text: 'Running xcodebuild', title: 'Deploying...' }
+		];
+
 		if (hasCapAndroid) {
-			project.add(new Tip('Run On Android', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection().setDynamicCommand(capRun, CapacitorPlatform.android));
+			project.add(new Tip('Run On Android', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
+				.showProgressDialog()
+				.requestDeviceSelection()
+				.setDynamicCommand(capRun, CapacitorPlatform.android)
+				.setRunPoints(runPoints)
+			);
 		}
 		if (hasCapIos) {
-			project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running').showProgressDialog().requestDeviceSelection().setDynamicCommand(capRun, CapacitorPlatform.ios));
+			project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
+				.showProgressDialog()
+				.requestDeviceSelection()
+				.setDynamicCommand(capRun, CapacitorPlatform.ios)
+				.setRunPoints(runPoints)
+			);
 		}
 
 		project.add(new Tip('Build', '', TipType.Build, 'Build', undefined, 'Building', undefined).setDynamicCommand(ionicBuild, project.folder));
+		const ionic = exists('@ionic/cli') ? 'ionic ' : '';
 		if (exists('@capacitor/core')) {
-			project.add(new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', `npx cap sync`, 'Syncing', undefined));
+			project.add(new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', `npx ${ionic}cap sync`, 'Syncing', undefined));
 		}
 		if (hasCapIos) {
-			project.add(new Tip('Open Xcode Project', '', TipType.Edit, 'Open Xcode', `npx cap open ios`, 'Opening project in Xcode').showProgressDialog());
+			project.add(new Tip('Open in Xcode', '', TipType.Edit, 'Opening Project in Xcode', `npx ${ionic}cap open ios`, 'Opening Project in Xcode').showProgressDialog());
 		}
 		if (hasCapAndroid) {
-			project.add(new Tip('Open Android Studio Project', '', TipType.Edit, 'Opening project in Android Studio', `npx cap open android`, 'Open Android Studio').showProgressDialog());
+			project.add(new Tip('Open in Android Studio', '', TipType.Edit, 'Opening Project in Android Studio', `npx ${ionic}cap open android`, 'Open Android Studio').showProgressDialog());
 		}
 	}
 

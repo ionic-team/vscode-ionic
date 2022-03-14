@@ -10,12 +10,14 @@ import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './project';
 import { Command, Tip } from './tip';
-import { CancelObject, run, getRunOutput, handleError, estimateRunTime } from './utilities';
+import { CancelObject, run, getRunOutput, estimateRunTime } from './utilities';
 import { ignore } from './ignore';
+import { handleError } from './error-handler';
 
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
+export let lastOperation: Tip;
 
 /**
  * Runs the command and obtains the stdout, parses it for the list of device names and target ids
@@ -46,7 +48,7 @@ async function getDevices(command: string, rootPath: string) {
 		}
 		return devices;
 	} catch (error) {
-		handleError(error);
+		handleError(error, [], rootPath);
 	}
 }
 
@@ -79,7 +81,7 @@ async function selectDevice(command: string, rootPath: string, tip: Tip) {
 	const selected = await vscode.window.showQuickPick(names, { placeHolder: 'Select a device to run application on' });
 	const device = devices.find(device => device.name == selected);
 	if (!device) return;
-	tip.commandTitle = 'Running on ' + device?.name;
+	tip.commandTitle = device?.name;
 	return command.replace('--list', '--target=' + device?.target);
 }
 
@@ -142,7 +144,8 @@ function finishCommand(tip: Tip) {
 function startCommand(tip: Tip, cmd: string) {
 	if (tip.title) {
 		const message = tip.commandTitle ? tip.commandTitle : tip.title;
-		channel.appendLine(`[Ionic] ${message} (${cmd})...`);
+		channel.appendLine(`[Ionic] ${message}...`);
+		channel.appendLine(`> ${cmd}`);
 		channel.show();
 	}
 }
@@ -172,6 +175,7 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 	}
 
 	runningOperations.push(tip);
+	lastOperation = tip;
 	const msg = tip.commandProgress ? tip.commandProgress : tip.commandTitle ? tip.commandTitle : command;
 	await vscode.window.withProgress(
 		{

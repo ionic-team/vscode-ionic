@@ -51,9 +51,19 @@ export async function processPackages(folder: string, allDependencies, devDepend
 	// outdated is an array with:
 	//  "@ionic-native/location-accuracy": { "wanted": "5.36.0", "latest": "5.36.0", "dependent": "cordova-old" }  
 
-	const packages = processDependencies(allDependencies, JSON.parse(outdated), devDependencies);
+	const packages = processDependencies(allDependencies, getOutdatedData(outdated), devDependencies);
 	inspectPackages(folder, packages);
 	return packages;
+}
+
+function getOutdatedData(outdated: string): any {
+	try {
+		return JSON.parse(outdated);
+	}
+	catch
+	{
+		return [];
+	}
 }
 
 export function reviewPackages(packages, project) {
@@ -172,10 +182,16 @@ function olderThan(d1: Date, d2: Date, days: number): boolean {
 function markIfPlugin(folder: string): boolean {
 	const pkg = path.join(folder, 'package.json');
 	if (fs.existsSync(pkg)) {
-		const packages = JSON.parse(fs.readFileSync(pkg, 'utf8'));
-		if (packages.capacitor?.ios || packages.capacitor?.android) {
-			return true;
+		try {
+			const packages = JSON.parse(fs.readFileSync(pkg, 'utf8'));
+			if (packages.capacitor?.ios || packages.capacitor?.android) {
+				return true;
+			}
+		} catch {
+			console.warn(`Unable to parse ${pkg}`);
+			return false;
 		}
+		
 	}
 	return false;
 }

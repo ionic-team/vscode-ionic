@@ -51,16 +51,17 @@ export function capacitorRecommendations(project: Project): Tip[] {
 			'https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor'
 		).showProgressDialog());
 	} else {
+		const ionic = exists('@ionic/cli') ? 'ionic ': '';
 		if (!exists('@capacitor/android')) {
 			tips.push(new Tip(
 				'Add Android Integration', '', TipType.Capacitor, 'Add Android support to your Capacitor project',
-				['npm install @capacitor/android --save-exact', 'npx cap add android'], 'Add Android', 'Android support added to your project').showProgressDialog());
+				['npm install @capacitor/android --save-exact', `npx ${ionic}cap add android`], 'Add Android', 'Android support added to your project').showProgressDialog());
 		}
 
 		if (!exists('@capacitor/ios')) {
 			tips.push(new Tip(
 				'Add iOS Integration', '', TipType.Capacitor, 'Add iOS support to your Capacitor project',
-				['npm install @capacitor/ios --save-exact', 'npx cap add ios'], 'Add iOS', 'iOS support added to your project').showProgressDialog());
+				['npm install @capacitor/ios --save-exact', `npx ${ionic}cap add ios`], 'Add iOS', 'iOS support added to your project').showProgressDialog());
 		}
 	}
 

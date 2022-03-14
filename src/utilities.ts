@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 
 import { RunPoint } from './tip';
 import { viewInEditor } from './editor-preview';
+import { handleError } from './error-handler';
 
 export interface CancelObject {
 	proc: child_process.ChildProcess;
@@ -41,6 +42,7 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 	if (command == 'rem-cordova') {
 		return removeCordovaFromPackageJSON(folder);
 	}
+	let logs: Array<string> = [];
 	return new Promise((resolve, reject) => {
 		console.log(`exec ${command} (${folder})`);
 		const start_time = process.hrtime();
@@ -53,14 +55,20 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 			if (!error || (command.includes('robocopy'))) {
 				const end_time = process.hrtime(start_time);
 				opTiming[command] = end_time[0]; // Number of seconds
+
+				// Allows handling of linting and tests
+				handleError(undefined, logs, folder);
+
 				resolve();
 			} else {
-				handleError(stderror);
+				handleError(stderror, logs, folder);
 				reject(`${command} Failed`);
 			}
 		});
 		proc.stdout.on('data', (data) => {
 			if (data) {
+				const loglines = data.split('\n');
+				logs = logs.concat(loglines);
 				if (viewEditor) {
 					if (data.includes('Local: http')) {
 						serverUrl = getStringFrom(data, 'Local: ', '\n');
@@ -79,10 +87,16 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 						}
 					}
 				}
-			}
 
-			channel.append(data);
-			channel.show();
+				for (const logline of loglines) {
+					if (logline.startsWith('[capacitor]')) {
+						channel.appendLine(logline.replace('[capacitor]', ''));
+					} else {
+						channel.appendLine(logline);
+					}
+				}
+				channel.show();
+			}
 		});
 		proc.stderr.on('data', (data) => {
 			channel.append(data);
@@ -94,14 +108,7 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 	});
 }
 
-export async function handleError(error: string): Promise<string> {
-	if (error.includes('ionic: command not found')) {
-		const selection = await vscode.window.showErrorMessage('The Ionic CLI is not installed. Get started by running npm install -g @ionic/cli at the terminal.', 'More Information');
-		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse('https://ionicframework.com/docs/intro/cli#install-the-ionic-cli'));
-		return;
-	}
-	vscode.window.showErrorMessage(error, 'Ok');
-}
+
 
 export async function getRunOutput(command: string, folder: string): Promise<string> {
 	return new Promise((resolve, reject) => {
@@ -109,7 +116,6 @@ export async function getRunOutput(command: string, folder: string): Promise<str
 		child_process.exec(command, runOptions(command, folder), (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (stdout) {
 				out += stdout;
-				console.log(stdout);
 			}
 			if (!error) {
 				resolve(out);
