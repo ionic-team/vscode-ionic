@@ -109,7 +109,7 @@
             {
                 "language": "Log",
                 "scopeName": "code.log",
-                "path": "./src/log-language.xml"
+                "path": "./resources/log-language.xml"
             }
         ],		
 		"commands": [
