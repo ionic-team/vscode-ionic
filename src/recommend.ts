@@ -39,7 +39,8 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 			{ text: '✔ update ios', title: 'Building Native...' },
 			{ text: '✔ update android', title: 'Building Native...' },
 			{ text: 'Running Gradle build', title: 'Deploying...' },
-			{ text: 'Running xcodebuild', title: 'Deploying...' }
+			{ text: 'Running xcodebuild', title: 'Deploying...' },
+			{ text: 'App deployed', title: 'Waiting for Code Changes'}
 		];
 
 		if (hasCapAndroid) {

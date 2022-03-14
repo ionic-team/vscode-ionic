@@ -22,7 +22,7 @@ export function capRun(platform: CapacitorPlatform): string {
 		capRunFlags = '';
 		// @ionic-enterprise/auth gets a crypt error when running with an external IP address. So avoid the issue
 		const channel = getOutputChannel();
-		channel.appendLine('Note: Live Update was ignored as you have @ionic-enterprise/auth included in your project');
+		channel.appendLine('[Ionic] Live Update was ignored as you have @ionic-enterprise/auth included in your project');
 	}
 
 	if (externalIP) {
