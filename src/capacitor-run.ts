@@ -26,7 +26,7 @@ export function capRun(platform: CapacitorPlatform): string {
 	}
 
 	if (externalIP) {
-		if (capRunFlags.length == 0) capRunFlags += ' ';
+		if (capRunFlags.length >= 0) capRunFlags += ' ';
 		capRunFlags += '--external';
 	}
 

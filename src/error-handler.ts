@@ -70,7 +70,10 @@ function extractErrors(errorText: string, logs: Array<string>, folder: string): 
 		let tsline = undefined; // Vue style typescript error
 		let javaLine = undefined; // Java style errors
 		let jasmineLine = undefined; // Jasmine test errors
-		for (const log of logs) {
+		for (let log of logs) {
+			if (log.startsWith('[capacitor]')) {
+				log = log.replace('[capacitor]', '').trim();
+			}
 			// Lint style errors, ESLint style errors
 			if (log.endsWith('.ts') || log.endsWith('.tsx')) {
 				line = log;
@@ -263,10 +266,14 @@ async function handleErrorLine(number: number, errors: Array<ErrorLine>, folder:
 		}
 	}
 	currentErrorFilename = uri;
-	await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(uri));
-	const myPos = new vscode.Position(errors[number].line, errors[number].position);
-	vscode.window.activeTextEditor.selection = new vscode.Selection(myPos, myPos);
-	vscode.commands.executeCommand('revealLine', { lineNumber: myPos.line, at: 'bottom' });
+	if (fs.existsSync(uri) && !fs.lstatSync(uri).isDirectory()) {
+		await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(uri));
+		const myPos = new vscode.Position(errors[number].line, errors[number].position);
+		vscode.window.activeTextEditor.selection = new vscode.Selection(myPos, myPos);
+		vscode.commands.executeCommand('revealLine', { lineNumber: myPos.line, at: 'bottom' });		
+	} else {
+		console.warn(`${uri} not found`);
+	}
 }
 
 // Extract error message from a line error line:

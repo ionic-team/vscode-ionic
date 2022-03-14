@@ -1,4 +1,10 @@
 ## Changelog
+### Version 1.2.0
+- Error assistance for errors from eslint, typescript, angular/vue/react cli, swift/java, jasmine/jest
+- Colorize the output window for warnings, errors, urls
+- Fix for Capacitor commands when @capacitor/cli is not installed
+- Fix for malformed node_module package.json files
+
 ### Version 1.1.5
 - Fix for starter projects with React and Vue
 

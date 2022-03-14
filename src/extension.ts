@@ -81,7 +81,7 @@ async function selectDevice(command: string, rootPath: string, tip: Tip) {
 	const selected = await vscode.window.showQuickPick(names, { placeHolder: 'Select a device to run application on' });
 	const device = devices.find(device => device.name == selected);
 	if (!device) return;
-	tip.commandTitle = 'Running on ' + device?.name;
+	tip.commandTitle = device?.name;
 	return command.replace('--list', '--target=' + device?.target);
 }
 
@@ -144,7 +144,8 @@ function finishCommand(tip: Tip) {
 function startCommand(tip: Tip, cmd: string) {
 	if (tip.title) {
 		const message = tip.commandTitle ? tip.commandTitle : tip.title;
-		channel.appendLine(`[Ionic] ${message} (${cmd})...`);
+		channel.appendLine(`[Ionic] ${message}...`);
+		channel.appendLine(`> ${cmd}`);
 		channel.show();
 	}
 }
