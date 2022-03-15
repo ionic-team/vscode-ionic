@@ -13,6 +13,7 @@ import { Command, Tip } from './tip';
 import { CancelObject, run, getRunOutput, estimateRunTime } from './utilities';
 import { ignore } from './ignore';
 import { handleError } from './error-handler';
+import { CommandName } from './command-name';
 
 
 let channel: vscode.OutputChannel = undefined;
@@ -259,58 +260,59 @@ export function activate(context: vscode.ExtensionContext) {
 	const view = vscode.window.createTreeView('ionic', { treeDataProvider: ionicProvider });
 	ionicState.view = view;
 
-	vscode.commands.registerCommand('ionic.refresh', () => {
+	vscode.commands.registerCommand(CommandName.Refresh, () => {
 		clearRefreshCache(context);
 		context.workspaceState.update('CapacitorProject', undefined);
 		ionicProvider.refresh();
 	});
 
-	vscode.commands.registerCommand('ionic.add', async () => {
+	vscode.commands.registerCommand(CommandName.Add, async () => {
 		await installPackage(context.extensionPath, rootPath);
 		if (ionicProvider) {
 			ionicProvider.refresh();
 		}
 	});
 
-	vscode.commands.registerCommand('ionic.signUp', async () => {
+	vscode.commands.registerCommand(CommandName.SignUp, async () => {
 		await ionicSignup(context.extensionPath, context);
 		ionicProvider.refresh();
 	});
 
-	vscode.commands.registerCommand('ionic.login', async () => {
+	vscode.commands.registerCommand(CommandName.Login, async () => {
 		await vscode.commands.executeCommand('setContext', Context.isLoggingIn, true);
 		await ionicLogin(context.extensionPath, context);
 		ionicProvider.refresh();
 	});
 
-	vscode.commands.registerCommand('ionic.skipLogin', async () => {
+	vscode.commands.registerCommand(CommandName.SkipLogin, async () => {
 		ionicState.skipAuth = true;
 		await vscode.commands.executeCommand('setContext', Context.inspectedProject, false);
 		await vscode.commands.executeCommand('setContext', Context.isAnonymous, false);
 		ionicProvider.refresh();
 	});
 
-	vscode.commands.registerCommand('ionic.open', async (recommendation: Recommendation) => {
+	vscode.commands.registerCommand(CommandName.Open, async (recommendation: Recommendation) => {
 		if (fs.existsSync(recommendation.tip.secondCommand)) {
 			vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(recommendation.tip.secondCommand));
 		}
 	});
 
-	vscode.commands.registerCommand('ionic.rebuild', async (recommendation: Recommendation) => {
+	vscode.commands.registerCommand(CommandName.Rebuild, async (recommendation: Recommendation) => {
 		await recommendation.tip.executeAction();
 		ionicProvider.refresh();
 	});
 
-	vscode.commands.registerCommand('ionic.fix', async (tip: Tip) => {
+	vscode.commands.registerCommand(CommandName.Fix, async (tip: Tip) => {
 		await fix(tip, rootPath, ionicProvider, context);
 	});
 
-	vscode.commands.registerCommand('ionic.lightbulb', async (r: Recommendation) => {
+	vscode.commands.registerCommand(CommandName.Idea, async (r: Recommendation) => {
 		await fix(r.tip, rootPath, ionicProvider, context);
 	});
 
-	vscode.commands.registerCommand('ionic.runapp', async (tip: Tip) => {
+	vscode.commands.registerCommand(CommandName.Run, async (tip: Tip) => {
 		tip.generateCommand();
+		tip.generateTitle();
 		if (tip.command) {
 			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
 			let command = tip.command;
@@ -331,16 +333,18 @@ export function activate(context: vscode.ExtensionContext) {
 
 	});
 
-	vscode.commands.registerCommand('ionic.link', async (tip: Tip) => {
+	vscode.commands.registerCommand(CommandName.Link, async (tip: Tip) => {
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
 	});
 }
 
 async function fix(tip: Tip, rootPath: string, ionicProvider: IonicTreeProvider, context: vscode.ExtensionContext): Promise<void> {
 	tip.generateCommand();
+	tip.generateTitle();
 	if (tip.command) {
 		const urlBtn = tip.url ? 'Info' : undefined;
-		const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
+		const msg = tip.message ? `: ${tip.message}` : '';
+		const info = tip.description ? tip.description : `${tip.title}${msg}`;
 		const ignoreTitle = tip.ignorable ? 'Ignore' : undefined;
 		const selection = await vscode.window.showInformationMessage(info, urlBtn, ignoreTitle, tip.secondTitle, tip.commandTitle);
 		if (selection && selection == tip.commandTitle) {

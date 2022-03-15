@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { lastOperation } from './extension';
+import { CommandName } from './command-name';
 
 interface ErrorLine {
 	uri: string;
@@ -43,7 +44,7 @@ export async function handleError(error: string, logs: Array<string>, folder: st
 			if (document.fileName == currentErrorFilename) {
 				onSave.dispose();
 				const title = lastOperation.title;
-				vscode.commands.executeCommand('ionic.runapp', lastOperation);
+				vscode.commands.executeCommand(CommandName.Run, lastOperation);
 				vscode.window.withProgress(
 					{
 						location: vscode.ProgressLocation.Notification,

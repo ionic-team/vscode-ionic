@@ -12,6 +12,7 @@ import { ionicState } from './ionic-tree-provider';
 import { Context } from './context-variables';
 import { getRecommendations } from './recommend';
 import { excludeIgnoredTips, getIgnored } from './ignore';
+import { CommandName } from './command-name';
 
 export class Project {
 	name: string;
@@ -61,7 +62,7 @@ export class Project {
 		const tip = new Tip(title, message, tipType, description, undefined, undefined, undefined, url);
 		const r = new Recommendation(description ? description : message, message, title, vscode.TreeItemCollapsibleState.None,
 			{
-				command: 'ionic.fix',
+				command: CommandName.Fix,
 				title: 'Information',
 				arguments: [tip]
 			}, undefined);
@@ -105,14 +106,14 @@ export class Project {
 		if (this.isIgnored(tip)) return;
 
 		let cmd: vscode.Command = {
-			command: 'ionic.fix',
+			command: CommandName.Fix,
 			title: 'Fix',
 			arguments: [tip]
 		};
 
 		if ([TipType.Run, TipType.Sync, TipType.Build, TipType.Edit].includes(tip.type) || tip.doRun) {
 			cmd = {
-				command: 'ionic.runapp',
+				command: CommandName.Run,
 				title: 'Run',
 				arguments: [tip]
 			};
@@ -120,7 +121,7 @@ export class Project {
 
 		if (tip.type == TipType.Link) {
 			cmd = {
-				command: 'ionic.link',
+				command: CommandName.Link,
 				title: 'Open',
 				arguments: [tip]
 			};
@@ -145,29 +146,70 @@ export class Project {
 
 	public addSubGroup(title: string) {
 		let command: vscode.Command = undefined;
-		let tooltip: string = undefined;
+		let tooltip = `Packages from ${title}`;
 		let tip: Tip = undefined;
 		if (title == 'angular') {
 
 			// Option to upgrade with: 
 			// ng update @angular/cli@13 @angular/core@13 --allow-dirty
 			command = {
-				command: 'ionic.lightbulb',
+				command: CommandName.Idea,
 				title: 'Upgrade Angular',
 				arguments: []
 			};
 			tooltip = 'Upgrade Angular';
-			tip = new Tip('Upgrade Angular', 'Updates your application and its dependencies to the latest version using "ng update". Make sure you have committed your code before trying an upgrade.', 
-			TipType.Run, undefined, 'ng update @angular/cli @angular/core --allow-dirty --force', 'Upgrade', undefined, 'https://angular.io/cli/update');
+			tip = new Tip('Upgrade Angular', 'Updates your application and its dependencies to the latest version using "ng update". Make sure you have committed your code before trying an upgrade.',
+				TipType.Run, undefined, 'ng update @angular/cli @angular/core --allow-dirty --force', 'Upgrade', undefined, 'https://angular.io/cli/update');
+		} else {
+			command = {
+				command: CommandName.Idea,
+				title: 'Upgrade All Packages',
+				arguments: []
+			};
+			tooltip = 'Upgrade All Packages';
+			tip = new Tip('Upgrade', undefined, TipType.Run, undefined, undefined, 'Upgrade');
 		}
+
+
 		const r = new Recommendation(tooltip, undefined, '@' + title, vscode.TreeItemCollapsibleState.Expanded, command, tip);
 		r.children = [];
+
 		if (title == 'angular') {
 			r.setContext('lightbulb');
+		} else {
+			r.setContext('lightbulb');
+			r.tip
+				.setDynamicCommand(this.updatePackages, r)
+				.setDynamicTitle(this.updatePackagesTitle, r);
 		}
 
 		this.group.children.push(r);
 		this.subgroup = r;
+	}
+
+	private updatePackages(r: Recommendation): string {
+		if (hasUninstall(r)) return;
+		let command = '';
+		for (const child of r.children) {
+			if (command != '') {
+				command += ' ';
+			}
+			// Command will be npm install @capacitor/android@3.4.3 --save-exact
+			command += (child.tip.command as string).replace('npm install ','').replace(' --save-exact','');
+		}
+		return `npm install ${command} --save-exact`;
+	}
+
+	private updatePackagesTitle(r: Recommendation): string {
+		if (hasUninstall(r)) return;
+		let title = '';
+		for (const child of r.children) {
+			if (title != '') {
+				title += ', ';
+			}
+			title += child.tip.description;
+		}
+		return `${r.children.length} Packages: ${title}`;
 	}
 
 	public clearSubgroup() {
@@ -266,7 +308,11 @@ export class Project {
 	}
 }
 
-
+// Check if there is an uninstall command in the children. 
+// (Cant be a method of Project because "this" isnt the project)
+function hasUninstall(r: Recommendation): boolean {
+	return r.children.find((child) => child.tip.command.includes('uninstall')) != undefined;
+}
 
 function checkNodeVersion() {
 	try {
