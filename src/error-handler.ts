@@ -11,7 +11,9 @@ interface ErrorLine {
 }
 
 let currentErrorFilename: string;
-let onSave;
+
+// On Save Document event (singleton)
+let onSave: vscode.Disposable;
 
 export async function handleError(error: string, logs: Array<string>, folder: string): Promise<string> {
 	if (error && error.includes('ionic: command not found')) {
@@ -55,7 +57,7 @@ export async function handleError(error: string, logs: Array<string>, folder: st
 	}
 }
 
-function timeout(ms) {
+function timeout(ms: number) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 

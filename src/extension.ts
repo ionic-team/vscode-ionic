@@ -302,34 +302,11 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand('ionic.fix', async (tip: Tip) => {
-		tip.generateCommand();
-		if (tip.command) {
-			const urlBtn = tip.url ? 'Info' : undefined;
-			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
-			const ignoreTitle = tip.ignorable ? 'Ignore' : undefined;
-			const selection = await vscode.window.showInformationMessage(info, urlBtn, ignoreTitle, tip.secondTitle, tip.commandTitle);
-			if (selection && selection == tip.commandTitle) {
-				fixIssue(tip.command, rootPath, ionicProvider, tip, tip.commandSuccess);
-			}
-			if (selection && selection == tip.secondTitle) {
-				fixIssue(tip.secondCommand, rootPath, ionicProvider, tip);
-			}
-			if (selection && selection == urlBtn) {
-				vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
-			}
-			if (selection && selection == ignoreTitle) {
-				ignore(tip, context);
-				if (ionicProvider) {
-					ionicProvider.refresh();
-				}
-			}
-		} else {
-			await execute(tip);
+		await fix(tip, rootPath, ionicProvider, context);
+	});
 
-			if (ionicProvider) {
-				ionicProvider.refresh();
-			}
-		}
+	vscode.commands.registerCommand('ionic.lightbulb', async (r: Recommendation) => {
+		await fix(r.tip, rootPath, ionicProvider, context);
 	});
 
 	vscode.commands.registerCommand('ionic.runapp', async (tip: Tip) => {
@@ -357,6 +334,37 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('ionic.link', async (tip: Tip) => {
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
 	});
+}
+
+async function fix(tip: Tip, rootPath: string, ionicProvider: IonicTreeProvider, context: vscode.ExtensionContext): Promise<void> {
+	tip.generateCommand();
+	if (tip.command) {
+		const urlBtn = tip.url ? 'Info' : undefined;
+		const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
+		const ignoreTitle = tip.ignorable ? 'Ignore' : undefined;
+		const selection = await vscode.window.showInformationMessage(info, urlBtn, ignoreTitle, tip.secondTitle, tip.commandTitle);
+		if (selection && selection == tip.commandTitle) {
+			fixIssue(tip.command, rootPath, ionicProvider, tip, tip.commandSuccess);
+		}
+		if (selection && selection == tip.secondTitle) {
+			fixIssue(tip.secondCommand, rootPath, ionicProvider, tip);
+		}
+		if (selection && selection == urlBtn) {
+			vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
+		}
+		if (selection && selection == ignoreTitle) {
+			ignore(tip, context);
+			if (ionicProvider) {
+				ionicProvider.refresh();
+			}
+		}
+	} else {
+		await execute(tip);
+
+		if (ionicProvider) {
+			ionicProvider.refresh();
+		}
+	}
 }
 
 async function execute(tip: Tip): Promise<void> {

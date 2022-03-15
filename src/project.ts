@@ -144,8 +144,27 @@ export class Project {
 	}
 
 	public addSubGroup(title: string) {
-		const r = new Recommendation(undefined, undefined, '@' + title, vscode.TreeItemCollapsibleState.Expanded);
+		let command: vscode.Command = undefined;
+		let tooltip: string = undefined;
+		let tip: Tip = undefined;
+		if (title == 'angular') {
+
+			// Option to upgrade with: 
+			// ng update @angular/cli@13 @angular/core@13 --allow-dirty
+			command = {
+				command: 'ionic.lightbulb',
+				title: 'Upgrade Angular',
+				arguments: []
+			};
+			tooltip = 'Upgrade Angular';
+			tip = new Tip('Upgrade Angular', 'Updates your application and its dependencies to the latest version using "ng update"', TipType.Run, undefined, 'ng update @angular/cli @angular/core --allow-dirty', 'Upgrade', undefined, 'https://angular.io/cli/update');
+		}
+		const r = new Recommendation(tooltip, undefined, '@' + title, vscode.TreeItemCollapsibleState.Expanded, command, tip);
 		r.children = [];
+		if (title == 'angular') {
+			r.setContext('lightbulb');
+		}
+
 		this.group.children.push(r);
 		this.subgroup = r;
 	}

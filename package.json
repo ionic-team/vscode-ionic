@@ -41,7 +41,8 @@
 		"onLanguage:jsonc",
 		"onCommand:ionic.refresh",
 		"onCommand:ionic.add",
-		"onCommand:ionic.fix"
+		"onCommand:ionic.fix",
+		"onCommand:ionic.lightbulb"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -130,6 +131,14 @@
 				}
 			},
 			{
+				"command": "ionic.lightbulb",
+				"title": "Upgrade",
+				"icon": {
+					"light": "resources/light/lightbulb.svg",
+					"dark": "resources/dark/lightbulb.svg"
+				}
+			},
+			{
 				"command": "ionic.fix",
 				"title": "Ionic: Fix Issue"
 			},
@@ -175,6 +184,10 @@
 				{
 					"command": "ionic.rebuild",
 					"when": "false"
+				},
+				{
+					"command": "ionic.lightbulb",
+					"when": "false"
 				}
 			],
 			"view/title": [
@@ -190,6 +203,12 @@
 					"when": "view == ionic && viewItem == packages",
 					"group": "inline"
 				},
+				{
+					"command": "ionic.lightbulb",
+					"when": "view == ionic && viewItem == lightbulb",
+					"group": "inline"
+				},
+				
 				{
 					"command": "ionic.open",					
 					"when": "view == ionic && viewItem == asset",
