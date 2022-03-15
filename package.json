@@ -88,31 +88,31 @@
 			],
 			"explorer": []
 		},
-        "languages": [
-            {
-                "id": "Log",
-                "aliases": [
-                    "log"
-                ],
-                "extensions": [
-                    ".log"
-                ],                
-                "mimetypes": [
-                    "log",
-                    "text/log",
-                    "text/x-log",
-                    "text/x-code-output",
-                    "x-code-output"
-                ]
-            }
-        ],
-        "grammars": [
-            {
-                "language": "Log",
-                "scopeName": "code.log",
-                "path": "./resources/log-language.xml"
-            }
-        ],		
+		"languages": [
+			{
+				"id": "Log",
+				"aliases": [
+					"log"
+				],
+				"extensions": [
+					".log"
+				],
+				"mimetypes": [
+					"log",
+					"text/log",
+					"text/x-log",
+					"text/x-code-output",
+					"x-code-output"
+				]
+			}
+		],
+		"grammars": [
+			{
+				"language": "Log",
+				"scopeName": "code.log",
+				"path": "./resources/log-language.xml"
+			}
+		],
 		"commands": [
 			{
 				"command": "ionic.refresh",
@@ -208,14 +208,13 @@
 					"when": "view == ionic && viewItem == lightbulb",
 					"group": "inline"
 				},
-				
 				{
-					"command": "ionic.open",					
+					"command": "ionic.open",
 					"when": "view == ionic && viewItem == asset",
 					"group": "inline"
 				},
 				{
-					"command": "ionic.rebuild",					
+					"command": "ionic.rebuild",
 					"when": "view == ionic && viewItem == rebuild",
 					"group": "inline"
 				}
@@ -272,7 +271,7 @@
 	},
 	"dependencies": {
 		"@capacitor/project": "^1.0.31",
-		"@ionic/cli": "6.18.2",
+		"@ionic/cli": "6.19.0",
 		"fast-xml-parser": "^3.21.1",
 		"mkdirp": "^0.5.1",
 		"rimraf": "^2.6.2",

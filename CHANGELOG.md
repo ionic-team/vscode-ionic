@@ -2,6 +2,9 @@
 ### Version 1.2.0
 - Error assistance for errors from eslint, typescript, angular/vue/react cli, swift/java, jasmine/jest
 - Colorize the output window for warnings, errors, urls
+- Option to upgrade all packages in a scope (eg @capacitor)
+- Migration for Cordova projects using @ionic/angular-toolkit >= v6 (adds @ionic/cordova-builders)
+- Migration for Capacitor projects using @ionic/angular-toolkit >= v6 (cleans angular.json)
 - Fix for Capacitor commands when @capacitor/cli is not installed
 - Fix for malformed node_module package.json files
 
