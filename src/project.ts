@@ -157,7 +157,8 @@ export class Project {
 				arguments: []
 			};
 			tooltip = 'Upgrade Angular';
-			tip = new Tip('Upgrade Angular', 'Updates your application and its dependencies to the latest version using "ng update"', TipType.Run, undefined, 'ng update @angular/cli @angular/core --allow-dirty', 'Upgrade', undefined, 'https://angular.io/cli/update');
+			tip = new Tip('Upgrade Angular', 'Updates your application and its dependencies to the latest version using "ng update". Make sure you have committed your code before trying an upgrade.', 
+			TipType.Run, undefined, 'ng update @angular/cli @angular/core --allow-dirty --force', 'Upgrade', undefined, 'https://angular.io/cli/update');
 		}
 		const r = new Recommendation(tooltip, undefined, '@' + title, vscode.TreeItemCollapsibleState.Expanded, command, tip);
 		r.children = [];
