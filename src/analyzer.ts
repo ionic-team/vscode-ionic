@@ -106,7 +106,7 @@ export async function load(fn: string, project: Project, context: vscode.Extensi
 		...packageFile.dependencies,
 		...packageFile.devDependencies,
 	};
-	console.log(`Inspecting ${Object.keys(allDependencies).length} packages...`);
+
 	return await processPackages(fn, allDependencies, packageFile.devDependencies, context, project.modified);
 }
 

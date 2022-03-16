@@ -341,6 +341,7 @@ export async function installPackage(extensionPath: string, folder: string) {
 }
 
 export async function reviewProject(folder: string, context: vscode.ExtensionContext): Promise<Recommendation[]> {
+	const startedOp = Date.now();
 	vscode.commands.executeCommand('setContext', Context.inspectedProject, false);
 	vscode.commands.executeCommand('setContext', Context.isLoggingIn, false);
 
@@ -367,5 +368,6 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 	await getRecommendations(project, context, packages);
 
 	vscode.commands.executeCommand('setContext', Context.inspectedProject, true);
+	console.log(`Analysed Project in ${(Date.now() - startedOp)}ms`);
 	return project.groups;
 }
