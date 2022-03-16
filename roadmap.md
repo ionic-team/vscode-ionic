@@ -27,6 +27,7 @@
 - (perf) Only run capacitor config commands when "Configuration" is expanded
 
 ## Bugs
+- (bug) versions of packages like ^6.0.0 might be actually 6.0.12
 - (bug) Bug capturing of inspection with telemetry reporting on exception
 - (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
 - (bug) Bundle id validate doesnt accept "stuff"

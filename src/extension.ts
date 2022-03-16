@@ -134,12 +134,6 @@ function finishCommand(tip: Tip) {
 	runningOperations = runningOperations.filter((op: Tip) => {
 		return op.title != tip.title;
 	});
-
-	if (tip.title) {
-		channel.appendLine(`[Ionic] ${tip.title} Completed.`);
-		channel.appendLine('');
-		channel.show();
-	}
 }
 
 function startCommand(tip: Tip, cmd: string) {
@@ -238,6 +232,11 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 	}
 	if (successMessage) {
 		channel.appendLine(successMessage);
+	}
+	if (tip.title) {
+		channel.appendLine(`[Ionic] ${tip.title} Completed.`);
+		channel.appendLine('');
+		channel.show();
 	}
 }
 
