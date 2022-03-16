@@ -2,8 +2,9 @@
 
 ## Features
 - (feat) @ionic/native should move to @awesome-cordova-plugins
-- (feat) Minify option in build.gradle - true or false with release build check
 - (feat) If you sync but the build didnt work then show suitable error
+- (feat) Angular migration option for current+1
+- (feat) Show gotchas page for Angular migration x to x+1
 - (feat) From packages have the option to update to any particular version found with `npm view package versions`
 - (feat) For web based projects have "Run on Web" under an Ionic Project
 - (feat) On Web projects that are Angular based hook up dist or configured folder
@@ -21,12 +22,16 @@
 - (feat) Open selection of an update check versions and provide option to update to the latest minor version. Eg 12.1 -> 12.x or 12.1.0 -> 12.1.x
 - (feat) Check for leftover platforms and plugins folders when removing cordova or when capacitor is detected
 
+
 ## Performance
 - (perf) Only run capacitor config commands when "Configuration" is expanded
 
 ## Bugs
 - (bug) Bug capturing of inspection with telemetry reporting on exception
+- (bug) Dont show progress if runPoints are used
+- (bug) Dont show progress percent above 100%
 - (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
+- (bug) verify a dev dependency upgrade stays dev by using --save-dev
 - (bug) Bundle id validate doesnt accept "stuff"
 - (bug) Creating a new Ionic project should allow changing version number/bundleid (see bug WN-276 in Capacitor project)
 - (bug) If a project has not been built and you try running on ios/android it could build for you beforehand
@@ -47,6 +52,9 @@
 - (feat) pnpm monorepo support
 - (feat) nx support
 - (feat) lerna support
+- (feat) Tool to capture plugins, cap community and paid plugins, evaluate (rank on archived, stars etc) and capture in json. Then use as part of an option to install known good plugins
+- (feat) Review output folder www and report any assets that are too large (eg photos that are png etc)
+- (feat) Twitter to RSS feed - pull news into plugin ??
 
 # Known Issues
 - Colorization of the output window is not supported in VS Code Extensions
