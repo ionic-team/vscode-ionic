@@ -34,8 +34,7 @@
 
 ## Docs
 - (docs) Record video of previewing in editor
-- (docs) Show splashscreen and icon assets
-- (docs) Record video of upgrade of all packages
+- (docs) Video of splashscreen and icon assets
 
 # Milestones
 - (feat) Bundle Analyser button, use stats.json for own report

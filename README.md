@@ -41,6 +41,7 @@ This extension for Visual Studio Code features:
 - Select a package from `Packages` section
 - Choose to `Upgrade` or `Install`
 - The `Info` option will launch the packages home page on npm
+- Select the `Light Bulb` icon next to a scoped package (eg @capacitor) to allow upgrading of all packages
 ![Video of upgrading packages](https://vs-ionic.netlify.app/videos/upgrade-packages.gif)
 
 ## Capacitor Migration
