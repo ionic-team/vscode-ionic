@@ -11,7 +11,7 @@ This extension for Visual Studio Code features:
 - [Integrate Capacitor](#adding-capacitor) into web projects
 - [Run Scripts](#upgrading-packages) from `package.json`
 - [Angular Migrations](#angular-migrations) - Automate Angular version migrations using `ng update`
-- [Splash Screen and Icons]() - Generate Splash Screen and Icons assets for iOS and Android projects
+- [Splash Screen and Icons](#splash-screen-and-icons) - Generate Splash Screen and Icons assets for iOS and Android projects
 - [Error Assistant](#error-assistant) - Detect errors in `swift`, `java`, `typescript`, `eslint`, `jasmine` and `jest`
 
 ## Creating Ionic Projects
