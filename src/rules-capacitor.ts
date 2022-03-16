@@ -10,50 +10,50 @@ import { asAppId } from "./utilities";
  */
 export function checkCapacitorRules(project: Project) {
 	project.tip(checkMinVersion('@capacitor/core', '2.2.0'));
-		project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/cli'));
-		project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/ios'));
-		project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/android'));
+	project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/cli'));
+	project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/ios'));
+	project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/android'));
 
-		// cordova-plugin-appsflyer-sdk doesnt build with Capacitor. Use appsflyer-capacitor-plugin instead 
-		// see https://github.com/AppsFlyerSDK/appsflyer-cordova-plugin#------%EF%B8%8F-note-for-capacitor-users--%EF%B8%8F------
-		project.recommendReplace('cordova-plugin-appsflyer-sdk', 'cordova-plugin-appsflyer-sdk',
-			`Replace with appsflyer-capacitor-plugin.`,
-			`The plugin cordova-plugin-appsflyer-sdk should be replaced with appsflyer-capacitor-plugin.`,
-			'appsflyer-capacitor-plugin'
-		);
+	// cordova-plugin-appsflyer-sdk doesnt build with Capacitor. Use appsflyer-capacitor-plugin instead 
+	// see https://github.com/AppsFlyerSDK/appsflyer-cordova-plugin#------%EF%B8%8F-note-for-capacitor-users--%EF%B8%8F------
+	project.recommendReplace('cordova-plugin-appsflyer-sdk', 'cordova-plugin-appsflyer-sdk',
+		`Replace with appsflyer-capacitor-plugin.`,
+		`The plugin cordova-plugin-appsflyer-sdk should be replaced with appsflyer-capacitor-plugin.`,
+		'appsflyer-capacitor-plugin'
+	);
 
-		if (exists('cordova-plugin-file-transfer') && !exists('cordova-plugin-whitelist')) {
-			// Latest 1.7.1 of the file-transfer plugin requires whitelist in Capacitor projects. See: https://github.com/ionic-team/capacitor/issues/1199
-			project.recommendAdd('cordova-plugin-whitelist', 'cordova-plugin-file-transfer',
-				'Install cordova-plugin-whitelist for compatibility',
-				'The plugin cordova-plugin-file-transfer has a dependency on cordova-plugin-whitelist when used with a Capacitor project');
-		}
+	if (exists('cordova-plugin-file-transfer') && !exists('cordova-plugin-whitelist')) {
+		// Latest 1.7.1 of the file-transfer plugin requires whitelist in Capacitor projects. See: https://github.com/ionic-team/capacitor/issues/1199
+		project.recommendAdd('cordova-plugin-whitelist', 'cordova-plugin-file-transfer',
+			'Install cordova-plugin-whitelist for compatibility',
+			'The plugin cordova-plugin-file-transfer has a dependency on cordova-plugin-whitelist when used with a Capacitor project');
+	}
 
-		if (exists('@ionic/cordova-builders')) {
-			// This is likely a leftover from a Cordova migration
-			project.recommendRemove('@ionic/cordova-builders', '@ionic/cordova-builders', 'This package is only required for Cordova projects.');
-		}
+	if (exists('@ionic/cordova-builders')) {
+		// This is likely a leftover from a Cordova migration
+		project.recommendRemove('@ionic/cordova-builders', '@ionic/cordova-builders', 'This package is only required for Cordova projects.');
+	}
 
-		if (isGreaterOrEqual('@ionic/angular-toolkit', '6.0.0')) {
-			checkMigrationAngularToolkit(project);
-		}
+	if (isGreaterOrEqual('@ionic/angular-toolkit', '6.0.0')) {
+		checkMigrationAngularToolkit(project);
+	}
 
-		if (isLess('@capacitor/android', '3.2.3')) {
-			// Check minifyEnabled is false for release
-		}
+	if (isLess('@capacitor/android', '3.2.3')) {
+		// Check minifyEnabled is false for release
+	}
 
-		if (exists('@ionic-enterprise/auth')) {
-			// TODO: Complete work
-			// checkAndroidManifest();
-		}
-		if (exists('cordova-plugin-x-socialsharing')) {
-			// TODO: Verify that Android Manifest contains
-			// <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
-		}
+	if (exists('@ionic-enterprise/auth')) {
+		// TODO: Complete work
+		// checkAndroidManifest();
+	}
+	if (exists('cordova-plugin-x-socialsharing')) {
+		// TODO: Verify that Android Manifest contains
+		// <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+	}
 
-		if (!isGreaterOrEqual('@ionic-enterprise/identity-vault', '5.1.0')) {
-			project.tip(checkMinVersion('@ionic-enterprise/identity-vault', '5.1.0', 'as the current version is missing important security fixes.', 'https://ionic.io/docs/identity-vault'));
-		}
+	if (!isGreaterOrEqual('@ionic-enterprise/identity-vault', '5.1.0')) {
+		project.tip(checkMinVersion('@ionic-enterprise/identity-vault', '5.1.0', 'as the current version is missing important security fixes.', 'https://ionic.io/docs/identity-vault'));
+	}
 }
 
 /**
@@ -78,7 +78,7 @@ export function capacitorRecommendations(project: Project): Tip[] {
 			'https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor'
 		).showProgressDialog());
 	} else {
-		const ionic = exists('@ionic/cli') ? 'ionic ': '';
+		const ionic = exists('@ionic/cli') ? 'ionic ' : '';
 		if (!exists('@capacitor/android')) {
 			tips.push(new Tip(
 				'Add Android Integration', '', TipType.Capacitor, 'Add Android support to your Capacitor project',

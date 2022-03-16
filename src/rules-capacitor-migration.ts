@@ -3,7 +3,6 @@ import { reviewPluginsWithHooks } from "./process-packages";
 import { Project } from "./project";
 import { capacitorRecommendations } from './rules-capacitor';
 import { Tip, TipType } from "./tip";
-import { asAppId } from "./utilities";
 
 
 export function capacitorMigrationChecks(packages, project: Project) {

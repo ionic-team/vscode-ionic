@@ -1,7 +1,7 @@
 
 import * as vscode from 'vscode';
 
-import { exists, isCapacitor, isCordova, isGreaterOrEqual, warnMinVersion } from './analyzer';
+import { exists, isCapacitor, isCordova } from './analyzer';
 import { reviewCapacitorConfig } from './capacitor-configure';
 import { ionicBuild } from './ionic-build';
 import { ionicServe } from './ionic-serve';
@@ -15,7 +15,7 @@ import { capacitorRecommendations, checkCapacitorRules } from './rules-capacitor
 import { checkCordovaRules } from './rules-cordova';
 import { webProject } from './rules-web-project';
 import { checkPackages } from './rules-packages';
-import { checkDeprecatedPlugins } from './rules-deprcated-plugins';
+import { checkDeprecatedPlugins } from './rules-deprecated-plugins';
 
 export async function getRecommendations(project: Project, context: vscode.ExtensionContext, packages: any): Promise<void> {
 	if (isCapacitor() && !isCordova()) {
