@@ -1,3 +1,6 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
 import { checkConsistentVersions, checkMinVersion, exists, incompatiblePlugin, incompatibleReplacementPlugin, isGreaterOrEqual, isLess, isLessOrEqual, notRequiredPlugin, replacementPlugin } from "./analyzer";
 import { checkMigrationAngularToolkit } from "./rules-angular-toolkit";
 import { Project } from "./project";
@@ -40,6 +43,7 @@ export function checkCapacitorRules(project: Project) {
 
 	if (isLess('@capacitor/android', '3.2.3')) {
 		// Check minifyEnabled is false for release
+		checkBuildGradleForMinifyInRelease(project);
 	}
 
 	if (exists('@ionic-enterprise/auth')) {
@@ -161,4 +165,17 @@ export function capacitorRecommendations(project: Project): Tip[] {
 	tips.push(replacementPlugin('cordova-plugin-statusbar', '@capacitor/status-bar', 'https://capacitorjs.com/docs/apis/status-bar'));
 	tips.push(replacementPlugin('phonegap-plugin-push', '@capacitor/push-notifications', 'https://capacitorjs.com/docs/apis/push-notifications'));
 	return tips;
+}
+
+// Capacity Android 3.2.3 added proguard rules for Capacitor for release build
+// Get users to upgrade if they turn on minifyEnabled to true
+function checkBuildGradleForMinifyInRelease(project: Project) {
+	// Look in android/app/build.gradle for "minifyEnabled true"
+	const filename = path.join(project.folder, 'android', 'app', 'build.gradle');
+	if (fs.existsSync(filename)) {
+		const txt = fs.readFileSync(filename, 'utf8');
+		if (txt.includes('minifyEnabled true')) {
+			project.add(checkMinVersion('@capacitor/android', '3.2.3', 'to ensure Android release builds work when minifyEnabled is true','https://developer.android.com/studio/build/shrink-code'));
+		}
+	}
 }
