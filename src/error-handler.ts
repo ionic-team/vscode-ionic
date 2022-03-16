@@ -205,9 +205,10 @@ function extractJestErrorFrom(line: string, testError: string): ErrorLine {
 function extractErrorLineFrom(msg: string, filename: string): ErrorLine {
 	const pos = parsePosition(msg);
 	const errormsg = extractErrorMessage(msg);
-	if (!errormsg || errormsg.length == 0) {
+	if (!errormsg || errormsg.length == 0 || !msg.includes('error')) {
 		return;
 	}
+
 	return { error: errormsg, uri: filename, line: pos.line, position: pos.character };
 }
 
