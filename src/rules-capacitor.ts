@@ -1,39 +1,66 @@
-import * as vscode from 'vscode';
-
-import { checkMinVersion, exists, incompatiblePlugin, incompatibleReplacementPlugin, notRequiredPlugin, replacementPlugin, reviewPlugin } from "./analyzer";
-import { reviewPluginsWithHooks } from "./process-packages";
+import { checkConsistentVersions, checkMinVersion, exists, incompatiblePlugin, incompatibleReplacementPlugin, isGreaterOrEqual, isLess, isLessOrEqual, notRequiredPlugin, replacementPlugin } from "./analyzer";
+import { checkMigrationAngularToolkit } from "./rules-angular-toolkit";
 import { Project } from "./project";
 import { Tip, TipType } from "./tip";
 import { asAppId } from "./utilities";
 
+/**
+ * Check rules for Capacitor projects
+ * @param  {Project} project
+ */
+export function checkCapacitorRules(project: Project) {
+	project.tip(checkMinVersion('@capacitor/core', '2.2.0'));
+		project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/cli'));
+		project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/ios'));
+		project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/android'));
 
-export function capacitorMigrationChecks(packages, project: Project) {
-	const tips: Tip[] = [];
-	project.setGroup(
-		'Capacitor Migration',
-		'Your Cordova application ' + project.name + ' can be migrated to Capacitor (see [guide](https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor)). The following recommendations will help with the migration:',
-		TipType.Capacitor, true
-	);
+		// cordova-plugin-appsflyer-sdk doesnt build with Capacitor. Use appsflyer-capacitor-plugin instead 
+		// see https://github.com/AppsFlyerSDK/appsflyer-cordova-plugin#------%EF%B8%8F-note-for-capacitor-users--%EF%B8%8F------
+		project.recommendReplace('cordova-plugin-appsflyer-sdk', 'cordova-plugin-appsflyer-sdk',
+			`Replace with appsflyer-capacitor-plugin.`,
+			`The plugin cordova-plugin-appsflyer-sdk should be replaced with appsflyer-capacitor-plugin.`,
+			'appsflyer-capacitor-plugin'
+		);
 
-	tips.push(...capacitorRecommendations(project));
+		if (exists('cordova-plugin-file-transfer') && !exists('cordova-plugin-whitelist')) {
+			// Latest 1.7.1 of the file-transfer plugin requires whitelist in Capacitor projects. See: https://github.com/ionic-team/capacitor/issues/1199
+			project.recommendAdd('cordova-plugin-whitelist', 'cordova-plugin-file-transfer',
+				'Install cordova-plugin-whitelist for compatibility',
+				'The plugin cordova-plugin-file-transfer has a dependency on cordova-plugin-whitelist when used with a Capacitor project');
+		}
 
-	// Plugins with Hooks
-	tips.push(...reviewPluginsWithHooks(packages));
+		if (exists('@ionic/cordova-builders')) {
+			// This is likely a leftover from a Cordova migration
+			project.recommendRemove('@ionic/cordova-builders', '@ionic/cordova-builders', 'This package is only required for Cordova projects.');
+		}
 
-	// Requires evaluation to determine compatibility
-	tips.push(reviewPlugin('cordova-wheel-selector-plugin'));
-	tips.push(reviewPlugin('cordova-plugin-secure-storage'));
-	tips.push(reviewPlugin('newrelic-cordova-plugin'));
+		if (isGreaterOrEqual('@ionic/angular-toolkit', '6.0.0')) {
+			checkMigrationAngularToolkit(project);
+		}
 
-	if (exists('cordova-ios') || (exists('cordova-android') || (project.fileExists('config.xml')))) {
-		const movecmd = process.platform === "win32" ? 'rename config.xml config.xml.bak' : 'mv config.xml config.xml.bak';
-		tips.push(new Tip('Remove Cordova Integration', '', TipType.Capacitor, 'Remove the Cordova integration',
-			['npm uninstall cordova-ios', 'npm uninstall cordova-android', movecmd, 'rem-cordova'],
-			'Remove Cordova', 'Removing Cordova', 'Successfully removed Cordova'));
-	}
-	project.tips(tips);
+		if (isLess('@capacitor/android', '3.2.3')) {
+			// Check minifyEnabled is false for release
+		}
+
+		if (exists('@ionic-enterprise/auth')) {
+			// TODO: Complete work
+			// checkAndroidManifest();
+		}
+		if (exists('cordova-plugin-x-socialsharing')) {
+			// TODO: Verify that Android Manifest contains
+			// <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+		}
+
+		if (!isGreaterOrEqual('@ionic-enterprise/identity-vault', '5.1.0')) {
+			project.tip(checkMinVersion('@ionic-enterprise/identity-vault', '5.1.0', 'as the current version is missing important security fixes.', 'https://ionic.io/docs/identity-vault'));
+		}
 }
 
+/**
+ * These rules are shared by the Capacitor Migration which is why they return an array
+ * @param  {Project} project
+ * @returns Tip
+ */
 export function capacitorRecommendations(project: Project): Tip[] {
 	const tips: Tip[] = [];
 
