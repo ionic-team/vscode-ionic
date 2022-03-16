@@ -91,7 +91,7 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 				for (const logline of loglines) {
 					if (logline.startsWith('[capacitor]')) {
 						channel.appendLine(logline.replace('[capacitor]', ''));
-					} else {
+					} else if (logline) {
 						channel.appendLine(logline);
 					}
 				}

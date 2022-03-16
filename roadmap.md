@@ -29,7 +29,6 @@
 ## Bugs
 - (bug) Bug capturing of inspection with telemetry reporting on exception
 - (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
-- (bug) verify a dev dependency upgrade stays dev by using --save-dev
 - (bug) Bundle id validate doesnt accept "stuff"
 - (bug) Creating a new Ionic project should allow changing version number/bundleid (see bug WN-276 in Capacitor project)
 - (bug) If a project has not been built and you try running on ios/android it could build for you beforehand
@@ -55,7 +54,6 @@
 - (feat) Twitter to RSS feed - pull news into plugin ??
 
 # Known Issues
-- Colorization of the output window is not supported in VS Code Extensions
 - Badge option is not available for VS Code Extensions
 - Show icon change when running is not supported by treeview without full refresh
 - links to external content cannot open in VS Code editor window (must be browser)
