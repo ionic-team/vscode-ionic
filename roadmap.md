@@ -2,13 +2,11 @@
 
 ## Features
 - (feat) @ionic/native should move to @awesome-cordova-plugins
-- (feat) For errors in a build, need a better way to go to code, fix error and rebuild
-- (feat) On a build that fails indicate red
+- (feat) Minify option in build.gradle - true or false with release build check
 - (feat) If you sync but the build didnt work then show suitable error
 - (feat) From packages have the option to update to any particular version found with `npm view package versions`
 - (feat) For web based projects have "Run on Web" under an Ionic Project
 - (feat) On Web projects that are Angular based hook up dist or configured folder
-- (feat) Support @angular project upgrades (ie multiple package update)
 - (feat) Recommend: Capacitor 2 to 3 migration
 - (feat) Recommend applying exact version numbers in package.json rather than ~ or ^
 - (feat) Allow add of plugins: list all official capacitor, ionic enterprise, supported plugins
@@ -18,7 +16,6 @@
 - (feat) Show preview as soon as "Run on Web" is clicked and show progress until app is ready
 - (feat) Option to export package/plugin list: version, latest, and dev dep or regular dep
 - (feat) Highlight dev dependencies in some way
-- (feat) Option to ignore particular update
 - (feat) Evaluate age of packages: when current version was released, when latest was released. If latest > 365 then warn. If latest - current > 365 then warn
 - (feat) Amp eslink rules to 11: using https://gist.github.com/dtarnawsky/7c42cec330443c7093976136286b5473
 - (feat) Open selection of an update check versions and provide option to update to the latest minor version. Eg 12.1 -> 12.x or 12.1.0 -> 12.1.x
@@ -39,6 +36,8 @@
 - (docs) Record video of changing display name, bundle id, version number, build number
 - (docs) Record video of previewing in editor
 - (docs) Show splashscreen and icon assets
+- (docs) Record video of Angular upgrade
+- (docs) Record video of upgrade of all packages
 
 # Milestones
 - (feat) Bundle Analyser button, use stats.json for own report

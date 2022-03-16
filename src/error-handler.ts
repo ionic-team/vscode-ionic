@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { lastOperation } from './extension';
+import { CommandName } from './command-name';
 
 interface ErrorLine {
 	uri: string;
@@ -11,7 +12,9 @@ interface ErrorLine {
 }
 
 let currentErrorFilename: string;
-let onSave;
+
+// On Save Document event (singleton)
+let onSave: vscode.Disposable;
 
 export async function handleError(error: string, logs: Array<string>, folder: string): Promise<string> {
 	if (error && error.includes('ionic: command not found')) {
@@ -41,7 +44,7 @@ export async function handleError(error: string, logs: Array<string>, folder: st
 			if (document.fileName == currentErrorFilename) {
 				onSave.dispose();
 				const title = lastOperation.title;
-				vscode.commands.executeCommand('ionic.runapp', lastOperation);
+				vscode.commands.executeCommand(CommandName.Run, lastOperation);
 				vscode.window.withProgress(
 					{
 						location: vscode.ProgressLocation.Notification,
@@ -55,7 +58,7 @@ export async function handleError(error: string, logs: Array<string>, folder: st
 	}
 }
 
-function timeout(ms) {
+function timeout(ms: number) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 

@@ -15,6 +15,7 @@ import { capacitorMigrationChecks, capacitorRecommendations } from './capacitor-
 import { reviewPackages, reviewPluginProperties } from './process-packages';
 import { CapacitorPlatform, capRun } from './capacitor-run';
 import { asAppId } from './utilities';
+import { checkMigrationAngularToolkit } from './migrate-angular-toolkit';
 
 export async function getRecommendations(project: Project, context: vscode.ExtensionContext, packages: any): Promise<void> {
 	if (isCapacitor() && !isCordova()) {
@@ -40,7 +41,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 			{ text: '✔ update android', title: 'Building Native...' },
 			{ text: 'Running Gradle build', title: 'Deploying...' },
 			{ text: 'Running xcodebuild', title: 'Deploying...' },
-			{ text: 'App deployed', title: 'Waiting for Code Changes'}
+			{ text: 'App deployed', title: 'Waiting for Code Changes' }
 		];
 
 		if (hasCapAndroid) {
@@ -172,6 +173,15 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 			project.checkNotExists('cordova-plugin-whitelist', 'is deprecated and no longer required with cordova-android v10+');
 		}
 
+		if (isGreaterOrEqual('@ionic/angular-toolkit', '6.0.0')) {
+			// In v6 Cordova projects require @ionic/cordova-builders
+			if (!exists('@ionic/cordova-builders')) {
+				project.recommendAdd('@ionic/cordova-builders', '@ionic/cordova-builders',
+					'Install @ionic/cordova-builders for compatibility',
+					'The package @ionic/cordova-builders is required when @ionic/angular-toolkit is version 6 and higher.');
+			}
+		}
+
 		project.recommendReplace('phonegap-plugin-push', 'phonegap-plugin-push',
 			`Replace with cordova-plugin-push due to deprecation`,
 			`The plugin phonegap-plugin-push should be replaced with cordova-plugin-push as phonegap-plugin-push was deprecated in 2017`,
@@ -213,6 +223,15 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 			project.recommendAdd('cordova-plugin-whitelist', 'cordova-plugin-file-transfer',
 				'Install cordova-plugin-whitelist for compatibility',
 				'The plugin cordova-plugin-file-transfer has a dependency on cordova-plugin-whitelist when used with a Capacitor project');
+		}
+
+		if (exists('@ionic/cordova-builders')) {
+			// This is likely a leftover from a Cordova migration
+			project.recommendRemove('@ionic/cordova-builders', '@ionic/cordova-builders', 'This package is only required for Cordova projects.');
+		}
+
+		if (isGreaterOrEqual('@ionic/angular-toolkit', '6.0.0')) {
+			checkMigrationAngularToolkit(project);
 		}
 
 		if (exists('@ionic-enterprise/auth')) {

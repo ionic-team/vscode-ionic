@@ -14,10 +14,12 @@ export class Tip {
 
 	private onAction: (...args) => unknown;
 	private onCommand: (...args) => string;
+	private onTitle: (...args) => string;
 	private actionArgs: any[];
+	private titleArgs: any[];
 
 	constructor(
-		public readonly title: string,
+		public title: string,
 		public readonly message: string,
 		public readonly type?: TipType,
 		public readonly description?: string,
@@ -75,6 +77,12 @@ export class Tip {
 		return this;
 	}
 
+	setDynamicTitle(func: (...argsIn) => string, ...args) {
+		this.onTitle = func;
+		this.titleArgs = args;
+		return this;
+	}
+
 	setSecondCommand(title: string, command: string) : Tip {
 		this.secondCommand = command;
 		this.secondTitle = title;
@@ -94,7 +102,13 @@ export class Tip {
 
 	async generateCommand() {
 		if (this.onCommand) {
-			this.command = this.onCommand(...this.actionArgs);
+			this.command = this.onCommand(...this.actionArgs);			
+		}
+	}
+
+	async generateTitle() {
+		if (this.onTitle) {
+			this.title = this.onTitle(...this.titleArgs);			
 		}
 	}
 }
