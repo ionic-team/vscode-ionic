@@ -52,7 +52,11 @@ This extension for Visual Studio Code features:
 
 
 ## Native Project Settings
-By opening the `Configuration` item you can set a projects Display Name, Version Number and Build Number. A change in settings will be applied to both the iOS and Android project.
+By opening the `Configuration` item you can set native projects settings:
+- Change Display Name, Version Number and Build Number. 
+- A change in settings will be applied to both the iOS and Android project.
+- Handles when the iOS and Android settings are deliberately different from each other.
+- [Video of Changing Native Project Settings](https://vs-ionic.netlify.app/videos/change-native-config.gif)
 
 ## Angular Migrations
 - Open the `Packages` section and find `@angular`

@@ -33,10 +33,8 @@
 - (bug) Detect if Android Studio not installed
 
 ## Docs
-- (docs) Record video of changing display name, bundle id, version number, build number
 - (docs) Record video of previewing in editor
 - (docs) Show splashscreen and icon assets
-- (docs) Record video of Angular upgrade
 - (docs) Record video of upgrade of all packages
 
 # Milestones
