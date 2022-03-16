@@ -167,6 +167,7 @@ export function getOutputChannel(): vscode.OutputChannel {
  */
 export async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, tip?: Tip, successMessage?: string) {
 	const channel = getOutputChannel();
+	const hasRunPoints = (tip && tip.runPoints && tip.runPoints.length > 0);
 
 	if (command == Command.NoOp) return;
 
@@ -198,8 +199,9 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 					finishCommand(tip);
 					cancelObject.proc.kill();
 				} else {
-					if (increment) {
+					if (increment && !hasRunPoints) {
 						percentage += increment;
+						if (percentage > 100) percentage = 100;
 						progress.report({ message: `${parseInt(percentage)}%`, increment: increment });
 					}
 				}

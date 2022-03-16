@@ -28,8 +28,6 @@
 
 ## Bugs
 - (bug) Bug capturing of inspection with telemetry reporting on exception
-- (bug) Dont show progress if runPoints are used
-- (bug) Dont show progress percent above 100%
 - (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
 - (bug) verify a dev dependency upgrade stays dev by using --save-dev
 - (bug) Bundle id validate doesnt accept "stuff"
