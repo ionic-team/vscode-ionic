@@ -42,6 +42,11 @@ This extension for Visual Studio Code features:
 - Choose to `Upgrade` or `Install`
 - The `Info` option will launch the packages home page on npm
 - Select the `Light Bulb` icon next to a scoped package (eg @capacitor) to allow upgrading of all packages
+
+### Upgrade to a particular version
+- Find the package to upgrade from the `Packages` section
+- Click the `...` icon on the right
+- Choose the version from the selection of released versions
 ![Video of upgrading packages](https://vs-ionic.netlify.app/videos/upgrade-packages.gif)
 
 ## Capacitor Migration
@@ -62,8 +67,9 @@ By opening the `Configuration` item you can set native projects settings:
 ## Angular Migrations
 - Open the `Packages` section and find `@angular`
 - Click the `Light Bulb` icon
-- Choose `Upgrade`
-- `ng update` will be used to update your Angular dependencies and perform automated code migrations.
+- Choose an `Upgrade` option of either the next or latest version
+- `ng update` will be used to update your Angular dependencies and perform automated code migrations
+- Follow up with manual steps documented at [update.angular.io](https://update.angular.io/)
 - [Video of Angular Migration](https://vs-ionic.netlify.app/videos/angular-migration-12to13.gif)
 
 ## Ionic Angular Toolkit Migration

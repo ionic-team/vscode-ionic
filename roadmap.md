@@ -1,7 +1,6 @@
 # ToDo
 
 ## Features
-- (4) From packages have the option to update to any particular version found with `npm view package versions`
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand
 - (2) @ionic/native should move to @awesome-cordova-plugins

@@ -14,6 +14,7 @@ import { CancelObject, run, getRunOutput, estimateRunTime } from './utilities';
 import { ignore } from './ignore';
 import { handleError } from './error-handler';
 import { CommandName } from './command-name';
+import { packageUpgrade } from './rules-package-upgrade';
 
 
 let channel: vscode.OutputChannel = undefined;
@@ -287,6 +288,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.commands.registerCommand(CommandName.SignUp, async () => {
 		await ionicSignup(context.extensionPath, context);
+		ionicProvider.refresh();
+	});
+
+	vscode.commands.registerCommand(CommandName.Upgrade, async (recommendation: Recommendation) => {
+		await packageUpgrade(recommendation.tip.data, rootPath);
 		ionicProvider.refresh();
 	});
 

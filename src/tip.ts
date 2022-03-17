@@ -12,6 +12,7 @@ export class Tip {
 	public runPoints: Array<RunPoint>;
 	public contextValue?: string;
 	public ignorable: boolean;
+	public data?: any;
 
 	private onAction: (...args) => unknown;
 	private onCommand: (...args) => string;
@@ -74,6 +75,11 @@ export class Tip {
 
 	setContextValue(contextValue: string) {
 		this.contextValue = contextValue;
+		return this;
+	}
+
+	setData(data: any) {
+		this.data = data;
 		return this;
 	}
 

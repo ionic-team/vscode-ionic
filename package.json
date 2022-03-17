@@ -161,6 +161,14 @@
 			{
 				"command": "ionic.rebuild",
 				"title": "Rebuild"
+			},
+			{
+				"command": "ionic.upgrade",
+				"title": "Upgrade",
+				"icon": {
+					"light": "resources/light/more.svg",
+					"dark": "resources/dark/more.svg"
+				}
 			}
 		],
 		"menus": {
@@ -187,6 +195,10 @@
 				},
 				{
 					"command": "ionic.lightbulb",
+					"when": "false"
+				},
+				{
+					"command": "ionic.upgrade",
 					"when": "false"
 				}
 			],
@@ -216,6 +228,11 @@
 				{
 					"command": "ionic.rebuild",
 					"when": "view == ionic && viewItem == rebuild",
+					"group": "inline"
+				},
+				{
+					"command": "ionic.upgrade",
+					"when": "view == ionic && viewItem == upgrade",
 					"group": "inline"
 				}
 			]

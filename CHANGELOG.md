@@ -4,6 +4,7 @@
 - Colorize the output window for warnings, errors, urls
 - Angular migration assistant (packages -> @angular -> click lightbulb)
 - Option to upgrade all packages in a scope (eg @capacitor)
+- Option to upgrade a package to a user chosen version (select ... on a package)
 - Migration for Cordova projects using @ionic/angular-toolkit >= v6 (adds @ionic/cordova-builders)
 - Migration for Capacitor projects using @ionic/angular-toolkit >= v6 (cleans angular.json)
 - Detect projects where minifyEnabled is set to true and @capacitor/android is less than 3.2.3

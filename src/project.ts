@@ -262,7 +262,10 @@ export class Project {
 				`${name} upgraded to ${toVersion}`,
 				`https://www.npmjs.com/package/${name}`,
 				`Upgrading ${name}`
-			).setSecondCommand(`Uninstall`, `npm uninstall ${name}`));
+			).setSecondCommand(`Uninstall`, `npm uninstall ${name}`)
+			.setContextValue('upgrade')
+			.setData({name: name, version: fromVersion})
+			);
 		}
 	}
 
