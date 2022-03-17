@@ -88,9 +88,16 @@ async function selectDevice(command: string, rootPath: string, tip: Tip) {
 
 async function requestAppName(tip: Tip) {
 	let name = await vscode.window.showInputBox({
-		title: 'Name of the application',
+		title: 'Internal name of the application',
 		placeHolder: 'my-app',
-		value: 'my-app'
+		value: 'my-app',
+		validateInput: (value: string) => {
+			const regexp = /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/;
+			if (!regexp.test(value)) {
+				return "The name cannot contain spaces, some characters and should be lowercase";
+			}
+			return null;
+		}
 	});
 	if (name && name.length > 1) {
 		const result = [];

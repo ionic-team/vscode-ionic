@@ -9,6 +9,7 @@
 - Fix for displayed version number when ^ or ~ is used
 - Fix for Capacitor commands when @capacitor/cli is not installed
 - Fix for malformed node_module package.json files
+- Fix to validate application names for new projects
 
 ### Version 1.1.5
 - Fix for starter projects with React and Vue
