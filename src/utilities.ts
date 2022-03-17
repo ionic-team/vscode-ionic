@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 import { RunPoint } from './tip';
 import { viewInEditor } from './editor-preview';
 import { handleError } from './error-handler';
+import { IonicTreeProvider } from './ionic-tree-provider';
 
 export interface CancelObject {
 	proc: child_process.ChildProcess;
@@ -38,7 +39,7 @@ function runOptions(command: string, folder: string) {
 	return { cwd: folder, encoding: 'utf8', env: env };
 }
 
-export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject, viewEditor: boolean, runPoints: Array<RunPoint>, progress: any): Promise<void> {
+export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject, viewEditor: boolean, runPoints: Array<RunPoint>, progress: any, ionicProvider?: IonicTreeProvider): Promise<void> {
 	if (command == 'rem-cordova') {
 		return removeCordovaFromPackageJSON(folder);
 	}
@@ -84,6 +85,9 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 					for (const runPoint of runPoints) {
 						if (data.includes(runPoint.text)) {
 							progress.report({ message: runPoint.title });
+							if (runPoint.refresh && ionicProvider) {
+								ionicProvider.refresh();
+							}
 						}
 					}
 				}

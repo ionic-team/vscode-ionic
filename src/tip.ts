@@ -5,6 +5,7 @@ export class Tip {
 	public doDeviceSelection: boolean;
 	public doViewEditor: boolean;
 	public cancelRequested: boolean;
+	public animates: boolean;
 	public secondCommand: string;
 	public secondTitle: string;
 	public tooltip: string;
@@ -52,6 +53,11 @@ export class Tip {
 
 	requestViewEditor() {
 		this.doViewEditor = true;
+		return this;
+	}
+
+	canAnimate() {
+		this.animates = true;
 		return this;
 	}
 
@@ -144,4 +150,5 @@ export enum TipType {
 export interface RunPoint {
 	text: string; // Search text in the log entry
 	title: string; // Title used for progress
+	refresh?: boolean; // Refresh the tree view
 }

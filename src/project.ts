@@ -6,7 +6,7 @@ import { Recommendation } from './recommendation';
 import { Tip, TipType } from './tip';
 import { load, isCapacitor, exists } from './analyzer';
 import { getPackageJSON, PackageFile } from './utilities';
-import { fixIssue } from './extension';
+import { fixIssue, isRunning } from './extension';
 import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
 import { Context } from './context-variables';
@@ -131,6 +131,11 @@ export class Project {
 		const tooltip = tip.tooltip ? tip.tooltip : tip.message;
 		const r = new Recommendation(tooltip, tip.message, tip.title, vscode.TreeItemCollapsibleState.None, cmd, tip, tip.url);
 		this.setIcon(tip.type, r);
+		if (tip.animates) {
+			if (isRunning(tip)) {
+				r.animate();
+			}
+		}
 
 		// Context values are used for the when condition for vscode commands (see ionic.open in package.json)
 		if (tip.contextValue) {
@@ -195,7 +200,7 @@ export class Project {
 				command += ' ';
 			}
 			// Command will be npm install @capacitor/android@3.4.3 --save-exact
-			command += (child.tip.command as string).replace('npm install ','').replace(' --save-exact','');
+			command += (child.tip.command as string).replace('npm install ', '').replace(' --save-exact', '');
 		}
 		return `npm install ${command} --save-exact`;
 	}

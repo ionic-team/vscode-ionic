@@ -117,7 +117,7 @@ async function showProgress(message: string, func: () => Promise<any>) {
 	);
 }
 
-function isRunning(tip: Tip) {
+export function isRunning(tip: Tip) {
 	const found = runningOperations.find((found) => { return found.title == tip.title; });
 	return (found != undefined);
 }
@@ -192,6 +192,9 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 					clearInterval(interval);
 					finishCommand(tip);
 					cancelObject.proc.kill();
+					if (ionicProvider) {
+						ionicProvider.refresh();
+					}
 				} else {
 					if (increment && !hasRunPoints) {
 						percentage += increment;
@@ -205,7 +208,7 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 				try {
 					for (const cmd of command) {
 						startCommand(tip, cmd);
-						await run(rootPath, cmd, channel, cancelObject, tip.doViewEditor, tip.runPoints, progress);
+						await run(rootPath, cmd, channel, cancelObject, tip.doViewEditor, tip.runPoints, progress, ionicProvider);
 
 					}
 				} finally {
@@ -219,7 +222,7 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 					percentage = 0;
 				}
 				try {
-					await run(rootPath, command, channel, cancelObject, tip.doViewEditor, tip.runPoints, progress);
+					await run(rootPath, command, channel, cancelObject, tip.doViewEditor, tip.runPoints, progress, ionicProvider);
 				} finally {
 					finishCommand(tip);
 				}
