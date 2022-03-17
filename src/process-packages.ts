@@ -8,40 +8,58 @@ import { libString } from './messages';
 import { Command, Tip, TipType } from './tip';
 import { Project } from './project';
 import { getRunOutput, getStringFrom } from './utilities';
+import { PackageCache } from './context-variables';
+import { NpmDependency, NpmOutdatedDependency, NpmPackage, PackageType, PackageVersion } from './npm-model';
 
 export function clearRefreshCache(context: vscode.ExtensionContext) {
 	if (context) {
-		context.workspaceState.update('npmOutdatedData', undefined);
+		context.workspaceState.update(PackageCache.outdated, undefined);
+		context.workspaceState.update(PackageCache.list, undefined);
 	}
 
-	console.log('Cached list of outdated packages cleared');
+	console.log('Cached data cleared');
 }
 
-export async function processPackages(folder: string, allDependencies, devDependencies, context: vscode.ExtensionContext, packagesModified: Date): Promise<any> {
+export async function processPackages(folder: string, allDependencies: object, devDependencies: object, context: vscode.ExtensionContext, packagesModified: Date): Promise<any> {
 	if (!fs.lstatSync(folder).isDirectory()) {
 		return {};
 	}
 
 	// npm outdated only shows dependencies and not dev dependencies if the node module isnt installed
 	let outdated = '[]';
+	let versions = '{}';
 	try {
-		const packageModifiedLast = context.workspaceState.get('packagesModified');
-		outdated = context.workspaceState.get('npmOutdatedData');
+		const packageModifiedLast = context.workspaceState.get(PackageCache.modified);
+		outdated = context.workspaceState.get(PackageCache.outdated);
+		versions = context.workspaceState.get(PackageCache.list);
 		const changed = packagesModified.toUTCString() != packageModifiedLast;
-		if (changed || !outdated) {
-			outdated = await getRunOutput('npm outdated --json', folder);
-			context.workspaceState.update('npmOutdatedData', outdated);
-			context.workspaceState.update('packagesModified', packagesModified.toUTCString());
+		if (changed || !outdated || !versions) {
+			await Promise.all([
+				getRunOutput('npm outdated --json', folder).then((data) => {
+					outdated = data;
+					context.workspaceState.update(PackageCache.outdated, outdated);
+				}),
+				getRunOutput('npm list --json', folder).then((data) => {
+					versions = data;
+					context.workspaceState.update(PackageCache.list, versions);
+				})
+			]);
+			context.workspaceState.update(PackageCache.modified, packagesModified.toUTCString());
 		} else {
 			// Use the cached value
 			// But also get a copy of the latest packages for updating later
 			getRunOutput('npm outdated --json', folder).then((outdatedFresh) => {
-				context.workspaceState.update('npmOutdatedData', outdatedFresh);
-				context.workspaceState.update('packagesModified', packagesModified.toUTCString());
+				context.workspaceState.update(PackageCache.outdated, outdatedFresh);
+				context.workspaceState.update(PackageCache.modified, packagesModified.toUTCString());
+			});
+
+			getRunOutput('npm list --json', folder).then((versionsFresh) => {
+				context.workspaceState.update(PackageCache.list, versionsFresh);
 			});
 		}
 	} catch (err) {
 		outdated = '[]';
+		versions = '{}';
 		if (err && err.includes('401')) {
 			vscode.window.showInformationMessage(`Unable to run 'npm outdated' due to authentication error. Check .npmrc`, 'OK');
 		}
@@ -51,7 +69,7 @@ export async function processPackages(folder: string, allDependencies, devDepend
 	// outdated is an array with:
 	//  "@ionic-native/location-accuracy": { "wanted": "5.36.0", "latest": "5.36.0", "dependent": "cordova-old" }  
 
-	const packages = processDependencies(allDependencies, getOutdatedData(outdated), devDependencies);
+	const packages = processDependencies(allDependencies, getOutdatedData(outdated), devDependencies, getListData(versions));
 	inspectPackages(folder, packages);
 	return packages;
 }
@@ -66,37 +84,40 @@ function getOutdatedData(outdated: string): any {
 	}
 }
 
-export function reviewPackages(packages, project) {
-	if (Object.keys(packages).length == 0) return;
+function getListData(list: string): NpmPackage {
+	try {
+		return JSON.parse(list);
+	}
+	catch
+	{
+		return { name: undefined, dependencies: undefined, version: undefined };
+	}
+}
 
-	// Uncomment to show packages that have a major bump
-	// listChanges(
-	// 	project,
-	// 	"Major Updates Available",
-	// 	'These project dependencies have major releases that you should consider updating to.',
-	// 	packages, "major");
+export function reviewPackages(packages: object, project: Project) {
+	if (Object.keys(packages).length == 0) return;
 
 	listPackages(
 		project,
 		"Packages",
-		'Your ' + project.type + ' project relies on these packages. Consider packages which have not had updates in more than a year to be a candidate for replacement in favor of a project that is actively maintained.',
-		packages, 'Dependency');
+		`Your ${project.type} project relies on these packages. Consider packages which have not had updates in more than a year to be a candidate for replacement in favor of a project that is actively maintained.`,
+		packages, PackageType.Dependency);
 
 	listPackages(
 		project,
 		`Cordova Plugins`,
 		`Your project relies on these Cordova plugins. Consider plugins which have not had updates in more than a year to be a candidate for replacement in favor of a plugin that is actively maintained.`,
-		packages, 'Plugin', TipType.Cordova);
+		packages, PackageType.CordovaPlugin, TipType.Cordova);
 
 	listPackages(
 		project,
 		`Capacitor Plugins`,
 		`Your project relies on these Capacitor plugins. Consider plugins which have not had updates in more than a year to be a candidate for replacement in favor of a plugin that is actively maintained.`,
-		packages, 'Capacitor Plugin', TipType.Capacitor);
+		packages, PackageType.CapacitorPlugin, TipType.Capacitor);
 }
 
 // List any plugins that use Cordova Hooks as potential issue
-export function reviewPluginsWithHooks(packages): Tip[] {
+export function reviewPluginsWithHooks(packages: object): Tip[] {
 	const tips = [];
 	// List of packages that don't need to be reported to the user because they would be dropped in a Capacitor migration
 	const dontReport = [
@@ -191,7 +212,6 @@ function markIfPlugin(folder: string): boolean {
 			console.warn(`Unable to parse ${pkg}`);
 			return false;
 		}
-		
 	}
 	return false;
 }
@@ -203,8 +223,8 @@ function inspectPackages(folder: string, packages) {
 		if (fs.existsSync(plugin)) {
 			// Cordova based
 			const content = fs.readFileSync(plugin, 'utf8');
-			packages[library].depType = 'Plugin';
-			packages[library].plugin = processPlugin(library, content);
+			packages[library].depType = PackageType.CordovaPlugin;
+			packages[library].plugin = processPlugin(content);
 		}
 
 		const nmFolder = folder + '/node_modules/' + library;
@@ -226,9 +246,9 @@ function inspectPackages(folder: string, packages) {
 
 		// Look for capacitor only as well
 		if (isPlugin) {
-			packages[library].depType = 'Capacitor Plugin';
+			packages[library].depType = PackageType.CapacitorPlugin;
 			if (!packages[library].plugin) {
-				packages[library].plugin = processPlugin(library, '');
+				packages[library].plugin = processPlugin('');
 			}
 		}
 	}
@@ -240,8 +260,8 @@ function inspectPackages(folder: string, packages) {
 		// Runs a command like this to find last update and other info: 
 		// npm show cordova-plugin-app-version --json
 		try {
-			if (packages[library].version == '[custom]') {
-				packages[library].updated = 'Unknown';
+			if (packages[library].version == PackageVersion.Custom) {
+				packages[library].updated = PackageVersion.Unknown;
 				packages[library].description = '';
 				packages[library].isOld = true;
 			} else {
@@ -259,14 +279,14 @@ function inspectPackages(folder: string, packages) {
 			}
 		} catch (err) {
 			console.log(`Unable to find latest version of ${library} on npm`, err);
-			packages[library].updated = 'Unknown';
+			packages[library].updated = PackageVersion.Unknown;
 			packages[library].description = '';
 			packages[library].isOld = true;
 		}
 	}
 }
 
-function processPlugin(library: string, content) {
+function processPlugin(content: string) {
 	const result = { androidPermissions: [], androidFeatures: [], hasHooks: false };
 	// Inspect plugin.xml in content and return plugin information { androidPermissions: ['android.permission.INTERNET']}
 	for (const permission of findAll(content, '<uses-permission android:name="', '"')) {
@@ -291,7 +311,7 @@ function findAll(content, search: string, endsearch: string): Array<any> {
 	return result;
 }
 
-function listPackages(project: Project, title: string, description: string, packages, depType: string, tipType?: TipType) {
+function listPackages(project: Project, title: string, description: string, packages: object, depType: string, tipType?: TipType) {
 	const count = Object.keys(packages).filter((library) => { return (packages[library].depType == depType); }).length;
 	if (count == 0) return;
 
@@ -303,22 +323,13 @@ function listPackages(project: Project, title: string, description: string, pack
 	for (const library of Object.keys(packages).sort()) {
 		if (packages[library].depType == depType) {
 			let v = `${packages[library].version}`;
-			if (v == 'null') v = '[custom]';
+			if (v == 'null') v = PackageVersion.Custom;
 
 			let url = packages[library].url;
 			if (url) {
 				url = url.replace('git+', '');
 			}
-			const updated = packages[library].updated;
-			const available = packages[library].latest;
-			let update = '';
-			if (packages[library].change == 'major') {
-				update = `Major update available to ${packages[library].latest}`;
-			} else if (packages[library].change == 'minor') {
-				update = `Minor update available to ${packages[library].latest}`;
-			}
 
-			const description = packages[library].description;
 			const scope = getStringFrom(library, '@', '/');
 			if (scope != lastScope) {
 				if (scope) {
@@ -332,7 +343,7 @@ function listPackages(project: Project, title: string, description: string, pack
 			if (scope) {
 				libraryTitle = library.substring(scope.length + 2);
 			}
-			if (v != packages[library].latest && (packages[library].latest != 'Unknown')) {
+			if (v != packages[library].latest && (packages[library].latest !== PackageVersion.Unknown)) {
 				project.upgrade(library, libraryTitle, `${v} → ${packages[library].latest}`, v, packages[library].latest);
 			} else {
 				project.package(library, libraryTitle, `${v}`);
@@ -342,62 +353,30 @@ function listPackages(project: Project, title: string, description: string, pack
 	project.clearSubgroup();
 }
 
-function listChanges(project: Project, title, description, packages, changeType) {
-	const count = Object.keys(packages).filter((library) => { return (packages[library].change == changeType); }).length;
-	project.setGroup(`${count} ${title}`, description);
-
-	for (const library of Object.keys(packages)) {
-		if (packages[library].change == changeType) {
-			let v = `${packages[library].version}`;
-			if (v == 'null') v = '[custom]';
-
-			project.upgrade(library, library, `${v} → ${packages[library].latest}`, v, packages[library].latest);
-		}
-	}
-}
-
-function processDependencies(allDependencies, outdated, devDependencies) {
+function processDependencies(allDependencies: object, outdated: object, devDependencies: object, list: NpmPackage) {
 	const packages = {};
 	for (const library of Object.keys(allDependencies)) {
-		let v = coerce(allDependencies[library]);
+		const dep: NpmDependency = list.dependencies[library];
+		let version = dep ? dep.version : `${coerce(allDependencies[library])}`;
 		if (allDependencies[library].startsWith('git') ||
 			allDependencies[library].startsWith('file')) {
-			v = '[custom]';
+			version = PackageVersion.Custom;
 		}
 
-		const recent = outdated[library];
+		const recent: NpmOutdatedDependency = outdated[library];
 		const wanted = recent?.wanted;
-		let latest = recent?.latest;
+		const latest = recent?.latest == undefined ? PackageVersion.Unknown : recent.latest;
 		const current = recent?.current;
-		const version = `${v}`;
+
 		const isDev = devDependencies && (library in devDependencies);
-		let change = 'none';
-		try {
-			if (latest) {
-				const latestv = coerce(latest);
-				if (latestv && latestv !== null) {
-					if (major(v) !== major(latestv)) {
-						change = 'major';
-					} else if (version != latest) {
-						change = 'minor';
-					}
-				} else { latest = 'Unknown'; }
-			} else {
-				latest = 'Unknown';
-			}
-		} catch (err) {
-			console.error(`${library} latest version of "${latest}" is invalid`, err);
-			latest = 'Unknown';
-		}
 
 		packages[library] = {
 			version: version,
 			current: current,
 			wanted: wanted,
 			latest: latest,
-			versionString: allDependencies[library],
-			change: change,
-			depType: isDev ? 'Dependency' : 'Dependency'
+			isDevDependency: isDev,
+			depType: PackageType.Dependency
 		};
 	}
 	return packages;

@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 import { PackageInfo } from './package-info';
 import { generateUUID } from './utilities';
 import { Project } from './project';
+import { PackageType } from './npm-model';
 
 interface TelemetryMetric {
 	name: string;
@@ -60,7 +61,7 @@ export function sendTelemetryEvents(folder: string, project: Project, packages: 
 			const info: PackageInfo = packages[library];
 			packageVersions.push(`${library}@${info.version}`);
 			packageList.push(library);
-			if (info.depType.includes('Plugin')) {
+			if (info.depType == PackageType.CordovaPlugin || info.depType == PackageType.CapacitorPlugin) {
 				plugins.push(library);
 			}
 		}

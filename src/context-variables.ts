@@ -11,3 +11,14 @@ export enum Context {
 	// VS Code hasnt opened a folder
 	noProjectFound = 'noProjectFound'
 }
+
+export enum PackageCache {
+	// Cache from npm outdated
+	outdated = 'npmOutdatedData',
+
+	// Cache from npm list
+	list = 'npmListData',
+
+	// The package.json modified file date
+	modified = 'packagesModified'
+}

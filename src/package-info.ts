@@ -3,7 +3,6 @@ export interface PackageInfo {
 	current: string;
 	wanted: string;
 	latest: string;
-	versionString: string;
 	change: string;
 	depType: string;
 }

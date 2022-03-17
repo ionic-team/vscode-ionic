@@ -143,6 +143,7 @@ export function capacitorRecommendations(project: Project): Tip[] {
 	tips.push(incompatibleReplacementPlugin('sentry-cordova', '@sentry/capacitor'));
 	tips.push(replacementPlugin('cordova-plugin-actionsheet', '@capacitor/action-sheet', 'https://capacitorjs.com/docs/apis/action-sheet'));
 	tips.push(replacementPlugin('cordova-plugin-camera', '@capacitor/camera', 'https://capacitorjs.com/docs/apis/camera'));
+	tips.push(replacementPlugin('ionic-plugin-deeplinks', '@capacitor/app', 'https://capacitorjs.com/docs/guides/deep-links'));
 	tips.push(replacementPlugin('@ionic-enterprise/clipboard', '@capacitor/clipboard', 'https://capacitorjs.com/docs/apis/clipboard'));
 	tips.push(replacementPlugin('@ionic-enterprise/deeplinks', '@capacitor/app', 'https://capacitorjs.com/docs/guides/deep-links'));
 	tips.push(replacementPlugin('@ionic-enterprise/statusbar', '@capacitor/status-bar', 'https://capacitorjs.com/docs/apis/status-bar'));
@@ -175,7 +176,7 @@ function checkBuildGradleForMinifyInRelease(project: Project) {
 	if (fs.existsSync(filename)) {
 		const txt = fs.readFileSync(filename, 'utf8');
 		if (txt.includes('minifyEnabled true')) {
-			project.add(checkMinVersion('@capacitor/android', '3.2.3', 'to ensure Android release builds work when minifyEnabled is true','https://developer.android.com/studio/build/shrink-code'));
+			project.add(checkMinVersion('@capacitor/android', '3.2.3', 'to ensure Android release builds work when minifyEnabled is true', 'https://developer.android.com/studio/build/shrink-code'));
 		}
 	}
 }

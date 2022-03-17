@@ -6,6 +6,7 @@
 - Migration for Cordova projects using @ionic/angular-toolkit >= v6 (adds @ionic/cordova-builders)
 - Migration for Capacitor projects using @ionic/angular-toolkit >= v6 (cleans angular.json)
 - Detect projects where minifyEnabled is set to true and @capacitor/android is less than 3.2.3
+- Fix for displayed version number when ^ or ~ is used
 - Fix for Capacitor commands when @capacitor/cli is not installed
 - Fix for malformed node_module package.json files
 
