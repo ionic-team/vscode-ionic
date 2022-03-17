@@ -166,7 +166,7 @@ export function getOutputChannel(): vscode.OutputChannel {
  * @param  {IonicTreeProvider} ionicProvider? the provide which will be refreshed on completion
  * @param  {string} successMessage? Message to display if successful 
  */
-export async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, tip?: Tip, successMessage?: string) {
+export async function fixIssue(command: string | string[], rootPath: string, ionicProvider?: IonicTreeProvider, tip?: Tip, successMessage?: string, title?: string) {
 	const channel = getOutputChannel();
 	const hasRunPoints = (tip && tip.runPoints && tip.runPoints.length > 0);
 
@@ -179,7 +179,8 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 
 	runningOperations.push(tip);
 	lastOperation = tip;
-	const msg = tip.commandProgress ? tip.commandProgress : tip.commandTitle ? tip.commandTitle : command;
+	let msg = tip.commandProgress ? tip.commandProgress : tip.commandTitle ? tip.commandTitle : command;
+	if (title) msg = title;
 	await vscode.window.withProgress(
 		{
 			location: tip.progressDialog ? vscode.ProgressLocation.Notification : vscode.ProgressLocation.Window,
@@ -362,7 +363,7 @@ async function fix(tip: Tip, rootPath: string, ionicProvider: IonicTreeProvider,
 			fixIssue(tip.command, rootPath, ionicProvider, tip, tip.commandSuccess);
 		}
 		if (selection && selection == tip.secondTitle) {
-			fixIssue(tip.secondCommand, rootPath, ionicProvider, tip);
+			fixIssue(tip.secondCommand, rootPath, ionicProvider, tip, undefined, tip.secondTitle);
 		}
 		if (selection && selection == urlBtn) {
 			vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));

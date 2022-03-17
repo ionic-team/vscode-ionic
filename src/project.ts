@@ -11,8 +11,9 @@ import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
 import { Context } from './context-variables';
 import { getRecommendations } from './recommend';
-import { excludeIgnoredTips, getIgnored } from './ignore';
+import { getIgnored } from './ignore';
 import { CommandName } from './command-name';
+import { angularMigrate } from './rules-angular-migrate';
 
 export class Project {
 	name: string;
@@ -149,36 +150,27 @@ export class Project {
 		}
 	}
 
-	public addSubGroup(title: string) {
+	public addSubGroup(title: string, latestVersion: string) {
 		let command: vscode.Command = undefined;
-		let tooltip = `Packages from ${title}`;
+		
 		let tip: Tip = undefined;
 		if (title == 'angular') {
-
 			// Option to upgrade with: 
 			// ng update @angular/cli@13 @angular/core@13 --allow-dirty
-			command = {
-				command: CommandName.Idea,
-				title: 'Upgrade Angular',
-				arguments: []
-			};
-			tooltip = 'Upgrade Angular';
-			tip = new Tip('Upgrade Angular', 'Updates your application and its dependencies to the latest version using "ng update". Make sure you have committed your code before trying an upgrade.',
-				TipType.Run, undefined, 'ng update @angular/cli @angular/core --allow-dirty --force', 'Upgrade', undefined, 'https://angular.io/cli/update');
-		} else {
-			command = {
-				command: CommandName.Idea,
-				title: 'Upgrade All Packages',
-				arguments: []
-			};
-			tooltip = 'Upgrade All Packages';
-			tip = new Tip('Upgrade', undefined, TipType.Run, undefined, undefined, 'Upgrade');
+			tip = angularMigrate(latestVersion);
+		} else {			
+			tip = new Tip('Upgrade All Packages', undefined, TipType.Run, undefined, undefined, 'Upgrade');		
 		}
 
+		command = {
+			command: CommandName.Idea,
+			title: tip.title,
+			arguments: []
+		};
+		
 
-		const r = new Recommendation(tooltip, undefined, '@' + title, vscode.TreeItemCollapsibleState.Expanded, command, tip);
+		const r = new Recommendation(tip.title, undefined, '@' + title, vscode.TreeItemCollapsibleState.Expanded, command, tip);
 		r.children = [];
-
 		if (title == 'angular') {
 			r.setContext('lightbulb');
 		} else {
@@ -368,7 +360,7 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 	sendTelemetryEvents(folder, project, packages, context);
 
 	checkNodeVersion();
-	project.getIgnored(context);
+	project.getIgnored(context);	
 
 	await getRecommendations(project, context, packages);
 

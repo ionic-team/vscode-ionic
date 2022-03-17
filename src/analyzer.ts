@@ -193,6 +193,10 @@ export function checkCordovaIosPreference(preference: string, value: any, prefer
 	}
 }
 
+export function getPackageVersion(library: string): any {
+	return coerce(allDependencies[library]);
+}
+
 export function isGreaterOrEqual(library: string, minVersion: string): boolean {
 	const v = coerce(allDependencies[library]);
 	return (v && gte(v, minVersion));

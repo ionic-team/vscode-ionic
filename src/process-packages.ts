@@ -319,10 +319,11 @@ function listPackages(project: Project, title: string, description: string, pack
 		project.setGroup(`${count} ${title}`, description, tipType, undefined, 'packages');
 	}
 
-	let lastScope;
+	let lastScope: string;
 	for (const library of Object.keys(packages).sort()) {
 		if (packages[library].depType == depType) {
 			let v = `${packages[library].version}`;
+			let latest;
 			if (v == 'null') v = PackageVersion.Custom;
 
 			let url = packages[library].url;
@@ -333,7 +334,12 @@ function listPackages(project: Project, title: string, description: string, pack
 			const scope = getStringFrom(library, '@', '/');
 			if (scope != lastScope) {
 				if (scope) {
-					project.addSubGroup(scope);
+					latest = undefined;
+					if (scope == 'angular') {
+						//
+						latest = packages['@angular/core']?.latest;
+					}
+					project.addSubGroup(scope, latest);
 					lastScope = scope;
 				} else {
 					project.clearSubgroup();
