@@ -171,7 +171,11 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 	const channel = getOutputChannel();
 	const hasRunPoints = (tip && tip.runPoints && tip.runPoints.length > 0);
 
-	if (command == Command.NoOp) return;
+	if (command == Command.NoOp) {
+		await tip.executeAction();
+		ionicProvider?.refresh();
+		return;
+	}
 
 	// If the task is already running then cancel it
 	if (isRunning(tip)) {

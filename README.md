@@ -70,7 +70,7 @@ By opening the `Configuration` item you can set native projects settings:
 - Choose an `Upgrade` option of either the next or latest version
 - `ng update` will be used to update your Angular dependencies and perform automated code migrations
 - Follow up with manual steps documented at [update.angular.io](https://update.angular.io/)
-- [Video of Angular Migration](https://vs-ionic.netlify.app/videos/angular-migration-12to13.gif)
+- [Video of Angular Migration](https://vs-ionic.netlify.app/videos/angular-migration.mp4)
 
 ## Ionic Angular Toolkit Migration
 Performs migrations related to upgrading to v6+ of `@ionic/angular-toolkit`:

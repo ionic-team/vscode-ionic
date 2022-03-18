@@ -20,10 +20,10 @@ export function checkCordovaRules(project: Project) {
 		project.tip(checkMinVersion('cordova-plugin-ionic-webview', '5.0.0', 'to support Android 10+'));
 		project.tip(checkMinVersion('scandit-cordova-datacapture-barcode', '6.9.1', 'to support Android 10+'));
 		project.tip(checkMinVersion('cordova-plugin-ionic', '5.5.0', 'to support Android 10+'));
-		project.tip(checkCordovaAndroidPreference('AndroidXEnabled', true));
+		project.tip(checkCordovaAndroidPreference(project, 'AndroidXEnabled', true));
 
 		if (exists('cordova-plugin-push') || exists('@havesource/cordova-plugin-push')) {
-			project.tip(checkCordovaAndroidPreference('GradlePluginGoogleServicesEnabled', true));
+			project.tip(checkCordovaAndroidPreference(project, 'GradlePluginGoogleServicesEnabled', true));
 			project.tip(checkCordovaAndroidPreferenceMinimum('GradlePluginGoogleServicesVersion', '4.3.8'));
 		}
 	} else {

@@ -362,7 +362,7 @@ function listPackages(project: Project, title: string, description: string, pack
 function processDependencies(allDependencies: object, outdated: object, devDependencies: object, list: NpmPackage) {
 	const packages = {};
 	for (const library of Object.keys(allDependencies)) {
-		const dep: NpmDependency = list.dependencies[library];
+		const dep: NpmDependency = list.dependencies ? list.dependencies[library] : undefined;
 		let version = dep ? dep.version : `${coerce(allDependencies[library])}`;
 		if (allDependencies[library].startsWith('git') ||
 			allDependencies[library].startsWith('file')) {

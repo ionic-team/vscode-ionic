@@ -2,7 +2,7 @@
 	"name": "ionic",
 	"displayName": "Ionic",
 	"description": "Ionic & Capacitor project tooling and recommendations",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"icon": "media/ionic.png",
 	"publisher": "Ionic",
 	"keywords": [
@@ -21,7 +21,7 @@
 		"esbuild": "npm run esbuild-base -- --sourcemap",
 		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
 		"compile": "tsc -p ./",
-		"package": "npm run build && cp ionic-1.2.0.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+		"package": "npm run build && cp ionic-1.2.1.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
 		"watch": "tsc -watch -p ./",
 		"lint": "eslint . --ext .ts,.tsx"
 	},
@@ -30,7 +30,7 @@
 		"url": "https://ionic.io"
 	},
 	"engines": {
-		"vscode": "^1.57.0"
+		"vscode": "^1.63.0"
 	},
 	"categories": [
 		"Other"
@@ -278,7 +278,7 @@
 		"@types/glob": "7.2.0",
 		"@types/node": "14.x",
 		"@types/rimraf": "3.0.2",
-		"@types/vscode": "1.57.0",
+		"@types/vscode": "1.63.0",
 		"@typescript-eslint/eslint-plugin": "5.12.1",
 		"@typescript-eslint/parser": "5.12.1",
 		"esbuild": "0.14.23",

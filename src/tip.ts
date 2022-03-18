@@ -67,7 +67,17 @@ export class Tip {
 		return this;
 	}
 
+	// The action is executed when the user clicks the item in the treeview
 	setAction(func: (...argsIn) => unknown, ...args) {
+		this.onAction = func;
+		this.actionArgs = args;
+		return this;
+	}
+
+	// The action is executed when the user clicks the button called title
+	setAfterClickAction(title: string, func: (...argsIn) => unknown, ...args) {
+		this.commandTitle = title;
+		this.command = Command.NoOp;
 		this.onAction = func;
 		this.actionArgs = args;
 		return this;

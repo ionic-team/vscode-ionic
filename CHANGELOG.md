@@ -1,5 +1,5 @@
 ## Changelog
-### Version 1.2.0
+### Version 1.2.1
 - Error assistance for errors from eslint, typescript, angular/vue/react cli, swift/java, jasmine/jest
 - Colorize the output window for warnings, errors, urls
 - Angular migration assistant (packages -> @angular -> click lightbulb)
@@ -7,6 +7,7 @@
 - Option to upgrade a package to a user chosen version (select ... on a package)
 - Migration for Cordova projects using @ionic/angular-toolkit >= v6 (adds @ionic/cordova-builders)
 - Migration for Capacitor projects using @ionic/angular-toolkit >= v6 (cleans angular.json)
+- Migration to fix Cordova projects when AndroidXEnabled is false or omitted
 - Detect projects where minifyEnabled is set to true and @capacitor/android is less than 3.2.3
 - Fix for displayed version number when ^ or ~ is used
 - Fix for Capacitor commands when @capacitor/cli is not installed

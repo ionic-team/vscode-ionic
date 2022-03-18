@@ -16,6 +16,7 @@ import {
 import { processPackages } from './process-packages';
 import { Command, Tip, TipType } from './tip';
 import { Project } from './project';
+import { setStringIn } from './utilities';
 
 let packageFile;
 let allDependencies;
@@ -132,17 +133,32 @@ export function exists(library: string) {
 	return !!allDependencies[library];
 }
 
-export function checkCordovaAndroidPreference(preference: string, value: string | boolean, preferredValue?: string): Tip {
+export function checkCordovaAndroidPreference(project: Project, preference: string, value: string | boolean): Tip {
 	if (!cordovaConfig) {
 		return;
 	}
 	if (!equals(cordovaConfig.androidPreferences[preference], value)) {
-		if (preferredValue) {
-			return error('config.xml', `The android preference ${preference} cannot be ${cordovaConfig.androidPreferences[preference]}. Add <preference name="${preference}" value="${preferredValue}" /> to <platform name="android"> in config.xml`);
-		} else {
-			return error('config.xml', `The android preference ${preference} should be ${value}. Add <preference name="${preference}" value="${value}" /> to <platform name="android"> in config.xml`);
-		}
+		const tip = error('config.xml', `The android preference ${preference} should be ${value}. Add <preference name="${preference}" value="${value}" /> to <platform name="android"> in config.xml`)
+			.setAfterClickAction('Fix config.xml', AddCordovaAndroidPreference, project.folder, preference, value);
+		return tip;
 	}
+}
+
+function AddCordovaAndroidPreference(folder: string, preference: string, value: string | boolean) {
+	const configXMLFilename = `${folder}/config.xml`;
+	if (!fs.existsSync(configXMLFilename)) return;
+	const txt = fs.readFileSync(configXMLFilename, 'utf8');
+	let newtxt = txt;
+	// Quick and dirty insertion of the preference or replace of value
+	if (newtxt.includes(`<preference name="${preference}"`)) {
+		newtxt = setStringIn(txt, `<preference name="${preference}" value="`, '"', `${value}`);
+	} else {
+		newtxt = txt.replace(
+			`<platform name="android">`,
+			`<platform name="android">\n        <preference name="${preference}" value="${value}" />`);
+	}
+	fs.writeFileSync(configXMLFilename, newtxt);
+	vscode.window.showInformationMessage(`config.xml has been updated to include the ${preference} preference`, 'OK');
 }
 
 export function checkAndroidManifest() {
