@@ -16,6 +16,7 @@
 	"scripts": {
 		"build": "npm run esbuild && npm run vsix-package",
 		"vsix-package": "vsce package",
+		"pre-release": "npm run build && vsce publish --pre-release",
 		"vscode:prepublish": "npm run esbuild-base -- --minify",
 		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --external:prettier --format=cjs --platform=node",
 		"esbuild": "npm run esbuild-base -- --sourcemap",
