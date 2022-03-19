@@ -6,6 +6,8 @@ import { checkMigrationAngularToolkit } from "./rules-angular-toolkit";
 import { Project } from "./project";
 import { Tip, TipType } from "./tip";
 import { asAppId } from "./utilities";
+import { capacitorAdd } from './capacitor-add';
+import { CapacitorPlatform } from './capacitor-platform';
 
 /**
  * Check rules for Capacitor projects
@@ -82,17 +84,16 @@ export function capacitorRecommendations(project: Project): Tip[] {
 			'https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor'
 		).showProgressDialog());
 	} else {
-		const ionic = exists('@ionic/cli') ? 'ionic ' : '';
-		if (!exists('@capacitor/android')) {
+		if (!project.hasCapacitorProject(CapacitorPlatform.android)) {
 			tips.push(new Tip(
 				'Add Android Integration', '', TipType.Capacitor, 'Add Android support to your Capacitor project',
-				['npm install @capacitor/android --save-exact', `npx ${ionic}cap add android`], 'Add Android', 'Android support added to your project').showProgressDialog());
+				['npm install @capacitor/android --save-exact', capacitorAdd(project, CapacitorPlatform.android)], 'Add Android', 'Android support added to your project').showProgressDialog());
 		}
 
-		if (!exists('@capacitor/ios')) {
+		if (!project.hasCapacitorProject(CapacitorPlatform.ios)) {
 			tips.push(new Tip(
 				'Add iOS Integration', '', TipType.Capacitor, 'Add iOS support to your Capacitor project',
-				['npm install @capacitor/ios --save-exact', `npx ${ionic}cap add ios`], 'Add iOS', 'iOS support added to your project').showProgressDialog());
+				['npm install @capacitor/ios --save-exact', capacitorAdd(project, CapacitorPlatform.ios)], 'Add iOS', 'iOS support added to your project').showProgressDialog());
 		}
 	}
 

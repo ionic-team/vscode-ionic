@@ -24,8 +24,8 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 	if (isCapacitor() && !isCordova()) {
 		project.setGroup(`Capacitor`, 'Recommendations related to Capacitor', TipType.Capacitor, true);
 
-		const hasCapIos = exists('@capacitor/ios');
-		const hasCapAndroid = exists('@capacitor/android');
+		const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
+		const hasCapAndroid = project.hasCapacitorProject(CapacitorPlatform.android);
 		project.add(
 			new Tip(
 				'Run On Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`)

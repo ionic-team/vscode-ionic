@@ -15,6 +15,7 @@ import { getIgnored } from './ignore';
 import { CommandName } from './command-name';
 import { angularMigrate } from './rules-angular-migrate';
 import { checkForMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
+import { CapacitorPlatform } from './capacitor-platform';
 
 export class Project {
 	name: string;
@@ -38,6 +39,11 @@ export class Project {
 
 	public getIgnored(context: vscode.ExtensionContext) {
 		this.ignored = getIgnored(context);
+	}
+
+	// Is the capacitor platform installed and does the project folder exists
+	public hasCapacitorProject(platform: CapacitorPlatform) {
+		return exists(`@capacitor/${platform}`) && fs.existsSync(path.join(this.projectFolder(), platform)); 		
 	}
 	
 	/**
@@ -382,7 +388,7 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 	sendTelemetryEvents(folder, project, packages, context);
 
 	checkNodeVersion();
-	project.getIgnored(context);	
+	project.getIgnored(context);
 
 	await getRecommendations(project, context, packages);
 

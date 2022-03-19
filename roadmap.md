@@ -57,7 +57,8 @@
 
 # Support For NX
 - (bug) Run command for cap isnt accepting --target=
-- (bug) Selection of projects not working
+- (bug) Splash assets
+- (bug) Package reconciliation (from root and project)
 
 
 - Detect @nrwl/cli to enable project switcher
