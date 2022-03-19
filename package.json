@@ -85,6 +85,12 @@
 					"name": "Ionic",
 					"icon": "media/ionic.svg",
 					"contextualTitle": "Ionic"
+				},
+				{
+					"id": "ionic-projects",
+					"name": "Projects",
+					"when": "isMonoRepo == true",
+					"visibility": "collapsed"
 				}
 			],
 			"explorer": []

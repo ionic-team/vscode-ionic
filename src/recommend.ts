@@ -62,7 +62,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 			);
 		}
 
-		project.add(new Tip('Build', '', TipType.Build, 'Build', undefined, 'Building', undefined).setDynamicCommand(ionicBuild, project.folder));
+		project.add(new Tip('Build', '', TipType.Build, 'Build', undefined, 'Building', undefined).setDynamicCommand(ionicBuild, project));
 		const ionic = exists('@ionic/cli') ? 'ionic ' : '';
 		if (exists('@capacitor/core')) {
 			project.add(new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', `npx ${ionic}cap sync`, 'Syncing', undefined));

@@ -14,6 +14,7 @@ import { getRecommendations } from './recommend';
 import { getIgnored } from './ignore';
 import { CommandName } from './command-name';
 import { angularMigrate } from './rules-angular-migrate';
+import { checkForMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
 
 export class Project {
 	name: string;
@@ -24,6 +25,12 @@ export class Project {
 	subgroup: Recommendation;
 	groups: Recommendation[] = [];
 	ignored: Array<string>;
+
+	// Mono repo Type (eg NX)
+	public repoType: MonoRepoType;
+
+	// Mono Repo Project selected
+	public monoRepo: MonoRepoProject;
 
 	constructor(_name: string) {
 		this.name = _name;
@@ -360,15 +367,13 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 		vscode.commands.executeCommand('setContext', Context.isAnonymous, false);
 	}
 
+	checkForMonoRepo(project);
+
 	sendTelemetryEvents(folder, project, packages, context);
 
 	checkNodeVersion();
 	project.getIgnored(context);	
 
-	// if (exists('@nrwl/cli')) {
-	// 	// Need to enable project selector
-	// 	vscode.window.showInformationMessage('NX is a WIP');
-	// }
 	await getRecommendations(project, context, packages);
 
 	vscode.commands.executeCommand('setContext', Context.inspectedProject, true);

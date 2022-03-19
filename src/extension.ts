@@ -15,6 +15,7 @@ import { ignore } from './ignore';
 import { handleError } from './error-handler';
 import { CommandName } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
+import { IonicProjectsreeProvider } from './ionic-projects-provider';
 
 
 let channel: vscode.OutputChannel = undefined;
@@ -273,7 +274,10 @@ export function activate(context: vscode.ExtensionContext) {
 	// }
 
 	const ionicProvider = new IonicTreeProvider(rootPath, context);
+	const ionicProjectsProvider = new IonicProjectsreeProvider(rootPath, context);
 	//vscode.window.registerTreeDataProvider('ionic', ionicProvider);
+	const projectsView = vscode.window.createTreeView('ionic-projects', { treeDataProvider: ionicProjectsProvider });
+	ionicState.projectsView = projectsView;
 	const view = vscode.window.createTreeView('ionic', { treeDataProvider: ionicProvider });
 	ionicState.view = view;
 
@@ -326,6 +330,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.commands.registerCommand(CommandName.Fix, async (tip: Tip) => {
 		await fix(tip, rootPath, ionicProvider, context);
+	});
+
+	vscode.commands.registerCommand(CommandName.ProjectsRefresh, async () => {
+		ionicProjectsProvider.refresh();
 	});
 
 	vscode.commands.registerCommand(CommandName.Idea, async (r: Recommendation) => {

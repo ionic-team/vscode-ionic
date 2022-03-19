@@ -8,8 +8,16 @@ import { reviewProject } from './project';
 import { Recommendation } from './recommendation';
 import { Context } from './context-variables';
 import { starterProject } from './ionic-start';
+import { MonoRepoProject } from './monorepo';
 
-export const ionicState = { view: undefined, skipAuth: false };
+interface IonicState {
+	view: vscode.TreeView<any>,
+	skipAuth: boolean,
+	projects: Array<MonoRepoProject>,
+	projectsView: vscode.TreeView<any>
+
+}
+export const ionicState: IonicState = { view: undefined, skipAuth: false, projects: [], projectsView: undefined };
 
 export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {
 	private _onDidChangeTreeData: vscode.EventEmitter<Recommendation | undefined | void> = new vscode.EventEmitter<Recommendation | undefined | void>();

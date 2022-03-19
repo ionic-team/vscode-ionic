@@ -11,6 +11,7 @@ export enum CommandName {
 	Rebuild = 'ionic.rebuild',
 	Open = 'ionic.open',
 	SkipLogin = 'ionic.skipLogin',
-	Upgrade = 'ionic.upgrade'
+	Upgrade = 'ionic.upgrade',
+	ProjectsRefresh = 'ionic.projectRefresh'
 
 }
