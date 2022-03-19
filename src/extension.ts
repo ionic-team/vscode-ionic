@@ -350,7 +350,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			if (tip.doDeviceSelection) {
 				const target = await selectDevice(tip.secondCommand as string, tip.data, tip);
-				command = tip.command + target;
+				command = (tip.command as string).replace('@', target);
 			}
 			if (command) {
 				execute(tip);

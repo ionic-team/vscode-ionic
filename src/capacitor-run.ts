@@ -46,9 +46,10 @@ function capRun(platform: CapacitorPlatform): string {
 	}
 
 	const ionic = exists('@ionic/cli') ? 'ionic ': '';
-	return `npx ${ionic}cap run ${platform}${capRunFlags} --target=`;
+	return `npx ${ionic}cap run ${platform}${capRunFlags} --target=@`;
 }
 
 function nxRun(project: Project, platform: CapacitorPlatform): string {
-	return `npx nx run ${project.monoRepo.name}:run --configuration=${platform} --target=`;
+	// Note: This may change, see: https://github.com/nxtend-team/nxtend/issues/490
+	return `npx nx run ${project.monoRepo.name}:cap --cmd "run ${platform} --target=@"`;
 }

@@ -56,7 +56,6 @@
 - links to external content cannot open in VS Code editor window (must be browser)
 
 # Support For NX
-- (bug) Run command for cap isnt accepting --target=
 - (bug) Package reconciliation (from root and project)
 - (feat) Needs lint, test and e2e nx tasks added (assuming @nxtend/ionic-angular)
 - (feat) Detect missing @nxtend/ionic-angular or @nxtend/ionic-react. Option to add
