@@ -317,10 +317,10 @@ async function getCapacitorProjectState(prj: Project, context: vscode.ExtensionC
 	async function getCapacitorProject(prj: Project): Promise<CapacitorProject> {
 		const capConfig: CapacitorConfig = {
 			ios: {
-				path: path.join(prj.folder, 'ios'),
+				path: path.join(prj.projectFolder(), 'ios'),
 			},
 			android: {
-				path: path.join(prj.folder, 'android'),
+				path: path.join(prj.projectFolder(), 'android'),
 			},
 		};
 		const project = new CapacitorProject(capConfig);
