@@ -59,15 +59,15 @@
 - (bug) Run command for cap isnt accepting --target=
 - (bug) Package reconciliation (from root and project)
 - (feat) Needs lint, test and e2e nx tasks added (assuming @nxtend/ionic-angular)
-
+- (feat) Remember last project selected
+- (feat) Detect missing @nxtend/ionic-angular or @nxtend/ionic-react. Option to add
+- (feat) Detect missing @nxtend/capacitor. Option to add
 
 - Detect @nrwl/cli to enable project switcher
 - Project switcher:
   - Instead of "Capacitor" do "Capacitor: {project name}"
   - Down arrow to allow selection of the project
   - Default to the first app (remember last used)
-- Instead of "ionic build" might need "nx build {project}", lint, serve, test, e2e (see https://nxtend.dev/docs/ionic-angular/getting-started/#targets)
-- Capacitor has "nx build {project}", "nx run {project}" and more (https://nxtend.dev/docs/ionic-angular/capacitor#add-native-platform)
 - Cap handle build, run, sync
 - workspace.json has a good list of projects
 
