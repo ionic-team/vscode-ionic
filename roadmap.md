@@ -57,7 +57,7 @@
 
 # Support For NX
 - (bug) Run command for cap isnt accepting --target=
-- (bug) Splash assets
+- (bug) Run for web probably needs nx command (https://nxtend.dev/docs/ionic-angular/getting-started)
 - (bug) Package reconciliation (from root and project)
 
 

@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { join } from 'path';
 
 import { MonoRepoProject } from "./monorepo";
 import { Project } from './project';
@@ -22,6 +23,17 @@ export function getNXProjects(project: Project): Array<MonoRepoProject> {
 		const projects = JSON.parse(txt).projects;
 		for (const prj of Object.keys(projects)) {
 			result.push({ name: prj, folder: projects[prj] });
+		}
+	} else {
+		// workspace.json is optional. Just iterate through apps folder
+		const folder = path.join(project.folder, 'apps');
+		if (fs.existsSync(folder)) {
+			const list = fs.readdirSync(folder, { withFileTypes: true });
+			for (const item of list) {				
+				if (item.isDirectory && !item.name.startsWith('.')) {
+					result.push({ name: item.name, folder: path.relative(project.folder, join(folder, item.name)) });
+				}
+			}
 		}
 	}
 	return result;

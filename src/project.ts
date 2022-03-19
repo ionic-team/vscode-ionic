@@ -331,7 +331,7 @@ export class Project {
 	}
 
 	public fileExists(filename: string): boolean {
-		return fs.existsSync(path.join(this.folder, filename));
+		return fs.existsSync(path.join(this.projectFolder(), filename));
 	}
 }
 

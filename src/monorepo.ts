@@ -32,8 +32,13 @@ export function checkForMonoRepo(project: Project, selectedProject: string) {
 		project.monoRepo = found ? found : projects[0];
 		ionicState.projects = projects;
 		ionicState.projectsView.title = 'NX Projects';
+		if (!project.monoRepo) {
+			project.repoType = MonoRepoType.none;
+			vscode.window.showErrorMessage('NX found but no projects found.');
+		} else {
 		ionicState.view.title = project.monoRepo.name;
 		vscode.commands.executeCommand(CommandName.ProjectsRefresh, project.monoRepo.name);
+		}
 	}
 	vscode.commands.executeCommand('setContext', 'isMonoRepo', project.repoType !== MonoRepoType.none);
 }
