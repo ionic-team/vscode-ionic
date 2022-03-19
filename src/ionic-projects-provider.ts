@@ -18,7 +18,6 @@ export class IonicProjectsreeProvider implements vscode.TreeDataProvider<Recomme
 	}
 
 	getChildren(element?: Recommendation): Thenable<Recommendation[]> {
-		console.log(element);
 		return Promise.resolve(this.projectList());
 	}
 

@@ -10,12 +10,15 @@ import { addSplashAndIconFeatures } from './splash-icon';
 import { Tip, TipType } from './tip';
 import { capacitorMigrationChecks as checkCapacitorMigrationRules } from './rules-capacitor-migration';
 import { reviewPackages, reviewPluginProperties } from './process-packages';
-import { CapacitorPlatform, capRun } from './capacitor-run';
+import { capacitorDevicesCommand, capacitorRun } from './capacitor-run';
 import { capacitorRecommendations, checkCapacitorRules } from './rules-capacitor';
 import { checkCordovaRules } from './rules-cordova';
 import { webProject } from './rules-web-project';
 import { checkPackages } from './rules-packages';
 import { checkDeprecatedPlugins } from './rules-deprecated-plugins';
+import { capacitorSync } from './capacitor-sync';
+import { capacitorOpen } from './capacitor-open';
+import { CapacitorPlatform } from './capacitor-platform';
 
 export async function getRecommendations(project: Project, context: vscode.ExtensionContext, packages: any): Promise<void> {
 	if (isCapacitor() && !isCordova()) {
@@ -49,7 +52,9 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 			project.add(new Tip('Run On Android', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
 				.showProgressDialog()
 				.requestDeviceSelection()
-				.setDynamicCommand(capRun, CapacitorPlatform.android)
+				.setDynamicCommand(capacitorRun, project, CapacitorPlatform.android)
+				.setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.android))
+				.setData(project.projectFolder())
 				.setRunPoints(runPoints)
 			);
 		}
@@ -57,21 +62,36 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 			project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
 				.showProgressDialog()
 				.requestDeviceSelection()
-				.setDynamicCommand(capRun, CapacitorPlatform.ios)
+				.setDynamicCommand(capacitorRun, project, CapacitorPlatform.ios)
+				.setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.ios))
+				.setData(project.projectFolder())
 				.setRunPoints(runPoints)
 			);
 		}
 
-		project.add(new Tip('Build', '', TipType.Build, 'Build', undefined, 'Building', undefined).setDynamicCommand(ionicBuild, project));
-		const ionic = exists('@ionic/cli') ? 'ionic ' : '';
+		project.add(new Tip(
+			'Build', '', TipType.Build, 'Build', undefined, 'Building', undefined)
+			.setDynamicCommand(ionicBuild, project));
+
 		if (exists('@capacitor/core')) {
-			project.add(new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', `npx ${ionic}cap sync`, 'Syncing', undefined));
+			project.add(new Tip(
+				'Sync', '', TipType.Sync, 'Capacitor Sync', undefined, 'Syncing', undefined)
+				.setDynamicCommand(capacitorSync, project)
+			);
 		}
 		if (hasCapIos) {
-			project.add(new Tip('Open in Xcode', '', TipType.Edit, 'Opening Project in Xcode', `npx ${ionic}cap open ios`, 'Opening Project in Xcode').showProgressDialog());
+			project.add(new Tip(
+				'Open in Xcode', '', TipType.Edit, 'Opening Project in Xcode', undefined, 'Open Project in Xcode')
+				.showProgressDialog()
+				.setDynamicCommand(capacitorOpen, project, CapacitorPlatform.ios)
+			);
 		}
 		if (hasCapAndroid) {
-			project.add(new Tip('Open in Android Studio', '', TipType.Edit, 'Opening Project in Android Studio', `npx ${ionic}cap open android`, 'Open Android Studio').showProgressDialog());
+			project.add(new Tip(
+				'Open in Android Studio', '', TipType.Edit, 'Opening Project in Android Studio', undefined, 'Open Android Studio')
+				.showProgressDialog()
+				.setDynamicCommand(capacitorOpen, project, CapacitorPlatform.android)
+			);
 		}
 	}
 

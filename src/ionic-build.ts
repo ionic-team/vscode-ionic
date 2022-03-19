@@ -11,15 +11,30 @@ import { MonoRepoType } from './monorepo';
  * @returns string
  */
 export function ionicBuild(project: Project): string {
-	const buildForProduction = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
-	const buildFlags = buildForProduction ? ' --prod' : '';
-
+	// For convenience, check if npm install was done and do it
 	const nmf = path.join(project.folder, 'node_modules');
 	const preop = (!fs.existsSync(nmf)) ? 'npm install && ' : '';
-	switch (project.repoType) {
-		case MonoRepoType.none : return `${preop}npx ionic build${buildFlags}`;
-		case MonoRepoType.nx : return `${preop}npx nx build ${project.monoRepo.name}`;
-		default: throw new Error('Unsupported Monorepo type');
 
+	const prod: boolean = vscode.workspace.getConfiguration('ionic').get('buildForProduction');	
+	switch (project.repoType) {
+		case MonoRepoType.none: return `${preop}${ionicCLIBuild(prod)}`;
+		case MonoRepoType.nx: return `${preop}${nxBuild(prod, project)}`;
+		default: throw new Error('Unsupported Monorepo type');
 	}
+}
+
+function ionicCLIBuild(prod: boolean): string {
+	let cmd = `npx ionic build`;
+	if (prod) {
+		cmd += ' --prod';
+	}
+	return cmd;
+}
+
+function nxBuild(prod: boolean, project: Project): string {
+	let cmd = `npx nx build ${project.monoRepo.name}`;
+	if (prod) {
+		cmd += ' --configuration=production';
+	}
+	return cmd;
 }

@@ -30,7 +30,7 @@ export class Project {
 	public repoType: MonoRepoType;
 
 	// Mono Repo Project selected
-	public monoRepo: MonoRepoProject;
+	public monoRepo: MonoRepoProject;	
 
 	constructor(_name: string) {
 		this.name = _name;
@@ -38,6 +38,16 @@ export class Project {
 
 	public getIgnored(context: vscode.ExtensionContext) {
 		this.ignored = getIgnored(context);
+	}
+	
+	/**
+	 * This is the path the selected project (for monorepos) or the root folder
+	 */
+	public projectFolder() {
+		if (this.repoType == MonoRepoType.none) {
+			return this.folder;
+		}
+		return path.join(this.folder, this.monoRepo.folder);
 	}
 
 	public setGroup(title: string, message: string, type?: TipType, expanded?: boolean, contextValue?: string): Recommendation {

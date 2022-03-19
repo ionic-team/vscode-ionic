@@ -49,6 +49,9 @@ async function getDevices(command: string, rootPath: string) {
 
 			}
 		}
+		if (devices.length == 0) {
+			vscode.window.showErrorMessage(`Unable to find any devices: ${result}`, 'OK');
+		}
 		return devices;
 	} catch (error) {
 		handleError(error, [], rootPath);
@@ -73,7 +76,7 @@ function parseDevice(line: string) {
  * @param  {string} command
  * @param  {string} rootPath
  */
-async function selectDevice(command: string, rootPath: string, tip: Tip) {
+async function selectDevice(command: string, rootPath: string, tip: Tip): Promise<string> {
 	let devices;
 	await showProgress('Getting Devices', async () => {
 		devices = await getDevices(command, rootPath);
@@ -81,11 +84,14 @@ async function selectDevice(command: string, rootPath: string, tip: Tip) {
 
 	//const devices = await getDevices(command, rootPath);
 	const names = devices.map(device => device.name);
+	if (names.length == 0) {
+		return;
+	}
 	const selected = await vscode.window.showQuickPick(names, { placeHolder: 'Select a device to run application on' });
 	const device = devices.find(device => device.name == selected);
 	if (!device) return;
 	tip.commandTitle = device?.name;
-	return command.replace('--list', '--target=' + device?.target);
+	return device?.target;
 }
 
 async function requestAppName(tip: Tip) {
@@ -350,7 +356,8 @@ export function activate(context: vscode.ExtensionContext) {
 				command = await requestAppName(tip);
 			}
 			if (tip.doDeviceSelection) {
-				command = await selectDevice(tip.command as string, rootPath, tip);
+				const target = await selectDevice(tip.secondCommand as string, tip.data, tip);
+				command = tip.command + target;
 			}
 			if (command) {
 				execute(tip);

@@ -56,6 +56,10 @@
 - links to external content cannot open in VS Code editor window (must be browser)
 
 # Support For NX
+- (bug) Run command for cap isnt accepting --target=
+- (bug) Selection of projects not working
+
+
 - Detect @nrwl/cli to enable project switcher
 - Project switcher:
   - Instead of "Capacitor" do "Capacitor: {project name}"
