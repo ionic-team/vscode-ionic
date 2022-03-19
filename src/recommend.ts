@@ -99,7 +99,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 	project.setGroup(`Scripts`, ``, TipType.Files, false);
 	project.addScripts();
 
-	if (isCapacitor()) {
+	if (isCapacitor() && project.hasACapacitorProject()) {
 		// Capacitor Configure Features
 		project.setGroup(`Configuration`, 'Configurations for native project', TipType.Capacitor, false);
 		await reviewCapacitorConfig(project, context);

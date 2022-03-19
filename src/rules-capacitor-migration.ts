@@ -25,7 +25,7 @@ export function capacitorMigrationChecks(packages, project: Project) {
 
 	if (exists('cordova-ios') || (exists('cordova-android') || (project.fileExists('config.xml')))) {
 		const movecmd = process.platform === "win32" ? 'rename config.xml config.xml.bak' : 'mv config.xml config.xml.bak';
-		tips.push(new Tip('Remove Cordova Integration', '', TipType.Capacitor, 'Remove the Cordova integration',
+		tips.push(new Tip('Remove Cordova Project', '', TipType.Capacitor, 'Remove the Cordova integration',
 			['npm uninstall cordova-ios', 'npm uninstall cordova-android', movecmd, 'rem-cordova'],
 			'Remove Cordova', 'Removing Cordova', 'Successfully removed Cordova'));
 	}

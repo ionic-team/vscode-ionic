@@ -31,7 +31,7 @@ export class Project {
 	public repoType: MonoRepoType;
 
 	// Mono Repo Project selected
-	public monoRepo: MonoRepoProject;	
+	public monoRepo: MonoRepoProject;
 
 	constructor(_name: string) {
 		this.name = _name;
@@ -43,9 +43,13 @@ export class Project {
 
 	// Is the capacitor platform installed and does the project folder exists
 	public hasCapacitorProject(platform: CapacitorPlatform) {
-		return exists(`@capacitor/${platform}`) && fs.existsSync(path.join(this.projectFolder(), platform)); 		
+		return exists(`@capacitor/${platform}`) && fs.existsSync(path.join(this.projectFolder(), platform));
 	}
-	
+
+	public hasACapacitorProject(): boolean {
+		return this.hasCapacitorProject(CapacitorPlatform.ios) || this.hasCapacitorProject(CapacitorPlatform.android);
+	}
+
 	/**
 	 * This is the path the selected project (for monorepos) or the root folder
 	 */
@@ -175,14 +179,14 @@ export class Project {
 
 	public addSubGroup(title: string, latestVersion: string) {
 		let command: vscode.Command = undefined;
-		
+
 		let tip: Tip = undefined;
 		if (title == 'angular') {
 			// Option to upgrade with: 
 			// ng update @angular/cli@13 @angular/core@13 --allow-dirty
 			tip = angularMigrate(latestVersion);
-		} else {			
-			tip = new Tip('Upgrade All Packages', undefined, TipType.Run, undefined, undefined, 'Upgrade');		
+		} else {
+			tip = new Tip('Upgrade All Packages', undefined, TipType.Run, undefined, undefined, 'Upgrade');
 		}
 
 		command = {
@@ -190,7 +194,7 @@ export class Project {
 			title: tip.title,
 			arguments: []
 		};
-		
+
 
 		const r = new Recommendation(tip.title, undefined, '@' + title, vscode.TreeItemCollapsibleState.Expanded, command, tip);
 		r.children = [];
@@ -286,8 +290,8 @@ export class Project {
 				`https://www.npmjs.com/package/${name}`,
 				`Upgrading ${name}`
 			).setSecondCommand(`Uninstall`, `npm uninstall ${name}`)
-			.setContextValue('upgrade')
-			.setData({name: name, version: fromVersion})
+				.setContextValue('upgrade')
+				.setData({ name: name, version: fromVersion })
 			);
 		}
 	}

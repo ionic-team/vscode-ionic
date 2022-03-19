@@ -86,13 +86,13 @@ export function capacitorRecommendations(project: Project): Tip[] {
 	} else {
 		if (!project.hasCapacitorProject(CapacitorPlatform.android)) {
 			tips.push(new Tip(
-				'Add Android Integration', '', TipType.Capacitor, 'Add Android support to your Capacitor project',
+				'Add Android Project', '', TipType.Capacitor, 'Add Android support to your Capacitor project',
 				['npm install @capacitor/android --save-exact', capacitorAdd(project, CapacitorPlatform.android)], 'Add Android', 'Android support added to your project').showProgressDialog());
 		}
 
 		if (!project.hasCapacitorProject(CapacitorPlatform.ios)) {
 			tips.push(new Tip(
-				'Add iOS Integration', '', TipType.Capacitor, 'Add iOS support to your Capacitor project',
+				'Add iOS Project', '', TipType.Capacitor, 'Add iOS support to your Capacitor project',
 				['npm install @capacitor/ios --save-exact', capacitorAdd(project, CapacitorPlatform.ios)], 'Add iOS', 'iOS support added to your project').showProgressDialog());
 		}
 	}
