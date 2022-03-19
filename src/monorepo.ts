@@ -23,14 +23,16 @@ export enum MonoRepoType {
  * Check to see if this is a monorepo and what type.
  * @param  {Project} project
  */
-export function checkForMonoRepo(project: Project) {
+export function checkForMonoRepo(project: Project, selectedProject: string) {
 	project.repoType = MonoRepoType.none;
 	if (exists('@nrwl/cli')) {
 		project.repoType = MonoRepoType.nx;
 		const projects = getNXProjects(project);
-		project.monoRepo = projects[0];
+		const found = projects.find((project) => project.name == selectedProject);
+		project.monoRepo = found ? found : projects[0];
 		ionicState.projects = projects;
 		ionicState.projectsView.title = 'NX Projects';
+		ionicState.view.title = project.monoRepo.name;
 		vscode.commands.executeCommand(CommandName.ProjectsRefresh);
 	}
 	vscode.commands.executeCommand('setContext', 'isMonoRepo', project.repoType !== MonoRepoType.none);

@@ -357,7 +357,7 @@ export async function installPackage(extensionPath: string, folder: string) {
 			`Installed ${selected}`).showProgressDialog());
 }
 
-export async function reviewProject(folder: string, context: vscode.ExtensionContext): Promise<Recommendation[]> {
+export async function reviewProject(folder: string, context: vscode.ExtensionContext, selectedProject: string): Promise<Recommendation[]> {
 	const startedOp = Date.now();
 	vscode.commands.executeCommand('setContext', Context.inspectedProject, false);
 	vscode.commands.executeCommand('setContext', Context.isLoggingIn, false);
@@ -377,7 +377,7 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 		vscode.commands.executeCommand('setContext', Context.isAnonymous, false);
 	}
 
-	checkForMonoRepo(project);
+	checkForMonoRepo(project, selectedProject);
 
 	sendTelemetryEvents(folder, project, packages, context);
 

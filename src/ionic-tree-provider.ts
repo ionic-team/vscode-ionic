@@ -23,6 +23,8 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
 	private _onDidChangeTreeData: vscode.EventEmitter<Recommendation | undefined | void> = new vscode.EventEmitter<Recommendation | undefined | void>();
 	readonly onDidChangeTreeData: vscode.Event<Recommendation | undefined | void> = this._onDidChangeTreeData.event;
 
+	selectedProject: string;
+
 	constructor(private workspaceRoot: string | undefined, private context: vscode.ExtensionContext) {
 	}
 
@@ -32,6 +34,11 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
 
 	getTreeItem(element: Recommendation): vscode.TreeItem {
 		return element;
+	}
+
+	selectProject(project: string) {
+		this.selectedProject = project;
+		this.refresh();
 	}
 
 	getChildren(element?: Recommendation): Thenable<Recommendation[]> {
@@ -46,7 +53,7 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
 		} else {
 			const packageJsonPath = path.join(this.workspaceRoot, 'package.json');
 			if (this.pathExists(packageJsonPath)) {
-				return reviewProject(this.workspaceRoot, this.context);
+				return reviewProject(this.workspaceRoot, this.context, this.selectedProject);
 			} else {
 				return Promise.resolve(starterProject(this.workspaceRoot));
 			}

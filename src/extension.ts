@@ -266,22 +266,8 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 export function activate(context: vscode.ExtensionContext) {
 	const rootPath = (vscode.workspace.workspaceFolders && (vscode.workspace.workspaceFolders.length > 0))
 		? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined;
-
-
-	// let javaHome: string = vscode.workspace.getConfiguration('ionic').get('javaHome');
-	// if (!javaHome || javaHome.length === 1) {
-	// 	javaHome = process.env['JAVA_HOME'];
-
-	// 	const jre = '/Applications/Android Studio.app/Contents/jre/Contents/Home';
-	// 	if (fs.lstatSync(jre).isDirectory()) {
-	// 		javaHome = jre;
-	// 	}
-	// 	vscode.workspace.getConfiguration('ionic').update('javaHome',javaHome, vscode.ConfigurationTarget.Global);		
-	// }
-
 	const ionicProvider = new IonicTreeProvider(rootPath, context);
 	const ionicProjectsProvider = new IonicProjectsreeProvider(rootPath, context);
-	//vscode.window.registerTreeDataProvider('ionic', ionicProvider);
 	const projectsView = vscode.window.createTreeView('ionic-projects', { treeDataProvider: ionicProjectsProvider });
 	ionicState.projectsView = projectsView;
 	const view = vscode.window.createTreeView('ionic', { treeDataProvider: ionicProvider });
@@ -338,8 +324,14 @@ export function activate(context: vscode.ExtensionContext) {
 		await fix(tip, rootPath, ionicProvider, context);
 	});
 
+	// The project list panel needs refreshing
 	vscode.commands.registerCommand(CommandName.ProjectsRefresh, async () => {
 		ionicProjectsProvider.refresh();
+	});
+
+	// User selected a project from the list (monorepo)
+	vscode.commands.registerCommand(CommandName.ProjectSelect, async (project: string) => {		
+		ionicProvider.selectProject(project);
 	});
 
 	vscode.commands.registerCommand(CommandName.Idea, async (r: Recommendation) => {

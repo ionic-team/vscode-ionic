@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { CommandName } from './command-name';
 import { ionicState } from './ionic-tree-provider';
 import { Recommendation } from './recommendation';
 
@@ -24,7 +25,12 @@ export class IonicProjectsreeProvider implements vscode.TreeDataProvider<Recomme
 	projectList(): Array<Recommendation> {
 		const list = [];
 		for (const project of ionicState.projects) {
-			list.push(new Recommendation(undefined, undefined, project.name, vscode.TreeItemCollapsibleState.None));
+			const cmd = {
+				command: CommandName.ProjectSelect,
+				title: 'Open',
+				arguments: [project.name]
+			};
+			list.push(new Recommendation(undefined, undefined, project.name, vscode.TreeItemCollapsibleState.None, cmd));
 		}
 		return list;
 	}
