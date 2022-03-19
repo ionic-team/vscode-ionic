@@ -29,7 +29,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 		project.add(
 			new Tip(
 				'Run On Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`)
-				.setDynamicCommand(ionicServe)
+				.setDynamicCommand(ionicServe, project)
 				.requestViewEditor()
 				.setRunPoints([
 					{ title: 'Building...', text: 'Generating browser application bundles' },

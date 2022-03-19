@@ -57,8 +57,8 @@
 
 # Support For NX
 - (bug) Run command for cap isnt accepting --target=
-- (bug) Run for web probably needs nx command (https://nxtend.dev/docs/ionic-angular/getting-started)
 - (bug) Package reconciliation (from root and project)
+- (feat) Needs lint, test and e2e nx tasks added (assuming @nxtend/ionic-angular)
 
 
 - Detect @nrwl/cli to enable project switcher
