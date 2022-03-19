@@ -33,7 +33,7 @@ export function checkForMonoRepo(project: Project, selectedProject: string) {
 		ionicState.projects = projects;
 		ionicState.projectsView.title = 'NX Projects';
 		ionicState.view.title = project.monoRepo.name;
-		vscode.commands.executeCommand(CommandName.ProjectsRefresh);
+		vscode.commands.executeCommand(CommandName.ProjectsRefresh, project.monoRepo.name);
 	}
 	vscode.commands.executeCommand('setContext', 'isMonoRepo', project.repoType !== MonoRepoType.none);
 }

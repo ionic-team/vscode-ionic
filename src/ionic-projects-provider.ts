@@ -10,7 +10,10 @@ export class IonicProjectsreeProvider implements vscode.TreeDataProvider<Recomme
 	constructor(private workspaceRoot: string | undefined, private context: vscode.ExtensionContext) {
 	}
 
-	refresh(): void {
+	selectedProject: string;
+
+	refresh(project: string): void {
+		this.selectedProject = project;
 		this._onDidChangeTreeData.fire();
 	}
 
@@ -30,7 +33,10 @@ export class IonicProjectsreeProvider implements vscode.TreeDataProvider<Recomme
 				title: 'Open',
 				arguments: [project.name]
 			};
-			list.push(new Recommendation(undefined, undefined, project.name, vscode.TreeItemCollapsibleState.None, cmd));
+			const r = new Recommendation(undefined, undefined, project.name, vscode.TreeItemCollapsibleState.None, cmd);
+			const icon = (project.name == this.selectedProject) ? 'circle-filled': 'none';
+			r.setIcon(icon);
+			list.push(r);
 		}
 		return list;
 	}

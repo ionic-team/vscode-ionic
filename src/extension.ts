@@ -325,8 +325,8 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	// The project list panel needs refreshing
-	vscode.commands.registerCommand(CommandName.ProjectsRefresh, async () => {
-		ionicProjectsProvider.refresh();
+	vscode.commands.registerCommand(CommandName.ProjectsRefresh, async (project: string) => {
+		ionicProjectsProvider.refresh(project);
 	});
 
 	// User selected a project from the list (monorepo)
