@@ -59,7 +59,6 @@
 - (bug) Run command for cap isnt accepting --target=
 - (bug) Package reconciliation (from root and project)
 - (feat) Needs lint, test and e2e nx tasks added (assuming @nxtend/ionic-angular)
-- (feat) Remember last project selected
 - (feat) Detect missing @nxtend/ionic-angular or @nxtend/ionic-react. Option to add
 - (feat) Detect missing @nxtend/capacitor. Option to add
 

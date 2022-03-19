@@ -330,7 +330,8 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	// User selected a project from the list (monorepo)
-	vscode.commands.registerCommand(CommandName.ProjectSelect, async (project: string) => {		
+	vscode.commands.registerCommand(CommandName.ProjectSelect, async (project: string) => {	
+		context.workspaceState.update('SelectedProject', project);	
 		ionicProvider.selectProject(project);
 	});
 

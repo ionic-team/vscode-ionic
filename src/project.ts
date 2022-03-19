@@ -387,7 +387,7 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 		vscode.commands.executeCommand('setContext', Context.isAnonymous, false);
 	}
 
-	checkForMonoRepo(project, selectedProject);
+	checkForMonoRepo(project, selectedProject, context);
 
 	sendTelemetryEvents(folder, project, packages, context);
 
