@@ -7,6 +7,7 @@ import { getOutputChannel } from './extension';
 import { Tip, TipType } from './tip';
 import { Project } from './project';
 import { exists } from './analyzer';
+import { CapacitorPlatform } from './capacitor-platform';
 
 export enum AssetType {
 	splash = 'splash.png',
@@ -18,7 +19,7 @@ export enum AssetType {
 export function addSplashAndIconFeatures(project: Project) {
 	project.setGroup(`Splash Screen & Icon`, '', TipType.Media, false, 'rebuild').tip = new Tip('Rebuild Assets',undefined).setAction(
 		async () => {
-			await runCordovaRes(project.folder);
+			await runCordovaRes(project);
 		}
 	);
 	project.add(createFeature('Splash Screen', AssetType.splash, project));
@@ -37,12 +38,12 @@ function getAssetTipType(folder: string, filename: AssetType): TipType {
 }
 
 function createFeature(title: string, assetType: AssetType, project: Project): Tip {
-	const tip = new Tip(title, undefined, getAssetTipType(project.folder, assetType));
-	tip.setAction(setAssetResource, project.folder, assetType);
+	const tip = new Tip(title, undefined, getAssetTipType(project.projectFolder(), assetType));
+	tip.setAction(setAssetResource, project, assetType);
 	tip.setContextValue('asset');
-	const filename = path.join(getResourceFolder(project.folder, assetType), assetType);
+	const filename = path.join(getResourceFolder(project.projectFolder(), assetType), assetType);
 	tip.setSecondCommand('Open Asset', filename);
-	tip.tooltip = getAssetTooltip(project.folder, assetType);
+	tip.tooltip = getAssetTooltip(project.projectFolder(), assetType);
 	return tip;
 }
 
@@ -69,7 +70,8 @@ function getAssetTooltip(folder: string, filename: AssetType): string {
 	}
 }
 
-async function setAssetResource(folder: string, filename: AssetType) {
+async function setAssetResource(project: Project, filename: AssetType) {
+	const folder = project.projectFolder();
 	const title = getAssetTooltip(folder, filename);
 	const buttonTitle = (getAssetTipType(folder, filename) == TipType.Warning) ? `Select File` : `Update File`;
 	const selected = await vscode.window.showInformationMessage(title, buttonTitle);
@@ -109,7 +111,7 @@ async function setAssetResource(folder: string, filename: AssetType) {
 			}
 
 
-		await runCordovaRes(folder);
+		await runCordovaRes(project);
 	} catch (err) {
 		vscode.window.showErrorMessage(`Operation failed ${err}`);
 	}
@@ -130,10 +132,11 @@ function hasNeededAssets(folder: string): string {
 	}
 }
 
-async function runCordovaRes(folder: string) {
+async function runCordovaRes(project: Project) {
 	const hasCordovaRes = exists('cordova-res');
-	const ios = exists('@capacitor/ios');
-	const android = exists('@capacitor/android');
+	const ios = project.hasCapacitorProject(CapacitorPlatform.ios);
+	const android = project.hasCapacitorProject(CapacitorPlatform.android);
+	const folder = project.projectFolder();
 	const neededMessage = hasNeededAssets(folder);
 	if (neededMessage) {
 		await vscode.window.showInformationMessage(neededMessage, 'OK');
