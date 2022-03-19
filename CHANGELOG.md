@@ -1,5 +1,5 @@
 ## Changelog
-### Version 1.2.1
+### Version 1.2.2
 - Error assistance for errors from eslint, typescript, angular/vue/react cli, swift/java, jasmine/jest
 - Colorize the output window for warnings, errors, urls
 - Angular migration assistant (packages -> @angular -> click lightbulb)

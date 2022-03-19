@@ -365,6 +365,10 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 	checkNodeVersion();
 	project.getIgnored(context);	
 
+	// if (exists('@nrwl/cli')) {
+	// 	// Need to enable project selector
+	// 	vscode.window.showInformationMessage('NX is a WIP');
+	// }
 	await getRecommendations(project, context, packages);
 
 	vscode.commands.executeCommand('setContext', Context.inspectedProject, true);

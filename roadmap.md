@@ -54,3 +54,20 @@
 # Known Issues
 - Badge option is not available for VS Code Extensions
 - links to external content cannot open in VS Code editor window (must be browser)
+
+# Support For NX
+- Detect @nrwl/cli to enable project switcher
+- Project switcher:
+  - Instead of "Capacitor" do "Capacitor: {project name}"
+  - Down arrow to allow selection of the project
+  - Default to the first app (remember last used)
+- Instead of "ionic build" might need "nx build {project}", lint, serve, test, e2e (see https://nxtend.dev/docs/ionic-angular/getting-started/#targets)
+- Capacitor has "nx build {project}", "nx run {project}" and more (https://nxtend.dev/docs/ionic-angular/capacitor#add-native-platform)
+- Cap handle build, run, sync
+- workspace.json has a good list of projects
+
+- Starters for NX?
+
+# Support for pnpm
+- See: https://github.com/reslear/ionic-vue-pnpm-monorepo
+
