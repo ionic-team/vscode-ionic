@@ -78,14 +78,6 @@ export class Project {
 		return r;
 	}
 
-	// Look in package.json for scripts and add options to execute
-	public addScripts() {
-		const packages: PackageFile = getPackageJSON(this.folder);
-		for (const script of Object.keys(packages.scripts)) {
-			this.add(new Tip(script, '', TipType.Run, '', `npm run ${script}`, `Running ${script}`, `Ran ${script}`));
-		}
-	}
-
 	public note(title: string, message: string, url?: string, tipType?: TipType, description?: string) {
 		const tip = new Tip(title, message, tipType, description, undefined, undefined, undefined, url);
 		const r = new Recommendation(description ? description : message, message, title, vscode.TreeItemCollapsibleState.None,

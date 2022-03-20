@@ -19,6 +19,7 @@ import { checkDeprecatedPlugins } from './rules-deprecated-plugins';
 import { capacitorSync } from './capacitor-sync';
 import { capacitorOpen } from './capacitor-open';
 import { CapacitorPlatform } from './capacitor-platform';
+import { addScripts } from './scripts';
 
 export async function getRecommendations(project: Project, context: vscode.ExtensionContext, packages: any): Promise<void> {
 	if (isCapacitor() && !isCordova()) {
@@ -95,9 +96,8 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 		}
 	}
 
-	// Script Running
-	project.setGroup(`Scripts`, ``, TipType.Files, false);
-	project.addScripts();
+	// Script Running	
+	addScripts(project);
 
 	if (isCapacitor() || project.hasACapacitorProject()) {
 		// Capacitor Configure Features
