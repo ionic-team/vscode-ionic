@@ -1,4 +1,8 @@
 ## Changelog
+### Version 1.3.0
+- Mono Repo Support for Nx
+
+
 ### Version 1.2.2
 - Error assistance for errors from eslint, typescript, angular/vue/react cli, swift/java, jasmine/jest
 - Colorize the output window for warnings, errors, urls

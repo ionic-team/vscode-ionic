@@ -13,6 +13,7 @@ This extension for Visual Studio Code features:
 - [Angular Migrations](#angular-migrations) - Automate Angular version migrations using `ng update`
 - [Splash Screen and Icons](#splash-screen-and-icons) - Generate Splash Screen and Icons assets for iOS and Android projects
 - [Error Assistant](#error-assistant) - Detect errors in `swift`, `java`, `typescript`, `eslint`, `jasmine` and `jest`
+- [Mono Repo Support for Nx](#nx-support) - Support for Capacitor and Ionic Angular/React with Nx and `nxtend.dev`
 
 ## Creating Ionic Projects
 - Open an Empty Folder
@@ -91,6 +92,12 @@ Detects errors in `swift`, `java`, `typescript`, `eslint`, `jasmine` and `jest` 
 - Opens the place in code where the error occurs
 - Allows navigation to `next` and `previous` errors
 - Re-runs the operation when you correct the problem and save the file
+
+## Nx Support
+Detects a Nx workspace and provides a Nx Project selector for `apps`. When an Nx project is selected menu options will reflect what the project is capable of (eg running a native iOS or Android app). The `scripts` section will also include the common Nx commands for `build`, `test`, `lint` and `e2e`.
+
+Note: The extension only provides support for node package upgrades at the root of your Nx workspace.
+- [Video of Nx Workspace](https://vs-ionic.netlify.app/videos/nx-workspace.mp4)
 
 ## Submit Feedback
 [File an issue](https://github.com/ionic-team/vscode-extension/issues) to provide feedback on bugs and feature requests.
