@@ -244,8 +244,9 @@ export class Project {
 		}
 	}
 
-	public recommendAdd(name: string, title: string, message: string, description?: string) {
-		this.add(new Tip(title, message, TipType.Warning, description, `npm install ${name}`, 'Install', `Installed ${name}`));
+	public recommendAdd(name: string, title: string, message: string, description: string, devDependency: boolean) {
+		const flags = devDependency ? ' --save-dev' : '';
+		this.add(new Tip(title, message, TipType.Warning, description, `npm install ${name} --save-exact ${flags}`, 'Install', `Installed ${name}`));
 	}
 
 	public deprecatedPlugin(name: string, message: string, url?: string) {

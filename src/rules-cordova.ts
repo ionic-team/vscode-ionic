@@ -35,7 +35,7 @@ export function checkCordovaRules(project: Project) {
 		if (!exists('@ionic/cordova-builders')) {
 			project.recommendAdd('@ionic/cordova-builders', '@ionic/cordova-builders',
 				'Install @ionic/cordova-builders for compatibility',
-				'The package @ionic/cordova-builders is required when @ionic/angular-toolkit is version 6 and higher.');
+				'The package @ionic/cordova-builders is required when @ionic/angular-toolkit is version 6 and higher.', true);
 		}
 	}
 

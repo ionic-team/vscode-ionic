@@ -19,6 +19,14 @@ export function checkCapacitorRules(project: Project) {
 	project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/ios'));
 	project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/android'));
 
+
+	if (!exists('@capacitor/cli')) {
+		// Capacitor CLI should be installed locally
+		project.recommendAdd('@capacitor/cli', '@capacitor/cli',
+			'Install @capacitor/cli',
+			'The Capacitor CLI should be installed locally in your project', true);
+	}
+
 	// cordova-plugin-appsflyer-sdk doesnt build with Capacitor. Use appsflyer-capacitor-plugin instead 
 	// see https://github.com/AppsFlyerSDK/appsflyer-cordova-plugin#------%EF%B8%8F-note-for-capacitor-users--%EF%B8%8F------
 	project.recommendReplace('cordova-plugin-appsflyer-sdk', 'cordova-plugin-appsflyer-sdk',
@@ -31,7 +39,7 @@ export function checkCapacitorRules(project: Project) {
 		// Latest 1.7.1 of the file-transfer plugin requires whitelist in Capacitor projects. See: https://github.com/ionic-team/capacitor/issues/1199
 		project.recommendAdd('cordova-plugin-whitelist', 'cordova-plugin-file-transfer',
 			'Install cordova-plugin-whitelist for compatibility',
-			'The plugin cordova-plugin-file-transfer has a dependency on cordova-plugin-whitelist when used with a Capacitor project');
+			'The plugin cordova-plugin-file-transfer has a dependency on cordova-plugin-whitelist when used with a Capacitor project', false);
 	}
 
 	if (exists('@ionic/cordova-builders')) {

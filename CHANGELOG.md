@@ -1,6 +1,7 @@
 ## Changelog
 ### Version 1.3.0
 - Mono Repo Support for Nx
+- Recommendation for Capacitor projects to add @capacitor/cli locally
 
 
 ### Version 1.2.2
