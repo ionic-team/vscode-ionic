@@ -2,6 +2,8 @@
 ### Version 1.3.0
 - Mono Repo Support for Nx
 - Recommendation for Capacitor projects to add @capacitor/cli locally
+- Add cordova-plugin-ionic to list of plugins working in Capacitor
+- Better handling of errors when Node is not installed
 
 
 ### Version 1.2.2
