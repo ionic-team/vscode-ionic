@@ -18,8 +18,13 @@ let onSave: vscode.Disposable;
 
 export async function handleError(error: string, logs: Array<string>, folder: string): Promise<string> {
 	if (error && error.includes('ionic: command not found')) {
-		const selection = await vscode.window.showErrorMessage('The Ionic CLI is not installed. Get started by running npm install -g @ionic/cli at the terminal.', 'More Information');
+		await vscode.window.showErrorMessage('The Ionic CLI is not installed. Get started by running npm install -g @ionic/cli at the terminal.', 'More Information');
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse('https://ionicframework.com/docs/intro/cli#install-the-ionic-cli'));
+		return;
+	}
+	if (error && error.startsWith('/bin/sh: npx')) {
+		await vscode.window.showErrorMessage('This extension requires Node to be installed.', 'More Information');
+		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse('https://nodejs.dev/'));
 		return;
 	}
 	let errorMessage = error;
