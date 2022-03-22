@@ -124,6 +124,7 @@ export function reviewPluginsWithHooks(packages: object): Tip[] {
 		'cordova-plugin-add-swift-support',
 		'cordova-plugin-androidx',
 		'cordova-plugin-androidx-adapter',
+		'cordova-plugin-ionic', // Works for Capacitor
 		'phonegap-plugin-push', // This has a hook for browser which is not applicable
 		'cordova-plugin-push', // This has a hook for browser which is not applicable
 	];
@@ -134,7 +135,7 @@ export function reviewPluginsWithHooks(packages: object): Tip[] {
 			tips.push(new Tip(library,
 				`contains Cordova hooks that may require manual migration to use with Capacitor.`,
 				TipType.Warning,
-				`${libString(library)} contains Cordova hooks that may to require manual migration to use with Capacitor.`, Command.NoOp, 'OK'
+				`${library} contains Cordova hooks that may to require manual migration to use with Capacitor.`, Command.NoOp, 'OK'
 			));
 		}
 	}
