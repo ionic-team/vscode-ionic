@@ -1,6 +1,7 @@
 import { Project } from './project';
 import { MonoRepoType } from './monorepo';
 import { exists } from './analyzer';
+import { InternalCommand } from './command-name';
 
 /**
  * Creates the capacitor sync command
@@ -11,6 +12,7 @@ import { exists } from './analyzer';
 	const ionicCLI = exists('@ionic/cli');
 	switch (project.repoType) {
 		case MonoRepoType.none: return ionicCLI ? capCLISync() : ionicCLISync();
+		case MonoRepoType.npm: return InternalCommand.cwd + (ionicCLI ? capCLISync() : ionicCLISync()); //+ ' --project='+ionicState.workspace;
 		case MonoRepoType.nx: return nxSync(project);
 		default: throw new Error('Unsupported Monorepo type');
 	}

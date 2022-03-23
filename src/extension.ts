@@ -13,7 +13,7 @@ import { Command, Tip } from './tip';
 import { CancelObject, run, getRunOutput, estimateRunTime } from './utilities';
 import { ignore } from './ignore';
 import { handleError } from './error-handler';
-import { CommandName } from './command-name';
+import { CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
 import { IonicProjectsreeProvider } from './ionic-projects-provider';
 
@@ -155,7 +155,12 @@ function startCommand(tip: Tip, cmd: string) {
 	if (tip.title) {
 		const message = tip.commandTitle ? tip.commandTitle : tip.title;
 		channel.appendLine(`[Ionic] ${message}...`);
-		channel.appendLine(`> ${cmd}`);
+		let command = cmd;
+		if (command.includes(InternalCommand.cwd)) {
+			command = command.replace(InternalCommand.cwd, '');
+			channel.appendLine(`> Workspace: ${ionicState.workspace}`);		
+		}
+		channel.appendLine(`> ${command}`);
 		channel.show();
 	}
 }
@@ -350,7 +355,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			if (tip.doDeviceSelection) {
 				const target = await selectDevice(tip.secondCommand as string, tip.data, tip);
-				command = (tip.command as string).replace('@', target);
+				command = (tip.command as string).replace(InternalCommand.target, target);
 			}
 			if (command) {
 				execute(tip);

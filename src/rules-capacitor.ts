@@ -8,6 +8,8 @@ import { Tip, TipType } from "./tip";
 import { asAppId } from "./utilities";
 import { capacitorAdd } from './capacitor-add';
 import { CapacitorPlatform } from './capacitor-platform';
+import { npmInstall } from './node-commands';
+import { InternalCommand } from './command-name';
 
 /**
  * Check rules for Capacitor projects
@@ -83,10 +85,10 @@ export function capacitorRecommendations(project: Project): Tip[] {
 		tips.push(new Tip(
 			'Add Capacitor Integration', '', TipType.Capacitor, 'Add the Capacitor integration to this project',
 			[
-				`npm install --save -E @capacitor/core@latest`,
-				`npm install -D -E @capacitor/cli@latest`,
-				`npm install @capacitor/app @capacitor/core @capacitor/haptics @capacitor/keyboard @capacitor/status-bar --save-exact`,
-				`npx capacitor init "${project.name}" "${asAppId(project.name)}" --web-dir www`
+				npmInstall('@capacitor/core@latest', '--save','-E'),
+				npmInstall('@capacitor/cli@latest', '-D', '-E'),
+				npmInstall(`@capacitor/app @capacitor/core @capacitor/haptics @capacitor/keyboard @capacitor/status-bar`),
+				`${InternalCommand.cwd}npx capacitor init "${project.name}" "${asAppId(project.name)}" --web-dir www`
 			],
 			'Add Capacitor', 'Capacitor added to this project',
 			'https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor'
@@ -95,13 +97,13 @@ export function capacitorRecommendations(project: Project): Tip[] {
 		if (!project.hasCapacitorProject(CapacitorPlatform.android)) {
 			tips.push(new Tip(
 				'Add Android Project', '', TipType.Capacitor, 'Add Android support to your Capacitor project',
-				['npm install @capacitor/android --save-exact', capacitorAdd(project, CapacitorPlatform.android)], 'Add Android', 'Android support added to your project').showProgressDialog());
+				[npmInstall('@capacitor/android'), capacitorAdd(project, CapacitorPlatform.android)], 'Add Android', 'Android support added to your project').showProgressDialog());
 		}
 
 		if (!project.hasCapacitorProject(CapacitorPlatform.ios)) {
 			tips.push(new Tip(
 				'Add iOS Project', '', TipType.Capacitor, 'Add iOS support to your Capacitor project',
-				['npm install @capacitor/ios --save-exact', capacitorAdd(project, CapacitorPlatform.ios)], 'Add iOS', 'iOS support added to your project').showProgressDialog());
+				[npmInstall('@capacitor/ios'), capacitorAdd(project, CapacitorPlatform.ios)], 'Add iOS', 'iOS support added to your project').showProgressDialog());
 		}
 	}
 

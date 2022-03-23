@@ -7,7 +7,9 @@ import * as vscode from 'vscode';
 import { RunPoint } from './tip';
 import { viewInEditor } from './editor-preview';
 import { handleError } from './error-handler';
-import { IonicTreeProvider } from './ionic-tree-provider';
+import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
+import { getMonoRepoFolder, getPackageJSONFilename } from './monorepo';
+import { InternalCommand } from './command-name';
 
 export interface CancelObject {
 	proc: child_process.ChildProcess;
@@ -29,7 +31,7 @@ function runOptions(command: string, folder: string) {
 	const javaHome: string = vscode.workspace.getConfiguration('ionic').get('javaHome');
 
 	// Cocoapods required lang set to en_US.UTF-8 (when capacitor sync or run ios is done)
-	if (command.includes('sync') || command.includes('cap run ios')) {
+	if (command.includes('sync') || command.includes('capacitor init') || command.includes('cap run ios')) {
 		env.LANG = 'en_US.UTF-8';
 	}
 	if (javaHome) {
@@ -40,12 +42,18 @@ function runOptions(command: string, folder: string) {
 }
 
 export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject, viewEditor: boolean, runPoints: Array<RunPoint>, progress: any, ionicProvider?: IonicTreeProvider): Promise<void> {
-	if (command == 'rem-cordova') {
+	if (command == InternalCommand.removeCordova) {
 		return removeCordovaFromPackageJSON(folder);
 	}
+
+	if (command.includes(InternalCommand.cwd)) {
+		command = command.replace(InternalCommand.cwd, '');
+		// Change the work directory for monorepos as folder is the root folder
+		folder = getMonoRepoFolder(ionicState.workspace);
+	}
+
 	let logs: Array<string> = [];
 	return new Promise((resolve, reject) => {
-		console.log(`exec ${command} (${folder})`);
 		const start_time = process.hrtime();
 		const proc = child_process.exec(command, runOptions(command, folder), (error: child_process.ExecException, stdout: string, stderror: string) => {
 			if (error) {
@@ -137,7 +145,7 @@ export async function getRunOutput(command: string, folder: string): Promise<str
 }
 
 export function getPackageJSON(folder: string): PackageFile {
-	const filename = path.join(folder, 'package.json');
+	const filename = getPackageJSONFilename(folder);
 	return JSON.parse(fs.readFileSync(filename, 'utf8'));
 }
 

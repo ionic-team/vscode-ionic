@@ -8,6 +8,7 @@ import { Tip, TipType } from './tip';
 import { Project } from './project';
 import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
+import { npmInstall } from './node-commands';
 
 export enum AssetType {
 	splash = 'splash.png',
@@ -149,7 +150,7 @@ async function runCordovaRes(project: Project) {
 	await showProgress('Generating Splash Screen and Icon Assets',
 		async () => {
 			if (!hasCordovaRes) {
-				await run(folder, 'npm install cordova-res --save-dev --save-exact', channel, undefined, false, undefined, undefined);
+				await run(folder, npmInstall('cordova-res', '--save-dev'), channel, undefined, false, undefined, undefined);
 			}
 			if (ios) {
 				await run(folder, 'npx cordova-res ios --skip-config --copy', channel, undefined, false, undefined, undefined);

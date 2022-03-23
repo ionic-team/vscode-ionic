@@ -14,5 +14,10 @@ export enum CommandName {
 	Upgrade = 'ionic.upgrade',
 	ProjectsRefresh = 'ionic.projectRefresh',
 	ProjectSelect = 'ionic.projectSelect'
+}
 
+export enum InternalCommand {
+	cwd = '[@cwd]', // Used to change the working directory for a commmand if we are in a monorepo
+	target = '[@target]', // Used to change the target to the device selected
+	removeCordova = 'rem-cordova' // Will remove cordova from the projcet
 }

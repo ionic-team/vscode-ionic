@@ -1,4 +1,5 @@
 import { exists, reviewPlugin } from "./analyzer";
+import { InternalCommand } from "./command-name";
 import { reviewPluginsWithHooks } from "./process-packages";
 import { Project } from "./project";
 import { capacitorRecommendations } from './rules-capacitor';
@@ -26,7 +27,7 @@ export function capacitorMigrationChecks(packages, project: Project) {
 	if (exists('cordova-ios') || (exists('cordova-android') || (project.fileExists('config.xml')))) {
 		const movecmd = process.platform === "win32" ? 'rename config.xml config.xml.bak' : 'mv config.xml config.xml.bak';
 		tips.push(new Tip('Remove Cordova Project', '', TipType.Capacitor, 'Remove the Cordova integration',
-			['npm uninstall cordova-ios', 'npm uninstall cordova-android', movecmd, 'rem-cordova'],
+			['npm uninstall cordova-ios', 'npm uninstall cordova-android', movecmd, InternalCommand.removeCordova],
 			'Remove Cordova', 'Removing Cordova', 'Successfully removed Cordova'));
 	}
 	project.tips(tips);

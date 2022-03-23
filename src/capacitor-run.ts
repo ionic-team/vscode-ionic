@@ -2,10 +2,10 @@ import * as vscode from 'vscode';
 
 import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
+import { InternalCommand } from './command-name';
 import { getOutputChannel } from './extension';
 import { MonoRepoType } from './monorepo';
 import { Project } from './project';
-import { Command } from './tip';
 
 
 
@@ -17,18 +17,19 @@ import { Command } from './tip';
  */
 export function capacitorRun(project: Project, platform: CapacitorPlatform): string {
 	switch (project.repoType) {
-		case MonoRepoType.none: return capRun(platform);
+		case MonoRepoType.none,
+			MonoRepoType.npm: return capRun(platform, project.repoType);
 		case MonoRepoType.nx: return nxRun(project, platform);
 		default: throw new Error('Unsupported Monorepo type');
-	}	
+	}
 }
 
 export function capacitorDevicesCommand(platform: CapacitorPlatform): string {
-	const ionic = exists('@ionic/cli') ? 'ionic ': '';
+	const ionic = exists('@ionic/cli') ? 'ionic ' : '';
 	return `npx ${ionic}cap run ${platform} --list`;
 }
 
-function capRun(platform: CapacitorPlatform): string {
+function capRun(platform: CapacitorPlatform, repoType: MonoRepoType): string {
 	const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
 	const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
 	let capRunFlags = liveReload ? ' -l' : '';
@@ -45,11 +46,12 @@ function capRun(platform: CapacitorPlatform): string {
 		capRunFlags += '--external';
 	}
 
-	const ionic = exists('@ionic/cli') ? 'ionic ': '';
-	return `npx ${ionic}cap run ${platform}${capRunFlags} --target=@`;
+	const pre = (repoType == MonoRepoType.npm) ? InternalCommand.cwd : '';
+	const ionic = exists('@ionic/cli') ? 'ionic ' : '';
+	return `${pre}npx ${ionic}cap run ${platform}${capRunFlags} --target=${InternalCommand.target}`;
 }
 
 function nxRun(project: Project, platform: CapacitorPlatform): string {
 	// Note: This may change, see: https://github.com/nxtend-team/nxtend/issues/490
-	return `npx nx run ${project.monoRepo.name}:cap --cmd "run ${platform} --target=@"`;
+	return `npx nx run ${project.monoRepo.name}:cap --cmd "run ${platform} --target=${InternalCommand.target}"`;
 }

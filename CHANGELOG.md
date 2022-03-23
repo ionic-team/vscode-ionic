@@ -1,4 +1,7 @@
 ## Changelog
+### Version 1.3.2
+- Mono Repo Support for npm workspaces
+
 ### Version 1.3.1
 - Mono Repo Support for Nx
 - Recommendation for Capacitor projects to add @capacitor/cli locally

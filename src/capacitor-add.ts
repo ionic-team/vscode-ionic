@@ -1,5 +1,6 @@
 import { exists } from "./analyzer";
 import { CapacitorPlatform } from "./capacitor-platform";
+import { InternalCommand } from "./command-name";
 import { MonoRepoType } from "./monorepo";
 import { Project } from "./project";
 
@@ -13,6 +14,7 @@ export function capacitorAdd(project: Project, platform: CapacitorPlatform): str
 	const ionic = exists('@ionic/cli') ? 'ionic ' : '';
 	switch (project.repoType) {
 		case MonoRepoType.none: return `npx ${ionic}cap add ${platform}`;
+		case MonoRepoType.npm: return `${InternalCommand.cwd}npx ${ionic}cap add ${platform}`;
 		case MonoRepoType.nx: return nxAdd(project, platform);
 		default: throw new Error('Unsupported Monorepo type');
 	}
