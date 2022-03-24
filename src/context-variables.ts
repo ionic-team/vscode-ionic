@@ -1,3 +1,5 @@
+import { Project } from "./project";
+
 export enum Context {
 	// Whether the project has been inspected (true) or not (false)
 	inspectedProject = 'inspectedProject',
@@ -12,13 +14,24 @@ export enum Context {
 	noProjectFound = 'noProjectFound'
 }
 
-export enum PackageCache {
-	// Cache from npm outdated
-	outdated = 'npmOutdatedData',
 
-	// Cache from npm list
-	list = 'npmListData',
+export function PackageCacheOutdated(project: Project) {
+	if (project?.monoRepo?.localPackageJson) {
+		return 'npmOutdatedData_'+project.monoRepo.name;
+	}
+	return 'npmOutdatedData';
+}
 
-	// The package.json modified file date
-	modified = 'packagesModified'
+export function PackageCacheList(project: Project) {
+	if (project?.monoRepo?.localPackageJson) {
+		return 'npmListData_'+project.monoRepo.name;
+	}
+	return 'npmListData';
+}
+
+export function PackageCacheModified(project: Project) {
+	if (project?.monoRepo?.localPackageJson) {
+		return 'packagesModified_'+project.monoRepo.name;
+	}
+	return 'packagesModified';
 }

@@ -4,6 +4,7 @@ import * as path from 'path';
 
 import { Project } from './project';
 import { MonoRepoType } from './monorepo';
+import { ionicState } from './ionic-tree-provider';
 
 /**
  * Creates the ionic build command
@@ -18,6 +19,7 @@ export function ionicBuild(project: Project): string {
 	const prod: boolean = vscode.workspace.getConfiguration('ionic').get('buildForProduction');	
 	switch (project.repoType) {
 		case MonoRepoType.none: return `${preop}${ionicCLIBuild(prod)}`;
+		case MonoRepoType.npm: return `${preop}${ionicCLIBuild(prod)} --project=${ionicState.workspace}`;
 		case MonoRepoType.nx: return `${preop}${nxBuild(prod, project)}`;
 		default: throw new Error('Unsupported Monorepo type');
 	}

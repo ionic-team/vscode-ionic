@@ -10,13 +10,13 @@ import {
 	writeMinVersionError,
 	writeMinVersionWarning,
 	error,
-	libString,
 	writeConsistentVersionWarning
 } from './messages';
 import { processPackages } from './process-packages';
 import { Command, Tip, TipType } from './tip';
 import { Project } from './project';
 import { setStringIn } from './utilities';
+import { npmInstall, npmUninstall } from './node-commands';
 
 let packageFile;
 let allDependencies;
@@ -103,12 +103,13 @@ export async function load(fn: string, project: Project, context: vscode.Extensi
 	project.modified = fs.statSync(packageJsonFilename).mtime;
 	packageFile = JSON.parse(fs.readFileSync(packageJsonFilename, 'utf8'));
 	project.name = packageFile.name;
+	project.workspaces = packageFile.workspaces;
 	allDependencies = {
 		...packageFile.dependencies,
 		...packageFile.devDependencies,
 	};
 
-	return await processPackages(fn, allDependencies, packageFile.devDependencies, context, project.modified);
+	return await processPackages(fn, allDependencies, packageFile.devDependencies, context, project);
 }
 
 export const checkMinVersion = (library: string, minVersion: string, reason?: string, url?: string): Tip => {
@@ -246,8 +247,8 @@ export function notRequiredPlugin(name: string, message?: string): Tip {
 		const msg = message ? '. ' + message : '';
 		return new Tip(name,
 			`Not required with Capacitor${msg}`, TipType.Error,
-			`The plugin ${libString(name)} is not required with Capacitor${msg}`,
-			`npm uninstall ${name}`,
+			`The plugin ${name} is not required with Capacitor${msg}`,
+			npmUninstall(name),
 			'Uninstall',
 			`${name} was uninstalled`).canIgnore();
 	}
@@ -257,8 +258,8 @@ export function replacementPlugin(name: string, replacement: string, url?: strin
 	if (exists(name)) {
 		return new Tip(name,
 			`Replace with ${replacement}${url ? ' (' + url + ')' : ''}`, TipType.Idea,
-			`The plugin ${libString(name)} could be replaced with ${libString(replacement)}${url ? ' (' + url + ')' : ''}`,
-			`npm install ${replacement} && npm uninstall ${name}`,
+			`The plugin ${name} could be replaced with ${replacement}${url ? ' (' + url + ')' : ''}`,
+			npmInstall(replacement) + ' && ' + npmUninstall(name),
 			'Replace Plugin',
 			`${name} replaced with ${replacement}`,
 			url
@@ -270,8 +271,8 @@ export function incompatibleReplacementPlugin(name: string, replacement: string,
 	if (exists(name)) {
 		return new Tip(name,
 			`Replace with ${replacement}${url ? ' (' + url + ')' : ''}`, TipType.Error,
-			`The plugin ${libString(name)} is incompatible with Capacitor and must be replaced with ${libString(replacement)}${url ? ' (' + url + ')' : ''}`,
-			`npm install ${replacement} && npm uninstall ${name}`,
+			`The plugin ${name} is incompatible with Capacitor and must be replaced with ${replacement}${url ? ' (' + url + ')' : ''}`,
+			npmInstall(replacement) + ' && ' + npmUninstall(name),
 			'Replace Plugin',
 			`${name} replaced with ${replacement}`,
 			url
@@ -285,7 +286,7 @@ export function incompatiblePlugin(name: string, url?: string): Tip {
 		const msg = (isUrl) ? `See ${url}` : url;
 		const tip = new Tip(name,
 			`Incompatible with Capacitor. ${msg}`, TipType.Error,
-			`The plugin ${libString(name)} is incompatible with Capacitor. ${msg}`, Command.NoOp, 'OK').canIgnore();
+			`The plugin ${name} is incompatible with Capacitor. ${msg}`, Command.NoOp, 'OK').canIgnore();
 		if (isUrl) {
 			tip.url = url;
 		} else {
@@ -300,12 +301,12 @@ export function reviewPlugin(name: string): Tip {
 	if (exists(name)) {
 		return new Tip(name,
 			`Test for Capacitor compatibility.`, TipType.Warning,
-			`The plugin ${libString(name)} requires testing for Capacitor compatibility.`);
+			`The plugin ${name} requires testing for Capacitor compatibility.`);
 	}
 }
 
 export function warnIfNotUsing(name: string): Tip {
 	if (!allDependencies[name]) {
-		return new Tip(name, `package is not using ${libString(name)}`);
+		return new Tip(name, `package is not using ${name}`);
 	}
 }

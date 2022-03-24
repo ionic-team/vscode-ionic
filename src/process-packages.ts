@@ -3,58 +3,67 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
-import { coerce, major } from 'semver';
-import { libString } from './messages';
+import { coerce } from 'semver';
 import { Command, Tip, TipType } from './tip';
 import { Project } from './project';
 import { getRunOutput, getStringFrom } from './utilities';
-import { PackageCache } from './context-variables';
 import { NpmDependency, NpmOutdatedDependency, NpmPackage, PackageType, PackageVersion } from './npm-model';
+import { listCommand, outdatedCommand } from './node-commands';
+import { PackageCacheList, PackageCacheModified, PackageCacheOutdated } from './context-variables';
+import { join } from 'path';
 
 export function clearRefreshCache(context: vscode.ExtensionContext) {
 	if (context) {
-		context.workspaceState.update(PackageCache.outdated, undefined);
-		context.workspaceState.update(PackageCache.list, undefined);
+		for (const key of context.workspaceState.keys()) {
+			if (key.startsWith(PackageCacheOutdated(undefined))) {
+				context.workspaceState.update(key, undefined);
+			}
+			if (key.startsWith(PackageCacheList(undefined))) {
+				context.workspaceState.update(key, undefined);
+			}
+		}
 	}
 
 	console.log('Cached data cleared');
 }
 
-export async function processPackages(folder: string, allDependencies: object, devDependencies: object, context: vscode.ExtensionContext, packagesModified: Date): Promise<any> {
+export async function processPackages(folder: string, allDependencies: object, devDependencies: object, context: vscode.ExtensionContext, project: Project): Promise<any> {
 	if (!fs.lstatSync(folder).isDirectory()) {
 		return {};
 	}
+
 
 	// npm outdated only shows dependencies and not dev dependencies if the node module isnt installed
 	let outdated = '[]';
 	let versions = '{}';
 	try {
-		const packageModifiedLast = context.workspaceState.get(PackageCache.modified);
-		outdated = context.workspaceState.get(PackageCache.outdated);
-		versions = context.workspaceState.get(PackageCache.list);
+		const packagesModified: Date = project.modified;
+		const packageModifiedLast = context.workspaceState.get(PackageCacheModified(project));
+		outdated = context.workspaceState.get(PackageCacheOutdated(project));
+		versions = context.workspaceState.get(PackageCacheList(project));
 		const changed = packagesModified.toUTCString() != packageModifiedLast;
 		if (changed || !outdated || !versions) {
 			await Promise.all([
-				getRunOutput('npm outdated --json', folder).then((data) => {
+				getRunOutput(outdatedCommand(project), folder).then((data) => {
 					outdated = data;
-					context.workspaceState.update(PackageCache.outdated, outdated);
+					context.workspaceState.update(PackageCacheOutdated(project), outdated);
 				}),
-				getRunOutput('npm list --json', folder).then((data) => {
+				getRunOutput(listCommand(project), folder).then((data) => {
 					versions = data;
-					context.workspaceState.update(PackageCache.list, versions);
+					context.workspaceState.update(PackageCacheList(project), versions);
 				})
 			]);
-			context.workspaceState.update(PackageCache.modified, packagesModified.toUTCString());
+			context.workspaceState.update(PackageCacheModified(project), packagesModified.toUTCString());
 		} else {
 			// Use the cached value
 			// But also get a copy of the latest packages for updating later
-			getRunOutput('npm outdated --json', folder).then((outdatedFresh) => {
-				context.workspaceState.update(PackageCache.outdated, outdatedFresh);
-				context.workspaceState.update(PackageCache.modified, packagesModified.toUTCString());
+			getRunOutput(outdatedCommand(project), folder).then((outdatedFresh) => {
+				context.workspaceState.update(PackageCacheOutdated(project), outdatedFresh);
+				context.workspaceState.update(PackageCacheModified(project), packagesModified.toUTCString());
 			});
 
-			getRunOutput('npm list --json', folder).then((versionsFresh) => {
-				context.workspaceState.update(PackageCache.list, versionsFresh);
+			getRunOutput(listCommand(project), folder).then((versionsFresh) => {
+				context.workspaceState.update(PackageCacheList(project), versionsFresh);
 			});
 		}
 	} catch (err) {
@@ -70,7 +79,7 @@ export async function processPackages(folder: string, allDependencies: object, d
 	//  "@ionic-native/location-accuracy": { "wanted": "5.36.0", "latest": "5.36.0", "dependent": "cordova-old" }  
 
 	const packages = processDependencies(allDependencies, getOutdatedData(outdated), devDependencies, getListData(versions));
-	inspectPackages(folder, packages);
+	inspectPackages(project.folder ? project.folder : folder, packages);
 	return packages;
 }
 
@@ -220,7 +229,7 @@ function markIfPlugin(folder: string): boolean {
 function inspectPackages(folder: string, packages) {
 	// plugins
 	for (const library of Object.keys(packages)) {
-		const plugin = folder + '/node_modules/' + library + '/plugin.xml';
+		const plugin = join(folder, 'node_modules', library, 'plugin.xml');
 		if (fs.existsSync(plugin)) {
 			// Cordova based
 			const content = fs.readFileSync(plugin, 'utf8');

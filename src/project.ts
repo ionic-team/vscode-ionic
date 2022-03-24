@@ -5,7 +5,6 @@ import * as path from 'path';
 import { Recommendation } from './recommendation';
 import { Tip, TipType } from './tip';
 import { load, isCapacitor, exists } from './analyzer';
-import { getPackageJSON, PackageFile } from './utilities';
 import { fixIssue, isRunning } from './extension';
 import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
@@ -16,10 +15,12 @@ import { CommandName } from './command-name';
 import { angularMigrate } from './rules-angular-migrate';
 import { checkForMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
 import { CapacitorPlatform } from './capacitor-platform';
+import { npmInstall, npmUninstall } from './node-commands';
 
 export class Project {
 	name: string;
 	type: string = undefined;
+	workspaces: Array<string>;
 	folder: string;
 	modified: Date; // Last modified date of package.json
 	group: Recommendation;
@@ -54,10 +55,11 @@ export class Project {
 	 * This is the path the selected project (for monorepos) or the root folder
 	 */
 	public projectFolder() {
-		if (this.repoType == MonoRepoType.none) {
-			return this.folder;
+		switch (this.repoType) {
+			case MonoRepoType.none: return this.folder;
+			case MonoRepoType.npm: return this.monoRepo.folder;
+			default: return path.join(this.folder, this.monoRepo.folder);
 		}
-		return path.join(this.folder, this.monoRepo.folder);
 	}
 
 	public setGroup(title: string, message: string, type?: TipType, expanded?: boolean, contextValue?: string): Recommendation {
@@ -204,26 +206,30 @@ export class Project {
 	}
 
 	private updatePackages(r: Recommendation): string {
-		if (hasUninstall(r)) return;
 		let command = '';
 		for (const child of r.children) {
-			if (command != '') {
-				command += ' ';
-			}
 			// Command will be npm install @capacitor/android@3.4.3 --save-exact
-			command += (child.tip.command as string).replace('npm install ', '').replace(' --save-exact', '');
+			if ((child.tip.command as string).includes('npm install')) {
+				const npackage = (child.tip.command as string).replace('npm install ', '').replace(' --save-exact', '');
+
+				if (command != '') {
+					command += ' ';
+				}
+				command += npackage.trim();
+			}
 		}
-		return `npm install ${command} --save-exact`;
+		return npmInstall(command);
 	}
 
 	private updatePackagesTitle(r: Recommendation): string {
-		if (hasUninstall(r)) return;
 		let title = '';
 		for (const child of r.children) {
-			if (title != '') {
-				title += ', ';
+			if ((child.tip.command as string).includes('npm install')) {
+				if (title != '') {
+					title += ', ';
+				}
+				title += child.tip.description;
 			}
-			title += child.tip.description;
 		}
 		return `${r.children.length} Packages: ${title}`;
 	}
@@ -234,20 +240,21 @@ export class Project {
 
 	public recommendReplace(name: string, title: string, message: string, description: string, replacement: string) {
 		if (exists(name)) {
-			this.add(new Tip(title, message, TipType.Warning, description, `npm install ${replacement} && npm uninstall ${name}`, 'Replace', `Replaced ${name} with ${replacement}`));
+			this.add(new Tip(title, message, TipType.Warning, description, `${npmInstall(replacement)} && ${npmUninstall(name)}`, 'Replace', `Replaced ${name} with ${replacement}`));
 		}
 	}
 
 	public recommendRemove(name: string, title: string, message: string, description?: string, url?: string) {
 		if (exists(name)) {
-			this.add(new Tip(title, message, TipType.Warning, description, `npm uninstall ${name}`, 'Uninstall', `Uninstalled ${name}`, url).canIgnore());
+			this.add(new Tip(title, message, TipType.Warning, description, npmUninstall(name), 'Uninstall', `Uninstalled ${name}`, url).canIgnore());
 		}
 	}
 
 	public recommendAdd(name: string, title: string, message: string, description: string, devDependency: boolean) {
-		const flags = devDependency ? ' --save-dev' : '';
-		this.add(new Tip(title, message, TipType.Warning, description, `npm install ${name} --save-exact ${flags}`, 'Install', `Installed ${name}`));
+		const flags = devDependency ? ' --save-dev' : undefined;
+		this.add(new Tip(title, message, TipType.Warning, description, npmInstall(name, flags), 'Install', `Installed ${name}`));
 	}
+
 
 	public deprecatedPlugin(name: string, message: string, url?: string) {
 		if (exists(name)) {
@@ -277,12 +284,12 @@ export class Project {
 				message,
 				undefined,
 				`Upgrade ${name} from ${fromVersion} to ${toVersion}`,
-				`npm install ${name}@${toVersion}${extra} --save-exact`,
+				npmInstall(`${name}@${toVersion}${extra}`),
 				`Upgrade`,
 				`${name} upgraded to ${toVersion}`,
 				`https://www.npmjs.com/package/${name}`,
 				`Upgrading ${name}`
-			).setSecondCommand(`Uninstall`, `npm uninstall ${name}`)
+			).setSecondCommand(`Uninstall`, npmUninstall(name))
 				.setContextValue('upgrade')
 				.setData({ name: name, version: fromVersion })
 			);
@@ -296,18 +303,19 @@ export class Project {
 				message,
 				undefined,
 				`Uninstall ${name}`,
-				`npm uninstall ${name}`,
+				npmUninstall(name),
 				`Uninstall`,
 				`${name} Uninstalled`,
 				`https://www.npmjs.com/package/${name}`,
 				`Uninstalling ${name}`
-			));
+			).setContextValue('upgrade')
+			.setData({ name: name, version: undefined }));
 		}
 	}
 
 	public checkNotExists(library: string, message: string) {
 		if (exists(library)) {
-			this.add(new Tip(library, message, TipType.Error, undefined, `npm uninstall ${library}`, 'Uninstall', `Uninstalled ${library}`));
+			this.add(new Tip(library, message, TipType.Error, undefined, npmUninstall(library), 'Uninstall', `Uninstalled ${library}`));
 		}
 	}
 
@@ -326,12 +334,6 @@ export class Project {
 	public fileExists(filename: string): boolean {
 		return fs.existsSync(path.join(this.projectFolder(), filename));
 	}
-}
-
-// Check if there is an uninstall command in the children. 
-// (Cant be a method of Project because "this" isnt the project)
-function hasUninstall(r: Recommendation): boolean {
-	return r.children.find((child) => child.tip.command.includes('uninstall')) != undefined;
 }
 
 function checkNodeVersion() {
@@ -354,7 +356,7 @@ export async function installPackage(extensionPath: string, folder: string) {
 	//const selected = await vscode.window.showQuickPick(items, { placeHolder: 'Select a package to install' });
 	const selected = await vscode.window.showInputBox({ placeHolder: 'Enter package name to install' });
 	if (!selected) return;
-	await fixIssue(`npm install ${selected}`, folder, undefined,
+	await fixIssue(npmInstall(selected), folder, undefined,
 		new Tip(`Install ${selected}`, undefined, TipType.Run, undefined, undefined,
 			`Installing ${selected}`,
 			`Installed ${selected}`).showProgressDialog());
@@ -366,7 +368,7 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 	vscode.commands.executeCommand('setContext', Context.isLoggingIn, false);
 
 	const project: Project = new Project('My Project');
-	const packages = await load(folder, project, context);
+	let packages = await load(folder, project, context);
 	ionicState.view.title = project.name;
 	project.type = isCapacitor() ? 'Capacitor' : 'Cordova';
 	project.folder = folder;
@@ -381,6 +383,10 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 	}
 
 	checkForMonoRepo(project, selectedProject, context);
+
+	if (project.monoRepo?.localPackageJson) {
+		packages = await load(project.monoRepo.folder, project, context);
+	}
 
 	sendTelemetryEvents(folder, project, packages, context);
 

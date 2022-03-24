@@ -31,6 +31,7 @@
 - (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
 - (bug) Bundle id validate doesnt accept "stuff"
 - (bug) Creating a new Ionic project should allow changing version number/bundleid (see bug WN-276 in Capacitor project)
+- (feat) cordova-plugin-file is required if you install cordova-plugin-advanced-http (inspect plugin.xml)
 
 ## Docs
 - (docs) Record video of previewing in editor
@@ -55,19 +56,26 @@
 - Badge option is not available for VS Code Extensions
 - links to external content cannot open in VS Code editor window (must be browser)
 
+# MonoRepo Tools
+Usage based on 2021.stateofjs.com:
+- Lerna - 25%
+- Yarn Workspaces - 25%
+- npm workspaces - 18%
+- pnpm - 13%
+- nx - 13%
+- Turborepo - 3%
+- Yalc - 2%
+- Rush - 2%
+
+### Js Painpoints
+- Managing Dependies, Code Architecture, State Management, Debugging...
+
+
 # Support For NX
 - (bug) Package reconciliation (from root and project)
 - (feat) Needs lint, test and e2e nx tasks added (assuming @nxtend/ionic-angular)
 - (feat) Detect missing @nxtend/ionic-angular or @nxtend/ionic-react. Option to add
 - (feat) Detect missing @nxtend/capacitor. Option to add
-
-- Detect @nrwl/cli to enable project switcher
-- Project switcher:
-  - Instead of "Capacitor" do "Capacitor: {project name}"
-  - Down arrow to allow selection of the project
-  - Default to the first app (remember last used)
-- Cap handle build, run, sync
-- workspace.json has a good list of projects
 
 - Starters for NX?
 
