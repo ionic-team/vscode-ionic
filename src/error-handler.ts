@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import { lastOperation } from './extension';
 import { CommandName } from './command-name';
@@ -23,7 +24,12 @@ export async function handleError(error: string, logs: Array<string>, folder: st
 		return;
 	}
 	if (error && error.startsWith('/bin/sh: npx')) {
-		await vscode.window.showErrorMessage('This extension requires Node to be installed.', 'More Information');
+		let msg = 'This extension requires npm to be installed. It can be downloaded and installed from nodejs.dev.';
+		if (os.platform() == 'darwin') {
+			msg += 'If you have npm installed you may need to run "npm config set script-shell /bin/zsh" to correctly set your shell and avoid this error.';
+		}
+
+		await vscode.window.showErrorMessage(msg, 'Install');
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse('https://nodejs.dev/'));
 		return;
 	}
@@ -279,7 +285,7 @@ async function handleErrorLine(number: number, errors: Array<ErrorLine>, folder:
 		await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(uri));
 		const myPos = new vscode.Position(errors[number].line, errors[number].position);
 		vscode.window.activeTextEditor.selection = new vscode.Selection(myPos, myPos);
-		vscode.commands.executeCommand('revealLine', { lineNumber: myPos.line, at: 'bottom' });		
+		vscode.commands.executeCommand('revealLine', { lineNumber: myPos.line, at: 'bottom' });
 	} else {
 		console.warn(`${uri} not found`);
 	}
