@@ -16,6 +16,7 @@ import { handleError } from './error-handler';
 import { CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
 import { IonicProjectsreeProvider } from './ionic-projects-provider';
+import { buildConfiguration } from './build-configuration';
 
 
 let channel: vscode.OutputChannel = undefined;
@@ -158,7 +159,7 @@ function startCommand(tip: Tip, cmd: string, ionicProvider: IonicTreeProvider) {
 		let command = cmd;
 		if (command.includes(InternalCommand.cwd)) {
 			command = command.replace(InternalCommand.cwd, '');
-			channel.appendLine(`> Workspace: ${ionicState.workspace}`);		
+			channel.appendLine(`> Workspace: ${ionicState.workspace}`);
 		}
 		channel.appendLine(`> ${command}`);
 		channel.show();
@@ -218,7 +219,7 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 				if (token.isCancellationRequested || tip.cancelRequested) {
 					tip.cancelRequested = false;
 					channel.appendLine(`[Ionic] Stopped "${tip.title}"`);
-					channel.show();					
+					channel.show();
 					clearInterval(interval);
 					finishCommand(tip);
 					cancelObject.proc.kill();
@@ -318,6 +319,13 @@ export function activate(context: vscode.ExtensionContext) {
 		ionicProvider.refresh();
 	});
 
+	vscode.commands.registerCommand(CommandName.BuildConfig, async (r: Recommendation) => {
+		const config = await buildConfiguration(context.extensionPath, context, r.tip.actionArg(0));
+		if (!config) return;
+		r.tip.addActionArg(`--configuration=${config}`);
+		runAction(r, ionicProvider, rootPath);
+	});
+
 	vscode.commands.registerCommand(CommandName.SkipLogin, async () => {
 		ionicState.skipAuth = true;
 		await vscode.commands.executeCommand(VSCommand.setContext, Context.inspectedProject, false);
@@ -346,8 +354,8 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	// User selected a project from the list (monorepo)
-	vscode.commands.registerCommand(CommandName.ProjectSelect, async (project: string) => {	
-		context.workspaceState.update('SelectedProject', project);	
+	vscode.commands.registerCommand(CommandName.ProjectSelect, async (project: string) => {
+		context.workspaceState.update('SelectedProject', project);
 		ionicProvider.selectProject(project);
 	});
 
@@ -356,34 +364,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand(CommandName.Run, async (r: Recommendation) => {
-		const tip = r.tip;
-		if (tip.stoppable) {
-			ionicProvider.refresh();
-		}
-		tip.generateCommand();	
-		tip.generateTitle();
-		if (tip.command) {
-			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
-			let command = tip.command;
-			if (tip.doRequestAppName) {
-				command = await requestAppName(tip);
-			}
-			if (tip.doDeviceSelection) {
-				const target = await selectDevice(tip.secondCommand as string, tip.data, tip);
-				if (!target) {
-					return;
-				}
-				command = (tip.command as string).replace(InternalCommand.target, target);
-			}
-			if (command) {
-				execute(tip);
-				fixIssue(command, rootPath, ionicProvider, tip);
-				return;
-			}
-		} else {
-			execute(tip);
-		}
-
+		runAction(r, ionicProvider, rootPath);
 	});
 
 	vscode.commands.registerCommand(CommandName.Link, async (tip: Tip) => {
@@ -391,6 +372,35 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 }
 
+async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, rootPath: string) {
+	const tip = r.tip;
+	if (tip.stoppable) {
+		ionicProvider.refresh();
+	}
+	tip.generateCommand();
+	tip.generateTitle();
+	if (tip.command) {
+		const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
+		let command = tip.command;
+		if (tip.doRequestAppName) {
+			command = await requestAppName(tip);
+		}
+		if (tip.doDeviceSelection) {
+			const target = await selectDevice(tip.secondCommand as string, tip.data, tip);
+			if (!target) {
+				return;
+			}
+			command = (tip.command as string).replace(InternalCommand.target, target);
+		}
+		if (command) {
+			execute(tip);
+			fixIssue(command, rootPath, ionicProvider, tip);
+			return;
+		}
+	} else {
+		execute(tip);
+	}
+}
 async function fix(tip: Tip, rootPath: string, ionicProvider: IonicTreeProvider, context: vscode.ExtensionContext): Promise<void> {
 	tip.generateCommand();
 	tip.generateTitle();

@@ -14,7 +14,8 @@ export enum CommandName {
 	SkipLogin = 'ionic.skipLogin',
 	Upgrade = 'ionic.upgrade',
 	ProjectsRefresh = 'ionic.projectRefresh',
-	ProjectSelect = 'ionic.projectSelect'
+	ProjectSelect = 'ionic.projectSelect',
+	BuildConfig = 'ionic.buildConfig'
 }
 
 export enum InternalCommand {

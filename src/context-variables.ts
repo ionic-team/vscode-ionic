@@ -26,7 +26,10 @@ export enum Context {
 	lightbulb = 'lightbulb',
 
 	// Stop option
-	stop = 'stop'
+	stop = 'stop',
+
+	// Build configuration
+	buildConfig = 'buildConfig'
 }
 
 // Commands from vs code

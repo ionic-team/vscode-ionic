@@ -101,6 +101,15 @@ export class Tip {
 		return this;
 	}
 
+
+	public addActionArg(arg: string) {
+		this.actionArgs.push(arg);
+	}
+
+	public actionArg(index: number) {
+		return this.actionArgs[index];
+	}
+
 	setData(data: any) {
 		this.data = data;
 		return this;

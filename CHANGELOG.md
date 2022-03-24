@@ -1,6 +1,7 @@
 ## Changelog
 ### Version 1.3.2
 - Mono Repo Support for npm workspaces
+- New Build option selection from Angular configuration
 - Fix for "upgrade all packages"
 - Fix upgrade to version of package if package is on latest
 - Fix when esc is pressed when selecting device
