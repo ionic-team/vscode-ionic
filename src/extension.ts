@@ -355,6 +355,9 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			if (tip.doDeviceSelection) {
 				const target = await selectDevice(tip.secondCommand as string, tip.data, tip);
+				if (!target) {
+					return;
+				}
 				command = (tip.command as string).replace(InternalCommand.target, target);
 			}
 			if (command) {

@@ -3,6 +3,7 @@
 - Mono Repo Support for npm workspaces
 - Fix for "upgrade all packages"
 - Fix upgrade to version of package if package is on latest
+- Fix when esc is pressed when selecting device
 
 ### Version 1.3.1
 - Mono Repo Support for Nx

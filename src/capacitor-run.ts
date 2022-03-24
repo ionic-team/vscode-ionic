@@ -17,8 +17,8 @@ import { Project } from './project';
  */
 export function capacitorRun(project: Project, platform: CapacitorPlatform): string {
 	switch (project.repoType) {
-		case MonoRepoType.none,
-			MonoRepoType.npm: return capRun(platform, project.repoType);
+		case MonoRepoType.none: return capRun(platform, project.repoType);
+		case MonoRepoType.npm: return capRun(platform, project.repoType);
 		case MonoRepoType.nx: return nxRun(project, platform);
 		default: throw new Error('Unsupported Monorepo type');
 	}
