@@ -1,5 +1,6 @@
 
 import * as vscode from 'vscode';
+import { InternalCommand } from './command-name';
 import { MonoRepoType } from './monorepo';
 import { Project } from './project';
 
@@ -10,6 +11,7 @@ import { Project } from './project';
 export function ionicServe(project: Project): string {
 	switch (project.repoType) {
 		case MonoRepoType.none: return ionicCLIServe();
+		case MonoRepoType.npm: return InternalCommand.cwd + ionicCLIServe();
 		case MonoRepoType.nx: return nxServe(project);
 		default: throw new Error('Unsupported Monorepo type');
 	}
