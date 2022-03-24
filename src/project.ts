@@ -206,26 +206,30 @@ export class Project {
 	}
 
 	private updatePackages(r: Recommendation): string {
-		if (hasUninstall(r)) return;
 		let command = '';
 		for (const child of r.children) {
-			if (command != '') {
-				command += ' ';
-			}
 			// Command will be npm install @capacitor/android@3.4.3 --save-exact
-			command += (child.tip.command as string).replace('npm install ', '').replace(' --save-exact', '');
+			if ((child.tip.command as string).includes('npm install')) {
+				const npackage = (child.tip.command as string).replace('npm install ', '').replace(' --save-exact', '');
+
+				if (command != '') {
+					command += ' ';
+				}
+				command += npackage.trim();
+			}
 		}
 		return npmInstall(command);
 	}
 
 	private updatePackagesTitle(r: Recommendation): string {
-		if (hasUninstall(r)) return;
 		let title = '';
 		for (const child of r.children) {
-			if (title != '') {
-				title += ', ';
+			if ((child.tip.command as string).includes('npm install')) {
+				if (title != '') {
+					title += ', ';
+				}
+				title += child.tip.description;
 			}
-			title += child.tip.description;
 		}
 		return `${r.children.length} Packages: ${title}`;
 	}
@@ -329,12 +333,6 @@ export class Project {
 	public fileExists(filename: string): boolean {
 		return fs.existsSync(path.join(this.projectFolder(), filename));
 	}
-}
-
-// Check if there is an uninstall command in the children. 
-// (Cant be a method of Project because "this" isnt the project)
-function hasUninstall(r: Recommendation): boolean {
-	return r.children.find((child) => child.tip.command.includes('uninstall')) != undefined;
 }
 
 function checkNodeVersion() {
