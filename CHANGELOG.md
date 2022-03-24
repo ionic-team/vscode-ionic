@@ -2,6 +2,7 @@
 ### Version 1.3.2
 - Mono Repo Support for npm workspaces
 - Fix for "upgrade all packages"
+- Fix upgrade to version of package if package is on latest
 
 ### Version 1.3.1
 - Mono Repo Support for Nx

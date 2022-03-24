@@ -308,7 +308,8 @@ export class Project {
 				`${name} Uninstalled`,
 				`https://www.npmjs.com/package/${name}`,
 				`Uninstalling ${name}`
-			));
+			).setContextValue('upgrade')
+			.setData({ name: name, version: undefined }));
 		}
 	}
 
