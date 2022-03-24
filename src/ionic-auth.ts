@@ -2,7 +2,7 @@ import * as child_process from 'child_process';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
-import { Context } from './context-variables';
+import { Context, VSCommand } from './context-variables';
 import { getOutputChannel } from './extension';
 import { ionicState } from './ionic-tree-provider';
 import { sendTelemetryEvent, TelemetryEventType } from './telemetry';
@@ -21,7 +21,7 @@ export async function ionicLogin(folder: string, context: vscode.ExtensionContex
 	} catch (err) {
 		vscode.window.showErrorMessage(err);
 		ionicState.skipAuth = true;
-		await vscode.commands.executeCommand('setContext', Context.isAnonymous, false);
+		await vscode.commands.executeCommand(VSCommand.setContext, Context.isAnonymous, false);
 	}
 }
 

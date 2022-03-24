@@ -34,8 +34,9 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 				.requestViewEditor()
 				.setRunPoints([
 					{ title: 'Building...', text: 'Generating browser application bundles' },
-					{ title: 'Serving', text: 'Development server running', refresh: true }
+					{ title: 'Serving', text: 'Development server running' }
 				])
+				.canStop()
 				.canAnimate()
 		);
 		// project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));

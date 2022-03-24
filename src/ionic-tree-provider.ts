@@ -6,7 +6,7 @@ import * as path from 'path';
 
 import { reviewProject } from './project';
 import { Recommendation } from './recommendation';
-import { Context } from './context-variables';
+import { Context, VSCommand } from './context-variables';
 import { starterProject } from './ionic-start';
 import { MonoRepoProject, MonoRepoType } from './monorepo';
 
@@ -45,10 +45,10 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
 
 	getChildren(element?: Recommendation): Thenable<Recommendation[]> {
 		if (!this.workspaceRoot) {
-			vscode.commands.executeCommand('setContext', Context.noProjectFound, true);
+			vscode.commands.executeCommand(VSCommand.setContext, Context.noProjectFound, true);
 			return Promise.resolve([]);
 		}
-		vscode.commands.executeCommand('setContext', Context.noProjectFound, false);
+		vscode.commands.executeCommand(VSCommand.setContext, Context.noProjectFound, false);
 
 		if (element) {
 			return Promise.resolve(element.children);

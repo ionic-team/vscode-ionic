@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 
-import { Context } from './context-variables';
+import { Context, VSCommand } from './context-variables';
 import { ionicLogin, ionicSignup } from './ionic-auth';
 import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { clearRefreshCache } from './process-packages';
@@ -151,7 +151,7 @@ function finishCommand(tip: Tip) {
 	});
 }
 
-function startCommand(tip: Tip, cmd: string) {
+function startCommand(tip: Tip, cmd: string, ionicProvider: IonicTreeProvider) {
 	if (tip.title) {
 		const message = tip.commandTitle ? tip.commandTitle : tip.title;
 		channel.appendLine(`[Ionic] ${message}...`);
@@ -192,6 +192,10 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 	// If the task is already running then cancel it
 	if (isRunning(tip)) {
 		await cancelRunning(tip);
+		if (tip.data == Context.stop) {
+			channel.show();
+			return; // User clicked stop
+		}
 	}
 
 	runningOperations.push(tip);
@@ -213,7 +217,8 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 				// Kill the process if the user cancels				
 				if (token.isCancellationRequested || tip.cancelRequested) {
 					tip.cancelRequested = false;
-					channel.appendLine(`Canceled operation "${tip.title}"`);
+					channel.appendLine(`[Ionic] Stopped "${tip.title}"`);
+					channel.show();					
 					clearInterval(interval);
 					finishCommand(tip);
 					cancelObject.proc.kill();
@@ -232,7 +237,7 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 			if (Array.isArray(command)) {
 				try {
 					for (const cmd of command) {
-						startCommand(tip, cmd);
+						startCommand(tip, cmd, ionicProvider);
 						await run(rootPath, cmd, channel, cancelObject, tip.doViewEditor, tip.runPoints, progress, ionicProvider);
 
 					}
@@ -240,7 +245,7 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 					finishCommand(tip);
 				}
 			} else {
-				startCommand(tip, command);
+				startCommand(tip, command, ionicProvider);
 				const secondsTotal = estimateRunTime(command);
 				if (secondsTotal) {
 					increment = 100.0 / secondsTotal;
@@ -291,6 +296,12 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
+	vscode.commands.registerCommand(CommandName.Stop, async (recommendation: Recommendation) => {
+		recommendation.tip.data = Context.stop;
+		await fixIssue(undefined, context.extensionPath, ionicProvider, recommendation.tip);
+		recommendation.setContext(undefined);
+	});
+
 	vscode.commands.registerCommand(CommandName.SignUp, async () => {
 		await ionicSignup(context.extensionPath, context);
 		ionicProvider.refresh();
@@ -302,15 +313,15 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand(CommandName.Login, async () => {
-		await vscode.commands.executeCommand('setContext', Context.isLoggingIn, true);
+		await vscode.commands.executeCommand(VSCommand.setContext, Context.isLoggingIn, true);
 		await ionicLogin(context.extensionPath, context);
 		ionicProvider.refresh();
 	});
 
 	vscode.commands.registerCommand(CommandName.SkipLogin, async () => {
 		ionicState.skipAuth = true;
-		await vscode.commands.executeCommand('setContext', Context.inspectedProject, false);
-		await vscode.commands.executeCommand('setContext', Context.isAnonymous, false);
+		await vscode.commands.executeCommand(VSCommand.setContext, Context.inspectedProject, false);
+		await vscode.commands.executeCommand(VSCommand.setContext, Context.isAnonymous, false);
 		ionicProvider.refresh();
 	});
 
@@ -344,8 +355,12 @@ export function activate(context: vscode.ExtensionContext) {
 		await fix(r.tip, rootPath, ionicProvider, context);
 	});
 
-	vscode.commands.registerCommand(CommandName.Run, async (tip: Tip) => {
-		tip.generateCommand();
+	vscode.commands.registerCommand(CommandName.Run, async (r: Recommendation) => {
+		const tip = r.tip;
+		if (tip.stoppable) {
+			ionicProvider.refresh();
+		}
+		tip.generateCommand();	
 		tip.generateTitle();
 		if (tip.command) {
 			const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;

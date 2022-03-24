@@ -9,7 +9,7 @@ export function addScripts(project: Project) {
 	project.setGroup(`Scripts`, ``, TipType.Files, false);
 	const packages: PackageFile = getPackageJSON(project.folder);
 	for (const script of Object.keys(packages.scripts)) {
-		project.add(new Tip(script, '', TipType.Run, '', npmRun(script), `Running ${script}`, `Ran ${script}`));
+		project.add(new Tip(script, '', TipType.Run, '', npmRun(script), `Running ${script}`, `Ran ${script}`).canStop());
 	}
 
 	if (project.repoType == MonoRepoType.nx) {

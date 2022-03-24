@@ -8,6 +8,7 @@ export enum CommandName {
 	Add = 'ionic.add',
 	SignUp = 'ionic.signUp',
 	Login = 'ionic.login',
+	Stop = 'ionic.stop',
 	Rebuild = 'ionic.rebuild',
 	Open = 'ionic.open',
 	SkipLogin = 'ionic.skipLogin',

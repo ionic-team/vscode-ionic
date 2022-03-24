@@ -9,6 +9,7 @@ import { Project } from './project';
 import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall } from './node-commands';
+import { Context } from './context-variables';
 
 export enum AssetType {
 	splash = 'splash.png',
@@ -41,7 +42,7 @@ function getAssetTipType(folder: string, filename: AssetType): TipType {
 function createFeature(title: string, assetType: AssetType, project: Project): Tip {
 	const tip = new Tip(title, undefined, getAssetTipType(project.projectFolder(), assetType));
 	tip.setAction(setAssetResource, project, assetType);
-	tip.setContextValue('asset');
+	tip.setContextValue(Context.asset);
 	const filename = path.join(getResourceFolder(project.projectFolder(), assetType), assetType);
 	tip.setSecondCommand('Open Asset', filename);
 	tip.tooltip = getAssetTooltip(project.projectFolder(), assetType);

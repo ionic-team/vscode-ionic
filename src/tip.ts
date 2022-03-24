@@ -1,3 +1,6 @@
+import { Context } from "./context-variables";
+import { isRunning } from "./extension";
+
 export class Tip {
 	public progressDialog: boolean;
 	public doRun: boolean;
@@ -6,6 +9,7 @@ export class Tip {
 	public doViewEditor: boolean;
 	public cancelRequested: boolean;
 	public animates: boolean;
+	public stoppable: boolean;
 	public secondCommand: string;
 	public secondTitle: string;
 	public tooltip: string;
@@ -62,6 +66,15 @@ export class Tip {
 		return this;
 	}
 
+	canStop() {
+		if (isRunning(this)) {
+			this.setContextValue(Context.stop);
+		} else {
+			this.stoppable = true;
+		}
+		return this;
+	}
+
 	canIgnore() {
 		this.ignorable = true;
 		return this;
@@ -105,7 +118,7 @@ export class Tip {
 		return this;
 	}
 
-	setSecondCommand(title: string, command: string) : Tip {
+	setSecondCommand(title: string, command: string): Tip {
 		this.secondCommand = command;
 		this.secondTitle = title;
 		return this;
@@ -124,13 +137,13 @@ export class Tip {
 
 	async generateCommand() {
 		if (this.onCommand) {
-			this.command = this.onCommand(...this.actionArgs);			
+			this.command = this.onCommand(...this.actionArgs);
 		}
 	}
 
 	async generateTitle() {
 		if (this.onTitle) {
-			this.title = this.onTitle(...this.titleArgs);			
+			this.title = this.onTitle(...this.titleArgs);
 		}
 	}
 }

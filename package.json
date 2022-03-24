@@ -170,6 +170,10 @@
 				"title": "Rebuild"
 			},
 			{
+				"command": "ionic.stop",
+				"title": "Stop"
+			},
+			{
 				"command": "ionic.upgrade",
 				"title": "Upgrade",
 				"icon": {
@@ -207,6 +211,10 @@
 				{
 					"command": "ionic.upgrade",
 					"when": "false"
+				},
+				{
+					"command": "ionic.stop",
+					"when": "false"
 				}
 			],
 			"view/title": [
@@ -225,6 +233,11 @@
 				{
 					"command": "ionic.lightbulb",
 					"when": "view == ionic && viewItem == lightbulb",
+					"group": "inline"
+				},				
+				{
+					"command": "ionic.stop",
+					"when": "view == ionic && viewItem == stop",
 					"group": "inline"
 				},
 				{
