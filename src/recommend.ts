@@ -107,7 +107,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 
 	if (isCapacitor() || project.hasACapacitorProject()) {
 		// Capacitor Configure Features
-		project.setGroup(`Configuration`, 'Configurations for native project', TipType.Capacitor, false);
+		project.setGroup(`Configuration`, 'Configurations for native project. Changes made apply to both the iOS and Android projects', TipType.Capacitor, false);
 		await reviewCapacitorConfig(project, context);
 
 		// Splash Screen and Icon Features

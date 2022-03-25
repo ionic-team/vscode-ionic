@@ -2,6 +2,8 @@
 
 ## Features
 - (1) Add .vs-code/extensions.json to recommend Ionic extension on starters
+- (16) Folder based monorepo style
+- (4) Conference starter is using Cordova, probably should be using Capacitor
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand
 - (2) @ionic/native should move to @awesome-cordova-plugins
@@ -28,6 +30,7 @@
 - (perf) Only run capacitor config commands when "Configuration" is expanded
 
 ## Bugs
+- (bug) Handle scenarios where npx/npm cannot be found (eg bash)
 - (bug) Bug capturing of inspection with telemetry reporting on exception
 - (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
 - (bug) Bundle id validate doesnt accept "stuff"

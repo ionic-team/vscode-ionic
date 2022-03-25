@@ -6,7 +6,7 @@ import { getPackageJSON, PackageFile } from "./utilities";
 
 // Look in package.json for scripts and add options to execute
 export function addScripts(project: Project) {
-	project.setGroup(`Scripts`, ``, TipType.Files, false);
+	project.setGroup(`Scripts`, `Any scripts from your package.json will appear here`, TipType.Files, false);
 	const packages: PackageFile = getPackageJSON(project.folder);
 	for (const script of Object.keys(packages.scripts)) {
 		project.add(new Tip(script, '', TipType.Run, '', npmRun(script), `Running ${script}`, `Ran ${script}`).canStop());
