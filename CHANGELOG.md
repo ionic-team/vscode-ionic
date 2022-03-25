@@ -5,6 +5,7 @@
 - Fix for "upgrade all packages"
 - Fix upgrade to version of package if package is on latest
 - Fix when esc is pressed when selecting device
+- Fix for Angular migrations when angular/cli is ony installed locally
 - Better error message when shell is not set to /bin/zsh
 
 ### Version 1.3.1
