@@ -20,6 +20,7 @@ import { capacitorSync } from './capacitor-sync';
 import { capacitorOpen } from './capacitor-open';
 import { CapacitorPlatform } from './capacitor-platform';
 import { addScripts } from './scripts';
+import { Context } from './context-variables';
 
 export async function getRecommendations(project: Project, context: vscode.ExtensionContext, packages: any): Promise<void> {
 	if (isCapacitor() && !isCordova()) {
@@ -34,8 +35,9 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 				.requestViewEditor()
 				.setRunPoints([
 					{ title: 'Building...', text: 'Generating browser application bundles' },
-					{ title: 'Serving', text: 'Development server running', refresh: true }
+					{ title: 'Serving', text: 'Development server running' }
 				])
+				.canStop()
 				.canAnimate()
 		);
 		// project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
@@ -72,7 +74,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 
 		project.add(new Tip(
 			'Build', '', TipType.Build, 'Build', undefined, 'Building', undefined)
-			.setDynamicCommand(ionicBuild, project));
+			.setDynamicCommand(ionicBuild, project).setContextValue(Context.buildConfig));
 
 		if (exists('@capacitor/core')) {
 			project.add(new Tip(

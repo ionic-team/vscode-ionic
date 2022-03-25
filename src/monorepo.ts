@@ -7,6 +7,7 @@ import { ionicState } from './ionic-tree-provider';
 import { getNpmWorkspaceProjects } from './monorepos-npm';
 import { getNXProjects } from './monorepos-nx';
 import { Project } from "./project";
+import { Context, VSCommand } from './context-variables';
 
 export interface MonoRepoProject {
 	name: string;
@@ -71,7 +72,7 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
 	}
 	ionicState.repoType = project.repoType;
 
-	vscode.commands.executeCommand('setContext', 'isMonoRepo', project.repoType !== MonoRepoType.none);
+	vscode.commands.executeCommand(VSCommand.setContext, Context.isMonoRepo, project.repoType !== MonoRepoType.none);
 }
 
 export function getMonoRepoFolder(name: string): string {

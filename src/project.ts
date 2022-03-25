@@ -8,7 +8,7 @@ import { load, isCapacitor, exists } from './analyzer';
 import { fixIssue, isRunning } from './extension';
 import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
-import { Context } from './context-variables';
+import { Context, VSCommand } from './context-variables';
 import { getRecommendations } from './recommend';
 import { getIgnored } from './ignore';
 import { CommandName } from './command-name';
@@ -127,6 +127,7 @@ export class Project {
 	public add(tip: Tip) {
 		if (this.isIgnored(tip)) return;
 
+		let argsIsRecommendation = false;
 		let cmd: vscode.Command = {
 			command: CommandName.Fix,
 			title: 'Fix',
@@ -136,9 +137,9 @@ export class Project {
 		if ([TipType.Run, TipType.Sync, TipType.Build, TipType.Edit].includes(tip.type) || tip.doRun) {
 			cmd = {
 				command: CommandName.Run,
-				title: 'Run',
-				arguments: [tip]
+				title: 'Run'
 			};
+			argsIsRecommendation = true;
 		}
 
 		if (tip.type == TipType.Link) {
@@ -153,6 +154,11 @@ export class Project {
 		const tooltip = tip.tooltip ? tip.tooltip : tip.message;
 		const r = new Recommendation(tooltip, tip.message, tip.title, vscode.TreeItemCollapsibleState.None, cmd, tip, tip.url);
 		this.setIcon(tip.type, r);
+
+		if (argsIsRecommendation) {
+			r.command.arguments = [r];
+		}
+
 		if (tip.animates) {
 			if (isRunning(tip)) {
 				r.animate();
@@ -193,9 +199,9 @@ export class Project {
 		const r = new Recommendation(tip.title, undefined, '@' + title, vscode.TreeItemCollapsibleState.Expanded, command, tip);
 		r.children = [];
 		if (title == 'angular') {
-			r.setContext('lightbulb');
+			r.setContext(Context.lightbulb);
 		} else {
-			r.setContext('lightbulb');
+			r.setContext(Context.lightbulb);
 			r.tip
 				.setDynamicCommand(this.updatePackages, r)
 				.setDynamicTitle(this.updatePackagesTitle, r);
@@ -290,7 +296,7 @@ export class Project {
 				`https://www.npmjs.com/package/${name}`,
 				`Upgrading ${name}`
 			).setSecondCommand(`Uninstall`, npmUninstall(name))
-				.setContextValue('upgrade')
+				.setContextValue(Context.upgrade)
 				.setData({ name: name, version: fromVersion })
 			);
 		}
@@ -308,8 +314,8 @@ export class Project {
 				`${name} Uninstalled`,
 				`https://www.npmjs.com/package/${name}`,
 				`Uninstalling ${name}`
-			).setContextValue('upgrade')
-			.setData({ name: name, version: undefined }));
+			).setContextValue(Context.upgrade)
+				.setData({ name: name, version: undefined }));
 		}
 	}
 
@@ -364,8 +370,8 @@ export async function installPackage(extensionPath: string, folder: string) {
 
 export async function reviewProject(folder: string, context: vscode.ExtensionContext, selectedProject: string): Promise<Recommendation[]> {
 	const startedOp = Date.now();
-	vscode.commands.executeCommand('setContext', Context.inspectedProject, false);
-	vscode.commands.executeCommand('setContext', Context.isLoggingIn, false);
+	vscode.commands.executeCommand(VSCommand.setContext, Context.inspectedProject, false);
+	vscode.commands.executeCommand(VSCommand.setContext, Context.isLoggingIn, false);
 
 	const project: Project = new Project('My Project');
 	let packages = await load(folder, project, context);
@@ -376,10 +382,10 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 	const gConfig = getGlobalIonicConfig();
 
 	if (!gConfig['user.id'] && !ionicState.skipAuth) {
-		vscode.commands.executeCommand('setContext', Context.isAnonymous, true);
+		vscode.commands.executeCommand(VSCommand.setContext, Context.isAnonymous, true);
 		return undefined;
 	} else {
-		vscode.commands.executeCommand('setContext', Context.isAnonymous, false);
+		vscode.commands.executeCommand(VSCommand.setContext, Context.isAnonymous, false);
 	}
 
 	checkForMonoRepo(project, selectedProject, context);
@@ -395,7 +401,7 @@ export async function reviewProject(folder: string, context: vscode.ExtensionCon
 
 	await getRecommendations(project, context, packages);
 
-	vscode.commands.executeCommand('setContext', Context.inspectedProject, true);
+	vscode.commands.executeCommand(VSCommand.setContext, Context.inspectedProject, true);
 	console.log(`Analysed Project in ${(Date.now() - startedOp)}ms`);
 	return project.groups;
 }

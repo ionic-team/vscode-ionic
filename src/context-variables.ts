@@ -11,7 +11,30 @@ export enum Context {
 	isAnonymous = 'isAnonymous',
 
 	// VS Code hasnt opened a folder
-	noProjectFound = 'noProjectFound'
+	noProjectFound = 'noProjectFound',
+
+	// Used for splash screen assets that can be viewed
+	asset = 'asset',
+
+	// The panel for monorepo projects
+	isMonoRepo = 'isMonoRepo',
+
+	// A scope that can be upgraded
+	upgrade = 'upgrade',
+
+	// Upgrade options 
+	lightbulb = 'lightbulb',
+
+	// Stop option
+	stop = 'stop',
+
+	// Build configuration
+	buildConfig = 'buildConfig'
+}
+
+// Commands from vs code
+export enum VSCommand {
+	setContext = 'setContext'
 }
 
 

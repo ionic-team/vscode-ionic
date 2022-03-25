@@ -170,6 +170,18 @@
 				"title": "Rebuild"
 			},
 			{
+				"command": "ionic.stop",
+				"title": "Stop"
+			},
+			{
+				"command": "ionic.buildConfig",
+				"title": "Build Configuration",
+				"icon": {
+					"light": "resources/light/more.svg",
+					"dark": "resources/dark/more.svg"
+				}
+			},
+			{
 				"command": "ionic.upgrade",
 				"title": "Upgrade",
 				"icon": {
@@ -201,11 +213,19 @@
 					"when": "false"
 				},
 				{
+					"command": "ionic.buildConfig",
+					"when": "false"
+				},
+				{
 					"command": "ionic.lightbulb",
 					"when": "false"
 				},
 				{
 					"command": "ionic.upgrade",
+					"when": "false"
+				},
+				{
+					"command": "ionic.stop",
 					"when": "false"
 				}
 			],
@@ -226,6 +246,11 @@
 					"command": "ionic.lightbulb",
 					"when": "view == ionic && viewItem == lightbulb",
 					"group": "inline"
+				},				
+				{
+					"command": "ionic.stop",
+					"when": "view == ionic && viewItem == stop",
+					"group": "inline"
 				},
 				{
 					"command": "ionic.open",
@@ -240,6 +265,11 @@
 				{
 					"command": "ionic.upgrade",
 					"when": "view == ionic && viewItem == upgrade",
+					"group": "inline"
+				},
+				{
+					"command": "ionic.buildConfig",
+					"when": "view == ionic && viewItem == buildConfig",
 					"group": "inline"
 				}
 			]
