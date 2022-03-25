@@ -1,4 +1,7 @@
 ## Changelog
+### Version 1.4.0
+- Option to debug for web browser
+
 ### Version 1.3.2
 - Mono Repo Support for npm workspaces
 - New Build option selection from Angular configuration

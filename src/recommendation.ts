@@ -31,7 +31,8 @@ export class Recommendation extends vscode.TreeItem {
 	}
 
 	public animate() {
-		this.setIcon(this.iconName + '-anim');
+		//this.setIcon(this.iconName + '-anim');
+		this.setIcon('run-anim');
 	}
 
 	public setContext(value: string) {

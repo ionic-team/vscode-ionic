@@ -18,7 +18,6 @@ import { packageUpgrade } from './rules-package-upgrade';
 import { IonicProjectsreeProvider } from './ionic-projects-provider';
 import { buildConfiguration } from './build-configuration';
 
-
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
 export let lastOperation: Tip;
@@ -324,6 +323,18 @@ export function activate(context: vscode.ExtensionContext) {
 		if (!config) return;
 		r.tip.addActionArg(`--configuration=${config}`);
 		runAction(r, ionicProvider, rootPath);
+	});
+
+	vscode.commands.registerCommand(CommandName.DebugMode, async (r: Recommendation) => {
+		ionicState.debugMode = true;
+		await vscode.commands.executeCommand(VSCommand.setContext, Context.debugMode, true);
+		ionicProvider.refresh();
+	});
+
+	vscode.commands.registerCommand(CommandName.RunMode, async (r: Recommendation) => {
+		ionicState.debugMode = false;
+		await vscode.commands.executeCommand(VSCommand.setContext, Context.debugMode, false);
+		ionicProvider.refresh();
 	});
 
 	vscode.commands.registerCommand(CommandName.SkipLogin, async () => {

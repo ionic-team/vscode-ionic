@@ -21,6 +21,7 @@ import { capacitorOpen } from './capacitor-open';
 import { CapacitorPlatform } from './capacitor-platform';
 import { addScripts } from './scripts';
 import { Context } from './context-variables';
+import { ionicState } from './ionic-tree-provider';
 
 export async function getRecommendations(project: Project, context: vscode.ExtensionContext, packages: any): Promise<void> {
 	if (isCapacitor() && !isCordova()) {
@@ -28,9 +29,11 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 
 		const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
 		const hasCapAndroid = project.hasCapacitorProject(CapacitorPlatform.android);
+		const title = (ionicState.debugMode) ? 'Debug On Web' : 'Run On Web';
+		const type = (ionicState.debugMode) ? TipType.Debug : TipType.Run;
 		project.add(
 			new Tip(
-				'Run On Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`)
+				title, '', type, 'Serve', undefined, 'Running on Web', `Project Served`)
 				.setDynamicCommand(ionicServe, project)
 				.requestViewEditor()
 				.setRunPoints([
@@ -38,6 +41,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 					{ title: 'Serving', text: 'Development server running' }
 				])
 				.canStop()
+				.contextIf(Context.debugMode, false)
 				.canAnimate()
 		);
 		// project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));

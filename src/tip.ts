@@ -75,6 +75,15 @@ export class Tip {
 		return this;
 	}
 
+	contextIf(value: Context, running: boolean) {
+		if (running && isRunning(this)) {
+			this.setContextValue(value);
+		} else if (!running && !isRunning(this)) {
+			this.setContextValue(value);
+		}
+		return this;
+	}
+
 	canIgnore() {
 		this.ignorable = true;
 		return this;
@@ -182,6 +191,7 @@ export enum TipType {
 	Sync,
 	Add,
 	Media,
+	Debug,
 	None
 }
 

@@ -29,7 +29,10 @@ export enum Context {
 	stop = 'stop',
 
 	// Build configuration
-	buildConfig = 'buildConfig'
+	buildConfig = 'buildConfig',
+
+	// Browser options
+	debugMode = 'debugMode'
 }
 
 // Commands from vs code

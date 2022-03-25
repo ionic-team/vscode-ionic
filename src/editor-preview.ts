@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { ionicState } from './ionic-tree-provider';
 
 interface device {
 	name: string;
@@ -22,7 +23,13 @@ const devices: Array<device> = [
 
 export function viewInEditor(url: string) {
 	const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
-	if (!previewInEditor) return;
+	if (!previewInEditor) {
+		if (ionicState.debugMode) {
+			debugBrowser(url);
+		}
+		return;
+	}
+
 	const panel = vscode.window.createWebviewPanel(
 		'viewApp',
 		'Preview',
@@ -38,6 +45,23 @@ export function viewInEditor(url: string) {
 			panel.webview.postMessage(device);
 		}
 	);
+}
+
+function debugBrowser(url: string) {
+	try {
+		const browserType: string = vscode.workspace.getConfiguration('ionic').get('browser');
+		const launchConfig: vscode.DebugConfiguration =
+		{
+			type: browserType,
+			name: 'Debug App',
+			request: 'launch',
+			url: url,
+			webRoot: '${workspaceFolder}'
+		};
+		vscode.debug.startDebugging(undefined, launchConfig);
+	} catch {
+		//
+	}
 }
 
 async function selectMockDevice(): Promise<device> {

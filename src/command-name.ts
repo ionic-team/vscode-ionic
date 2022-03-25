@@ -15,7 +15,9 @@ export enum CommandName {
 	Upgrade = 'ionic.upgrade',
 	ProjectsRefresh = 'ionic.projectRefresh',
 	ProjectSelect = 'ionic.projectSelect',
-	BuildConfig = 'ionic.buildConfig'
+	BuildConfig = 'ionic.buildConfig',
+	DebugMode = 'ionic.debugMode',
+	RunMode = 'ionic.runMode',
 }
 
 export enum InternalCommand {

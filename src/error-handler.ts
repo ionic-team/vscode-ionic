@@ -4,6 +4,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { lastOperation } from './extension';
 import { CommandName } from './command-name';
+import { showMessage } from './utilities';
 
 interface ErrorLine {
 	uri: string;
@@ -56,21 +57,10 @@ export async function handleError(error: string, logs: Array<string>, folder: st
 				onSave.dispose();
 				const title = lastOperation.title;
 				vscode.commands.executeCommand(CommandName.Run, lastOperation);
-				vscode.window.withProgress(
-					{
-						location: vscode.ProgressLocation.Notification,
-						title: `Lets try to ${title} again...`,
-						cancellable: false
-					}, async () => {
-						await timeout(3000); // Show the message for 3 seconds
-					});
+				showMessage(`Lets try to ${title} again...`, 3000);
 			}
 		});
 	}
-}
-
-function timeout(ms: number) {
-	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function extractErrors(errorText: string, logs: Array<string>, folder: string): Array<ErrorLine> {

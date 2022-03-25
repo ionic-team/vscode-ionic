@@ -82,7 +82,7 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 					if (data.includes('Local: http')) {
 						serverUrl = getStringFrom(data, 'Local: ', '\n');
 						const url = serverUrl;
-						channel.appendLine(`Launching editor for ${url}`);
+						channel.appendLine(`[Ionic] Launching ${url}`);
 						viewEditor = false;
 						setTimeout(() => viewInEditor(url), 500);
 					}
@@ -195,6 +195,21 @@ export interface PackageFile {
 	description: string;
 	version: string;
 	scripts: Record<string, unknown>;
+}
+
+export async function showMessage(message: string, ms: number) {
+	vscode.window.withProgress(
+		{
+			location: vscode.ProgressLocation.Notification,
+			title: message,
+			cancellable: false
+		}, async () => {
+			await timeout(ms); // Show the message for 3 seconds
+		});
+}
+
+function timeout(ms: number) {
+	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function removeCordovaFromPackageJSON(folder: string): Promise<void> {

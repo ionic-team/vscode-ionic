@@ -108,6 +108,7 @@ export class Project {
 			case TipType.Comment: r.setIcon('comment'); break;
 			case TipType.Settings: r.setIcon('settings-gear'); break;
 			case TipType.Run: r.setIcon('run'); break;
+			case TipType.Debug: r.setIcon('debug-alt-small'); break;
 			case TipType.Link: r.setIcon('files'); break;
 			case TipType.None: break;
 			case TipType.Add: r.setIcon('add'); break;
@@ -134,7 +135,7 @@ export class Project {
 			arguments: [tip]
 		};
 
-		if ([TipType.Run, TipType.Sync, TipType.Build, TipType.Edit].includes(tip.type) || tip.doRun) {
+		if ([TipType.Run, TipType.Sync, TipType.Debug, TipType.Build, TipType.Edit].includes(tip.type) || tip.doRun) {
 			cmd = {
 				command: CommandName.Run,
 				title: 'Run'

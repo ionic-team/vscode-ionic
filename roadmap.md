@@ -1,6 +1,7 @@
 # ToDo
 
 ## Features
+- (1) Add .vs-code/extensions.json to recommend Ionic extension on starters
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand
 - (2) @ionic/native should move to @awesome-cordova-plugins
@@ -81,4 +82,10 @@ Usage based on 2021.stateofjs.com:
 
 # Support for pnpm
 - See: https://github.com/reslear/ionic-vue-pnpm-monorepo
+
+# Browser Debugging
+- When url is known and debug is turned on:
+- use no-open
+- update launch.json with config
+- run vscode.command.executeCommand
 

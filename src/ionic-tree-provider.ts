@@ -16,10 +16,11 @@ interface IonicState {
 	projects: Array<MonoRepoProject>,
 	repoType: MonoRepoType,
 	workspace: string,
-	projectsView: vscode.TreeView<any>
+	projectsView: vscode.TreeView<any>,
+	debugMode: boolean
 
 }
-export const ionicState: IonicState = { view: undefined, skipAuth: false, projects: [], projectsView: undefined, repoType: MonoRepoType.none, workspace: undefined };
+export const ionicState: IonicState = { view: undefined, skipAuth: false, projects: [], projectsView: undefined, repoType: MonoRepoType.none, workspace: undefined, debugMode: false };
 
 export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {
 	private _onDidChangeTreeData: vscode.EventEmitter<Recommendation | undefined | void> = new vscode.EventEmitter<Recommendation | undefined | void>();
