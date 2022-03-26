@@ -13,13 +13,14 @@ import { InternalCommand } from './command-name';
 
 export interface CancelObject {
 	proc: child_process.ChildProcess;
+	cancelled: boolean;
 }
 
 const opTiming = {};
 let serverUrl = undefined;
 
 export function estimateRunTime(command: string) {
-	const idx = command.replace(InternalCommand.cwd,'');
+	const idx = command.replace(InternalCommand.cwd, '');
 	if (opTiming[idx]) {
 		return opTiming[idx];
 	} else {
@@ -64,7 +65,9 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 			// Quirk of windows robocopy is that it logs errors/exit code on success
 			if (!error || (command.includes('robocopy'))) {
 				const end_time = process.hrtime(start_time);
-				opTiming[command] = end_time[0]; // Number of seconds
+				if (!cancelObject?.cancelled) {
+					opTiming[command] = end_time[0]; // Number of seconds
+				}
 
 				// Allows handling of linting and tests
 				handleError(undefined, logs, folder);

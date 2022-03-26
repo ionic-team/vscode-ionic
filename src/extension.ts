@@ -127,7 +127,7 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 		},
 
 		async (progress, token) => {
-			const cancelObject: CancelObject = { proc: undefined };
+			const cancelObject: CancelObject = { proc: undefined, cancelled: false };
 			let increment = undefined;
 			let percentage = undefined;
 			const interval = setInterval(() => {
@@ -138,6 +138,7 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 					channel.show();
 					clearInterval(interval);
 					finishCommand(tip);
+					cancelObject.cancelled = true;
 					cancelObject.proc.kill();
 					if (ionicProvider) {
 						ionicProvider.refresh();
@@ -145,8 +146,8 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 				} else {
 					if (increment && !hasRunPoints) {
 						percentage += increment;
-						if (percentage > 100) percentage = 100;
-						progress.report({ message: `${parseInt(percentage)}%`, increment: increment });
+						const msg = (percentage > 100) ? ' ' : `${parseInt(percentage)}%`;
+						progress.report({ message: msg, increment: increment });
 					}
 				}
 			}, 1000);
