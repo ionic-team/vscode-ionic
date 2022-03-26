@@ -12,9 +12,10 @@ import { Project } from './project';
  */
 export function ionicServe(project: Project, browser: string): string {
 	switch (project.repoType) {
-		case MonoRepoType.none: return ionicCLIServe(project);
-		case MonoRepoType.npm: return InternalCommand.cwd + ionicCLIServe(project);
+		case MonoRepoType.none: return ionicCLIServe(project);		
 		case MonoRepoType.nx: return nxServe(project);
+		case MonoRepoType.npm:
+		case MonoRepoType.folder: return InternalCommand.cwd + ionicCLIServe(project);
 		default: throw new Error('Unsupported Monorepo type');
 	}
 

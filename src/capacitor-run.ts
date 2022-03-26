@@ -17,7 +17,8 @@ import { Project } from './project';
  */
 export function capacitorRun(project: Project, platform: CapacitorPlatform): string {
 	switch (project.repoType) {
-		case MonoRepoType.none: return capRun(platform, project.repoType);
+		case MonoRepoType.none:
+		case MonoRepoType.folder:
 		case MonoRepoType.npm: return capRun(platform, project.repoType);
 		case MonoRepoType.nx: return nxRun(project, platform);
 		default: throw new Error('Unsupported Monorepo type');
@@ -46,7 +47,7 @@ function capRun(platform: CapacitorPlatform, repoType: MonoRepoType): string {
 		capRunFlags += '--external';
 	}
 
-	const pre = (repoType == MonoRepoType.npm) ? InternalCommand.cwd : '';
+	const pre = (repoType == MonoRepoType.npm || repoType == MonoRepoType.folder) ? InternalCommand.cwd : '';
 	const ionic = exists('@ionic/cli') ? 'ionic ' : '';
 	return `${pre}npx ${ionic}cap run ${platform}${capRunFlags} --target=${InternalCommand.target}`;
 }

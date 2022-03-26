@@ -11,7 +11,7 @@ import { ionicState } from './ionic-tree-provider';
 import { Context, VSCommand } from './context-variables';
 import { getRecommendations } from './recommend';
 import { getIgnored } from './ignore';
-import { CommandName } from './command-name';
+import { CommandName, InternalCommand } from './command-name';
 import { angularMigrate } from './rules-angular-migrate';
 import { checkForMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
 import { CapacitorPlatform } from './capacitor-platform';
@@ -42,6 +42,14 @@ export class Project {
 		this.ignored = getIgnored(context);
 	}
 
+	public getNodeModulesFolder(): string {
+		let nmf = path.join(this.folder, 'node_modules');
+		if (this.monoRepo?.localPackageJson) {
+			nmf = this.monoRepo.folder;
+		}
+		return nmf;
+	}
+
 	// Is the capacitor platform installed and does the project folder exists
 	public hasCapacitorProject(platform: CapacitorPlatform) {
 		return exists(`@capacitor/${platform}`) && fs.existsSync(path.join(this.projectFolder(), platform));
@@ -57,7 +65,8 @@ export class Project {
 	public projectFolder() {
 		switch (this.repoType) {
 			case MonoRepoType.none: return this.folder;
-			case MonoRepoType.npm: return this.monoRepo.folder;
+			case MonoRepoType.npm:
+			case MonoRepoType.folder: return this.monoRepo.folder;
 			default: return path.join(this.folder, this.monoRepo.folder);
 		}
 	}
@@ -217,7 +226,7 @@ export class Project {
 		for (const child of r.children) {
 			// Command will be npm install @capacitor/android@3.4.3 --save-exact
 			if ((child.tip.command as string).includes('npm install')) {
-				const npackage = (child.tip.command as string).replace('npm install ', '').replace(' --save-exact', '');
+				const npackage = (child.tip.command as string).replace('npm install ', '').replace(' --save-exact', '').replace(InternalCommand.cwd,'');
 
 				if (command != '') {
 					command += ' ';
@@ -261,7 +270,6 @@ export class Project {
 		const flags = devDependency ? ' --save-dev' : undefined;
 		this.add(new Tip(title, message, TipType.Warning, description, npmInstall(name, flags), 'Install', `Installed ${name}`));
 	}
-
 
 	public deprecatedPlugin(name: string, message: string, url?: string) {
 		if (exists(name)) {

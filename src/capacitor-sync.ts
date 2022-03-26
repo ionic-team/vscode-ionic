@@ -12,7 +12,8 @@ import { InternalCommand } from './command-name';
 	const ionicCLI = exists('@ionic/cli');
 	switch (project.repoType) {
 		case MonoRepoType.none: return ionicCLI ? capCLISync() : ionicCLISync();
-		case MonoRepoType.npm: return InternalCommand.cwd + (ionicCLI ? capCLISync() : ionicCLISync()); //+ ' --project='+ionicState.workspace;
+		case MonoRepoType.folder:
+		case MonoRepoType.npm: return InternalCommand.cwd + (ionicCLI ? capCLISync() : ionicCLISync());
 		case MonoRepoType.nx: return nxSync(project);
 		default: throw new Error('Unsupported Monorepo type');
 	}

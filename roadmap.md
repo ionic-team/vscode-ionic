@@ -3,6 +3,7 @@
 ## Features
 - (1) Add .vs-code/extensions.json to recommend Ionic extension on starters
 - (16) Folder based monorepo style
+- (2) When finishing a debug session for web return back to ionic extension and stop run
 - (4) Conference starter is using Cordova, probably should be using Capacitor
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand

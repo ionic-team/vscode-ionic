@@ -1,5 +1,6 @@
 ## Changelog
 ### Version 1.4.0
+- Add folder style mono repos
 - Option to debug for web browser
 
 ### Version 1.3.2

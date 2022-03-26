@@ -14,7 +14,8 @@ export function capacitorAdd(project: Project, platform: CapacitorPlatform): str
 	const ionic = exists('@ionic/cli') ? 'ionic ' : '';
 	switch (project.repoType) {
 		case MonoRepoType.none: return `npx ${ionic}cap add ${platform}`;
-		case MonoRepoType.npm: return `${InternalCommand.cwd}npx ${ionic}cap add ${platform}`;
+		case MonoRepoType.npm:
+		case MonoRepoType.folder: return `${InternalCommand.cwd}npx ${ionic}cap add ${platform}`;
 		case MonoRepoType.nx: return nxAdd(project, platform);
 		default: throw new Error('Unsupported Monorepo type');
 	}

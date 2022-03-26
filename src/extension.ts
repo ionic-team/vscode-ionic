@@ -10,89 +10,19 @@ import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './project';
 import { Command, Tip } from './tip';
-import { CancelObject, run, getRunOutput, estimateRunTime } from './utilities';
+import { CancelObject, run, estimateRunTime } from './utilities';
 import { ignore } from './ignore';
-import { handleError } from './error-handler';
 import { CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
 import { IonicProjectsreeProvider } from './ionic-projects-provider';
 import { buildConfiguration } from './build-configuration';
+import { selectDevice } from './capacitor-device';
+import { getLocalFolder } from './monorepo';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
 export let lastOperation: Tip;
 
-/**
- * Runs the command and obtains the stdout, parses it for the list of device names and target ids
- * @param  {string} command Node command which gathers device list
- * @param  {string} rootPath Path where the node command runs
- */
-async function getDevices(command: string, rootPath: string) {
-	try {
-		const result = await getRunOutput(command, rootPath);
-
-		const lines = result.split('\n');
-		lines.shift(); // Remove the header
-		const devices = [];
-		for (const line of lines) {
-			const data = line.split('|');
-			if (data.length == 3) {
-				const target = data[2].trim();
-				if (target != '?') {
-					devices.push({ name: data[0].trim() + ' ' + data[1].trim(), target: target });
-				}
-			} else {
-				const device = parseDevice(line);
-				if (device) {
-					devices.push(device);
-				}
-
-			}
-		}
-		if (devices.length == 0) {
-			vscode.window.showErrorMessage(`Unable to find any devices: ${result}`, 'OK');
-		}
-		return devices;
-	} catch (error) {
-		handleError(error, [], rootPath);
-	}
-}
-
-function parseDevice(line: string) {
-	try {
-		const name = line.substring(0, line.indexOf('  ')).trim();
-		line = line.substring(line.indexOf('  ')).trim();
-		const args = line.replace('  ', '|').split('|');
-		return { name: name + ' ' + args[0].trim(), target: args[1].trim() };
-	} catch
-	{
-		return undefined;
-	}
-}
-
-/**
- * Uses vscodes Quick pick dialog to allow selection of a device and
- * returns the command used to run on the selected device
- * @param  {string} command
- * @param  {string} rootPath
- */
-async function selectDevice(command: string, rootPath: string, tip: Tip): Promise<string> {
-	let devices;
-	await showProgress('Getting Devices', async () => {
-		devices = await getDevices(command, rootPath);
-	});
-
-	//const devices = await getDevices(command, rootPath);
-	const names = devices.map(device => device.name);
-	if (names.length == 0) {
-		return;
-	}
-	const selected = await vscode.window.showQuickPick(names, { placeHolder: 'Select a device to run application on' });
-	const device = devices.find(device => device.name == selected);
-	if (!device) return;
-	tip.commandTitle = device?.name;
-	return device?.target;
-}
 
 async function requestAppName(tip: Tip) {
 	let name = await vscode.window.showInputBox({
@@ -117,19 +47,6 @@ async function requestAppName(tip: Tip) {
 	} else {
 		return undefined;
 	}
-}
-
-async function showProgress(message: string, func: () => Promise<any>) {
-	await vscode.window.withProgress(
-		{
-			location: vscode.ProgressLocation.Notification,
-			title: `${message}`,
-			cancellable: true,
-		},
-		async (progress, token) => {
-			await func();
-		}
-	);
 }
 
 export function isRunning(tip: Tip) {
@@ -308,7 +225,7 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand(CommandName.Upgrade, async (recommendation: Recommendation) => {
-		await packageUpgrade(recommendation.tip.data, rootPath);
+		await packageUpgrade(recommendation.tip.data, getLocalFolder(rootPath));
 		ionicProvider.refresh();
 	});
 
