@@ -10,6 +10,7 @@ import { capacitorAdd } from './capacitor-add';
 import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall } from './node-commands';
 import { InternalCommand } from './command-name';
+import { MonoRepoType } from './monorepo';
 
 /**
  * Check rules for Capacitor projects
@@ -82,13 +83,14 @@ export function capacitorRecommendations(project: Project): Tip[] {
 
 	// Capacitor Integrations
 	if (!project.fileExists('capacitor.config.ts') && (!project.fileExists('capacitor.config.json'))) {
+		const local = (project.repoType != MonoRepoType.none) ? InternalCommand.cwd : '';
 		tips.push(new Tip(
 			'Add Capacitor Integration', '', TipType.Capacitor, 'Add the Capacitor integration to this project',
 			[
 				npmInstall('@capacitor/core@latest', '--save','-E'),
 				npmInstall('@capacitor/cli@latest', '-D', '-E'),
 				npmInstall(`@capacitor/app @capacitor/core @capacitor/haptics @capacitor/keyboard @capacitor/status-bar`),
-				`${InternalCommand.cwd}npx capacitor init "${project.name}" "${asAppId(project.name)}" --web-dir www`
+				`${local}npx capacitor init "${project.name}" "${asAppId(project.name)}" --web-dir www`
 			],
 			'Add Capacitor', 'Capacitor added to this project',
 			'https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor'
