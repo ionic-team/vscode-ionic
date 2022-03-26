@@ -90,6 +90,13 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 						viewEditor = false;
 						setTimeout(() => viewInEditor(url), 500);
 					}
+					if (data.includes('open your browser on')) {
+						serverUrl = getStringFrom(data, 'open your browser on ', ' **');
+						const url = serverUrl;
+						channel.appendLine(`[Ionic] Launching ${url}`);
+						viewEditor = false;
+						setTimeout(() => viewInEditor(url), 500);
+					}
 				}
 
 				// Based on found text logged change the progress message in the status bar
