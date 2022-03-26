@@ -202,7 +202,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.commands.registerCommand(CommandName.Refresh, () => {
 		clearRefreshCache(context);
-		context.workspaceState.update('CapacitorProject', undefined);
 		ionicProvider.refresh();
 	});
 

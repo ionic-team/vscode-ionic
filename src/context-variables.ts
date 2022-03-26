@@ -55,6 +55,13 @@ export function PackageCacheList(project: Project) {
 	return 'npmListData';
 }
 
+export function CapProjectCache(project: Project) {
+	if (project?.monoRepo?.localPackageJson) {
+		return 'CapacitorProject_'+project.monoRepo.name;
+	}
+	return 'CapacitorProject';
+}
+
 export function PackageCacheModified(project: Project) {
 	if (project?.monoRepo?.localPackageJson) {
 		return 'packagesModified_'+project.monoRepo.name;

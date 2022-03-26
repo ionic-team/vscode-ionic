@@ -9,7 +9,7 @@ import { Project } from './project';
 import { getRunOutput, getStringFrom } from './utilities';
 import { NpmDependency, NpmOutdatedDependency, NpmPackage, PackageType, PackageVersion } from './npm-model';
 import { listCommand, outdatedCommand } from './node-commands';
-import { PackageCacheList, PackageCacheModified, PackageCacheOutdated } from './context-variables';
+import { CapProjectCache, PackageCacheList, PackageCacheModified, PackageCacheOutdated } from './context-variables';
 import { join } from 'path';
 
 export function clearRefreshCache(context: vscode.ExtensionContext) {
@@ -19,6 +19,9 @@ export function clearRefreshCache(context: vscode.ExtensionContext) {
 				context.workspaceState.update(key, undefined);
 			}
 			if (key.startsWith(PackageCacheList(undefined))) {
+				context.workspaceState.update(key, undefined);
+			}
+			if (key.startsWith(CapProjectCache(undefined))) {
 				context.workspaceState.update(key, undefined);
 			}
 		}
