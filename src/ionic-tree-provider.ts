@@ -8,7 +8,7 @@ import { reviewProject } from './project';
 import { Recommendation } from './recommendation';
 import { Context, VSCommand } from './context-variables';
 import { starterProject } from './ionic-start';
-import { MonoRepoProject, MonoRepoType } from './monorepo';
+import { isFolderBasedMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
 
 interface IonicState {
 	view: vscode.TreeView<any>,
@@ -16,10 +16,11 @@ interface IonicState {
 	projects: Array<MonoRepoProject>,
 	repoType: MonoRepoType,
 	workspace: string,
-	projectsView: vscode.TreeView<any>
+	projectsView: vscode.TreeView<any>,
+	debugMode: boolean
 
 }
-export const ionicState: IonicState = { view: undefined, skipAuth: false, projects: [], projectsView: undefined, repoType: MonoRepoType.none, workspace: undefined };
+export const ionicState: IonicState = { view: undefined, skipAuth: false, projects: [], projectsView: undefined, repoType: MonoRepoType.none, workspace: undefined, debugMode: false };
 
 export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {
 	private _onDidChangeTreeData: vscode.EventEmitter<Recommendation | undefined | void> = new vscode.EventEmitter<Recommendation | undefined | void>();
@@ -54,7 +55,8 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
 			return Promise.resolve(element.children);
 		} else {
 			const packageJsonPath = path.join(this.workspaceRoot, 'package.json');
-			if (this.pathExists(packageJsonPath)) {
+			const folderBased = isFolderBasedMonoRepo(this.workspaceRoot).length > 0;
+			if (this.pathExists(packageJsonPath) || folderBased) {
 				return reviewProject(this.workspaceRoot, this.context, this.selectedProject);
 			} else {
 				return Promise.resolve(starterProject(this.workspaceRoot));

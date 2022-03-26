@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
 
 import { exists } from "./analyzer";
 import { CommandName } from './command-name';
@@ -21,7 +22,8 @@ export enum MonoRepoType {
 	turboRepo,
 	pnpm,
 	lerna,
-	npm
+	npm,
+	folder
 }
 
 /**
@@ -40,21 +42,26 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
 		projects = getNXProjects(project);
 		ionicState.projects = projects;
 		ionicState.projectsView.title = 'NX Projects';
-		
-	} else {
-		// For npm workspaces check package.json
-		if (project.workspaces?.length > 0) {
-			projects = getNpmWorkspaceProjects(project);
-			project.repoType = MonoRepoType.npm;
-			ionicState.projects = projects;
-			ionicState.projectsView.title = "Workspaces";
-		}
 
+	} else if (project.workspaces?.length > 0) {
+		// For npm workspaces check package.jsonß
+		projects = getNpmWorkspaceProjects(project);
+		project.repoType = MonoRepoType.npm;
+		ionicState.projects = projects;
+		ionicState.projectsView.title = "Workspaces";
+	} else {
+		// See if it looks like a folder based repo
+		projects = getFolderBasedProjects(project);
+		if (projects?.length > 0) {
+			project.repoType = MonoRepoType.folder;
+			ionicState.projectsView.title = "Projects";
+		}
+		ionicState.projects = projects;
 	}
 	if (projects?.length > 0) {
 		const found = projects.find((project) => project.name == selectedProject);
 		if (!found) {
-			context.workspaceState.update('SelectedProject',projects[0]);
+			context.workspaceState.update('SelectedProject', projects[0]);
 		}
 		project.monoRepo = found ? found : projects[0];
 
@@ -63,9 +70,9 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
 			vscode.window.showErrorMessage('No mono repo projects found.');
 		} else {
 			ionicState.view.title = project.monoRepo.name;
-			
+
 			// npm workspaces uses the package.json of the local folder
-			project.monoRepo.localPackageJson = (project.repoType == MonoRepoType.npm);
+			project.monoRepo.localPackageJson = ([MonoRepoType.npm, MonoRepoType.folder].includes(project.repoType));
 
 			vscode.commands.executeCommand(CommandName.ProjectsRefresh, project.monoRepo.name);
 		}
@@ -75,14 +82,58 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
 	vscode.commands.executeCommand(VSCommand.setContext, Context.isMonoRepo, project.repoType !== MonoRepoType.none);
 }
 
+/**
+ * Does it looks like there are subfolders with Ionic/web apps in them
+ * @param  {string} rootFolder
+ * @returns boolean
+ */
+export function isFolderBasedMonoRepo(rootFolder: string): Array<any> {
+	const folders = fs.readdirSync(rootFolder, { withFileTypes: true }).filter(dir => dir.isDirectory()).map(dir => dir.name);
+	const result = [];
+	for (const folder of folders) {
+		const packagejson = path.join(rootFolder, folder, 'package.json');
+		if (fs.existsSync(packagejson)) {
+			result.push({ name: folder, packageJson: packagejson, path: path.join(rootFolder, folder) });
+		}
+	}
+	return result;
+}
+
 export function getMonoRepoFolder(name: string): string {
-	const found: MonoRepoProject = ionicState.projects.find((repo) => repo.name == name);	
+	const found: MonoRepoProject = ionicState.projects.find((repo) => repo.name == name);
 	return found?.folder;
 }
 
 export function getPackageJSONFilename(rootFolder: string): string {
+	return path.join(getLocalFolder(rootFolder), 'package.json');
+}
+
+export function getLocalFolder(rootFolder: string): string {
 	switch (ionicState.repoType) {
-		case MonoRepoType.npm: return path.join(getMonoRepoFolder(ionicState.workspace), 'package.json');
+		case MonoRepoType.npm:
+		case MonoRepoType.folder: return getMonoRepoFolder(ionicState.workspace);
 	}
-    return path.join(rootFolder, 'package.json');
+	return rootFolder;
+}
+
+function getFolderBasedProjects(prj: Project): Array<MonoRepoProject> {
+	const projects = isFolderBasedMonoRepo(prj.folder);
+	let result: Array<MonoRepoProject> = [];
+	for (const project of projects) {
+		// Look for suitable dependencies: @ionic/*, @angular/*
+		try {
+			const pck = JSON.parse(fs.readFileSync(project.packageJson, 'utf8'));
+			if (pck?.dependencies?.['@ionic/vue'] ||
+				pck?.dependencies?.['@ionic/angular'] ||
+				pck?.dependencies?.['@ionic/react'] ||
+				pck?.dependencies?.['@angular/core']
+			) {
+				result.push({ name: project.name, folder: project.path });
+			}
+		} catch {
+			//
+		}
+	}
+	result = result.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 : -1);
+	return result;
 }

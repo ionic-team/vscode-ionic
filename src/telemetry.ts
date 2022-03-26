@@ -53,7 +53,7 @@ export function sendTelemetryEvents(folder: string, project: Project, packages: 
 	if (!config.telemetry) return;
 
 	const sent = context.workspaceState.get(`packages-${project.name}`);
-	if (sent != project.modified.toUTCString()) {
+	if (sent != project.modified?.toUTCString()) {
 		const packageList = [];
 		const packageVersions = [];
 		const plugins = [];
@@ -75,7 +75,7 @@ export function sendTelemetryEvents(folder: string, project: Project, packages: 
 		});
 
 		// Store the last time the package.json was modified so that we can send if it changes
-		context.workspaceState.update(`packages-${project.name}`, project.modified.toUTCString());
+		context.workspaceState.update(`packages-${project.name}`, project.modified?.toUTCString());
 	}
 
 	const sentUsage = context.globalState.get(`lastusage`);

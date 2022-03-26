@@ -1,4 +1,9 @@
 ## Changelog
+### Version 1.4.0
+- Add folder style mono repos
+- Option to debug for web browser
+- Fix for Capacitor project information in a mono repo
+
 ### Version 1.3.2
 - Mono Repo Support for npm workspaces
 - New Build option selection from Angular configuration

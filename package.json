@@ -89,8 +89,7 @@
 				{
 					"id": "ionic-projects",
 					"name": "Projects",
-					"when": "isMonoRepo == true",
-					"visibility": "collapsed"
+					"when": "isMonoRepo == true"
 				}
 			],
 			"explorer": []
@@ -182,6 +181,22 @@
 				}
 			},
 			{
+				"command": "ionic.debugMode",
+				"title": "Switch to debug mode",
+				"icon": {
+					"light": "resources/light/debug.svg",
+					"dark": "resources/dark/debug.svg"
+				}
+			},
+			{
+				"command": "ionic.runMode",
+				"title": "Switch to run mode",
+				"icon": {
+					"light": "resources/light/run.svg",
+					"dark": "resources/dark/run.svg"
+				}
+			},
+			{
 				"command": "ionic.upgrade",
 				"title": "Upgrade",
 				"icon": {
@@ -217,6 +232,14 @@
 					"when": "false"
 				},
 				{
+					"command": "ionic.debugMode",
+					"when": "false"
+				},
+				{
+					"command": "ionic.runMode",
+					"when": "false"
+				},
+				{
 					"command": "ionic.lightbulb",
 					"when": "false"
 				},
@@ -246,7 +269,7 @@
 					"command": "ionic.lightbulb",
 					"when": "view == ionic && viewItem == lightbulb",
 					"group": "inline"
-				},				
+				},
 				{
 					"command": "ionic.stop",
 					"when": "view == ionic && viewItem == stop",
@@ -271,6 +294,16 @@
 					"command": "ionic.buildConfig",
 					"when": "view == ionic && viewItem == buildConfig",
 					"group": "inline"
+				},
+				{
+					"command": "ionic.debugMode",
+					"when": "view == ionic && viewItem == debugMode && debugMode == false",
+					"group": "inline"
+				},
+				{
+					"command": "ionic.runMode",
+					"when": "view == ionic && viewItem == debugMode && debugMode == true",
+					"group": "inline"
 				}
 			]
 		},
@@ -281,6 +314,19 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Live Reload will refresh the app on the device when source code is changed in the editor."
+				},
+				"ionic.browser": {
+					"type": "string",
+					"default": "chrome",
+					"enum": [
+						"chrome",
+						"pwa-msedge"
+					],
+					"enumDescriptions": [
+						"Google Chrome",
+						"Microsoft Edge"
+					],
+					"description": "When Debugging for web which browser should be launched."
 				},
 				"ionic.externalAddress": {
 					"type": "boolean",

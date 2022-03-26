@@ -19,7 +19,7 @@ export enum AssetType {
 }
 
 export function addSplashAndIconFeatures(project: Project) {
-	project.setGroup(`Splash Screen & Icon`, '', TipType.Media, false, 'rebuild').tip = new Tip('Rebuild Assets',undefined).setAction(
+	project.setGroup(`Splash Screen & Icon`, 'Allows setting of the Splash Screen and Icon. Clicking Rebuild will create assets for your iOS and Android native projects.', TipType.Media, false, 'rebuild').tip = new Tip('Rebuild Assets',undefined).setAction(
 		async () => {
 			await runCordovaRes(project);
 		}

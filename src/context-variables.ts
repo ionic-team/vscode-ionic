@@ -29,7 +29,10 @@ export enum Context {
 	stop = 'stop',
 
 	// Build configuration
-	buildConfig = 'buildConfig'
+	buildConfig = 'buildConfig',
+
+	// Browser options
+	debugMode = 'debugMode'
 }
 
 // Commands from vs code
@@ -50,6 +53,13 @@ export function PackageCacheList(project: Project) {
 		return 'npmListData_'+project.monoRepo.name;
 	}
 	return 'npmListData';
+}
+
+export function CapProjectCache(project: Project) {
+	if (project?.monoRepo?.localPackageJson) {
+		return 'CapacitorProject_'+project.monoRepo.name;
+	}
+	return 'CapacitorProject';
 }
 
 export function PackageCacheModified(project: Project) {

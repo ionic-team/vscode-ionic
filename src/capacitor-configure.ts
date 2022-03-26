@@ -9,6 +9,7 @@ import { getOutputChannel } from './extension';
 import { Project } from './project';
 import { Tip, TipType } from './tip';
 import { getStringFrom, setStringIn } from './utilities';
+import { CapProjectCache } from './context-variables';
 
 enum NativePlatform {
 	iOSOnly,
@@ -95,7 +96,7 @@ export async function reviewCapacitorConfig(project: Project, context: vscode.Ex
 async function getCapacitorProjectState(prj: Project, context: vscode.ExtensionContext): Promise<CapacitorProjectState> {
 	let state: CapacitorProjectState = {};
 
-	const tmp: string = context.workspaceState.get('CapacitorProject');
+	const tmp: string = context.workspaceState.get(CapProjectCache(prj));
 	if (tmp) {
 		if (useCapProjectCache) {
 			state = JSON.parse(tmp);
@@ -129,7 +130,7 @@ async function getCapacitorProjectState(prj: Project, context: vscode.ExtensionC
 		return undefined;
 	}
 
-	context.workspaceState.update('CapacitorProject', JSON.stringify(state));
+	context.workspaceState.update(CapProjectCache(prj), JSON.stringify(state));
 	return state;
 }
 

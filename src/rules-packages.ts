@@ -4,15 +4,16 @@ import * as fs from 'fs';
 import { Project } from "./project";
 import { Tip, TipType } from './tip';
 import { exists, isGreaterOrEqual, warnMinVersion } from './analyzer';
+import { npmInstallAll } from './node-commands';
 
 /**
  * General Rules for packages like momentjs, jquery, etc
  * @param  {Project} project
  */
 export function checkPackages(project: Project) {
-	const nmf = path.join(project.folder, 'node_modules');
+	const nmf = project.getNodeModulesFolder();
 	if (!fs.existsSync(nmf)) {
-		project.add(new Tip('Install Node Modules', '', TipType.Idea, 'Install Node Modules', 'npm install', 'Installing').performRun().showProgressDialog());
+		project.add(new Tip('Install Node Modules', '', TipType.Idea, 'Install Node Modules', npmInstallAll(), 'Installing').performRun().showProgressDialog());
 	}
 
 	// Replace momentjs with date-fns

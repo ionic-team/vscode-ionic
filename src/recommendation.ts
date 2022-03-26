@@ -30,8 +30,9 @@ export class Recommendation extends vscode.TreeItem {
 		};
 	}
 
+	// Animinated icons need to have an equivalent filename with -anim that contains animated svg
 	public animate() {
-		this.setIcon(this.iconName + '-anim');
+		this.setIcon(this.iconName + '-anim');		
 	}
 
 	public setContext(value: string) {
