@@ -19,8 +19,9 @@ const opTiming = {};
 let serverUrl = undefined;
 
 export function estimateRunTime(command: string) {
-	if (opTiming[command]) {
-		return opTiming[command];
+	const idx = command.replace(InternalCommand.cwd,'');
+	if (opTiming[idx]) {
+		return opTiming[idx];
 	} else {
 		return undefined;
 	}
