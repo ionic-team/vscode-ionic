@@ -2,8 +2,11 @@
 
 ## Features
 - (1) Add .vs-code/extensions.json to recommend Ionic extension on starters
-- (16) Folder based monorepo style
 - (2) When finishing a debug session for web return back to ionic extension and stop run
+- (2) For a web project with Capacitor if ionic build wont work (because not angular, vue, react) then npm run build instead
+- (16) Lerna support
+- (16) Debugging for Android
+- (32) Debugging for iOS
 - (4) Conference starter is using Cordova, probably should be using Capacitor
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand
@@ -43,10 +46,9 @@
 - (docs) Video of splashscreen and icon assets
 
 # Large Feature Requests
-- (feat) nx support
 - (feat) Capture console/network etc https://medium.com/swlh/chrome-dev-tools-protocol-2d0ef2baf4bf
   - See chrome-remote-interface for debugging with Chrome/Edge/Firefox/Android
-- (feat) Debugger for browser, iOS and Android (add breakpoints, inspection etc)
+- (feat) Debugger for iOS and Android (add breakpoints, inspection etc)
 - (feat) Bundle Analyser button, use stats.json for own report
 - (feat) Use npm audit to list vulnerable packages
 - (feat) info.plist editing
@@ -61,35 +63,13 @@
 - Badge option is not available for VS Code Extensions
 - links to external content cannot open in VS Code editor window (must be browser)
 
-# MonoRepo Tools
-Usage based on 2021.stateofjs.com:
-- Lerna - 25%
-- Yarn Workspaces - 25%
-- npm workspaces - 18%
-- pnpm - 13%
-- nx - 13%
-- Turborepo - 3%
-- Yalc - 2%
-- Rush - 2%
-
-### Js Painpoints
-- Managing Dependies, Code Architecture, State Management, Debugging...
-
-
 # Support For NX
 - (bug) Package reconciliation (from root and project)
 - (feat) Needs lint, test and e2e nx tasks added (assuming @nxtend/ionic-angular)
 - (feat) Detect missing @nxtend/ionic-angular or @nxtend/ionic-react. Option to add
 - (feat) Detect missing @nxtend/capacitor. Option to add
-
 - Starters for NX?
 
 # Support for pnpm
 - See: https://github.com/reslear/ionic-vue-pnpm-monorepo
-
-# Browser Debugging
-- When url is known and debug is turned on:
-- use no-open
-- update launch.json with config
-- run vscode.command.executeCommand
 
