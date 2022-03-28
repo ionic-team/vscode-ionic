@@ -33,7 +33,7 @@ function runOptions(command: string, folder: string) {
 	const javaHome: string = vscode.workspace.getConfiguration('ionic').get('javaHome');
 
 	// Cocoapods required lang set to en_US.UTF-8 (when capacitor sync or run ios is done)
-	if (command.includes('sync') || command.includes('capacitor init') || command.includes('cap run ios')) {
+	if (command.includes('sync') || command.includes('capacitor init') || command.includes('cap run ios') || command.includes('cap add')) {
 		env.LANG = 'en_US.UTF-8';
 	}
 	if (javaHome) {
