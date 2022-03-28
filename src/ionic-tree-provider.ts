@@ -19,7 +19,8 @@ interface IonicState {
 	projectsView: vscode.TreeView<any>,
 	webDebugMode: boolean,
 	selectedAndroidDevice?: string,
-	selectedIOSDevice?: string
+	selectedIOSDevice?: string,
+	projectDirty?: boolean // Was there a likely change in the project (ie file saved)
 
 }
 export const ionicState: IonicState = { view: undefined, skipAuth: false, projects: [], projectsView: undefined, repoType: MonoRepoType.none, workspace: undefined, webDebugMode: false };

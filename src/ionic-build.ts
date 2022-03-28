@@ -16,6 +16,8 @@ export function ionicBuild(project: Project, configurationArg?: string): string 
 	// For convenience, check if npm install was done and do it
 	const nmf =project.getNodeModulesFolder();
 	const preop = (!fs.existsSync(nmf)) ? 'npm install && ' : '';
+	
+	ionicState.projectDirty = false;
 
 	const prod: boolean = vscode.workspace.getConfiguration('ionic').get('buildForProduction');	
 	switch (project.repoType) {

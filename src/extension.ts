@@ -204,6 +204,8 @@ export function activate(context: vscode.ExtensionContext) {
 	const view = vscode.window.createTreeView('ionic', { treeDataProvider: ionicProvider });
 	ionicState.view = view;
 
+	trackProjectChange();
+
 	vscode.commands.registerCommand(CommandName.Refresh, () => {
 		clearRefreshCache(context);
 		ionicProvider.refresh();
@@ -308,6 +310,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(AndroidDebugType, new AndroidDebugProvider()));
 	context.subscriptions.push(vscode.debug.onDidTerminateDebugSession(androidDebugUnforward));
+}
+
+function trackProjectChange() {
+	vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
+		ionicState.projectDirty = true;
+	});
 }
 
 async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, rootPath: string) {
