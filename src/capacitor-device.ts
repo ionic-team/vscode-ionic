@@ -17,7 +17,7 @@ import { getRunOutput } from './utilities';
 		return preselected;
 	}
 	let devices;
-	await showProgress('Getting Devices', async () => {
+	await showProgress('Getting Devices...', async () => {
 		devices = await getDevices(command, rootPath);
 	});
 
