@@ -17,7 +17,9 @@ interface IonicState {
 	repoType: MonoRepoType,
 	workspace: string,
 	projectsView: vscode.TreeView<any>,
-	webDebugMode: boolean
+	webDebugMode: boolean,
+	selectedAndroidDevice?: string,
+	selectedIOSDevice?: string
 
 }
 export const ionicState: IonicState = { view: undefined, skipAuth: false, projects: [], projectsView: undefined, repoType: MonoRepoType.none, workspace: undefined, webDebugMode: false };

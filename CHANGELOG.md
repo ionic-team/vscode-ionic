@@ -1,4 +1,7 @@
 ## Changelog
+### Version 1.4.2
+- When re-running on iOS or Android the device does not need to be reselected
+
 ### Version 1.4.1
 - Add folder style mono repos
 - Option to debug for web browser

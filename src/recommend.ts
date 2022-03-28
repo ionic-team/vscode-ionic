@@ -50,6 +50,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 		);
 		// project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
 		const runPoints = [
+			{ text: 'Copying web assets', title: 'Copying...' },
 			{ text: 'ng run app:build', title: 'Building Web...' },
 			{ text: 'capacitor run', title: 'Syncing...' },
 			{ text: '✔ update ios', title: 'Building Native...' },
@@ -60,7 +61,8 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 		];
 
 		if (hasCapAndroid) {
-			project.add(new Tip('Run On Android', '',  TipType.Run, 'Run', undefined, 'Running', 'Project is running')
+			const title = (ionicState.selectedAndroidDevice) ? `Run on ${ionicState.selectedAndroidDevice}`: 'Run on Android';
+			project.add(new Tip(title, '',  TipType.Run, 'Run', undefined, 'Running', 'Project is running')
 				.showProgressDialog()
 				.requestDeviceSelection()
 				.setDynamicCommand(capacitorRun, project, CapacitorPlatform.android)
@@ -70,7 +72,8 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 			);
 		}
 		if (hasCapIos) {
-			project.add(new Tip('Run On iOS', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
+			const title = (ionicState.selectedIOSDevice) ? `Run on ${ionicState.selectedIOSDevice}`: 'Run on iOS';
+			project.add(new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
 				.showProgressDialog()
 				.requestDeviceSelection()
 				.setDynamicCommand(capacitorRun, project, CapacitorPlatform.ios)
