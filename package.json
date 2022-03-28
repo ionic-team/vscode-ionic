@@ -169,6 +169,10 @@
 				"title": "Rebuild"
 			},
 			{
+				"command": "ionic.function",
+				"title": "Execute"
+			},
+			{
 				"command": "ionic.stop",
 				"title": "Stop"
 			},
@@ -225,6 +229,10 @@
 				},
 				{
 					"command": "ionic.rebuild",
+					"when": "false"
+				},
+				{
+					"command": "ionic.function",
 					"when": "false"
 				},
 				{

@@ -17,10 +17,10 @@ interface IonicState {
 	repoType: MonoRepoType,
 	workspace: string,
 	projectsView: vscode.TreeView<any>,
-	debugMode: boolean
+	webDebugMode: boolean
 
 }
-export const ionicState: IonicState = { view: undefined, skipAuth: false, projects: [], projectsView: undefined, repoType: MonoRepoType.none, workspace: undefined, debugMode: false };
+export const ionicState: IonicState = { view: undefined, skipAuth: false, projects: [], projectsView: undefined, repoType: MonoRepoType.none, workspace: undefined, webDebugMode: false };
 
 export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {
 	private _onDidChangeTreeData: vscode.EventEmitter<Recommendation | undefined | void> = new vscode.EventEmitter<Recommendation | undefined | void>();
@@ -33,6 +33,10 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
 
 	refresh(): void {
 		this._onDidChangeTreeData.fire();
+	}
+
+	getParent(element: Recommendation) {
+		return undefined;
 	}
 
 	getTreeItem(element: Recommendation): vscode.TreeItem {
@@ -52,7 +56,11 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
 		vscode.commands.executeCommand(VSCommand.setContext, Context.noProjectFound, false);
 
 		if (element) {
-			return Promise.resolve(element.children);
+			if (element.whenExpanded) {
+				return element.whenExpanded();
+			} else {
+				return Promise.resolve(element.children);
+			}
 		} else {
 			const packageJsonPath = path.join(this.workspaceRoot, 'package.json');
 			const folderBased = isFolderBasedMonoRepo(this.workspaceRoot).length > 0;

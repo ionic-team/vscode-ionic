@@ -22,6 +22,8 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { addScripts } from './scripts';
 import { Context } from './context-variables';
 import { ionicState } from './ionic-tree-provider';
+import { getAndroidWebViewList } from './android-debug-list';
+import { getDebugBrowserName } from './editor-preview';
 
 export async function getRecommendations(project: Project, context: vscode.ExtensionContext, packages: any): Promise<void> {
 	if (isCapacitor() && !isCordova()) {
@@ -29,8 +31,9 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 
 		const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
 		const hasCapAndroid = project.hasCapacitorProject(CapacitorPlatform.android);
-		const title = (ionicState.debugMode) ? 'Debug On Web' : 'Run On Web';
-		const type = (ionicState.debugMode) ? TipType.Debug : TipType.Run;
+		const title = (ionicState.webDebugMode) ? 'Debug On Web' : 'Run On Web';
+		const tooltip = (ionicState.webDebugMode) ? `Debug using ${getDebugBrowserName()}. The browser can be changed in Settings.` : 'Run a developement server and open using the default web browser';
+		const type = (ionicState.webDebugMode) ? TipType.Debug : TipType.Run;
 		project.add(
 			new Tip(
 				title, '', type, 'Serve', undefined, 'Running on Web', `Project Served`)
@@ -43,6 +46,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 				.canStop()
 				.contextIf(Context.debugMode, false)
 				.canAnimate()
+				.setTooltip(tooltip)
 		);
 		// project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
 		const runPoints = [
@@ -56,7 +60,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 		];
 
 		if (hasCapAndroid) {
-			project.add(new Tip('Run On Android', '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
+			project.add(new Tip('Run On Android', '',  TipType.Run, 'Run', undefined, 'Running', 'Project is running')
 				.showProgressDialog()
 				.requestDeviceSelection()
 				.setDynamicCommand(capacitorRun, project, CapacitorPlatform.android)
@@ -100,6 +104,11 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 				.setDynamicCommand(capacitorOpen, project, CapacitorPlatform.android)
 			);
 		}
+
+		const r = project.setGroup(`Debug`, 'Running Ionic applications you can debug', TipType.Debug, false);
+		r.whenExpanded = async () => {
+			return getAndroidWebViewList(hasCapAndroid);
+		};
 	}
 
 	// Script Running	

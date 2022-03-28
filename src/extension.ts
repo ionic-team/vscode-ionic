@@ -18,6 +18,9 @@ import { IonicProjectsreeProvider } from './ionic-projects-provider';
 import { buildConfiguration } from './build-configuration';
 import { selectDevice } from './capacitor-device';
 import { getLocalFolder } from './monorepo';
+import { androidDebugUnforward } from './android-debug-bridge';
+import { AndroidDebugProvider } from './android-debug-provider';
+import { AndroidDebugType } from './android-debug';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
@@ -243,13 +246,13 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand(CommandName.DebugMode, async (r: Recommendation) => {
-		ionicState.debugMode = true;
+		ionicState.webDebugMode = true;
 		await vscode.commands.executeCommand(VSCommand.setContext, Context.debugMode, true);
 		ionicProvider.refresh();
 	});
 
 	vscode.commands.registerCommand(CommandName.RunMode, async (r: Recommendation) => {
-		ionicState.debugMode = false;
+		ionicState.webDebugMode = false;
 		await vscode.commands.executeCommand(VSCommand.setContext, Context.debugMode, false);
 		ionicProvider.refresh();
 	});
@@ -270,6 +273,10 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand(CommandName.Rebuild, async (recommendation: Recommendation) => {
 		await recommendation.tip.executeAction();
 		ionicProvider.refresh();
+	});
+
+	vscode.commands.registerCommand(CommandName.Function, async (recommendation: Recommendation) => {
+		await recommendation.tip.executeAction();
 	});
 
 	vscode.commands.registerCommand(CommandName.Fix, async (tip: Tip) => {
@@ -298,6 +305,9 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand(CommandName.Link, async (tip: Tip) => {
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
 	});
+
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(AndroidDebugType, new AndroidDebugProvider()));
+	context.subscriptions.push(vscode.debug.onDidTerminateDebugSession(androidDebugUnforward));
 }
 
 async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, rootPath: string) {

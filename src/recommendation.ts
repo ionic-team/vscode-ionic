@@ -6,6 +6,7 @@ import { Tip } from './tip';
 export class Recommendation extends vscode.TreeItem {
 	public children: Recommendation[];
 	private iconName: string;
+	public whenExpanded: () => Promise<Array<Recommendation>>;
 
 	constructor(
 		public readonly tooltip: string,

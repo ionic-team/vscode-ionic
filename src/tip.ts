@@ -66,6 +66,11 @@ export class Tip {
 		return this;
 	}
 
+	setTooltip(tooltip: string) {
+		this.tooltip = tooltip;
+		return this;
+	}
+
 	canStop() {
 		if (isRunning(this)) {
 			this.setContextValue(Context.stop);

@@ -31,7 +31,7 @@ export enum Context {
 	// Build configuration
 	buildConfig = 'buildConfig',
 
-	// Browser options
+	// Run or Debug
 	debugMode = 'debugMode'
 }
 

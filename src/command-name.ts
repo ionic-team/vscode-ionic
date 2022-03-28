@@ -10,6 +10,7 @@ export enum CommandName {
 	Login = 'ionic.login',
 	Stop = 'ionic.stop',
 	Rebuild = 'ionic.rebuild',
+	Function = 'ionic.function',
 	Open = 'ionic.open',
 	SkipLogin = 'ionic.skipLogin',
 	Upgrade = 'ionic.upgrade',
@@ -17,7 +18,7 @@ export enum CommandName {
 	ProjectSelect = 'ionic.projectSelect',
 	BuildConfig = 'ionic.buildConfig',
 	DebugMode = 'ionic.debugMode',
-	RunMode = 'ionic.runMode',
+	RunMode = 'ionic.runMode'
 }
 
 export enum InternalCommand {
