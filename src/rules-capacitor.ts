@@ -63,6 +63,15 @@ export function checkCapacitorRules(project: Project) {
 		// TODO: Complete work
 		// checkAndroidManifest();
 	}
+
+	// Ionic CLI unlock live reload
+	if (!exists('@ionic/cli') && isIonicBasedProject()) {
+		project.recommendAdd('@ionic/cli', '@ionic/cli',
+			'Add the Ionic CLI for Live Reload',
+			'The Ionic CLI adds the "Live Reload" feature to quickly refresh your application on a device after a code change.',
+			true);
+	}
+
 	if (exists('cordova-plugin-x-socialsharing')) {
 		// TODO: Verify that Android Manifest contains
 		// <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
@@ -119,7 +128,6 @@ export function capacitorRecommendations(project: Project): Tip[] {
 			);
 		}
 	}
-
 
 	// List of incompatible plugins
 	tips.push(incompatiblePlugin('cordova-plugin-admobpro', 'https://github.com/ionic-team/capacitor/issues/1101'));
@@ -190,6 +198,10 @@ export function capacitorRecommendations(project: Project): Tip[] {
 	tips.push(replacementPlugin('cordova-plugin-statusbar', '@capacitor/status-bar', 'https://capacitorjs.com/docs/apis/status-bar'));
 	tips.push(replacementPlugin('phonegap-plugin-push', '@capacitor/push-notifications', 'https://capacitorjs.com/docs/apis/push-notifications'));
 	return tips;
+}
+
+function isIonicBasedProject() {
+	return (exists('@ionic/angular') || exists('@ionic/react') || exists('@ionic/vue'));
 }
 
 // Capacity Android 3.2.3 added proguard rules for Capacitor for release build
