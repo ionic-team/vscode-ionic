@@ -21,6 +21,7 @@ import { getLocalFolder } from './monorepo';
 import { androidDebugUnforward } from './android-debug-bridge';
 import { AndroidDebugProvider } from './android-debug-provider';
 import { AndroidDebugType } from './android-debug';
+import { CapacitorPlatform } from './capacitor-platform';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
@@ -304,6 +305,17 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand(CommandName.Run, async (r: Recommendation) => {
+		runAction(r, ionicProvider, rootPath);
+	});
+
+	vscode.commands.registerCommand(CommandName.SelectDevice, async (r: Recommendation) => {		 
+		if (r.tip.actionArg(1) == CapacitorPlatform.android) {
+			ionicState.selectedAndroidDevice = undefined;
+			ionicState.selectedAndroidDeviceName = undefined;
+		} else {
+			ionicState.selectedIOSDevice = undefined;
+			ionicState.selectedIOSDeviceName = undefined;
+		}
 		runAction(r, ionicProvider, rootPath);
 	});
 
