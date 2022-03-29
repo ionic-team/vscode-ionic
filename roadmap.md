@@ -6,6 +6,7 @@
 - (1) Suggest live reload option by ensuring @ionic/cli is installed and enabled (allow ignore)
 - (1) Remove ansii color codes from output
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
+- (1) Project like a standard vue app will not launch the browser (even though url is captured)
 
 - (16) Lerna support
 - (16) Debugging for Android

@@ -93,10 +93,17 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 						channel.appendLine(`[Ionic] Launching ${url}`);
 						viewEditor = false;
 						setTimeout(() => viewInEditor(url), 500);
-					}
-					if (data.includes('open your browser on')) {
+					} else if (data.includes('open your browser on')) {
+						// Likely React
 						serverUrl = getStringFrom(data, 'open your browser on ', ' **');
 						const url = serverUrl;
+						channel.appendLine(`[Ionic] Launching ${url}`);
+						viewEditor = false;
+						setTimeout(() => viewInEditor(url), 500);
+					} else if (data.includes('- Local:   ')) {
+						// Likely Vue
+						serverUrl = getStringFrom(data, 'Local: ', '\n');
+						const url = serverUrl.trim();
 						channel.appendLine(`[Ionic] Launching ${url}`);
 						viewEditor = false;
 						setTimeout(() => viewInEditor(url), 500);
@@ -119,7 +126,8 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 					if (logline.startsWith('[capacitor]')) {
 						channel.appendLine(logline.replace('[capacitor]', ''));
 					} else if (logline) {
-						channel.appendLine(logline);
+						const nocolor = logline.replace(/[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,"");
+						channel.appendLine(nocolor);
 					}
 				}
 				channel.show();

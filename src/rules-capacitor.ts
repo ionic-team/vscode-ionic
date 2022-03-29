@@ -93,7 +93,8 @@ export function capacitorRecommendations(project: Project): Tip[] {
 				`${local}npx capacitor init "${project.name}" "${asAppId(project.name)}" --web-dir www`
 			],
 			'Add Capacitor', 'Capacitor added to this project',
-			'https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor'
+			'https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor',
+			'Adding Capacitor to the project...'
 		).showProgressDialog());
 	} else {
 		if (!project.hasCapacitorProject(CapacitorPlatform.android)) {
