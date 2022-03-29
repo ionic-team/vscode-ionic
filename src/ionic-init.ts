@@ -27,10 +27,26 @@ export async function ionicInit(folder: string): Promise<boolean> {
 			packageFile.scripts['ionic:serve'] = 'npm run start';
 		}
 		fs.writeFileSync(filename, JSON.stringify(packageFile, undefined, 2));
+		addIonicConfigCapacitor(folder);
 		channel.appendLine('[Ionic] Created Ionic Project');
 		return true;
 	} catch (err) {
 		channel.appendLine('[Ionic] Unable to create Ionic project');
 		return false;
+	}
+}
+
+function addIonicConfigCapacitor(folder: string) {
+	// This will add capacitor to integrations object of ionic.config.json
+	// "capacitor": {}
+	try {
+		const filename = path.join(folder, 'ionic.config.json');
+		if (fs.existsSync(filename)) {
+			const ionicConfig = JSON.parse(fs.readFileSync(filename, 'utf8'));
+			ionicConfig.integrations.capacitor = new Object();
+			fs.writeFileSync(filename, JSON.stringify(ionicConfig, undefined, 2));
+		}
+	} catch {
+		// Just continue
 	}
 }
