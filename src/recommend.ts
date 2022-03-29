@@ -24,6 +24,7 @@ import { Context } from './context-variables';
 import { ionicState } from './ionic-tree-provider';
 import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
+import { features } from './features';
 
 export async function getRecommendations(project: Project, context: vscode.ExtensionContext, packages: any): Promise<void> {
 	if (isCapacitor() && !isCordova()) {
@@ -61,8 +62,8 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 		];
 
 		if (hasCapAndroid) {
-			const title = (ionicState.selectedAndroidDevice) ? `Run on ${ionicState.selectedAndroidDevice}`: 'Run on Android';
-			project.add(new Tip(title, '',  TipType.Run, 'Run', undefined, 'Running', 'Project is running')
+			const title = (ionicState.selectedAndroidDevice) ? `Run on ${ionicState.selectedAndroidDevice}` : 'Run on Android';
+			project.add(new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
 				.showProgressDialog()
 				.requestDeviceSelection()
 				.setDynamicCommand(capacitorRun, project, CapacitorPlatform.android)
@@ -72,7 +73,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 			);
 		}
 		if (hasCapIos) {
-			const title = (ionicState.selectedIOSDevice) ? `Run on ${ionicState.selectedIOSDevice}`: 'Run on iOS';
+			const title = (ionicState.selectedIOSDevice) ? `Run on ${ionicState.selectedIOSDevice}` : 'Run on iOS';
 			project.add(new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
 				.showProgressDialog()
 				.requestDeviceSelection()
@@ -107,11 +108,13 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 				.setDynamicCommand(capacitorOpen, project, CapacitorPlatform.android)
 			);
 		}
-
-		const r = project.setGroup(`Debug`, 'Running Ionic applications you can debug', TipType.Debug, false);
-		r.whenExpanded = async () => {
-			return getAndroidWebViewList(hasCapAndroid);
-		};
+		
+		if (features.debugAndroid) { // Experimental Feature
+			const r = project.setGroup(`Debug`, 'Running Ionic applications you can debug', TipType.Debug, false);
+			r.whenExpanded = async () => {
+				return getAndroidWebViewList(hasCapAndroid);
+			};
+		}
 	}
 
 	// Script Running	
