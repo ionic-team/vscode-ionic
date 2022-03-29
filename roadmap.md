@@ -3,17 +3,10 @@
 ## Features
 - (1) Add .vs-code/extensions.json to recommend Ionic extension on starters
 - (2) When finishing a debug session for web return back to ionic extension and stop run
-- (1) "[Warn] Sync could not run missing www folder" - Make sure warning is captured and for this scenario try to autocorrect??
-x (1) For "Run on iOS etc" the alert for running should have "..." at end of sentence and allow minimize
 - (1) Suggest live reload option by ensuring @ionic/cli is installed and enabled (allow ignore)
-x (1) If you have selected a device previously from UI then default to that again
-x (1) If you make a change to a file in the editor and choose "run" (& its not live reload) then do a build first
 - (1) Remove ansii color codes from output
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
-- (1) For Ionic cli commands where ionic:build and ionic:serve do not exist then create them
 
-
-- (2) For a web project with Capacitor if ionic build wont work (because not angular, vue, react) then npm run build instead
 - (16) Lerna support
 - (16) Debugging for Android
 - (32) Debugging for iOS
