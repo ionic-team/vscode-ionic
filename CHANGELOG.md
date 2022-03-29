@@ -1,6 +1,7 @@
 ## Changelog
 ### Version 1.4.2
 - When re-running on iOS or Android the device does not need to be reselected
+- For projects not integrated with Ionic automate initialization of custom project with ionic:build and ionic:serve scripts
 - If you change your project and click run on iOS/Android it will rebuild the app before running
 
 ### Version 1.4.1

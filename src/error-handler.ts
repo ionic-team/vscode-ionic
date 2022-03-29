@@ -5,6 +5,7 @@ import * as path from 'path';
 import { lastOperation } from './extension';
 import { CommandName } from './command-name';
 import { showMessage } from './utilities';
+import { ionicInit } from './ionic-init';
 
 interface ErrorLine {
 	uri: string;
@@ -18,12 +19,16 @@ let currentErrorFilename: string;
 // On Save Document event (singleton)
 let onSave: vscode.Disposable;
 
-export async function handleError(error: string, logs: Array<string>, folder: string): Promise<string> {
+export async function handleError(error: string, logs: Array<string>, folder: string): Promise<boolean> {
 	if (error && error.includes('ionic: command not found')) {
 		await vscode.window.showErrorMessage('The Ionic CLI is not installed. Get started by running npm install -g @ionic/cli at the terminal.', 'More Information');
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse('https://ionicframework.com/docs/intro/cli#install-the-ionic-cli'));
 		return;
 	}
+	if (error && error.includes(`If this is a project you'd like to integrate with Ionic, run ionic init.`)) {
+		return await ionicInit(folder);
+	}
+
 	if (error && error.startsWith('/bin/sh: npx')) {
 		let msg = 'This extension requires npm to be installed. It can be downloaded and installed from nodejs.dev.';
 		if (os.platform() == 'darwin') {

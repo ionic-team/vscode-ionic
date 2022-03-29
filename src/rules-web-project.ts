@@ -9,7 +9,7 @@ import { asAppId } from "./utilities";
  */
 export function webProject(project: Project) {
 	project.tip(new Tip(
-		'Add Capacitor Integration', '', TipType.Capacitor, 'Integrate Capacitor with this project to make it native mobile.',
+		'Add Capacitor Integration', '', TipType.Capacitor, 'Integrate Capacitor with this project to make it native mobile?',
 		[
 			npmInstall(`@capacitor/core`),
 			npmInstall(`@capacitor/cli`),

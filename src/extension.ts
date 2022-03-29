@@ -76,7 +76,7 @@ function startCommand(tip: Tip, cmd: string, ionicProvider: IonicTreeProvider) {
 		const message = tip.commandTitle ? tip.commandTitle : tip.title;
 		channel.appendLine(`[Ionic] ${message}...`);
 		let command = cmd;
-		if (command.includes(InternalCommand.cwd)) {
+		if (command?.includes(InternalCommand.cwd)) {
 			command = command.replace(InternalCommand.cwd, '');
 			channel.appendLine(`> Workspace: ${ionicState.workspace}`);
 		}
@@ -173,7 +173,10 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 					percentage = 0;
 				}
 				try {
-					await run(rootPath, command, channel, cancelObject, tip.doViewEditor, tip.runPoints, progress, ionicProvider);
+					let retry = true;
+					while (retry) {
+						retry = await run(rootPath, command, channel, cancelObject, tip.doViewEditor, tip.runPoints, progress, ionicProvider);
+					}
 				} finally {
 					finishCommand(tip);
 				}

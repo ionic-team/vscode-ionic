@@ -43,9 +43,9 @@ function runOptions(command: string, folder: string) {
 	return { cwd: folder, encoding: 'utf8', env: env };
 }
 
-export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject, viewEditor: boolean, runPoints: Array<RunPoint>, progress: any, ionicProvider?: IonicTreeProvider): Promise<void> {
+export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject, viewEditor: boolean, runPoints: Array<RunPoint>, progress: any, ionicProvider?: IonicTreeProvider): Promise<boolean> {
 	if (command == InternalCommand.removeCordova) {
-		return removeCordovaFromPackageJSON(folder);
+		return await removeCordovaFromPackageJSON(folder);
 	}
 
 	if (command.includes(InternalCommand.cwd)) {
@@ -70,12 +70,16 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 				}
 
 				// Allows handling of linting and tests
-				handleError(undefined, logs, folder);
+				const retry = handleError(undefined, logs, folder);
 
-				resolve();
+				resolve(retry);
 			} else {
-				handleError(stderror, logs, folder);
-				reject(`${command} Failed`);
+				const retry = handleError(stderror, logs, folder);
+				if (retry) {
+					resolve(retry);
+				} else {
+					reject(`${command} Failed`);
+				}
 			}
 		});
 		proc.stdout.on('data', (data) => {
@@ -223,14 +227,14 @@ function timeout(ms: number) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function removeCordovaFromPackageJSON(folder: string): Promise<void> {
+function removeCordovaFromPackageJSON(folder: string): Promise<boolean> {
 	return new Promise((resolve, reject) => {
 		try {
 			const filename = path.join(folder, 'package.json');
 			const packageFile = JSON.parse(fs.readFileSync(filename, 'utf8'));
 			packageFile.cordova = undefined;
 			fs.writeFileSync(filename, JSON.stringify(packageFile, undefined, 2));
-			resolve();
+			resolve(false);
 		} catch (err) {
 			reject(err);
 		}
