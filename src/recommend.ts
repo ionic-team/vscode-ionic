@@ -62,7 +62,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 		];
 
 		if (hasCapAndroid) {
-			const title = (ionicState.selectedAndroidDevice) ? `Run on ${ionicState.selectedAndroidDevice}` : 'Run on Android';
+			const title = (ionicState.selectedAndroidDevice) ? `Run on ${ionicState.selectedAndroidDeviceName}` : 'Run on Android';
 			project.add(new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
 				.showProgressDialog()
 				.requestDeviceSelection()
@@ -73,7 +73,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 			);
 		}
 		if (hasCapIos) {
-			const title = (ionicState.selectedIOSDevice) ? `Run on ${ionicState.selectedIOSDevice}` : 'Run on iOS';
+			const title = (ionicState.selectedIOSDevice) ? `Run on ${ionicState.selectedIOSDeviceName}` : 'Run on iOS';
 			project.add(new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
 				.showProgressDialog()
 				.requestDeviceSelection()

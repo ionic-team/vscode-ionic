@@ -20,6 +20,8 @@ interface IonicState {
 	webDebugMode: boolean,
 	selectedAndroidDevice?: string,
 	selectedIOSDevice?: string,
+	selectedAndroidDeviceName?: string,
+	selectedIOSDeviceName?: string,
 	projectDirty?: boolean // Was there a likely change in the project (ie file saved)
 
 }

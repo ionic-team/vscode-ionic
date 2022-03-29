@@ -32,8 +32,10 @@ import { getRunOutput } from './utilities';
 	tip.commandTitle = device?.name;
 	if (command.includes('android')) {
 		ionicState.selectedAndroidDevice = device?.target;
+		ionicState.selectedAndroidDeviceName = device?.name;
 	} else {
 		ionicState.selectedIOSDevice = device?.target;
+		ionicState.selectedIOSDeviceName = device?.name;
 	}
 	return device?.target;
 }
