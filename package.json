@@ -193,6 +193,14 @@
 				}
 			},
 			{
+				"command": "ionic.selectDevice",
+				"title": "Select device to run",
+				"icon": {
+					"light": "resources/light/more.svg",
+					"dark": "resources/dark/more.svg"
+				}
+			},
+			{
 				"command": "ionic.runMode",
 				"title": "Switch to run mode",
 				"icon": {
@@ -241,6 +249,10 @@
 				},
 				{
 					"command": "ionic.debugMode",
+					"when": "false"
+				},
+				{
+					"command": "ionic.selectDevice",
 					"when": "false"
 				},
 				{
@@ -301,6 +313,11 @@
 				{
 					"command": "ionic.buildConfig",
 					"when": "view == ionic && viewItem == buildConfig",
+					"group": "inline"
+				},
+				{
+					"command": "ionic.selectDevice",
+					"when": "view == ionic && viewItem == selectDevice",
 					"group": "inline"
 				},
 				{

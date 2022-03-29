@@ -70,6 +70,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 				.setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.android))
 				.setData(project.projectFolder())
 				.setRunPoints(runPoints)
+				.setContextValue(Context.selectDevice)
 			);
 		}
 		if (hasCapIos) {
@@ -81,6 +82,7 @@ export async function getRecommendations(project: Project, context: vscode.Exten
 				.setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.ios))
 				.setData(project.projectFolder())
 				.setRunPoints(runPoints)
+				.setContextValue(Context.selectDevice)
 			);
 		}
 

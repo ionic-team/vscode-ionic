@@ -36,7 +36,6 @@
 
 ## Bugs
 - (bug) Re-running an app will sync the app again. I dont think that is required
-- (bug) Run for device x should have a ... option to choose device
 - (bug) Handle scenarios where npx/npm cannot be found (eg bash)
 - (bug) Project like a standard vue app (no ionic) will not launch the browser (even though url is captured). Maybe Ionic serve issue
 - (bug) Bug capturing of inspection with telemetry reporting on exception

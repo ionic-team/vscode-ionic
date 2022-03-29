@@ -18,7 +18,8 @@ export enum CommandName {
 	ProjectSelect = 'ionic.projectSelect',
 	BuildConfig = 'ionic.buildConfig',
 	DebugMode = 'ionic.debugMode',
-	RunMode = 'ionic.runMode'
+	RunMode = 'ionic.runMode',
+	SelectDevice = 'ionic.selectDevice'
 }
 
 export enum InternalCommand {
