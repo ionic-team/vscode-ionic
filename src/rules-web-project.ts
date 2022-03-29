@@ -1,11 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { CommandName, InternalCommand } from './command-name';
+import { exists } from './analyzer';
+import { InternalCommand } from './command-name';
 import { MonoRepoType } from './monorepo';
 
 import { npmInstall } from "./node-commands";
 import { Project } from "./project";
-import { Command, Tip, TipType } from "./tip";
+import { Tip, TipType } from "./tip";
 import { asAppId } from "./utilities";
 
 /**
@@ -17,13 +18,13 @@ export function webProject(project: Project) {
 
 	// If there is a build folder and not a www folder then...
 	if (!fs.existsSync(path.join(project.projectFolder(), 'www'))) {
-		if (fs.existsSync(path.join(project.projectFolder(), 'build'))) {
+		if (fs.existsSync(path.join(project.projectFolder(), 'build')) || exists('react')) {
 			outFolder = 'build'; // use build folder (usually react)
-		} else if (fs.existsSync(path.join(project.projectFolder(), 'dist'))) {
+		} else if (fs.existsSync(path.join(project.projectFolder(), 'dist')) || exists('vue')) {
 			outFolder = 'dist'; /// use dist folder (usually vue)
 		}
 	}
-	
+
 	const pre = (project.repoType != MonoRepoType.none) ? InternalCommand.cwd : '';
 
 	project.tip(new Tip(
