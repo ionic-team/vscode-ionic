@@ -13,7 +13,6 @@
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand
 - (2) @ionic/native should move to @awesome-cordova-plugins
-- (4) Add ionic:build -> npm run build script for Vue if you get "Since you're using the Vue project type, you must provide the ionic:build npm script so the Ionic CLI can build your project."
 - (2) Show gotchas page for Angular migration x to x+1
 - (2) For web based projects have "Run on Web" under an Ionic Project
 - (2) On Web projects that are Angular based hook up dist or configured folder

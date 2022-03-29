@@ -49,7 +49,7 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 	}
 
 	if (command.includes(InternalCommand.cwd)) {
-		command = command.replace(InternalCommand.cwd, '');
+		command = replaceAll(command, InternalCommand.cwd, '');
 		// Change the work directory for monorepos as folder is the root folder
 		folder = getMonoRepoFolder(ionicState.workspace);
 	}
@@ -126,7 +126,7 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 					if (logline.startsWith('[capacitor]')) {
 						channel.appendLine(logline.replace('[capacitor]', ''));
 					} else if (logline) {
-						const nocolor = logline.replace(/[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,"");
+						const nocolor = logline.replace(/[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "");
 						channel.appendLine(nocolor);
 					}
 				}
@@ -143,7 +143,9 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 	});
 }
 
-
+function replaceAll(str: string, find: string, replace: string): string {
+	return str.replace(new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replace);
+}
 
 export async function getRunOutput(command: string, folder: string): Promise<string> {
 	return new Promise((resolve, reject) => {
