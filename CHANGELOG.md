@@ -1,4 +1,7 @@
 ## Changelog
+### Version 1.4.3
+- Fix for NX monorepos where the app folder is specified in the root property
+
 ### Version 1.4.2
 - When re-running on iOS or Android the device does not need to be reselected
 - For projects not integrated with Ionic automate initialization of custom project with ionic:build and ionic:serve scripts

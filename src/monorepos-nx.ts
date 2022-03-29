@@ -22,7 +22,11 @@ export function getNXProjects(project: Project): Array<MonoRepoProject> {
 		const txt = fs.readFileSync(filename, 'utf-8');
 		const projects = JSON.parse(txt).projects;
 		for (const prj of Object.keys(projects)) {
-			result.push({ name: prj, folder: projects[prj] });
+			let folder = projects[prj];
+			if (folder?.root) { // NX project can be a folder or an object with a root property specifying the folder
+				folder = folder.root;
+			}
+			result.push({ name: prj, folder: folder });
 		}
 	} else {
 		// workspace.json is optional. Just iterate through apps folder
