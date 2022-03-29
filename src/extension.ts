@@ -18,6 +18,10 @@ import { IonicProjectsreeProvider } from './ionic-projects-provider';
 import { buildConfiguration } from './build-configuration';
 import { selectDevice } from './capacitor-device';
 import { getLocalFolder } from './monorepo';
+import { androidDebugUnforward } from './android-debug-bridge';
+import { AndroidDebugProvider } from './android-debug-provider';
+import { AndroidDebugType } from './android-debug';
+import { CapacitorPlatform } from './capacitor-platform';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
@@ -73,7 +77,7 @@ function startCommand(tip: Tip, cmd: string, ionicProvider: IonicTreeProvider) {
 		const message = tip.commandTitle ? tip.commandTitle : tip.title;
 		channel.appendLine(`[Ionic] ${message}...`);
 		let command = cmd;
-		if (command.includes(InternalCommand.cwd)) {
+		if (command?.includes(InternalCommand.cwd)) {
 			command = command.replace(InternalCommand.cwd, '');
 			channel.appendLine(`> Workspace: ${ionicState.workspace}`);
 		}
@@ -170,7 +174,10 @@ export async function fixIssue(command: string | string[], rootPath: string, ion
 					percentage = 0;
 				}
 				try {
-					await run(rootPath, command, channel, cancelObject, tip.doViewEditor, tip.runPoints, progress, ionicProvider);
+					let retry = true;
+					while (retry) {
+						retry = await run(rootPath, command, channel, cancelObject, tip.doViewEditor, tip.runPoints, progress, ionicProvider);
+					}
 				} finally {
 					finishCommand(tip);
 				}
@@ -200,6 +207,8 @@ export function activate(context: vscode.ExtensionContext) {
 	ionicState.projectsView = projectsView;
 	const view = vscode.window.createTreeView('ionic', { treeDataProvider: ionicProvider });
 	ionicState.view = view;
+
+	trackProjectChange();
 
 	vscode.commands.registerCommand(CommandName.Refresh, () => {
 		clearRefreshCache(context);
@@ -243,13 +252,13 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	vscode.commands.registerCommand(CommandName.DebugMode, async (r: Recommendation) => {
-		ionicState.debugMode = true;
+		ionicState.webDebugMode = true;
 		await vscode.commands.executeCommand(VSCommand.setContext, Context.debugMode, true);
 		ionicProvider.refresh();
 	});
 
 	vscode.commands.registerCommand(CommandName.RunMode, async (r: Recommendation) => {
-		ionicState.debugMode = false;
+		ionicState.webDebugMode = false;
 		await vscode.commands.executeCommand(VSCommand.setContext, Context.debugMode, false);
 		ionicProvider.refresh();
 	});
@@ -270,6 +279,10 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand(CommandName.Rebuild, async (recommendation: Recommendation) => {
 		await recommendation.tip.executeAction();
 		ionicProvider.refresh();
+	});
+
+	vscode.commands.registerCommand(CommandName.Function, async (recommendation: Recommendation) => {
+		await recommendation.tip.executeAction();
 	});
 
 	vscode.commands.registerCommand(CommandName.Fix, async (tip: Tip) => {
@@ -295,8 +308,28 @@ export function activate(context: vscode.ExtensionContext) {
 		runAction(r, ionicProvider, rootPath);
 	});
 
+	vscode.commands.registerCommand(CommandName.SelectDevice, async (r: Recommendation) => {		 
+		if (r.tip.actionArg(1) == CapacitorPlatform.android) {
+			ionicState.selectedAndroidDevice = undefined;
+			ionicState.selectedAndroidDeviceName = undefined;
+		} else {
+			ionicState.selectedIOSDevice = undefined;
+			ionicState.selectedIOSDeviceName = undefined;
+		}
+		runAction(r, ionicProvider, rootPath);
+	});
+
 	vscode.commands.registerCommand(CommandName.Link, async (tip: Tip) => {
 		vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
+	});
+
+	context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(AndroidDebugType, new AndroidDebugProvider()));
+	context.subscriptions.push(vscode.debug.onDidTerminateDebugSession(androidDebugUnforward));
+}
+
+function trackProjectChange() {
+	vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
+		ionicState.projectDirty = true;
 	});
 }
 

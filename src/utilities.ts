@@ -33,7 +33,7 @@ function runOptions(command: string, folder: string) {
 	const javaHome: string = vscode.workspace.getConfiguration('ionic').get('javaHome');
 
 	// Cocoapods required lang set to en_US.UTF-8 (when capacitor sync or run ios is done)
-	if (command.includes('sync') || command.includes('capacitor init') || command.includes('cap run ios')) {
+	if (command.includes('sync') || command.includes('capacitor init') || command.includes('cap run ios') || command.includes('cap add')) {
 		env.LANG = 'en_US.UTF-8';
 	}
 	if (javaHome) {
@@ -43,13 +43,13 @@ function runOptions(command: string, folder: string) {
 	return { cwd: folder, encoding: 'utf8', env: env };
 }
 
-export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject, viewEditor: boolean, runPoints: Array<RunPoint>, progress: any, ionicProvider?: IonicTreeProvider): Promise<void> {
+export async function run(folder: string, command: string, channel: vscode.OutputChannel, cancelObject: CancelObject, viewEditor: boolean, runPoints: Array<RunPoint>, progress: any, ionicProvider?: IonicTreeProvider): Promise<boolean> {
 	if (command == InternalCommand.removeCordova) {
-		return removeCordovaFromPackageJSON(folder);
+		return await removeCordovaFromPackageJSON(folder);
 	}
 
 	if (command.includes(InternalCommand.cwd)) {
-		command = command.replace(InternalCommand.cwd, '');
+		command = replaceAll(command, InternalCommand.cwd, '');
 		// Change the work directory for monorepos as folder is the root folder
 		folder = getMonoRepoFolder(ionicState.workspace);
 	}
@@ -70,12 +70,16 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 				}
 
 				// Allows handling of linting and tests
-				handleError(undefined, logs, folder);
+				const retry = handleError(undefined, logs, folder);
 
-				resolve();
+				resolve(retry);
 			} else {
-				handleError(stderror, logs, folder);
-				reject(`${command} Failed`);
+				const retry = handleError(stderror, logs, folder);
+				if (retry) {
+					resolve(retry);
+				} else {
+					reject(`${command} Failed`);
+				}
 			}
 		});
 		proc.stdout.on('data', (data) => {
@@ -89,10 +93,17 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 						channel.appendLine(`[Ionic] Launching ${url}`);
 						viewEditor = false;
 						setTimeout(() => viewInEditor(url), 500);
-					}
-					if (data.includes('open your browser on')) {
+					} else if (data.includes('open your browser on')) {
+						// Likely React
 						serverUrl = getStringFrom(data, 'open your browser on ', ' **');
 						const url = serverUrl;
+						channel.appendLine(`[Ionic] Launching ${url}`);
+						viewEditor = false;
+						setTimeout(() => viewInEditor(url), 500);
+					} else if (data.includes('- Local:   ')) {
+						// Likely Vue
+						serverUrl = getStringFrom(data, 'Local: ', '\n');
+						const url = serverUrl.trim();
 						channel.appendLine(`[Ionic] Launching ${url}`);
 						viewEditor = false;
 						setTimeout(() => viewInEditor(url), 500);
@@ -115,7 +126,8 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 					if (logline.startsWith('[capacitor]')) {
 						channel.appendLine(logline.replace('[capacitor]', ''));
 					} else if (logline) {
-						channel.appendLine(logline);
+						const nocolor = logline.replace(/[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, "");
+						channel.appendLine(nocolor);
 					}
 				}
 				channel.show();
@@ -131,7 +143,9 @@ export async function run(folder: string, command: string, channel: vscode.Outpu
 	});
 }
 
-
+function replaceAll(str: string, find: string, replace: string): string {
+	return str.replace(new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replace);
+}
 
 export async function getRunOutput(command: string, folder: string): Promise<string> {
 	return new Promise((resolve, reject) => {
@@ -223,14 +237,14 @@ function timeout(ms: number) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function removeCordovaFromPackageJSON(folder: string): Promise<void> {
+function removeCordovaFromPackageJSON(folder: string): Promise<boolean> {
 	return new Promise((resolve, reject) => {
 		try {
 			const filename = path.join(folder, 'package.json');
 			const packageFile = JSON.parse(fs.readFileSync(filename, 'utf8'));
 			packageFile.cordova = undefined;
 			fs.writeFileSync(filename, JSON.stringify(packageFile, undefined, 2));
-			resolve();
+			resolve(false);
 		} catch (err) {
 			reject(err);
 		}

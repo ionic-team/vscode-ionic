@@ -75,7 +75,9 @@ export class Project {
 
 		// If the last group has no items in it then remove it (eg if there are no recommendations for a project)
 		if (this.groups.length > 1 && this.groups[this.groups.length - 1].children.length == 0) {
-			this.groups.pop();
+			if (!this.groups[this.groups.length-1].whenExpanded) {
+				this.groups.pop();
+			}
 		}
 		const r = new Recommendation(message, '', title, expanded ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.Collapsed);
 		if (contextValue) {
@@ -226,7 +228,7 @@ export class Project {
 		for (const child of r.children) {
 			// Command will be npm install @capacitor/android@3.4.3 --save-exact
 			if ((child.tip.command as string).includes('npm install')) {
-				const npackage = (child.tip.command as string).replace('npm install ', '').replace(' --save-exact', '').replace(InternalCommand.cwd,'');
+				const npackage = (child.tip.command as string).replace('npm install ', '').replace(' --save-exact', '').replace(InternalCommand.cwd, '');
 
 				if (command != '') {
 					command += ' ';

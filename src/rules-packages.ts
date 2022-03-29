@@ -13,7 +13,7 @@ import { npmInstallAll } from './node-commands';
 export function checkPackages(project: Project) {
 	const nmf = project.getNodeModulesFolder();
 	if (!fs.existsSync(nmf)) {
-		project.add(new Tip('Install Node Modules', '', TipType.Idea, 'Install Node Modules', npmInstallAll(), 'Installing').performRun().showProgressDialog());
+		project.add(new Tip('Install Node Modules', '', TipType.Idea, 'Install Node Modules', npmInstallAll(), 'Installing Node Modules...').performRun().showProgressDialog());
 	}
 
 	// Replace momentjs with date-fns

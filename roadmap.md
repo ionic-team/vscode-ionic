@@ -3,7 +3,9 @@
 ## Features
 - (1) Add .vs-code/extensions.json to recommend Ionic extension on starters
 - (2) When finishing a debug session for web return back to ionic extension and stop run
-- (2) For a web project with Capacitor if ionic build wont work (because not angular, vue, react) then npm run build instead
+- (1) Suggest live reload option by ensuring @ionic/cli is installed and enabled (allow ignore)
+- (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
+
 - (16) Lerna support
 - (16) Debugging for Android
 - (32) Debugging for iOS
@@ -11,7 +13,6 @@
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand
 - (2) @ionic/native should move to @awesome-cordova-plugins
-- (4) Add ionic:build -> npm run build script for Vue if you get "Since you're using the Vue project type, you must provide the ionic:build npm script so the Ionic CLI can build your project."
 - (2) Show gotchas page for Angular migration x to x+1
 - (2) For web based projects have "Run on Web" under an Ionic Project
 - (2) On Web projects that are Angular based hook up dist or configured folder
@@ -34,7 +35,9 @@
 - (perf) Only run capacitor config commands when "Configuration" is expanded
 
 ## Bugs
+- (bug) Re-running an app will sync the app again. I dont think that is required
 - (bug) Handle scenarios where npx/npm cannot be found (eg bash)
+- (bug) Project like a standard vue app (no ionic) will not launch the browser (even though url is captured). Maybe Ionic serve issue
 - (bug) Bug capturing of inspection with telemetry reporting on exception
 - (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
 - (bug) Bundle id validate doesnt accept "stuff"

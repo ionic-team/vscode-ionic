@@ -31,8 +31,11 @@ export enum Context {
 	// Build configuration
 	buildConfig = 'buildConfig',
 
-	// Browser options
-	debugMode = 'debugMode'
+	// Run or Debug
+	debugMode = 'debugMode',
+
+	// Device selection
+	selectDevice = 'selectDevice'
 }
 
 // Commands from vs code

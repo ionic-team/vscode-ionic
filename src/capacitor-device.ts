@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { handleError } from './error-handler';
+import { ionicState } from './ionic-tree-provider';
 
 import { Tip } from "./tip";
 import { getRunOutput } from './utilities';
@@ -11,8 +12,12 @@ import { getRunOutput } from './utilities';
  * @param  {string} rootPath
  */
  export async function selectDevice(command: string, rootPath: string, tip: Tip): Promise<string> {
+	const preselected = (command.includes('android')) ? ionicState.selectedAndroidDevice : ionicState.selectedIOSDevice;
+	if (preselected) {
+		return preselected;
+	}
 	let devices;
-	await showProgress('Getting Devices', async () => {
+	await showProgress('Getting Devices...', async () => {
 		devices = await getDevices(command, rootPath);
 	});
 
@@ -25,6 +30,13 @@ import { getRunOutput } from './utilities';
 	const device = devices.find(device => device.name == selected);
 	if (!device) return;
 	tip.commandTitle = device?.name;
+	if (command.includes('android')) {
+		ionicState.selectedAndroidDevice = device?.target;
+		ionicState.selectedAndroidDeviceName = device?.name;
+	} else {
+		ionicState.selectedIOSDevice = device?.target;
+		ionicState.selectedIOSDeviceName = device?.name;
+	}
 	return device?.target;
 }
 

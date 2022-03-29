@@ -25,7 +25,7 @@ function ionicCLIServe(project: Project): string {
 	const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
 	const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
 	let serveFlags = '';
-	if (previewInEditor || ionicState.debugMode) {
+	if (previewInEditor || ionicState.webDebugMode) {
 		serveFlags += ' --no-open';
 	}
 	if (httpsForWeb) {

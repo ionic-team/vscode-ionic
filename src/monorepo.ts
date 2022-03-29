@@ -14,6 +14,7 @@ export interface MonoRepoProject {
 	name: string;
 	folder: string;
 	localPackageJson?: boolean; // Is the package.json in the local project folder
+	isIonic?: boolean; // Does it looks like an ionic project using @ionic/vue etc
 }
 
 export enum MonoRepoType {
@@ -123,13 +124,12 @@ function getFolderBasedProjects(prj: Project): Array<MonoRepoProject> {
 		// Look for suitable dependencies: @ionic/*, @angular/*
 		try {
 			const pck = JSON.parse(fs.readFileSync(project.packageJson, 'utf8'));
-			if (pck?.dependencies?.['@ionic/vue'] ||
+			const isIonic = (pck?.dependencies?.['@ionic/vue'] ||
 				pck?.dependencies?.['@ionic/angular'] ||
 				pck?.dependencies?.['@ionic/react'] ||
 				pck?.dependencies?.['@angular/core']
-			) {
-				result.push({ name: project.name, folder: project.path });
-			}
+			);
+			result.push({ name: project.name, folder: project.path, isIonic: isIonic });
 		} catch {
 			//
 		}
