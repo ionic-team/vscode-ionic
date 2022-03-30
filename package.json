@@ -14,6 +14,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
+    "prepare": "husky install",
     "build": "npm run esbuild && npm run vsix-package",
     "vsix-package": "vsce package",
     "pre-release": "npm run build && vsce publish --pre-release",
@@ -27,11 +28,6 @@
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write",
     "prettier": "prettier \"**/*.ts\"",
     "eslint": "eslint . --ext .ts"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npx pretty-quick --staged"
-    }
   },
   "repository": {
     "type": "git",
@@ -405,7 +401,7 @@
     "esbuild": "0.14.23",
     "eslint": "^7.32.0",
     "glob": "7.2.0",
-    "husky": "^7.0.4",
+    "husky": "^7.0.0",
     "typescript": "4.5.5"
   },
   "dependencies": {
