@@ -6,6 +6,7 @@ import { Project } from './project';
 import { MonoRepoType } from './monorepo';
 import { ionicState } from './ionic-tree-provider';
 import { InternalCommand } from './command-name';
+import { preflightNPMCheck } from './node-commands';
 
 /**
  * Creates the ionic build command
@@ -13,9 +14,7 @@ import { InternalCommand } from './command-name';
  * @returns string
  */
 export function ionicBuild(project: Project, configurationArg?: string): string {
-  // For convenience, check if npm install was done and do it
-  const nmf = project.getNodeModulesFolder();
-  const preop = !fs.existsSync(nmf) ? 'npm install && ' : '';
+  const preop = preflightNPMCheck(project);
 
   ionicState.projectDirty = false;
 

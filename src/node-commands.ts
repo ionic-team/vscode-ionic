@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+
 import { InternalCommand } from './command-name';
 import { ionicState } from './ionic-tree-provider';
 import { MonoRepoType } from './monorepo';
@@ -22,6 +24,17 @@ export function npmInstall(name: string, ...args): string {
     default:
       return `npm install ${name} --save-exact ${argList}`;
   }
+}
+
+/**
+ * Check to see if we have node modules installed and return a command to prepend to any operations we may do
+ * @param  {Project} project
+ * @returns string
+ */
+export function preflightNPMCheck(project: Project): string {
+  const nmf = project.getNodeModulesFolder();
+  const preop = !fs.existsSync(nmf) ? 'npm install && ' : '';
+  return preop;
 }
 
 export function npmInstallAll(): string {

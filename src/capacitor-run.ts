@@ -7,6 +7,7 @@ import { getOutputChannel } from './extension';
 import { ionicBuild } from './ionic-build';
 import { ionicState } from './ionic-tree-provider';
 import { MonoRepoType } from './monorepo';
+import { preflightNPMCheck } from './node-commands';
 import { Project } from './project';
 
 /**
@@ -23,6 +24,8 @@ export function capacitorRun(project: Project, platform: CapacitorPlatform): str
     const channel = getOutputChannel();
     channel.appendLine('[Ionic] Rebuilding as you changed your project...');
     preop = ionicBuild(project) + ' && ';
+  } else {
+    preop = preflightNPMCheck(project);
   }
 
   switch (project.repoType) {

@@ -2,6 +2,7 @@
 
 ### Version 1.4.4
 
+- Node modules will be installed if missing whenever an operation is started
 - Fix to prevent focus changing to the output window while you editing your code during live reload
 
 ### Version 1.4.3

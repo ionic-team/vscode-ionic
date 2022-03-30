@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { InternalCommand } from './command-name';
 import { ionicState } from './ionic-tree-provider';
 import { MonoRepoType } from './monorepo';
+import { preflightNPMCheck } from './node-commands';
 import { Project } from './project';
 
 /**
@@ -24,6 +25,7 @@ export function ionicServe(project: Project, browser: string): string {
 }
 
 function ionicCLIServe(project: Project): string {
+  const preop = preflightNPMCheck(project);
   const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
   const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
   let serveFlags = '';
@@ -34,7 +36,7 @@ function ionicCLIServe(project: Project): string {
     serveFlags += ' --ssl';
   }
 
-  return `npx ionic serve${serveFlags}`;
+  return `${preop}npx ionic serve${serveFlags}`;
 }
 
 function nxServe(project: Project): string {

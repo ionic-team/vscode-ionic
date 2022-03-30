@@ -1,6 +1,7 @@
 # ToDo
 
 ## Features
+
 - (1) Add .vs-code/extensions.json to recommend Ionic extension on starters
 - (2) When finishing a debug session for web return back to ionic extension and stop run
 - (1) Suggest live reload option by ensuring @ionic/cli is installed and enabled (allow ignore)
@@ -20,7 +21,7 @@
 - (4) Recommend applying exact version numbers in package.json rather than ~ or ^
 - (16) Allow add of plugins: list all official capacitor, ionic enterprise, supported plugins
 - (16) If using say @capacitor/camera then allow editing of info.plist and Android permissions (highlight if empty)
-- (4) When running for web, if you close the browser, a button for "Open Browser" should allow opening it again. 
+- (4) When running for web, if you close the browser, a button for "Open Browser" should allow opening it again.
 - (4) Add "Build", "Sync", "Run" etc to commmand palette with keyboard shortcut
 - (8) Show preview as soon as "Run on Web" is clicked and show progress until app is ready
 - (16) Option to export package/plugin list: version, latest, and dev dep or regular dep
@@ -32,10 +33,11 @@
 - (4) Detect if Android Studio not installed
 
 ## Performance
+
 - (perf) Only run capacitor config commands when "Configuration" is expanded
 
 ## Bugs
-- (bug) On remove Cordova option take ionic.config.json and replace integrations.cordova with capacitor (eg conference app)
+
 - (bug) Re-running an app will sync the app again. I dont think that is required
 - (bug) Handle scenarios where npx/npm cannot be found (eg bash)
 - (bug) Project like a standard vue app (no ionic) will not launch the browser (even though url is captured). Maybe Ionic serve issue
@@ -46,10 +48,12 @@
 - (feat) cordova-plugin-file is required if you install cordova-plugin-advanced-http (inspect plugin.xml)
 
 ## Docs
+
 - (docs) Record video of previewing in editor
 - (docs) Video of splashscreen and icon assets
 
 # Large Feature Requests
+
 - (feat) Capture console/network etc https://medium.com/swlh/chrome-dev-tools-protocol-2d0ef2baf4bf
   - See chrome-remote-interface for debugging with Chrome/Edge/Firefox/Android
 - (feat) Debugger for iOS and Android (add breakpoints, inspection etc)
@@ -64,10 +68,12 @@
 - (feat) Twitter to RSS feed - pull news into plugin ??
 
 # Known Issues
+
 - Badge option is not available for VS Code Extensions
 - links to external content cannot open in VS Code editor window (must be browser)
 
 # Support For NX
+
 - (bug) Package reconciliation (from root and project)
 - (feat) Needs lint, test and e2e nx tasks added (assuming @nxtend/ionic-angular)
 - (feat) Detect missing @nxtend/ionic-angular or @nxtend/ionic-react. Option to add
@@ -75,5 +81,5 @@
 - Starters for NX?
 
 # Support for pnpm
-- See: https://github.com/reslear/ionic-vue-pnpm-monorepo
 
+- See: https://github.com/reslear/ionic-vue-pnpm-monorepo
