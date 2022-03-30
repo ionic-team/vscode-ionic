@@ -2,83 +2,79 @@ import * as vscode from 'vscode';
 import { ionicState } from './ionic-tree-provider';
 
 interface device {
-	name: string;
-	width: number;
-	height: number;
-	type: string;
+  name: string;
+  width: number;
+  height: number;
+  type: string;
 }
 
 const devices: Array<device> = [
-	{ name: 'iPhone SE', width: 375, height: 667, type: 'ios' },
-	{ name: 'iPhone XR', width: 414, height: 896, type: 'ios' },
-	{ name: 'iPhone 12 Pro', width: 390, height: 844, type: 'ios' },
-	{ name: 'iPad Air', width: 820, height: 1180, type: 'ios' },
-	{ name: 'iPad Mini', width: 768, height: 1024, type: 'ios' },
-	{ name: 'Pixel 3', width: 393, height: 786, type: 'android' },
-	{ name: 'Pixel 5', width: 393, height: 851, type: 'android' },
-	{ name: 'Samsung Galaxy S8+', width: 360, height: 740, type: 'android' },
-	{ name: 'Samsung Galaxy S20 Ultra', width: 412, height: 915, type: 'android' },
-	{ name: 'Samsung Galaxy Tab S4', width: 712, height: 1138, type: 'android' }
+  { name: 'iPhone SE', width: 375, height: 667, type: 'ios' },
+  { name: 'iPhone XR', width: 414, height: 896, type: 'ios' },
+  { name: 'iPhone 12 Pro', width: 390, height: 844, type: 'ios' },
+  { name: 'iPad Air', width: 820, height: 1180, type: 'ios' },
+  { name: 'iPad Mini', width: 768, height: 1024, type: 'ios' },
+  { name: 'Pixel 3', width: 393, height: 786, type: 'android' },
+  { name: 'Pixel 5', width: 393, height: 851, type: 'android' },
+  { name: 'Samsung Galaxy S8+', width: 360, height: 740, type: 'android' },
+  { name: 'Samsung Galaxy S20 Ultra', width: 412, height: 915, type: 'android' },
+  { name: 'Samsung Galaxy Tab S4', width: 712, height: 1138, type: 'android' },
 ];
 
 export function viewInEditor(url: string) {
-	const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
-	if (!previewInEditor) {
-		if (ionicState.webDebugMode) {
-			debugBrowser(url);
-		}
-		return;
-	}
+  const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
+  if (!previewInEditor) {
+    if (ionicState.webDebugMode) {
+      debugBrowser(url);
+    }
+    return;
+  }
 
-	const panel = vscode.window.createWebviewPanel(
-		'viewApp',
-		'Preview',
-		vscode.ViewColumn.Beside,
-		{ enableScripts: true }
-	);
+  const panel = vscode.window.createWebviewPanel('viewApp', 'Preview', vscode.ViewColumn.Beside, {
+    enableScripts: true,
+  });
 
-	panel.webview.html = getWebviewContent(url);
+  panel.webview.html = getWebviewContent(url);
 
-	panel.webview.onDidReceiveMessage(
-		async (message) => {
-			const device = await selectMockDevice();
-			panel.webview.postMessage(device);
-		}
-	);
+  panel.webview.onDidReceiveMessage(async (message) => {
+    const device = await selectMockDevice();
+    panel.webview.postMessage(device);
+  });
 }
 
 export function getDebugBrowserName(): string {
-	const browser = vscode.workspace.getConfiguration('ionic').get('browser') as string;
-	if (browser == 'pwa-msedge') return 'Microsoft Edge';
-	if (browser == 'chrome') return 'Google Chrome';
-	return browser;
+  const browser = vscode.workspace.getConfiguration('ionic').get('browser') as string;
+  if (browser == 'pwa-msedge') return 'Microsoft Edge';
+  if (browser == 'chrome') return 'Google Chrome';
+  return browser;
 }
 
 function debugBrowser(url: string) {
-	try {
-		const browserType: string = vscode.workspace.getConfiguration('ionic').get('browser');
-		const launchConfig: vscode.DebugConfiguration =
-		{
-			type: browserType,
-			name: 'Debug App',
-			request: 'launch',
-			url: url,
-			webRoot: '${workspaceFolder}'
-		};
-		vscode.debug.startDebugging(undefined, launchConfig);
-	} catch {
-		//
-	}
+  try {
+    const browserType: string = vscode.workspace.getConfiguration('ionic').get('browser');
+    const launchConfig: vscode.DebugConfiguration = {
+      type: browserType,
+      name: 'Debug App',
+      request: 'launch',
+      url: url,
+      webRoot: '${workspaceFolder}',
+    };
+    vscode.debug.startDebugging(undefined, launchConfig);
+  } catch {
+    //
+  }
 }
 
 async function selectMockDevice(): Promise<device> {
-	const selected = await vscode.window.showQuickPick(devices.map(device => `${device.name} (${device.width} x ${device.height})`), { placeHolder: 'Select Emulated Device' });
-	return devices.find((device) => selected.startsWith(device.name));
-
+  const selected = await vscode.window.showQuickPick(
+    devices.map((device) => `${device.name} (${device.width} x ${device.height})`),
+    { placeHolder: 'Select Emulated Device' }
+  );
+  return devices.find((device) => selected.startsWith(device.name));
 }
 
 function getWebviewContent(url: string): string {
-	return `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 	<html lang="en">
 	<head>
 		<meta charset="UTF-8">

@@ -11,24 +11,28 @@ import { InternalCommand } from './command-name';
  * @returns string
  */
 export function capacitorOpen(project: Project, platform: CapacitorPlatform): string {
-	const ionicCLI = exists('@ionic/cli');
-	switch (project.repoType) {
-		case MonoRepoType.none: return ionicCLI ? capCLIOpen(platform) : ionicCLIOpen(platform);
-		case MonoRepoType.folder:
-		case MonoRepoType.npm: return InternalCommand.cwd + (ionicCLI ? capCLIOpen(platform) : ionicCLIOpen(platform));
-		case MonoRepoType.nx: return nxOpen(project, platform);
-		default: throw new Error('Unsupported Monorepo type');
-	}
+  const ionicCLI = exists('@ionic/cli');
+  switch (project.repoType) {
+    case MonoRepoType.none:
+      return ionicCLI ? capCLIOpen(platform) : ionicCLIOpen(platform);
+    case MonoRepoType.folder:
+    case MonoRepoType.npm:
+      return InternalCommand.cwd + (ionicCLI ? capCLIOpen(platform) : ionicCLIOpen(platform));
+    case MonoRepoType.nx:
+      return nxOpen(project, platform);
+    default:
+      throw new Error('Unsupported Monorepo type');
+  }
 }
 
 function capCLIOpen(platform: CapacitorPlatform): string {
-	return `npx cap open ${platform}`;
+  return `npx cap open ${platform}`;
 }
 
 function ionicCLIOpen(platform: CapacitorPlatform): string {
-	return `npx ionic cap open ${platform}`;
+  return `npx ionic cap open ${platform}`;
 }
 
 function nxOpen(project: Project, platform: CapacitorPlatform): string {
-	return `npx nx run ${project.monoRepo.name}:open:${platform}`;
+  return `npx nx run ${project.monoRepo.name}:open:${platform}`;
 }

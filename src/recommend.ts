@@ -1,4 +1,3 @@
-
 import * as vscode from 'vscode';
 
 import { exists, isCapacitor, isCordova } from './analyzer';
@@ -26,140 +25,180 @@ import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
 import { features } from './features';
 
-export async function getRecommendations(project: Project, context: vscode.ExtensionContext, packages: any): Promise<void> {
-	if (isCapacitor() && !isCordova()) {
-		project.setGroup(`Capacitor`, 'Recommendations related to Capacitor', TipType.Capacitor, true);
+export async function getRecommendations(
+  project: Project,
+  context: vscode.ExtensionContext,
+  packages: any
+): Promise<void> {
+  if (isCapacitor() && !isCordova()) {
+    project.setGroup(`Capacitor`, 'Recommendations related to Capacitor', TipType.Capacitor, true);
 
-		const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
-		const hasCapAndroid = project.hasCapacitorProject(CapacitorPlatform.android);
-		const title = (ionicState.webDebugMode) ? 'Debug On Web' : 'Run On Web';
-		const tooltip = (ionicState.webDebugMode) ? `Debug using ${getDebugBrowserName()}. The browser can be changed in Settings.` : 'Run a developement server and open using the default web browser';
-		const type = (ionicState.webDebugMode) ? TipType.Debug : TipType.Run;
-		project.add(
-			new Tip(
-				title, '', type, 'Serve', undefined, 'Running on Web', `Project Served`)
-				.setDynamicCommand(ionicServe, project)
-				.requestViewEditor()
-				.setRunPoints([
-					{ title: 'Building...', text: 'Generating browser application bundles' },
-					{ title: 'Serving', text: 'Development server running' }
-				])
-				.canStop()
-				.contextIf(Context.debugMode, false)
-				.canAnimate()
-				.setTooltip(tooltip)
-		);
-		// project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
-		const runPoints = [
-			{ text: 'Copying web assets', title: 'Copying...' },
-			{ text: 'ng run app:build', title: 'Building Web...' },
-			{ text: 'capacitor run', title: 'Syncing...' },
-			{ text: '✔ update ios', title: 'Building Native...' },
-			{ text: '✔ update android', title: 'Building Native...' },
-			{ text: 'Running Gradle build', title: 'Deploying...' },
-			{ text: 'Running xcodebuild', title: 'Deploying...' },
-			{ text: 'App deployed', title: 'Waiting for Code Changes' }
-		];
+    const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
+    const hasCapAndroid = project.hasCapacitorProject(CapacitorPlatform.android);
+    const title = ionicState.webDebugMode ? 'Debug On Web' : 'Run On Web';
+    const tooltip = ionicState.webDebugMode
+      ? `Debug using ${getDebugBrowserName()}. The browser can be changed in Settings.`
+      : 'Run a developement server and open using the default web browser';
+    const type = ionicState.webDebugMode ? TipType.Debug : TipType.Run;
+    project.add(
+      new Tip(title, '', type, 'Serve', undefined, 'Running on Web', `Project Served`)
+        .setDynamicCommand(ionicServe, project)
+        .requestViewEditor()
+        .setRunPoints([
+          { title: 'Building...', text: 'Generating browser application bundles' },
+          { title: 'Serving', text: 'Development server running' },
+        ])
+        .canStop()
+        .contextIf(Context.debugMode, false)
+        .canAnimate()
+        .setTooltip(tooltip)
+    );
+    // project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
+    const runPoints = [
+      { text: 'Copying web assets', title: 'Copying...' },
+      { text: 'ng run app:build', title: 'Building Web...' },
+      { text: 'capacitor run', title: 'Syncing...' },
+      { text: '✔ update ios', title: 'Building Native...' },
+      { text: '✔ update android', title: 'Building Native...' },
+      { text: 'Running Gradle build', title: 'Deploying...' },
+      { text: 'Running xcodebuild', title: 'Deploying...' },
+      { text: 'App deployed', title: 'Waiting for Code Changes' },
+    ];
 
-		if (hasCapAndroid) {
-			const title = (ionicState.selectedAndroidDevice) ? `Run on ${ionicState.selectedAndroidDeviceName}` : 'Run on Android';
-			project.add(new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
-				.showProgressDialog()
-				.requestDeviceSelection()
-				.setDynamicCommand(capacitorRun, project, CapacitorPlatform.android)
-				.setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.android))
-				.setData(project.projectFolder())
-				.setRunPoints(runPoints)
-				.setContextValue(Context.selectDevice)
-			);
-		}
-		if (hasCapIos) {
-			const title = (ionicState.selectedIOSDevice) ? `Run on ${ionicState.selectedIOSDeviceName}` : 'Run on iOS';
-			project.add(new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
-				.showProgressDialog()
-				.requestDeviceSelection()
-				.setDynamicCommand(capacitorRun, project, CapacitorPlatform.ios)
-				.setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.ios))
-				.setData(project.projectFolder())
-				.setRunPoints(runPoints)
-				.setContextValue(Context.selectDevice)
-			);
-		}
+    if (hasCapAndroid) {
+      const title = ionicState.selectedAndroidDevice
+        ? `Run on ${ionicState.selectedAndroidDeviceName}`
+        : 'Run on Android';
+      project.add(
+        new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
+          .showProgressDialog()
+          .requestDeviceSelection()
+          .setDynamicCommand(capacitorRun, project, CapacitorPlatform.android)
+          .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.android))
+          .setData(project.projectFolder())
+          .setRunPoints(runPoints)
+          .setContextValue(Context.selectDevice)
+      );
+    }
+    if (hasCapIos) {
+      const title = ionicState.selectedIOSDevice ? `Run on ${ionicState.selectedIOSDeviceName}` : 'Run on iOS';
+      project.add(
+        new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
+          .showProgressDialog()
+          .requestDeviceSelection()
+          .setDynamicCommand(capacitorRun, project, CapacitorPlatform.ios)
+          .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.ios))
+          .setData(project.projectFolder())
+          .setRunPoints(runPoints)
+          .setContextValue(Context.selectDevice)
+      );
+    }
 
-		project.add(new Tip(
-			'Build', '', TipType.Build, 'Build', undefined, 'Building', undefined)
-			.setDynamicCommand(ionicBuild, project).setContextValue(Context.buildConfig));
+    project.add(
+      new Tip('Build', '', TipType.Build, 'Build', undefined, 'Building', undefined)
+        .setDynamicCommand(ionicBuild, project)
+        .setContextValue(Context.buildConfig)
+    );
 
-		if (exists('@capacitor/core')) {
-			project.add(new Tip(
-				'Sync', '', TipType.Sync, 'Capacitor Sync', undefined, 'Syncing', undefined)
-				.setDynamicCommand(capacitorSync, project)
-			);
-		}
-		if (hasCapIos) {
-			project.add(new Tip(
-				'Open in Xcode', '', TipType.Edit, 'Opening Project in Xcode', undefined, 'Open Project in Xcode')
-				.showProgressDialog()
-				.setDynamicCommand(capacitorOpen, project, CapacitorPlatform.ios)
-			);
-		}
-		if (hasCapAndroid) {
-			project.add(new Tip(
-				'Open in Android Studio', '', TipType.Edit, 'Opening Project in Android Studio', undefined, 'Open Android Studio')
-				.showProgressDialog()
-				.setDynamicCommand(capacitorOpen, project, CapacitorPlatform.android)
-			);
-		}
-		
-		if (features.debugAndroid) { // Experimental Feature
-			const r = project.setGroup(`Debug`, 'Running Ionic applications you can debug', TipType.Debug, false);
-			r.whenExpanded = async () => {
-				return getAndroidWebViewList(hasCapAndroid);
-			};
-		}
-	}
+    if (exists('@capacitor/core')) {
+      project.add(
+        new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', undefined, 'Syncing', undefined).setDynamicCommand(
+          capacitorSync,
+          project
+        )
+      );
+    }
+    if (hasCapIos) {
+      project.add(
+        new Tip('Open in Xcode', '', TipType.Edit, 'Opening Project in Xcode', undefined, 'Open Project in Xcode')
+          .showProgressDialog()
+          .setDynamicCommand(capacitorOpen, project, CapacitorPlatform.ios)
+      );
+    }
+    if (hasCapAndroid) {
+      project.add(
+        new Tip(
+          'Open in Android Studio',
+          '',
+          TipType.Edit,
+          'Opening Project in Android Studio',
+          undefined,
+          'Open Android Studio'
+        )
+          .showProgressDialog()
+          .setDynamicCommand(capacitorOpen, project, CapacitorPlatform.android)
+      );
+    }
 
-	// Script Running	
-	addScripts(project);
+    if (features.debugAndroid) {
+      // Experimental Feature
+      const r = project.setGroup(`Debug`, 'Running Ionic applications you can debug', TipType.Debug, false);
+      r.whenExpanded = async () => {
+        return getAndroidWebViewList(hasCapAndroid);
+      };
+    }
+  }
 
-	if (isCapacitor() || project.hasACapacitorProject()) {
-		// Capacitor Configure Features
-		project.setGroup(`Configuration`, 'Configurations for native project. Changes made apply to both the iOS and Android projects', TipType.Capacitor, false);
-		await reviewCapacitorConfig(project, context);
+  // Script Running
+  addScripts(project);
 
-		// Splash Screen and Icon Features
-		addSplashAndIconFeatures(project);
-	}
+  if (isCapacitor() || project.hasACapacitorProject()) {
+    // Capacitor Configure Features
+    project.setGroup(
+      `Configuration`,
+      'Configurations for native project. Changes made apply to both the iOS and Android projects',
+      TipType.Capacitor,
+      false
+    );
+    await reviewCapacitorConfig(project, context);
 
-	project.setGroup(
-		`Recommendations`, `The following recommendations were made by analyzing the package.json file of your ${project.type} app.`, TipType.Idea, true);
+    // Splash Screen and Icon Features
+    addSplashAndIconFeatures(project);
+  }
 
-	// General Rules around node modules (eg Jquery)
-	checkPackages(project);
+  project.setGroup(
+    `Recommendations`,
+    `The following recommendations were made by analyzing the package.json file of your ${project.type} app.`,
+    TipType.Idea,
+    true
+  );
 
-	// Deprecated plugins
-	checkDeprecatedPlugins(project);
+  // General Rules around node modules (eg Jquery)
+  checkPackages(project);
 
-	if (isCordova()) {
-		checkCordovaRules(project);
-		checkCapacitorMigrationRules(packages, project);
-	} else if (isCapacitor()) {
-		checkCapacitorRules(project);
-		project.tips(capacitorRecommendations(project));
-	} else {
-		// The project is not using Cordova or Capacitor
-		webProject(project);
-	}
+  // Deprecated plugins
+  checkDeprecatedPlugins(project);
 
-	// Package Upgrade Features
-	reviewPackages(packages, project);
+  if (isCordova()) {
+    checkCordovaRules(project);
+    checkCapacitorMigrationRules(packages, project);
+  } else if (isCapacitor()) {
+    checkCapacitorRules(project);
+    project.tips(capacitorRecommendations(project));
+  } else {
+    // The project is not using Cordova or Capacitor
+    webProject(project);
+  }
 
-	// Plugin Properties
-	reviewPluginProperties(packages, project);
+  // Package Upgrade Features
+  reviewPackages(packages, project);
 
-	// Support and Feedback
-	project.setGroup(`Support`, 'Feature requests and bug fixes', TipType.Ionic, true);
-	project.add(new Tip('Provide Feedback', '', TipType.Comment, undefined, undefined, undefined, undefined, `https://github.com/ionic-team/vscode-extension/issues`));
-	project.add(new Tip('Settings', '', TipType.Settings));
+  // Plugin Properties
+  reviewPluginProperties(packages, project);
+
+  // Support and Feedback
+  project.setGroup(`Support`, 'Feature requests and bug fixes', TipType.Ionic, true);
+  project.add(
+    new Tip(
+      'Provide Feedback',
+      '',
+      TipType.Comment,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      `https://github.com/ionic-team/vscode-extension/issues`
+    )
+  );
+  project.add(new Tip('Settings', '', TipType.Settings));
 }
-

@@ -1,405 +1,423 @@
 {
-	"name": "ionic",
-	"displayName": "Ionic",
-	"description": "Ionic & Capacitor project tooling and recommendations",
-	"version": "1.4.3",
-	"icon": "media/ionic.png",
-	"publisher": "Ionic",
-	"keywords": [
-		"Ionic",
-		"Capacitor",
-		"Ionic Framework",
-		"Cordova"
-	],
-	"private": true,
-	"license": "MIT",
-	"scripts": {
-		"build": "npm run esbuild && npm run vsix-package",
-		"vsix-package": "vsce package",
-		"pre-release": "npm run build && vsce publish --pre-release",
-		"vscode:prepublish": "npm run esbuild-base -- --minify",
-		"esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --external:prettier --format=cjs --platform=node",
-		"esbuild": "npm run esbuild-base -- --sourcemap",
-		"esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
-		"compile": "tsc -p ./",
-		"package": "npm run build && cp ionic-1.4.3.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
-		"watch": "tsc -watch -p ./",
-		"lint": "eslint . --ext .ts,.tsx"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://ionic.io"
-	},
-	"engines": {
-		"vscode": "^1.63.0"
-	},
-	"categories": [
-		"Other"
-	],
-	"activationEvents": [
-		"onView:ionic",
-		"onLanguage:json",
-		"onLanguage:jsonc",
-		"onCommand:ionic.refresh",
-		"onCommand:ionic.add",
-		"onCommand:ionic.fix",
-		"onCommand:ionic.lightbulb"
-	],
-	"main": "./out/extension.js",
-	"contributes": {
-		"viewsWelcome": [
-			{
-				"view": "ionic",
-				"contents": "Please wait while inspecting project...",
-				"when": "inspectedProject == false && isAnonymous == false && noProjectFound == false"
-			},
-			{
-				"view": "ionic",
-				"contents": "To get started with Ionic open an [empty folder](command:vscode.openFolder) or your projects folder.",
-				"when": "noProjectFound == true"
-			},
-			{
-				"view": "ionic",
-				"contents": "A free Ionic account is required to unlock all extension features or [Skip for Now](command:ionic.skipLogin).\n[Login](command:ionic.login)\n[Sign Up](command:ionic.signUp)\n",
-				"when": "isAnonymous == true && isLoggingIn == false"
-			},
-			{
-				"view": "ionic",
-				"contents": "Complete the login in the web browser. This view will change as soon as you login.",
-				"when": "isAnonymous == true && isLoggingIn == true"
-			}
-		],
-		"viewsContainers": {
-			"activitybar": [
-				{
-					"id": "ionic-recommendation",
-					"title": "Ionic",
-					"icon": "media/ionic.svg"
-				}
-			]
-		},
-		"views": {
-			"ionic-recommendation": [
-				{
-					"id": "ionic",
-					"name": "Ionic",
-					"icon": "media/ionic.svg",
-					"contextualTitle": "Ionic"
-				},
-				{
-					"id": "ionic-projects",
-					"name": "Projects",
-					"when": "isMonoRepo == true"
-				}
-			],
-			"explorer": []
-		},
-		"languages": [
-			{
-				"id": "Log",
-				"aliases": [
-					"log"
-				],
-				"extensions": [
-					".log"
-				],
-				"mimetypes": [
-					"log",
-					"text/log",
-					"text/x-log",
-					"text/x-code-output",
-					"x-code-output"
-				]
-			}
-		],
-		"grammars": [
-			{
-				"language": "Log",
-				"scopeName": "code.log",
-				"path": "./resources/log-language.xml"
-			}
-		],
-		"commands": [
-			{
-				"command": "ionic.refresh",
-				"title": "Ionic: Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-			{
-				"command": "ionic.add",
-				"title": "Ionic: Install Package",
-				"icon": {
-					"light": "resources/light/add.svg",
-					"dark": "resources/dark/add.svg"
-				}
-			},
-			{
-				"command": "ionic.lightbulb",
-				"title": "Upgrade",
-				"icon": {
-					"light": "resources/light/lightbulb.svg",
-					"dark": "resources/dark/lightbulb.svg"
-				}
-			},
-			{
-				"command": "ionic.fix",
-				"title": "Ionic: Fix Issue"
-			},
-			{
-				"command": "ionic.signUp",
-				"title": "Ionic: Sign Up"
-			},
-			{
-				"command": "ionic.login",
-				"title": "Ionic: Login"
-			},
-			{
-				"command": "ionic.skipLogin",
-				"title": "Ionic: Skip Login"
-			},
-			{
-				"command": "ionic.open",
-				"title": "View"
-			},
-			{
-				"command": "ionic.rebuild",
-				"title": "Rebuild"
-			},
-			{
-				"command": "ionic.function",
-				"title": "Execute"
-			},
-			{
-				"command": "ionic.stop",
-				"title": "Stop"
-			},
-			{
-				"command": "ionic.buildConfig",
-				"title": "Build Configuration",
-				"icon": {
-					"light": "resources/light/more.svg",
-					"dark": "resources/dark/more.svg"
-				}
-			},
-			{
-				"command": "ionic.debugMode",
-				"title": "Switch to debug mode",
-				"icon": {
-					"light": "resources/light/debug.svg",
-					"dark": "resources/dark/debug.svg"
-				}
-			},
-			{
-				"command": "ionic.selectDevice",
-				"title": "Select device to run",
-				"icon": {
-					"light": "resources/light/more.svg",
-					"dark": "resources/dark/more.svg"
-				}
-			},
-			{
-				"command": "ionic.runMode",
-				"title": "Switch to run mode",
-				"icon": {
-					"light": "resources/light/run.svg",
-					"dark": "resources/dark/run.svg"
-				}
-			},
-			{
-				"command": "ionic.upgrade",
-				"title": "Upgrade",
-				"icon": {
-					"light": "resources/light/more.svg",
-					"dark": "resources/dark/more.svg"
-				}
-			}
-		],
-		"menus": {
-			"commandPalette": [
-				{
-					"command": "ionic.skipLogin",
-					"when": "false"
-				},
-				{
-					"command": "ionic.refresh",
-					"when": "false"
-				},
-				{
-					"command": "ionic.fix",
-					"when": "false"
-				},
-				{
-					"command": "ionic.open",
-					"when": "false"
-				},
-				{
-					"command": "ionic.rebuild",
-					"when": "false"
-				},
-				{
-					"command": "ionic.function",
-					"when": "false"
-				},
-				{
-					"command": "ionic.buildConfig",
-					"when": "false"
-				},
-				{
-					"command": "ionic.debugMode",
-					"when": "false"
-				},
-				{
-					"command": "ionic.selectDevice",
-					"when": "false"
-				},
-				{
-					"command": "ionic.runMode",
-					"when": "false"
-				},
-				{
-					"command": "ionic.lightbulb",
-					"when": "false"
-				},
-				{
-					"command": "ionic.upgrade",
-					"when": "false"
-				},
-				{
-					"command": "ionic.stop",
-					"when": "false"
-				}
-			],
-			"view/title": [
-				{
-					"command": "ionic.refresh",
-					"when": "view == ionic",
-					"group": "navigation"
-				}
-			],
-			"view/item/context": [
-				{
-					"command": "ionic.add",
-					"when": "view == ionic && viewItem == packages",
-					"group": "inline"
-				},
-				{
-					"command": "ionic.lightbulb",
-					"when": "view == ionic && viewItem == lightbulb",
-					"group": "inline"
-				},
-				{
-					"command": "ionic.stop",
-					"when": "view == ionic && viewItem == stop",
-					"group": "inline"
-				},
-				{
-					"command": "ionic.open",
-					"when": "view == ionic && viewItem == asset",
-					"group": "inline"
-				},
-				{
-					"command": "ionic.rebuild",
-					"when": "view == ionic && viewItem == rebuild",
-					"group": "inline"
-				},
-				{
-					"command": "ionic.upgrade",
-					"when": "view == ionic && viewItem == upgrade",
-					"group": "inline"
-				},
-				{
-					"command": "ionic.buildConfig",
-					"when": "view == ionic && viewItem == buildConfig",
-					"group": "inline"
-				},
-				{
-					"command": "ionic.selectDevice",
-					"when": "view == ionic && viewItem == selectDevice",
-					"group": "inline"
-				},
-				{
-					"command": "ionic.debugMode",
-					"when": "view == ionic && viewItem == debugMode && debugMode == false",
-					"group": "inline"
-				},
-				{
-					"command": "ionic.runMode",
-					"when": "view == ionic && viewItem == debugMode && debugMode == true",
-					"group": "inline"
-				}
-			]
-		},
-		"configuration": {
-			"title": "Ionic",
-			"properties": {
-				"ionic.liveReload": {
-					"type": "boolean",
-					"default": true,
-					"description": "Live Reload will refresh the app on the device when source code is changed in the editor."
-				},
-				"ionic.browser": {
-					"type": "string",
-					"default": "chrome",
-					"enum": [
-						"chrome",
-						"pwa-msedge"
-					],
-					"enumDescriptions": [
-						"Google Chrome",
-						"Microsoft Edge"
-					],
-					"description": "When Debugging for web which browser should be launched."
-				},
-				"ionic.externalAddress": {
-					"type": "boolean",
-					"default": true,
-					"description": "Whether to use an external IP address when using Live Reload."
-				},
-				"ionic.httpsForWeb": {
-					"type": "boolean",
-					"default": false,
-					"description": "Whether to use https (rather than http) when running the application for the web."
-				},
-				"ionic.buildForProduction": {
-					"type": "boolean",
-					"default": false,
-					"description": "Use the production configuration when building the application."
-				},
-				"ionic.previewInEditor": {
-					"type": "boolean",
-					"default": false,
-					"description": "Preview the application in the VS Code Editor."
-				},
-				"ionic.javaHome": {
-					"type": "string",
-					"scope": "application",
-					"default": "",
-					"description": "Location of JAVA_HOME. Used to specify how Android will be built"
-				}
-			}
-		}
-	},
-	"devDependencies": {
-		"@types/glob": "7.2.0",
-		"@types/node": "14.x",
-		"@types/rimraf": "3.0.2",
-		"@types/vscode": "1.63.0",
-		"@typescript-eslint/eslint-plugin": "5.12.1",
-		"@typescript-eslint/parser": "5.12.1",
-		"esbuild": "0.14.23",
-		"eslint": "8.10.0",
-		"glob": "7.2.0",
-		"typescript": "4.5.5"
-	},
-	"dependencies": {
-		"@capacitor/project": "^1.0.31",
-		"@ionic/cli": "6.19.0",
-		"fast-xml-parser": "^3.21.1",
-		"mkdirp": "^0.5.1",
-		"rimraf": "^2.6.2",
-		"semver": "7.3.5"
-	}
+  "name": "ionic",
+  "displayName": "Ionic",
+  "description": "Ionic & Capacitor project tooling and recommendations",
+  "version": "1.4.3",
+  "icon": "media/ionic.png",
+  "publisher": "Ionic",
+  "keywords": [
+    "Ionic",
+    "Capacitor",
+    "Ionic Framework",
+    "Cordova"
+  ],
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "npm run esbuild && npm run vsix-package",
+    "vsix-package": "vsce package",
+    "pre-release": "npm run build && vsce publish --pre-release",
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --external:prettier --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "compile": "tsc -p ./",
+    "package": "npm run build && cp ionic-1.4.3.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+    "lint": "npm run eslint && npm run prettier -- --check",
+    "fmt": "npm run eslint -- --fix && npm run prettier -- --write",
+    "prettier": "prettier \"**/*.ts\"",
+    "eslint": "eslint . --ext .ts"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npx pretty-quick --staged"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://ionic.io"
+  },
+  "engines": {
+    "vscode": "^1.63.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:ionic",
+    "onLanguage:json",
+    "onLanguage:jsonc",
+    "onCommand:ionic.refresh",
+    "onCommand:ionic.add",
+    "onCommand:ionic.fix",
+    "onCommand:ionic.lightbulb"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsWelcome": [
+      {
+        "view": "ionic",
+        "contents": "Please wait while inspecting project...",
+        "when": "inspectedProject == false && isAnonymous == false && noProjectFound == false"
+      },
+      {
+        "view": "ionic",
+        "contents": "To get started with Ionic open an [empty folder](command:vscode.openFolder) or your projects folder.",
+        "when": "noProjectFound == true"
+      },
+      {
+        "view": "ionic",
+        "contents": "A free Ionic account is required to unlock all extension features or [Skip for Now](command:ionic.skipLogin).\n[Login](command:ionic.login)\n[Sign Up](command:ionic.signUp)\n",
+        "when": "isAnonymous == true && isLoggingIn == false"
+      },
+      {
+        "view": "ionic",
+        "contents": "Complete the login in the web browser. This view will change as soon as you login.",
+        "when": "isAnonymous == true && isLoggingIn == true"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ionic-recommendation",
+          "title": "Ionic",
+          "icon": "media/ionic.svg"
+        }
+      ]
+    },
+    "views": {
+      "ionic-recommendation": [
+        {
+          "id": "ionic",
+          "name": "Ionic",
+          "icon": "media/ionic.svg",
+          "contextualTitle": "Ionic"
+        },
+        {
+          "id": "ionic-projects",
+          "name": "Projects",
+          "when": "isMonoRepo == true"
+        }
+      ],
+      "explorer": []
+    },
+    "languages": [
+      {
+        "id": "Log",
+        "aliases": [
+          "log"
+        ],
+        "extensions": [
+          ".log"
+        ],
+        "mimetypes": [
+          "log",
+          "text/log",
+          "text/x-log",
+          "text/x-code-output",
+          "x-code-output"
+        ]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "Log",
+        "scopeName": "code.log",
+        "path": "./resources/log-language.xml"
+      }
+    ],
+    "commands": [
+      {
+        "command": "ionic.refresh",
+        "title": "Ionic: Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "ionic.add",
+        "title": "Ionic: Install Package",
+        "icon": {
+          "light": "resources/light/add.svg",
+          "dark": "resources/dark/add.svg"
+        }
+      },
+      {
+        "command": "ionic.lightbulb",
+        "title": "Upgrade",
+        "icon": {
+          "light": "resources/light/lightbulb.svg",
+          "dark": "resources/dark/lightbulb.svg"
+        }
+      },
+      {
+        "command": "ionic.fix",
+        "title": "Ionic: Fix Issue"
+      },
+      {
+        "command": "ionic.signUp",
+        "title": "Ionic: Sign Up"
+      },
+      {
+        "command": "ionic.login",
+        "title": "Ionic: Login"
+      },
+      {
+        "command": "ionic.skipLogin",
+        "title": "Ionic: Skip Login"
+      },
+      {
+        "command": "ionic.open",
+        "title": "View"
+      },
+      {
+        "command": "ionic.rebuild",
+        "title": "Rebuild"
+      },
+      {
+        "command": "ionic.function",
+        "title": "Execute"
+      },
+      {
+        "command": "ionic.stop",
+        "title": "Stop"
+      },
+      {
+        "command": "ionic.buildConfig",
+        "title": "Build Configuration",
+        "icon": {
+          "light": "resources/light/more.svg",
+          "dark": "resources/dark/more.svg"
+        }
+      },
+      {
+        "command": "ionic.debugMode",
+        "title": "Switch to debug mode",
+        "icon": {
+          "light": "resources/light/debug.svg",
+          "dark": "resources/dark/debug.svg"
+        }
+      },
+      {
+        "command": "ionic.selectDevice",
+        "title": "Select device to run",
+        "icon": {
+          "light": "resources/light/more.svg",
+          "dark": "resources/dark/more.svg"
+        }
+      },
+      {
+        "command": "ionic.runMode",
+        "title": "Switch to run mode",
+        "icon": {
+          "light": "resources/light/run.svg",
+          "dark": "resources/dark/run.svg"
+        }
+      },
+      {
+        "command": "ionic.upgrade",
+        "title": "Upgrade",
+        "icon": {
+          "light": "resources/light/more.svg",
+          "dark": "resources/dark/more.svg"
+        }
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "ionic.skipLogin",
+          "when": "false"
+        },
+        {
+          "command": "ionic.refresh",
+          "when": "false"
+        },
+        {
+          "command": "ionic.fix",
+          "when": "false"
+        },
+        {
+          "command": "ionic.open",
+          "when": "false"
+        },
+        {
+          "command": "ionic.rebuild",
+          "when": "false"
+        },
+        {
+          "command": "ionic.function",
+          "when": "false"
+        },
+        {
+          "command": "ionic.buildConfig",
+          "when": "false"
+        },
+        {
+          "command": "ionic.debugMode",
+          "when": "false"
+        },
+        {
+          "command": "ionic.selectDevice",
+          "when": "false"
+        },
+        {
+          "command": "ionic.runMode",
+          "when": "false"
+        },
+        {
+          "command": "ionic.lightbulb",
+          "when": "false"
+        },
+        {
+          "command": "ionic.upgrade",
+          "when": "false"
+        },
+        {
+          "command": "ionic.stop",
+          "when": "false"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "ionic.refresh",
+          "when": "view == ionic",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "ionic.add",
+          "when": "view == ionic && viewItem == packages",
+          "group": "inline"
+        },
+        {
+          "command": "ionic.lightbulb",
+          "when": "view == ionic && viewItem == lightbulb",
+          "group": "inline"
+        },
+        {
+          "command": "ionic.stop",
+          "when": "view == ionic && viewItem == stop",
+          "group": "inline"
+        },
+        {
+          "command": "ionic.open",
+          "when": "view == ionic && viewItem == asset",
+          "group": "inline"
+        },
+        {
+          "command": "ionic.rebuild",
+          "when": "view == ionic && viewItem == rebuild",
+          "group": "inline"
+        },
+        {
+          "command": "ionic.upgrade",
+          "when": "view == ionic && viewItem == upgrade",
+          "group": "inline"
+        },
+        {
+          "command": "ionic.buildConfig",
+          "when": "view == ionic && viewItem == buildConfig",
+          "group": "inline"
+        },
+        {
+          "command": "ionic.selectDevice",
+          "when": "view == ionic && viewItem == selectDevice",
+          "group": "inline"
+        },
+        {
+          "command": "ionic.debugMode",
+          "when": "view == ionic && viewItem == debugMode && debugMode == false",
+          "group": "inline"
+        },
+        {
+          "command": "ionic.runMode",
+          "when": "view == ionic && viewItem == debugMode && debugMode == true",
+          "group": "inline"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Ionic",
+      "properties": {
+        "ionic.liveReload": {
+          "type": "boolean",
+          "default": true,
+          "description": "Live Reload will refresh the app on the device when source code is changed in the editor."
+        },
+        "ionic.browser": {
+          "type": "string",
+          "default": "chrome",
+          "enum": [
+            "chrome",
+            "pwa-msedge"
+          ],
+          "enumDescriptions": [
+            "Google Chrome",
+            "Microsoft Edge"
+          ],
+          "description": "When Debugging for web which browser should be launched."
+        },
+        "ionic.externalAddress": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to use an external IP address when using Live Reload."
+        },
+        "ionic.httpsForWeb": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to use https (rather than http) when running the application for the web."
+        },
+        "ionic.buildForProduction": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use the production configuration when building the application."
+        },
+        "ionic.previewInEditor": {
+          "type": "boolean",
+          "default": false,
+          "description": "Preview the application in the VS Code Editor."
+        },
+        "ionic.javaHome": {
+          "type": "string",
+          "scope": "application",
+          "default": "",
+          "description": "Location of JAVA_HOME. Used to specify how Android will be built"
+        }
+      }
+    }
+  },
+  "eslintConfig": {
+    "extends": "@ionic/eslint-config/recommended"
+  },
+  "prettier": "@ionic/prettier-config",
+  "devDependencies": {
+    "@ionic/eslint-config": "^0.3.0",
+    "@ionic/prettier-config": "^2.0.0",
+    "@types/glob": "7.2.0",
+    "@types/node": "14.x",
+    "@types/rimraf": "3.0.2",
+    "@types/vscode": "1.63.0",
+    "@typescript-eslint/eslint-plugin": "5.12.1",
+    "@typescript-eslint/parser": "5.12.1",
+    "esbuild": "0.14.23",
+    "eslint": "^7.32.0",
+    "glob": "7.2.0",
+    "husky": "^7.0.4",
+    "typescript": "4.5.5"
+  },
+  "dependencies": {
+    "@capacitor/project": "^1.0.31",
+    "@ionic/cli": "6.19.0",
+    "fast-xml-parser": "^3.21.1",
+    "mkdirp": "^0.5.1",
+    "rimraf": "^2.6.2",
+    "semver": "7.3.5"
+  },
+  "volta": {
+    "node": "16.13.2",
+    "npm": "8.3.0"
+  }
 }
