@@ -23,6 +23,7 @@ interface IonicState {
   selectedAndroidDeviceName?: string;
   selectedIOSDeviceName?: string;
   projectDirty?: boolean; // Was there a likely change in the project (ie file saved)
+  outputIsFocused: boolean;
 }
 export const ionicState: IonicState = {
   view: undefined,
@@ -32,6 +33,7 @@ export const ionicState: IonicState = {
   repoType: MonoRepoType.none,
   workspace: undefined,
   webDebugMode: false,
+  outputIsFocused: false,
 };
 
 export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {

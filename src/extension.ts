@@ -353,6 +353,16 @@ function trackProjectChange() {
   vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
     ionicState.projectDirty = true;
   });
+
+  vscode.window.onDidChangeVisibleTextEditors((e: Array<any>) => {
+    let outputIsFocused = false;
+    for (const d of e) {
+      if ((d as any)?.document?.uri?.scheme == 'output') {
+        outputIsFocused = true;
+      }
+    }
+    ionicState.outputIsFocused = outputIsFocused;
+  });
 }
 
 async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, rootPath: string) {

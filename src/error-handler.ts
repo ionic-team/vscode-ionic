@@ -126,7 +126,7 @@ function extractErrors(errorText: string, logs: Array<string>, folder: string): 
         }
       }
 
-      // React synax error
+      // React syntax error
       // SyntaxError: /Users/damian/Code/demo-intune-react/src/pages/Login.tsx: 'await' is only allowed within async functions and at the top levels of modules. (29:19)
       if (log.startsWith('SyntaxError:')) {
         errors.push(extractSyntaxError(log));
