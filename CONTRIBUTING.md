@@ -1,4 +1,7 @@
 # Getting Started
+
+Install Volta: https://docs.volta.sh/guide/getting-started
+
 Ensure Visual Studio Extension Manager:
 - `npm install -g vsce`
 

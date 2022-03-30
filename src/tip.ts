@@ -1,207 +1,206 @@
-import { Context } from "./context-variables";
-import { isRunning } from "./extension";
+import { Context } from './context-variables';
+import { isRunning } from './extension';
 
 export class Tip {
-	public progressDialog: boolean;
-	public doRun: boolean;
-	public doRequestAppName: boolean;
-	public doDeviceSelection: boolean;
-	public doViewEditor: boolean;
-	public cancelRequested: boolean;
-	public animates: boolean;
-	public stoppable: boolean;
-	public secondCommand: string;
-	public secondTitle: string;
-	public tooltip: string;
-	public runPoints: Array<RunPoint>;
-	public contextValue?: string;
-	public ignorable: boolean;
-	public data?: any;
+  public progressDialog: boolean;
+  public doRun: boolean;
+  public doRequestAppName: boolean;
+  public doDeviceSelection: boolean;
+  public doViewEditor: boolean;
+  public cancelRequested: boolean;
+  public animates: boolean;
+  public stoppable: boolean;
+  public secondCommand: string;
+  public secondTitle: string;
+  public tooltip: string;
+  public runPoints: Array<RunPoint>;
+  public contextValue?: string;
+  public ignorable: boolean;
+  public data?: any;
 
-	private onAction: (...args) => unknown;
-	private onCommand: (...args) => string;
-	private onTitle: (...args) => string;
-	private actionArgs: any[];
-	private titleArgs: any[];
+  private onAction: (...args) => unknown;
+  private onCommand: (...args) => string;
+  private onTitle: (...args) => string;
+  private actionArgs: any[];
+  private titleArgs: any[];
 
-	constructor(
-		public title: string,
-		public readonly message: string,
-		public readonly type?: TipType,
-		public readonly description?: string,
-		public command?: string | string[],
-		public commandTitle?: string,
-		public readonly commandSuccess?: string,
-		public url?: string,
-		public commandProgress?: string
-	) { }
+  constructor(
+    public title: string,
+    public readonly message: string,
+    public readonly type?: TipType,
+    public readonly description?: string,
+    public command?: string | string[],
+    public commandTitle?: string,
+    public readonly commandSuccess?: string,
+    public url?: string,
+    public commandProgress?: string
+  ) {}
 
-	showProgressDialog() {
-		this.progressDialog = true;
-		return this;
-	}
+  showProgressDialog() {
+    this.progressDialog = true;
+    return this;
+  }
 
-	performRun() {
-		this.doRun = true;
-		return this;
-	}
+  performRun() {
+    this.doRun = true;
+    return this;
+  }
 
-	requestAppName() {
-		this.doRequestAppName = true;
-		return this;
-	}
+  requestAppName() {
+    this.doRequestAppName = true;
+    return this;
+  }
 
-	requestDeviceSelection() {
-		this.doDeviceSelection = true;
-		return this;
-	}
+  requestDeviceSelection() {
+    this.doDeviceSelection = true;
+    return this;
+  }
 
-	requestViewEditor() {
-		this.doViewEditor = true;
-		return this;
-	}
+  requestViewEditor() {
+    this.doViewEditor = true;
+    return this;
+  }
 
-	canAnimate() {
-		this.animates = true;
-		return this;
-	}
+  canAnimate() {
+    this.animates = true;
+    return this;
+  }
 
-	setTooltip(tooltip: string) {
-		this.tooltip = tooltip;
-		return this;
-	}
+  setTooltip(tooltip: string) {
+    this.tooltip = tooltip;
+    return this;
+  }
 
-	canStop() {
-		if (isRunning(this)) {
-			this.setContextValue(Context.stop);
-		} else {
-			this.stoppable = true;
-		}
-		return this;
-	}
+  canStop() {
+    if (isRunning(this)) {
+      this.setContextValue(Context.stop);
+    } else {
+      this.stoppable = true;
+    }
+    return this;
+  }
 
-	contextIf(value: Context, running: boolean) {
-		if (running && isRunning(this)) {
-			this.setContextValue(value);
-		} else if (!running && !isRunning(this)) {
-			this.setContextValue(value);
-		}
-		return this;
-	}
+  contextIf(value: Context, running: boolean) {
+    if (running && isRunning(this)) {
+      this.setContextValue(value);
+    } else if (!running && !isRunning(this)) {
+      this.setContextValue(value);
+    }
+    return this;
+  }
 
-	canIgnore() {
-		this.ignorable = true;
-		return this;
-	}
+  canIgnore() {
+    this.ignorable = true;
+    return this;
+  }
 
-	// The action is executed when the user clicks the item in the treeview
-	setAction(func: (...argsIn) => unknown, ...args) {
-		this.onAction = func;
-		this.actionArgs = args;
-		return this;
-	}
+  // The action is executed when the user clicks the item in the treeview
+  setAction(func: (...argsIn) => unknown, ...args) {
+    this.onAction = func;
+    this.actionArgs = args;
+    return this;
+  }
 
-	// The action is executed when the user clicks the button called title
-	setAfterClickAction(title: string, func: (...argsIn) => unknown, ...args) {
-		this.commandTitle = title;
-		this.command = Command.NoOp;
-		this.onAction = func;
-		this.actionArgs = args;
-		return this;
-	}
+  // The action is executed when the user clicks the button called title
+  setAfterClickAction(title: string, func: (...argsIn) => unknown, ...args) {
+    this.commandTitle = title;
+    this.command = Command.NoOp;
+    this.onAction = func;
+    this.actionArgs = args;
+    return this;
+  }
 
-	setContextValue(contextValue: string) {
-		this.contextValue = contextValue;
-		return this;
-	}
+  setContextValue(contextValue: string) {
+    this.contextValue = contextValue;
+    return this;
+  }
 
+  public addActionArg(arg: string) {
+    this.actionArgs.push(arg);
+  }
 
-	public addActionArg(arg: string) {
-		this.actionArgs.push(arg);
-	}
+  public actionArg(index: number) {
+    return this.actionArgs[index];
+  }
 
-	public actionArg(index: number) {
-		return this.actionArgs[index];
-	}
+  setData(data: any) {
+    this.data = data;
+    return this;
+  }
 
-	setData(data: any) {
-		this.data = data;
-		return this;
-	}
+  setDynamicCommand(func: (...argsIn) => string, ...args) {
+    this.onCommand = func;
+    this.actionArgs = args;
+    return this;
+  }
 
-	setDynamicCommand(func: (...argsIn) => string, ...args) {
-		this.onCommand = func;
-		this.actionArgs = args;
-		return this;
-	}
+  setDynamicTitle(func: (...argsIn) => string, ...args) {
+    this.onTitle = func;
+    this.titleArgs = args;
+    return this;
+  }
 
-	setDynamicTitle(func: (...argsIn) => string, ...args) {
-		this.onTitle = func;
-		this.titleArgs = args;
-		return this;
-	}
+  setSecondCommand(title: string, command: string): Tip {
+    this.secondCommand = command;
+    this.secondTitle = title;
+    return this;
+  }
 
-	setSecondCommand(title: string, command: string): Tip {
-		this.secondCommand = command;
-		this.secondTitle = title;
-		return this;
-	}
+  setRunPoints(runPoints: Array<RunPoint>): Tip {
+    this.runPoints = runPoints;
+    return this;
+  }
 
-	setRunPoints(runPoints: Array<RunPoint>): Tip {
-		this.runPoints = runPoints;
-		return this;
-	}
+  async executeAction() {
+    if (this.onAction) {
+      await this.onAction(...this.actionArgs);
+    }
+  }
 
-	async executeAction() {
-		if (this.onAction) {
-			await this.onAction(...this.actionArgs);
-		}
-	}
+  async generateCommand() {
+    if (this.onCommand) {
+      this.command = this.onCommand(...this.actionArgs);
+    }
+  }
 
-	async generateCommand() {
-		if (this.onCommand) {
-			this.command = this.onCommand(...this.actionArgs);
-		}
-	}
-
-	async generateTitle() {
-		if (this.onTitle) {
-			this.title = this.onTitle(...this.titleArgs);
-		}
-	}
+  async generateTitle() {
+    if (this.onTitle) {
+      this.title = this.onTitle(...this.titleArgs);
+    }
+  }
 }
 
 export enum Command {
-	NoOp = ' '
+  NoOp = ' ',
 }
 
 export enum TipType {
-	Build,
-	Error,
-	Edit,
-	Warning,
-	Idea,
-	Capacitor,
-	Cordova,
-	Ionic,
-	Run,
-	Link,
-	Android,
-	Vue,
-	Angular,
-	React,
-	Comment,
-	Settings,
-	Files,
-	Sync,
-	Add,
-	Media,
-	Debug,
-	None
+  Build,
+  Error,
+  Edit,
+  Warning,
+  Idea,
+  Capacitor,
+  Cordova,
+  Ionic,
+  Run,
+  Link,
+  Android,
+  Vue,
+  Angular,
+  React,
+  Comment,
+  Settings,
+  Files,
+  Sync,
+  Add,
+  Media,
+  Debug,
+  None,
 }
 
 export interface RunPoint {
-	text: string; // Search text in the log entry
-	title: string; // Title used for progress
-	refresh?: boolean; // Refresh the tree view
+  text: string; // Search text in the log entry
+  title: string; // Title used for progress
+  refresh?: boolean; // Refresh the tree view
 }

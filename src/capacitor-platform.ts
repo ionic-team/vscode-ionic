@@ -1,4 +1,4 @@
 export enum CapacitorPlatform {
-	ios = 'ios',
-	android = 'android'
+  ios = 'ios',
+  android = 'android',
 }
