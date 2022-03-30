@@ -23,7 +23,12 @@ node_modules/@types
 node_modules/**/*.md
 node_modules/conventional-changelog
 node_modules/native-run
+node_modules/@ionic/eslint-config
+node_modules/@ionic/prettier-config
 node_modules/**/LICENSE
+node_modules/@types
+node_modules/@typescript-eslint/**/*
+node_modules/husky
 **/*.ts
 **/*.jar
 **/*.map
