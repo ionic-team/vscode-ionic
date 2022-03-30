@@ -6,6 +6,8 @@ import { lastOperation } from './extension';
 import { CommandName } from './command-name';
 import { showMessage } from './utilities';
 import { ionicInit } from './ionic-init';
+import { Context } from './context-variables';
+import { ionicState } from './ionic-tree-provider';
 
 interface ErrorLine {
   uri: string;
@@ -36,14 +38,14 @@ export async function handleError(error: string, logs: Array<string>, folder: st
   }
 
   if (error && error.startsWith('/bin/sh: npx')) {
-    let msg = 'This extension requires npm to be installed. It can be downloaded and installed from nodejs.dev.';
-    if (os.platform() == 'darwin') {
-      msg +=
-        'If you have npm installed you may need to run "npm config set script-shell /bin/zsh" to correctly set your shell and avoid this error.';
-    }
-
-    await vscode.window.showErrorMessage(msg, 'Install');
-    vscode.commands.executeCommand('vscode.open', vscode.Uri.parse('https://nodejs.dev/'));
+    const zsh = '/bin/zsh';
+    ionicState.shell = zsh;
+    ionicState.context.workspaceState.update(Context.shell, zsh);
+    const msg =
+      'It looks like node was not found with the default shell so it has been switched to ' +
+      zsh +
+      '. Please try the operation again.';
+    await vscode.window.showErrorMessage(msg, 'OK');
     return;
   }
   let errorMessage = error;

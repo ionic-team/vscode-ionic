@@ -36,6 +36,9 @@ export enum Context {
 
   // Device selection
   selectDevice = 'selectDevice',
+
+  // Shell (eg /bin/zsh)
+  shell = 'shell',
 }
 
 // Commands from vs code

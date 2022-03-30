@@ -216,7 +216,7 @@ export async function fixIssue(
   }
 }
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   const rootPath =
     vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
       ? vscode.workspace.workspaceFolders[0].uri.fsPath
@@ -227,6 +227,13 @@ export function activate(context: vscode.ExtensionContext) {
   ionicState.projectsView = projectsView;
   const view = vscode.window.createTreeView('ionic', { treeDataProvider: ionicProvider });
   ionicState.view = view;
+  ionicState.context = context;
+
+  ionicState.shell = context.workspaceState.get(Context.shell);
+  const shellOverride: string = vscode.workspace.getConfiguration('ionic').get('shellPath');
+  if (shellOverride && shellOverride.length > 0) {
+    ionicState.shell = shellOverride;
+  }
 
   trackProjectChange();
 

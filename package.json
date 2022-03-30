@@ -362,6 +362,12 @@
           "default": true,
           "description": "Whether to use an external IP address when using Live Reload."
         },
+        "ionic.shellPath": {
+          "type": "string",
+          "scope": "application",
+          "default": "",
+          "description": "Use this option to override the shell used (eg /bin/zsh). Default is /bin/sh or cmd on Windows."
+        },
         "ionic.httpsForWeb": {
           "type": "boolean",
           "default": false,

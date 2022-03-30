@@ -3,7 +3,9 @@
 ### Version 1.4.4
 
 - Node modules will be installed if missing whenever an operation is started
-- Fix to prevent focus changing to the output window while you editing your code during live reload
+- Fix to prevent focus changing to the output window while you editing your code during live reload (fixes #29)
+- Fix when /bin/sh fails (switches to /bin/zsh)
+- Setting added to override the default shell used to run commands
 
 ### Version 1.4.3
 

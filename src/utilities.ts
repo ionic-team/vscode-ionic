@@ -45,7 +45,7 @@ function runOptions(command: string, folder: string) {
     env.JAVA_HOME = javaHome;
   }
 
-  return { cwd: folder, encoding: 'utf8', env: env };
+  return { cwd: folder, shell: ionicState.shell, encoding: 'utf8', env: env };
 }
 
 export async function run(

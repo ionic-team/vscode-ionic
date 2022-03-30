@@ -16,6 +16,8 @@ interface IonicState {
   projects: Array<MonoRepoProject>;
   repoType: MonoRepoType;
   workspace: string;
+  context: vscode.ExtensionContext;
+  shell?: string;
   projectsView: vscode.TreeView<any>;
   webDebugMode: boolean;
   selectedAndroidDevice?: string;
@@ -27,6 +29,7 @@ interface IonicState {
 }
 export const ionicState: IonicState = {
   view: undefined,
+  context: undefined,
   skipAuth: false,
   projects: [],
   projectsView: undefined,
