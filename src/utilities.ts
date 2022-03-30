@@ -261,15 +261,26 @@ function timeout(ms: number) {
 }
 
 function removeCordovaFromPackageJSON(folder: string): Promise<boolean> {
-  return new Promise((resolve, reject) => {
-    try {
-      const filename = path.join(folder, 'package.json');
-      const packageFile = JSON.parse(fs.readFileSync(filename, 'utf8'));
-      packageFile.cordova = undefined;
-      fs.writeFileSync(filename, JSON.stringify(packageFile, undefined, 2));
-      resolve(false);
-    } catch (err) {
-      reject(err);
-    }
-  });
+	return new Promise((resolve, reject) => {
+		try {
+			const filename = path.join(folder, 'package.json');
+			const packageFile = JSON.parse(fs.readFileSync(filename, 'utf8'));
+			packageFile.cordova = undefined;
+			fs.writeFileSync(filename, JSON.stringify(packageFile, undefined, 2));
+
+			// Also replace cordova in ionic.config.json
+			const ifilename = path.join(folder, 'ionic.config.json');
+			if (fs.existsSync(ifilename)) {
+				const ionicConfig = JSON.parse(fs.readFileSync(ifilename, 'utf8'));
+				if (ionicConfig.integrations.cordova) {
+					delete ionicConfig.integrations.cordova;
+					ionicConfig.integrations.capacitor = new Object();
+				}
+				fs.writeFileSync(ifilename, JSON.stringify(ionicConfig, undefined, 2));
+			}
+			resolve(false);
+		} catch (err) {
+			reject(err);
+		}
+	});
 }
