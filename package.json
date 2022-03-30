@@ -23,6 +23,7 @@
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
     "package": "npm run build && cp ionic-1.4.3.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
     "lint": "npm run eslint && npm run prettier -- --check",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write",
@@ -405,7 +406,7 @@
     "typescript": "4.5.5"
   },
   "dependencies": {
-    "@capacitor/project": "^1.0.31",
+    "@capacitor/project": "2.0.3",
     "@ionic/cli": "6.19.0",
     "fast-xml-parser": "^3.21.1",
     "mkdirp": "^0.5.1",

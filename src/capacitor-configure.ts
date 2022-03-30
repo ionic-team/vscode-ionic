@@ -117,7 +117,7 @@ async function getCapacitorProjectState(
     state.iosDisplayName = await project.ios.getDisplayName(appTarget.name);
     for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
       state.iosVersion = project.ios?.getVersion(appTarget.name, buildConfig.name);
-      state.iosBuild = project.ios.getBuild(appTarget.name, buildConfig.name);
+      state.iosBuild = await project.ios.getBuild(appTarget.name, buildConfig.name);
     }
   }
 

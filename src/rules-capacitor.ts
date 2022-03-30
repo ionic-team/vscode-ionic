@@ -9,7 +9,6 @@ import {
   incompatibleReplacementPlugin,
   isGreaterOrEqual,
   isLess,
-  isLessOrEqual,
   notRequiredPlugin,
   replacementPlugin,
 } from './analyzer';
