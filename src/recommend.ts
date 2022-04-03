@@ -101,6 +101,8 @@ export async function getRecommendations(
       new Tip('Build', '', TipType.Build, 'Build', undefined, 'Building', undefined)
         .setDynamicCommand(ionicBuild, project)
         .setContextValue(Context.buildConfig)
+        .canStop()
+        .canAnimate()
     );
 
     if (exists('@capacitor/core')) {
