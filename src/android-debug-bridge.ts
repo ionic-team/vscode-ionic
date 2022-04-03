@@ -2,6 +2,7 @@ import * as child_process from 'child_process';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import * as os from 'os';
+
 import {
   AdbOptions,
   Device,
@@ -269,10 +270,10 @@ function resolvePath(from: string): string {
   });
 
   if (substituted.includes('/')) {
-    // Resolve the path if it contains a path seperator.
+    // Resolve path if it has a path seperator.
     return path.resolve(substituted);
   } else {
-    // Otherwise we treat it as a command that exists in PATH.
+    // Its a command that exists in PATH.
     return substituted;
   }
 }
@@ -286,16 +287,9 @@ async function getSockets(serial: string): Promise<string[]> {
   });
 
   /**
-   * Parse 'cat /proc/net/unix' output which on Android looks like this:
-   *
-   * Num               RefCount Protocol Flags    Type St Inode Path
-   * 0000000000000000: 00000002 00000000 00010000 0001 01 27955 /data/fpc/oem
-   * 0000000000000000: 00000002 00000000 00010000 0001 01  3072 @chrome_devtools_remote
-   *
-   * We need to find records with paths starting from '@' (abstract socket)
-   * and containing the channel pattern ("_devtools_remote").
+   * Parse the command 'cat /proc/net/unix' output for records with
+   * paths starting from '@' (abstract socket) and containing the channel pattern ("_devtools_remote").
    */
-
   const result: string[] = [];
 
   for (const line of output.split(/[\r\n]+/g)) {
@@ -327,14 +321,7 @@ async function getProcesses(serial: string): Promise<Process[]> {
     command: 'ps',
   });
 
-  /**
-   * Parse 'ps' output which on Android looks like this:
-   *
-   * USER       PID  PPID      VSZ     RSS  WCHAN  ADDR  S  NAME
-   * root         1     0    24128    1752  0         0  S  init
-   * u0_a100  22100  1307  1959228  128504  0         0  S  com.android.chrome
-   */
-
+  // Parse 'ps' output
   const result: Process[] = [];
 
   for (const line of output.split(/[\r\n]+/g)) {
@@ -365,22 +352,7 @@ async function getPackages(serial: string): Promise<Package[]> {
     command: 'dumpsys package packages',
   });
 
-  /**
-   * Parse 'dumpsys package packages' output which on Android looks like this:
-   *
-   * Packages:
-   *   Package [com.android.chrome] (76d4737):
-   *     userId=10100
-   *     pkg=Package{3e86c27 com.android.chrome}
-   *     codePath=/data/app/com.android.chrome-MMpc6mFfM3KpEYJ7RaZaTA==
-   *     resourcePath=/data/app/com.android.chrome-MMpc6mFfM3KpEYJ7RaZaTA==
-   *     legacyNativeLibraryDir=/data/app/com.android.chrome-MMpc6mFfM3KpEYJ7RaZaTA==/lib
-   *     primaryCpuAbi=armeabi-v7a
-   *     secondaryCpuAbi=arm64-v8a
-   *     versionCode=344009152 minSdk=24 targetSdk=28
-   *     versionName=68.0.3440.91
-   */
-
+  // Parse 'dumpsys package packages' output
   const result: Package[] = [];
 
   let packageName: string | undefined;

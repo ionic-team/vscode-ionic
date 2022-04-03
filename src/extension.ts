@@ -53,25 +53,26 @@ async function requestAppName(tip: Tip) {
 }
 
 export function isRunning(tip: Tip) {
-  const found = runningOperations.find((found) => {
-    return found.title == tip.title;
+  const found: Tip = runningOperations.find((found) => {
+    return found.sameAs(tip);
   });
   return found != undefined;
 }
 
 function cancelRunning(tip: Tip): Promise<void> {
-  const found = runningOperations.find((found) => {
-    return found.title == tip.title;
+  const found: Tip = runningOperations.find((found) => {
+    return found.sameAs(tip);
   });
   if (found) {
     found.cancelRequested = true;
+    console.log('Found task to cancel...');
   }
   return new Promise((resolve) => setTimeout(resolve, 1000));
 }
 
 function finishCommand(tip: Tip) {
   runningOperations = runningOperations.filter((op: Tip) => {
-    return op.title != tip.title;
+    return !op.sameAs(tip);
   });
 }
 
@@ -140,10 +141,11 @@ export async function fixIssue(
       cancellable: true,
     },
 
-    async (progress, token) => {
+    async (progress, token: vscode.CancellationToken) => {
       const cancelObject: CancelObject = { proc: undefined, cancelled: false };
       let increment = undefined;
       let percentage = undefined;
+
       const interval = setInterval(() => {
         // Kill the process if the user cancels
         if (token.isCancellationRequested || tip.cancelRequested) {
@@ -153,7 +155,13 @@ export async function fixIssue(
           clearInterval(interval);
           finishCommand(tip);
           cancelObject.cancelled = true;
-          cancelObject.proc.kill();
+
+          console.log(`Killing process ${cancelObject.proc.pid}`);
+          const killed = cancelObject.proc.kill('SIGTERM');
+          if (!killed) {
+            vscode.window.showErrorMessage('Unable to stop operation');
+          }
+
           if (ionicProvider) {
             ionicProvider.refresh();
           }
@@ -166,18 +174,11 @@ export async function fixIssue(
         }
       }, 1000);
 
-      if (Array.isArray(command)) {
-        try {
-          for (const cmd of command) {
-            startCommand(tip, cmd, ionicProvider);
-            await run(rootPath, cmd, channel, cancelObject, tip.doViewEditor, tip.runPoints, progress, ionicProvider);
-          }
-        } finally {
-          finishCommand(tip);
-        }
-      } else {
-        startCommand(tip, command, ionicProvider);
-        const secondsTotal = estimateRunTime(command);
+      const commands = Array.isArray(command) ? command : [command];
+
+      for (const cmd of commands) {
+        startCommand(tip, cmd, ionicProvider);
+        const secondsTotal = estimateRunTime(cmd);
         if (secondsTotal) {
           increment = 100.0 / secondsTotal;
           percentage = 0;
@@ -185,16 +186,21 @@ export async function fixIssue(
         try {
           let retry = true;
           while (retry) {
-            retry = await run(
-              rootPath,
-              command,
-              channel,
-              cancelObject,
-              tip.doViewEditor,
-              tip.runPoints,
-              progress,
-              ionicProvider
-            );
+            try {
+              retry = await run(
+                rootPath,
+                cmd,
+                channel,
+                cancelObject,
+                tip.features,
+                tip.runPoints,
+                progress,
+                ionicProvider
+              );
+            } catch (err) {
+              retry = false;
+              channel.appendLine('[Ionic] ' + err);
+            }
           }
         } finally {
           finishCommand(tip);
@@ -276,18 +282,6 @@ export async function activate(context: vscode.ExtensionContext) {
     if (!config) return;
     r.tip.addActionArg(`--configuration=${config}`);
     runAction(r, ionicProvider, rootPath);
-  });
-
-  vscode.commands.registerCommand(CommandName.DebugMode, async (r: Recommendation) => {
-    ionicState.webDebugMode = true;
-    await vscode.commands.executeCommand(VSCommand.setContext, Context.debugMode, true);
-    ionicProvider.refresh();
-  });
-
-  vscode.commands.registerCommand(CommandName.RunMode, async (r: Recommendation) => {
-    ionicState.webDebugMode = false;
-    await vscode.commands.executeCommand(VSCommand.setContext, Context.debugMode, false);
-    ionicProvider.refresh();
   });
 
   vscode.commands.registerCommand(CommandName.SkipLogin, async () => {

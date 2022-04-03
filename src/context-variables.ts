@@ -31,9 +31,6 @@ export enum Context {
   // Build configuration
   buildConfig = 'buildConfig',
 
-  // Run or Debug
-  debugMode = 'debugMode',
-
   // Device selection
   selectDevice = 'selectDevice',
 

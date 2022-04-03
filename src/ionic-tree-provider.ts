@@ -19,7 +19,6 @@ interface IonicState {
   context: vscode.ExtensionContext;
   shell?: string;
   projectsView: vscode.TreeView<any>;
-  webDebugMode: boolean;
   selectedAndroidDevice?: string;
   selectedIOSDevice?: string;
   selectedAndroidDeviceName?: string;
@@ -35,7 +34,6 @@ export const ionicState: IonicState = {
   projectsView: undefined,
   repoType: MonoRepoType.none,
   workspace: undefined,
-  webDebugMode: false,
   outputIsFocused: false,
 };
 

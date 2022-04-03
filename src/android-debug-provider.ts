@@ -120,34 +120,3 @@ function withTimeoutRetries<T>(timeout: number, interval: number, func: () => Pr
   };
   return run();
 }
-
-async function findTask(name: string): Promise<vscode.Task | undefined> {
-  const tasks = await vscode.tasks.fetchTasks();
-  return tasks.find((task) => task.name === name);
-}
-
-async function executeTask(task: vscode.Task): Promise<boolean> {
-  const activeTask = vscode.tasks.taskExecutions.find((t) => t.task.name === task.name);
-  if (activeTask && activeTask.task.isBackground) {
-    return true;
-  }
-
-  return new Promise((resolve, reject) => {
-    let execution: vscode.TaskExecution | undefined;
-    vscode.tasks.executeTask(task).then((exec) => {
-      execution = exec;
-    });
-
-    if (task.isBackground) {
-      resolve(true);
-    } else {
-      const endEvent = vscode.tasks.onDidEndTask((e) => {
-        if (e.execution === execution) {
-          endEvent.dispose();
-
-          resolve(true);
-        }
-      });
-    }
-  });
-}
