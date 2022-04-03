@@ -105,10 +105,10 @@ export async function getRecommendations(
 
     if (exists('@capacitor/core')) {
       project.add(
-        new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', undefined, 'Syncing', undefined).setDynamicCommand(
-          capacitorSync,
-          project
-        )
+        new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', undefined, 'Syncing', undefined)
+          .setDynamicCommand(capacitorSync, project)
+          .canStop()
+          .canAnimate()
       );
     }
     if (hasCapIos) {
