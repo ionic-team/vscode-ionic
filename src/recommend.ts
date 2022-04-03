@@ -103,6 +103,7 @@ export async function getRecommendations(
         .setContextValue(Context.buildConfig)
         .canStop()
         .canAnimate()
+        .setTooltip('Builds the web project')
     );
 
     if (exists('@capacitor/core')) {
@@ -111,6 +112,9 @@ export async function getRecommendations(
           .setDynamicCommand(capacitorSync, project)
           .canStop()
           .canAnimate()
+          .setTooltip(
+            'Capacitor Sync copies the web app build assets to the native projects and updates native plugins and dependencies.'
+          )
       );
     }
     if (hasCapIos) {
@@ -118,6 +122,7 @@ export async function getRecommendations(
         new Tip('Open in Xcode', '', TipType.Edit, 'Opening Project in Xcode', undefined, 'Open Project in Xcode')
           .showProgressDialog()
           .setDynamicCommand(capacitorOpen, project, CapacitorPlatform.ios)
+          .setTooltip('Opens the native iOS project in XCode')
       );
     }
     if (hasCapAndroid) {
@@ -132,6 +137,7 @@ export async function getRecommendations(
         )
           .showProgressDialog()
           .setDynamicCommand(capacitorOpen, project, CapacitorPlatform.android)
+          .setTooltip('Opens the native Android project in Android Studio')
       );
     }
   }

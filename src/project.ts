@@ -412,16 +412,17 @@ export class Project {
           .setSecondCommand(`Uninstall`, npmUninstall(name))
           .setContextValue(Context.upgrade)
           .setData({ name: name, version: fromVersion })
+          .setTooltip(`${name} ${fromVersion}`)
       );
     }
   }
 
-  public package(name: string, title: string, message: string) {
+  public package(name: string, title: string, version: string) {
     if (exists(name)) {
       this.add(
         new Tip(
           title,
-          message,
+          version,
           undefined,
           `Uninstall ${name}`,
           npmUninstall(name),
@@ -432,6 +433,7 @@ export class Project {
         )
           .setContextValue(Context.upgrade)
           .setData({ name: name, version: undefined })
+          .setTooltip(`${name} ${version}`)
       );
     }
   }
