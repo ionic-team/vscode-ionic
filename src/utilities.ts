@@ -100,7 +100,9 @@ export async function run(
           clearInterval(interval);
           resolve(retry);
         } else {
-          retry = await handleError(stderror, logs, folder);
+          if (!cancelObject?.cancelled) {
+            retry = await handleError(stderror, logs, folder);
+          }
           clearInterval(interval);
           if (retry) {
             resolve(retry);
