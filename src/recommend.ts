@@ -31,7 +31,7 @@ export async function getRecommendations(
   packages: any
 ): Promise<void> {
   if (isCapacitor() && !isCordova()) {
-    project.setGroup(`Run`, '', TipType.Run, true);
+    project.setGroup(`Run`, 'Options to run on various platforms', TipType.Ionic, true);
 
     const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
     const hasCapAndroid = project.hasCapacitorProject(CapacitorPlatform.android);
@@ -90,13 +90,13 @@ export async function getRecommendations(
 
     if (features.debugAndroid) {
       // Experimental Feature
-      const r = project.setGroup(`Debug`, 'Running Ionic applications you can debug', TipType.Debug, false);
+      const r = project.setGroup(`Debug`, 'Running Ionic applications you can debug', TipType.Ionic, false);
       r.whenExpanded = async () => {
         return [project.asRecommendation(debugOnWeb(project)), ...(await getAndroidWebViewList(hasCapAndroid))];
       };
     }
 
-    project.setGroup(`Capacitor`, 'Recommendations related to Capacitor', TipType.Capacitor, true);
+    project.setGroup(`Capacitor`, 'Capacitor Features', TipType.Capacitor, true);
     project.add(
       new Tip('Build', '', TipType.Build, 'Build', undefined, 'Building', undefined)
         .setDynamicCommand(ionicBuild, project)
