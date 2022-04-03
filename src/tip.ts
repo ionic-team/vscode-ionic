@@ -1,12 +1,16 @@
 import { Context } from './context-variables';
 import { isRunning } from './extension';
 
+export enum TipFeature {
+  viewInEditor,
+  debugOnWeb,
+}
+
 export class Tip {
   public progressDialog: boolean;
   public doRun: boolean;
   public doRequestAppName: boolean;
   public doDeviceSelection: boolean;
-  public doViewEditor: boolean;
   public cancelRequested: boolean;
   public animates: boolean;
   public stoppable: boolean;
@@ -17,6 +21,7 @@ export class Tip {
   public contextValue?: string;
   public ignorable: boolean;
   public data?: any;
+  public features: Array<TipFeature> = [];
 
   private onAction: (...args) => unknown;
   private onCommand: (...args) => string;
@@ -56,9 +61,15 @@ export class Tip {
     return this;
   }
 
-  requestViewEditor() {
-    this.doViewEditor = true;
+  setFeatures(features: Array<TipFeature>): Tip {
+    for (const feature of features) {
+      this.features.push(feature);
+    }
     return this;
+  }
+
+  hasFeature(feature: TipFeature): boolean {
+    return this.features.includes(feature);
   }
 
   canAnimate() {
@@ -69,6 +80,10 @@ export class Tip {
   setTooltip(tooltip: string) {
     this.tooltip = tooltip;
     return this;
+  }
+
+  public sameAs(tip: Tip): boolean {
+    return this.title == tip.title && this.message == tip.message;
   }
 
   canStop() {

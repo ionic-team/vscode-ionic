@@ -166,21 +166,13 @@ async function runCordovaRes(project: Project) {
   channel.show();
   await showProgress('Generating Splash Screen and Icon Assets', async () => {
     if (!hasCordovaRes) {
-      await run(folder, npmInstall('cordova-res', '--save-dev'), channel, undefined, false, undefined, undefined);
+      await run(folder, npmInstall('cordova-res', '--save-dev'), channel, undefined, [], undefined, undefined);
     }
     if (ios) {
-      await run(folder, 'npx cordova-res ios --skip-config --copy', channel, undefined, false, undefined, undefined);
+      await run(folder, 'npx cordova-res ios --skip-config --copy', channel, undefined, [], undefined, undefined);
     }
     if (android) {
-      await run(
-        folder,
-        'npx cordova-res android --skip-config --copy',
-        channel,
-        undefined,
-        false,
-        undefined,
-        undefined
-      );
+      await run(folder, 'npx cordova-res android --skip-config --copy', channel, undefined, [], undefined, undefined);
     }
   });
   channel.appendLine('[Ionic] Completed created Splash Screen and Icon Assets');

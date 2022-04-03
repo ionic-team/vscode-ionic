@@ -193,6 +193,17 @@ export class Project {
   }
 
   public add(tip: Tip) {
+    const r = this.asRecommendation(tip);
+    if (!r) return;
+
+    if (this.subgroup) {
+      this.subgroup.children.push(r);
+    } else {
+      this.group.children.push(r);
+    }
+  }
+
+  public asRecommendation(tip: Tip): Recommendation {
     if (this.isIgnored(tip)) return;
 
     let argsIsRecommendation = false;
@@ -246,11 +257,7 @@ export class Project {
       r.setContext(tip.contextValue);
     }
 
-    if (this.subgroup) {
-      this.subgroup.children.push(r);
-    } else {
-      this.group.children.push(r);
-    }
+    return r;
   }
 
   public addSubGroup(title: string, latestVersion: string) {
@@ -405,16 +412,17 @@ export class Project {
           .setSecondCommand(`Uninstall`, npmUninstall(name))
           .setContextValue(Context.upgrade)
           .setData({ name: name, version: fromVersion })
+          .setTooltip(`${name} ${fromVersion}`)
       );
     }
   }
 
-  public package(name: string, title: string, message: string) {
+  public package(name: string, title: string, version: string) {
     if (exists(name)) {
       this.add(
         new Tip(
           title,
-          message,
+          version,
           undefined,
           `Uninstall ${name}`,
           npmUninstall(name),
@@ -425,6 +433,7 @@ export class Project {
         )
           .setContextValue(Context.upgrade)
           .setData({ name: name, version: undefined })
+          .setTooltip(`${name} ${version}`)
       );
     }
   }

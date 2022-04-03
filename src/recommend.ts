@@ -6,7 +6,7 @@ import { ionicBuild } from './ionic-build';
 import { ionicServe } from './ionic-serve';
 import { Project } from './project';
 import { addSplashAndIconFeatures } from './splash-icon';
-import { Tip, TipType } from './tip';
+import { Tip, TipFeature, TipType } from './tip';
 import { capacitorMigrationChecks as checkCapacitorMigrationRules } from './rules-capacitor-migration';
 import { reviewPackages, reviewPluginProperties } from './process-packages';
 import { capacitorDevicesCommand, capacitorRun } from './capacitor-run';
@@ -31,28 +31,24 @@ export async function getRecommendations(
   packages: any
 ): Promise<void> {
   if (isCapacitor() && !isCordova()) {
-    project.setGroup(`Capacitor`, 'Recommendations related to Capacitor', TipType.Capacitor, true);
+    project.setGroup(`Run`, 'Options to run on various platforms', TipType.Ionic, true);
 
     const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
     const hasCapAndroid = project.hasCapacitorProject(CapacitorPlatform.android);
-    const title = ionicState.webDebugMode ? 'Debug On Web' : 'Run On Web';
-    const tooltip = ionicState.webDebugMode
-      ? `Debug using ${getDebugBrowserName()}. The browser can be changed in Settings.`
-      : 'Run a developement server and open using the default web browser';
-    const type = ionicState.webDebugMode ? TipType.Debug : TipType.Run;
+
     project.add(
-      new Tip(title, '', type, 'Serve', undefined, 'Running on Web', `Project Served`)
-        .setDynamicCommand(ionicServe, project)
-        .requestViewEditor()
+      new Tip('Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`)
+        .setDynamicCommand(ionicServe, project, false)
+        .setFeatures([TipFeature.viewInEditor])
         .setRunPoints([
           { title: 'Building...', text: 'Generating browser application bundles' },
           { title: 'Serving', text: 'Development server running' },
         ])
         .canStop()
-        .contextIf(Context.debugMode, false)
         .canAnimate()
-        .setTooltip(tooltip)
+        .setTooltip('Run a developement server and open using the default web browser')
     );
+
     // project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
     const runPoints = [
       { text: 'Copying web assets', title: 'Copying...' },
@@ -66,9 +62,7 @@ export async function getRecommendations(
     ];
 
     if (hasCapAndroid) {
-      const title = ionicState.selectedAndroidDevice
-        ? `Run on ${ionicState.selectedAndroidDeviceName}`
-        : 'Run on Android';
+      const title = ionicState.selectedAndroidDevice ? `${ionicState.selectedAndroidDeviceName}` : 'Android';
       project.add(
         new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
           .showProgressDialog()
@@ -81,7 +75,7 @@ export async function getRecommendations(
       );
     }
     if (hasCapIos) {
-      const title = ionicState.selectedIOSDevice ? `Run on ${ionicState.selectedIOSDeviceName}` : 'Run on iOS';
+      const title = ionicState.selectedIOSDevice ? `${ionicState.selectedIOSDeviceName}` : 'iOS';
       project.add(
         new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
           .showProgressDialog()
@@ -94,18 +88,33 @@ export async function getRecommendations(
       );
     }
 
+    if (features.debugAndroid) {
+      // Experimental Feature
+      const r = project.setGroup(`Debug`, 'Running Ionic applications you can debug', TipType.Ionic, false);
+      r.whenExpanded = async () => {
+        return [project.asRecommendation(debugOnWeb(project)), ...(await getAndroidWebViewList(hasCapAndroid))];
+      };
+    }
+
+    project.setGroup(`Capacitor`, 'Capacitor Features', TipType.Capacitor, true);
     project.add(
       new Tip('Build', '', TipType.Build, 'Build', undefined, 'Building', undefined)
         .setDynamicCommand(ionicBuild, project)
         .setContextValue(Context.buildConfig)
+        .canStop()
+        .canAnimate()
+        .setTooltip('Builds the web project')
     );
 
     if (exists('@capacitor/core')) {
       project.add(
-        new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', undefined, 'Syncing', undefined).setDynamicCommand(
-          capacitorSync,
-          project
-        )
+        new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', undefined, 'Syncing', undefined)
+          .setDynamicCommand(capacitorSync, project)
+          .canStop()
+          .canAnimate()
+          .setTooltip(
+            'Capacitor Sync copies the web app build assets to the native projects and updates native plugins and dependencies.'
+          )
       );
     }
     if (hasCapIos) {
@@ -113,6 +122,7 @@ export async function getRecommendations(
         new Tip('Open in Xcode', '', TipType.Edit, 'Opening Project in Xcode', undefined, 'Open Project in Xcode')
           .showProgressDialog()
           .setDynamicCommand(capacitorOpen, project, CapacitorPlatform.ios)
+          .setTooltip('Opens the native iOS project in XCode')
       );
     }
     if (hasCapAndroid) {
@@ -127,15 +137,8 @@ export async function getRecommendations(
         )
           .showProgressDialog()
           .setDynamicCommand(capacitorOpen, project, CapacitorPlatform.android)
+          .setTooltip('Opens the native Android project in Android Studio')
       );
-    }
-
-    if (features.debugAndroid) {
-      // Experimental Feature
-      const r = project.setGroup(`Debug`, 'Running Ionic applications you can debug', TipType.Debug, false);
-      r.whenExpanded = async () => {
-        return getAndroidWebViewList(hasCapAndroid);
-      };
     }
   }
 
@@ -201,4 +204,17 @@ export async function getRecommendations(
     )
   );
   project.add(new Tip('Settings', '', TipType.Settings));
+}
+
+function debugOnWeb(project: Project): Tip {
+  return new Tip('Web', `(${getDebugBrowserName()})`, TipType.Debug, 'Serve', undefined, 'Debugging', `Project Served`)
+    .setDynamicCommand(ionicServe, project, true)
+    .setFeatures([TipFeature.debugOnWeb])
+    .setRunPoints([
+      { title: 'Building...', text: 'Generating browser application bundles' },
+      { title: 'Serving', text: 'Development server running' },
+    ])
+    .canStop()
+    .canAnimate()
+    .setTooltip(`Debug using ${getDebugBrowserName()}. The browser can be changed in Settings.`);
 }

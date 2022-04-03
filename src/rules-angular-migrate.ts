@@ -1,7 +1,6 @@
 import { getPackageVersion } from './analyzer';
-import { Project } from './project';
 import { Tip, TipType } from './tip';
-import { coerce, compare, lt, gte, lte } from 'semver';
+import { coerce } from 'semver';
 
 export function angularMigrate(latestVersion: string): Tip {
   const current = getPackageVersion('@angular/core');

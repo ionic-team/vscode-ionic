@@ -24,9 +24,6 @@ const devices: Array<device> = [
 export function viewInEditor(url: string) {
   const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
   if (!previewInEditor) {
-    if (ionicState.webDebugMode) {
-      debugBrowser(url);
-    }
     return;
   }
 
@@ -49,12 +46,12 @@ export function getDebugBrowserName(): string {
   return browser;
 }
 
-function debugBrowser(url: string) {
+export function debugBrowser(url: string) {
   try {
     const browserType: string = vscode.workspace.getConfiguration('ionic').get('browser');
     const launchConfig: vscode.DebugConfiguration = {
       type: browserType,
-      name: 'Debug App',
+      name: 'Debug Web',
       request: 'launch',
       url: url,
       webRoot: '${workspaceFolder}',

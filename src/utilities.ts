@@ -4,8 +4,8 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 
-import { RunPoint } from './tip';
-import { viewInEditor } from './editor-preview';
+import { RunPoint, TipFeature } from './tip';
+import { debugBrowser, viewInEditor } from './editor-preview';
 import { handleError } from './error-handler';
 import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { getMonoRepoFolder, getPackageJSONFilename } from './monorepo';
@@ -53,7 +53,7 @@ export async function run(
   command: string,
   channel: vscode.OutputChannel,
   cancelObject: CancelObject,
-  viewEditor: boolean,
+  features: Array<TipFeature>,
   runPoints: Array<RunPoint>,
   progress: any,
   ionicProvider?: IonicTreeProvider
@@ -67,14 +67,23 @@ export async function run(
     // Change the work directory for monorepos as folder is the root folder
     folder = getMonoRepoFolder(ionicState.workspace);
   }
+  let viewEditor = features.includes(TipFeature.debugOnWeb) || features.includes(TipFeature.viewInEditor);
 
   let logs: Array<string> = [];
   return new Promise((resolve, reject) => {
     const start_time = process.hrtime();
+    const interval = setInterval(() => {
+      if (cancelObject.cancelled) {
+        clearInterval(interval);
+        reject(`${command} Cancelled`);
+      }
+    }, 500);
+
     const proc = child_process.exec(
       command,
       runOptions(command, folder),
-      (error: child_process.ExecException, stdout: string, stderror: string) => {
+      async (error: child_process.ExecException, stdout: string, stderror: string) => {
+        let retry = false;
         if (error) {
           console.error(error);
         }
@@ -87,11 +96,12 @@ export async function run(
           }
 
           // Allows handling of linting and tests
-          const retry = handleError(undefined, logs, folder);
-
+          retry = await handleError(undefined, logs, folder);
+          clearInterval(interval);
           resolve(retry);
         } else {
-          const retry = handleError(stderror, logs, folder);
+          retry = await handleError(stderror, logs, folder);
+          clearInterval(interval);
           if (retry) {
             resolve(retry);
           } else {
@@ -100,6 +110,7 @@ export async function run(
         }
       }
     );
+
     proc.stdout.on('data', (data) => {
       if (data) {
         const loglines = data.split('\n');
@@ -110,21 +121,21 @@ export async function run(
             const url = serverUrl;
             channel.appendLine(`[Ionic] Launching ${url}`);
             viewEditor = false;
-            setTimeout(() => viewInEditor(url), 500);
+            setTimeout(() => handleUrl(url, features), 500);
           } else if (data.includes('open your browser on')) {
             // Likely React
             serverUrl = getStringFrom(data, 'open your browser on ', ' **');
             const url = serverUrl;
             channel.appendLine(`[Ionic] Launching ${url}`);
             viewEditor = false;
-            setTimeout(() => viewInEditor(url), 500);
+            setTimeout(() => handleUrl(url, features), 500);
           } else if (data.includes('- Local:   ')) {
             // Likely Vue
             serverUrl = getStringFrom(data, 'Local: ', '\n');
             const url = serverUrl.trim();
             channel.appendLine(`[Ionic] Launching ${url}`);
             viewEditor = false;
-            setTimeout(() => viewInEditor(url), 500);
+            setTimeout(() => handleUrl(url, features), 500);
           }
         }
 
@@ -154,14 +165,24 @@ export async function run(
         focusOutput(channel);
       }
     });
+
     proc.stderr.on('data', (data) => {
       channel.append(data);
       focusOutput(channel);
     });
+
     if (cancelObject) {
       cancelObject.proc = proc;
     }
   });
+}
+
+function handleUrl(url: string, features: Array<TipFeature>) {
+  if (features.includes(TipFeature.viewInEditor)) {
+    viewInEditor(url);
+  } else {
+    debugBrowser(url);
+  }
 }
 
 /**

@@ -18,7 +18,7 @@ export async function getAndroidWebViewList(hasCapacitorAndroid: boolean): Promi
     const webviews = await findWebViews(device!);
     for (const webview of webviews) {
       const r = new Recommendation(
-        `Click to debug ${webview.packageName} ${webview.versionName}`,
+        `Debug ${webview.packageName} ${webview.versionName} on running Android device ${device.product}`,
         `(${device.product})`,
         `${webview.packageName}`,
         vscode.TreeItemCollapsibleState.None,

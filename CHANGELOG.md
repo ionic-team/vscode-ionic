@@ -1,5 +1,11 @@
 ## Changelog
 
+### Version 1.5.0
+
+- Debugging added for Android devices
+- Launch and debug option added for web
+- Improved tooltips
+
 ### Version 1.4.4
 
 - Node modules will be installed if missing whenever an operation is started

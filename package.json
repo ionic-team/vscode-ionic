@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Ionic & Capacitor project tooling and recommendations",
-  "version": "1.4.4",
+  "version": "1.5.0",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -24,7 +24,7 @@
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "npm run build && cp ionic-1.4.4.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+    "package": "npm run build && cp ionic-1.5.0.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
     "lint": "npm run eslint && npm run prettier -- --check",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write",
     "prettier": "prettier \"**/*.ts\"",
@@ -189,14 +189,6 @@
         }
       },
       {
-        "command": "ionic.debugMode",
-        "title": "Switch to debug mode",
-        "icon": {
-          "light": "resources/light/debug.svg",
-          "dark": "resources/dark/debug.svg"
-        }
-      },
-      {
         "command": "ionic.selectDevice",
         "title": "Select device to run",
         "icon": {
@@ -249,10 +241,6 @@
         },
         {
           "command": "ionic.buildConfig",
-          "when": "false"
-        },
-        {
-          "command": "ionic.debugMode",
           "when": "false"
         },
         {
@@ -322,16 +310,6 @@
         {
           "command": "ionic.selectDevice",
           "when": "view == ionic && viewItem == selectDevice",
-          "group": "inline"
-        },
-        {
-          "command": "ionic.debugMode",
-          "when": "view == ionic && viewItem == debugMode && debugMode == false",
-          "group": "inline"
-        },
-        {
-          "command": "ionic.runMode",
-          "when": "view == ionic && viewItem == debugMode && debugMode == true",
           "group": "inline"
         }
       ]

@@ -10,7 +10,11 @@ export function addScripts(project: Project) {
 
   const packages: PackageFile = getPackageJSON(project.folder);
   for (const script of Object.keys(packages.scripts)) {
-    project.add(new Tip(script, '', TipType.Run, '', npmRun(script), `Running ${script}`, `Ran ${script}`).canStop());
+    project.add(
+      new Tip(script, '', TipType.Run, '', npmRun(script), `Running ${script}`, `Ran ${script}`)
+        .canStop()
+        .setTooltip(`Runs 'npm run ${script}' found in package.json`)
+    );
   }
 
   if (project.repoType == MonoRepoType.nx) {
