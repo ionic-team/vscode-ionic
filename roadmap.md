@@ -4,11 +4,9 @@
 
 - (1) Add .vs-code/extensions.json to recommend Ionic extension on starters
 - (2) When finishing a debug session for web return back to ionic extension and stop run
-- (1) Suggest live reload option by ensuring @ionic/cli is installed and enabled (allow ignore)
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
 
 - (16) Lerna support
-- (16) Debugging for Android
 - (32) Debugging for iOS
 - (4) Conference starter is using Cordova, probably should be using Capacitor
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)
@@ -38,6 +36,7 @@
 
 ## Bugs
 
+- (bug) Debugging with Android web view without live reload doesnt allow breakpoints (see https://ionic-cloud.atlassian.net/browse/WN-391)
 - (bug) Re-running an app will sync the app again. I dont think that is required
 - (bug) Handle scenarios where npx/npm cannot be found (eg bash)
 - (bug) Project like a standard vue app (no ionic) will not launch the browser (even though url is captured). Maybe Ionic serve issue
