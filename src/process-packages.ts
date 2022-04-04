@@ -95,7 +95,7 @@ export async function processPackages(
     devDependencies,
     getListData(versions)
   );
-  inspectPackages(project.folder ? project.folder : folder, packages);
+  inspectPackages(project.projectFolder() ? project.projectFolder() : folder, packages);
   return packages;
 }
 

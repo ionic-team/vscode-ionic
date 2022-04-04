@@ -63,6 +63,9 @@ export class Project {
    * This is the path the selected project (for monorepos) or the root folder
    */
   public projectFolder() {
+    if (this.repoType == undefined) {
+      return this.folder;
+    }
     switch (this.repoType) {
       case MonoRepoType.none:
         return this.folder;
@@ -523,10 +526,10 @@ export async function reviewProject(
   vscode.commands.executeCommand(VSCommand.setContext, Context.isLoggingIn, false);
 
   const project: Project = new Project('My Project');
+  project.folder = folder;
   let packages = await load(folder, project, context);
   ionicState.view.title = project.name;
   project.type = isCapacitor() ? 'Capacitor' : 'Cordova';
-  project.folder = folder;
 
   const gConfig = getGlobalIonicConfig();
 

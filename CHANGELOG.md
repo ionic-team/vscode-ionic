@@ -5,6 +5,7 @@
 - Debugging added for Android devices
 - Launch and debug option added for web
 - Improved tooltips
+- Fix for folder based mono-repos and plugin detection
 
 ### Version 1.4.4
 
