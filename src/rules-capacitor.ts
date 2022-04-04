@@ -334,9 +334,14 @@ export function capacitorRecommendations(project: Project): Tip[] {
   tips.push(
     replacementPlugin('cordova-plugin-dialogs', '@capacitor/dialog', 'https://capacitorjs.com/docs/apis/dialog')
   );
-  tips.push(
-    replacementPlugin('cordova-plugin-file', '@capacitor/filesystem', 'https://capacitorjs.com/docs/apis/filesystem')
-  );
+
+  // cordova-plugin-advanced-http required cordova-plugin-file
+  if (!exists('cordova-plugin-advanced-http')) {
+    tips.push(
+      replacementPlugin('cordova-plugin-file', '@capacitor/filesystem', 'https://capacitorjs.com/docs/apis/filesystem')
+    );
+  }
+
   tips.push(
     replacementPlugin(
       'cordova-plugin-file-transfer',
