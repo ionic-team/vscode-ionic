@@ -132,7 +132,9 @@ function getFolderBasedProjects(prj: Project): Array<MonoRepoProject> {
         pck?.dependencies?.['@ionic/angular'] ||
         pck?.dependencies?.['@ionic/react'] ||
         pck?.dependencies?.['@angular/core'];
-      result.push({ name: project.name, folder: project.path, isIonic: isIonic });
+      if (pck.dependencies) {
+        result.push({ name: project.name, folder: project.path, isIonic: isIonic });
+      }
     } catch {
       //
     }
