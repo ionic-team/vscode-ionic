@@ -1,10 +1,11 @@
 ## Changelog
 
-### Version 1.5.0
+### Version 1.5.x
 
 - Debugging added for Android devices
 - Launch and debug option added for web
 - Improved tooltips
+- Detection and recommendations for plugins that depend on other plugins
 - Fix for folder based mono-repos and plugin detection
 
 ### Version 1.4.4

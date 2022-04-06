@@ -44,7 +44,6 @@
 - (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
 - (bug) Bundle id validate doesnt accept "stuff"
 - (bug) Creating a new Ionic project should allow changing version number/bundleid (see bug WN-276 in Capacitor project)
-- (feat) cordova-plugin-file is required if you install cordova-plugin-advanced-http (inspect plugin.xml)
 
 ## Docs
 

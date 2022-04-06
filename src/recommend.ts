@@ -11,7 +11,7 @@ import { capacitorMigrationChecks as checkCapacitorMigrationRules } from './rule
 import { reviewPackages, reviewPluginProperties } from './process-packages';
 import { capacitorDevicesCommand, capacitorRun } from './capacitor-run';
 import { capacitorRecommendations, checkCapacitorRules } from './rules-capacitor';
-import { checkCordovaRules } from './rules-cordova';
+import { checkCordovaPlugins, checkCordovaRules } from './rules-cordova';
 import { webProject } from './rules-web-project';
 import { checkPackages } from './rules-packages';
 import { checkDeprecatedPlugins } from './rules-deprecated-plugins';
@@ -177,6 +177,7 @@ export async function getRecommendations(
     checkCapacitorMigrationRules(packages, project);
   } else if (isCapacitor()) {
     checkCapacitorRules(project);
+    checkCordovaPlugins(packages, project);
     project.tips(capacitorRecommendations(project));
   } else {
     // The project is not using Cordova or Capacitor

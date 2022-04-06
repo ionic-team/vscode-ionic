@@ -7,7 +7,9 @@ import {
   isGreaterOrEqual,
   warnMinVersion,
 } from './analyzer';
+import { npmInstall } from './node-commands';
 import { Project } from './project';
+import { Tip, TipType } from './tip';
 
 /**
  * Check rules for Cordova projects
@@ -106,5 +108,28 @@ export function checkCordovaRules(project: Project) {
       'cordova-support-google-services',
       'Remove as the functionality is built into cordova-android 9+. See: https://github.com/chemerisuk/cordova-support-google-services'
     );
+  }
+}
+
+export function checkCordovaPlugins(packages, project: Project) {
+  if (Object.keys(packages).length == 0) return;
+
+  for (const library of Object.keys(packages)) {
+    if (packages[library].depType == 'Plugin') {
+      for (const dependentPlugin of packages[library].plugin.dependentPlugins) {
+        if (!exists(dependentPlugin)) {
+          project.add(
+            new Tip(
+              dependentPlugin,
+              `Missing dependency`,
+              TipType.Warning,
+              `The plugin ${library} has a dependency on ${dependentPlugin} but it is missing from your project. It should be installed.`,
+              npmInstall(dependentPlugin),
+              `Install`
+            )
+          );
+        }
+      }
+    }
   }
 }

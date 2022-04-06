@@ -12,6 +12,13 @@ import { listCommand, outdatedCommand } from './node-commands';
 import { CapProjectCache, PackageCacheList, PackageCacheModified, PackageCacheOutdated } from './context-variables';
 import { join } from 'path';
 
+export interface PluginInformation {
+  androidPermissions: Array<string>;
+  androidFeatures: Array<string>;
+  dependentPlugins: Array<string>;
+  hasHooks: boolean;
+}
+
 export function clearRefreshCache(context: vscode.ExtensionContext) {
   if (context) {
     for (const key of context.workspaceState.keys()) {
@@ -321,14 +328,17 @@ function inspectPackages(folder: string, packages) {
   }
 }
 
-function processPlugin(content: string) {
-  const result = { androidPermissions: [], androidFeatures: [], hasHooks: false };
+function processPlugin(content: string): PluginInformation {
+  const result = { androidPermissions: [], androidFeatures: [], dependentPlugins: [], hasHooks: false };
   // Inspect plugin.xml in content and return plugin information { androidPermissions: ['android.permission.INTERNET']}
   for (const permission of findAll(content, '<uses-permission android:name="', '"')) {
     result.androidPermissions.push(permission);
   }
   for (const feature of findAll(content, '<uses-feature android:name="', '"')) {
     result.androidFeatures.push(feature);
+  }
+  for (const dependency of findAll(content, '<dependency id="', '"')) {
+    result.dependentPlugins.push(dependency);
   }
   for (const hook of findAll(content, '<hook', '"')) {
     result.hasHooks = true;
