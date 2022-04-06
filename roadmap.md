@@ -5,13 +5,11 @@
 - (1) Add .vs-code/extensions.json to recommend Ionic extension on starters
 - (2) When finishing a debug session for web return back to ionic extension and stop run
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
-
 - (16) Lerna support
 - (32) Debugging for iOS
-- (4) Conference starter is using Cordova, probably should be using Capacitor
+  (4) Conference starter is using Cordova, probably should be using Capacitor
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand
-- (2) @ionic/native should move to @awesome-cordova-plugins
 - (2) Show gotchas page for Angular migration x to x+1
 - (2) For web based projects have "Run on Web" under an Ionic Project
 - (2) On Web projects that are Angular based hook up dist or configured folder

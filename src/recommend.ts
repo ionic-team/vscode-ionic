@@ -24,6 +24,7 @@ import { ionicState } from './ionic-tree-provider';
 import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
 import { features } from './features';
+import { checkIonicNativePackages } from './rules-ionic-native';
 
 export async function getRecommendations(
   project: Project,
@@ -177,6 +178,7 @@ export async function getRecommendations(
     checkCapacitorMigrationRules(packages, project);
   } else if (isCapacitor()) {
     checkCapacitorRules(project);
+    checkIonicNativePackages(packages, project);
     checkCordovaPlugins(packages, project);
     project.tips(capacitorRecommendations(project));
   } else {

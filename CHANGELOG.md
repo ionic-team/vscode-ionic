@@ -6,6 +6,8 @@
 - Launch and debug option added for web
 - Improved tooltips
 - Detection and recommendations for plugins that depend on other plugins
+- Recommendation to replace @ionic/native with @awesome-cordova-plugins
+- Handling of older typescript style errors
 - Fix for folder based mono-repos and plugin detection
 
 ### Version 1.4.4

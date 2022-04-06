@@ -174,8 +174,9 @@ function extractErrors(errorText: string, logs: Array<string>, folder: string): 
     for (const line of lines) {
       if (line.startsWith('Error: ')) {
         errors.push(extractErrorFrom(line));
-      }
-      if (line.startsWith('FAIL')) {
+      } else if (line.includes('- error TS')) {
+        errors.push(extractTSErrorFrom(line));
+      } else if (line.startsWith('FAIL')) {
         fail = line;
       } else {
         if (fail) {
@@ -186,6 +187,26 @@ function extractErrors(errorText: string, logs: Array<string>, folder: string): 
     }
   }
   return errors;
+}
+
+// Parse an error like:
+// libs/core/src/services/downloadPdf.service.ts:4:32 - error TS2307: Cannot find module '@ionic-native/document-viewer/ngx' or its corresponding type declarations.
+function extractTSErrorFrom(line: string): ErrorLine {
+  try {
+    const codeline = line.replace('ERROR in ', '').split(':')[0];
+    const args = line.split(':');
+    const position = parseInt(args[2]) - 1;
+    const linenumber = parseInt(args[1].trim()) - 1;
+    const errormsg = line.substring(line.indexOf('- ', codeline.length) + 2);
+    return {
+      line: linenumber,
+      position: position,
+      uri: codeline,
+      error: errormsg + `line:${linenumber} pos:${position}`,
+    };
+  } catch {
+    // Couldnt parse the line. Continue
+  }
 }
 
 // Parse an error like this one for the line, position and error message
