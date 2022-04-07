@@ -1,7 +1,7 @@
 {
   "name": "ionic",
   "displayName": "Ionic",
-  "description": "Ionic & Capacitor project tooling and recommendations",
+  "description": "Official extension for Ionic and Capacitor development",
   "version": "1.5.1",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
