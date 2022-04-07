@@ -114,10 +114,20 @@ export function checkCordovaRules(project: Project) {
 export function checkCordovaPlugins(packages, project: Project) {
   if (Object.keys(packages).length == 0) return;
 
+  // These are plugins that are required for Cordova projects but not Capacitor
+  const ignorePlugins = ['cordova-plugin-add-swift-support', 'cordova-plugin-ionic-webview'];
+
+  const missing = [];
+
   for (const library of Object.keys(packages)) {
     if (packages[library].depType == 'Plugin') {
       for (const dependentPlugin of packages[library].plugin.dependentPlugins) {
-        if (!exists(dependentPlugin)) {
+        if (
+          !exists(dependentPlugin) &&
+          !ignorePlugins.includes(dependentPlugin) &&
+          !missing.includes(dependentPlugin)
+        ) {
+          missing.push(dependentPlugin);
           project.add(
             new Tip(
               dependentPlugin,
