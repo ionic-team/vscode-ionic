@@ -28,6 +28,8 @@ export function capacitorRun(project: Project, platform: CapacitorPlatform): str
     preop = preflightNPMCheck(project);
   }
 
+  ionicState.refreshDebugDevices = true;
+
   switch (project.repoType) {
     case MonoRepoType.none:
     case MonoRepoType.folder:

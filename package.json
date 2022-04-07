@@ -173,6 +173,14 @@
         "title": "Rebuild"
       },
       {
+        "command": "ionic.refreshDebug",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/sync.svg",
+          "dark": "resources/dark/sync.svg"
+        }
+      },
+      {
         "command": "ionic.function",
         "title": "Execute"
       },
@@ -236,6 +244,10 @@
           "when": "false"
         },
         {
+          "command": "ionic.refreshDebug",
+          "when": "false"
+        },
+        {
           "command": "ionic.function",
           "when": "false"
         },
@@ -295,6 +307,11 @@
         {
           "command": "ionic.rebuild",
           "when": "view == ionic && viewItem == rebuild",
+          "group": "inline"
+        },
+        {
+          "command": "ionic.refreshDebug",
+          "when": "view == ionic && viewItem == refreshDebug",
           "group": "inline"
         },
         {

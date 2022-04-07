@@ -6,7 +6,7 @@ import { ionicBuild } from './ionic-build';
 import { ionicServe } from './ionic-serve';
 import { Project } from './project';
 import { addSplashAndIconFeatures } from './splash-icon';
-import { Tip, TipFeature, TipType } from './tip';
+import { RunPoint, Tip, TipFeature, TipType } from './tip';
 import { capacitorMigrationChecks as checkCapacitorMigrationRules } from './rules-capacitor-migration';
 import { reviewPackages, reviewPluginProperties } from './process-packages';
 import { capacitorDevicesCommand, capacitorRun } from './capacitor-run';
@@ -51,7 +51,7 @@ export async function getRecommendations(
     );
 
     // project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
-    const runPoints = [
+    const runPoints: Array<RunPoint> = [
       { text: 'Copying web assets', title: 'Copying...' },
       { text: 'ng run app:build', title: 'Building Web...' },
       { text: 'capacitor run', title: 'Syncing...' },
@@ -59,7 +59,7 @@ export async function getRecommendations(
       { text: '✔ update android', title: 'Building Native...' },
       { text: 'Running Gradle build', title: 'Deploying...' },
       { text: 'Running xcodebuild', title: 'Deploying...' },
-      { text: 'App deployed', title: 'Waiting for Code Changes' },
+      { text: 'App deployed', title: 'Waiting for Code Changes', refresh: true },
     ];
 
     if (hasCapAndroid) {
@@ -91,7 +91,13 @@ export async function getRecommendations(
 
     if (features.debugAndroid) {
       // Experimental Feature
-      const r = project.setGroup(`Debug`, 'Running Ionic applications you can debug', TipType.Ionic, false);
+      const r = project.setGroup(
+        'Debug',
+        'Running Ionic applications you can debug',
+        TipType.Ionic,
+        ionicState.refreshDebugDevices,
+        Context.refreshDebug
+      );
       r.whenExpanded = async () => {
         return [project.asRecommendation(debugOnWeb(project)), ...(await getAndroidWebViewList(hasCapAndroid))];
       };

@@ -24,7 +24,7 @@ export function addSplashAndIconFeatures(project: Project) {
     'Allows setting of the Splash Screen and Icon. Clicking Rebuild will create assets for your iOS and Android native projects.',
     TipType.Media,
     false,
-    'rebuild'
+    Context.rebuild
   ).tip = new Tip('Rebuild Assets', undefined).setAction(async () => {
     await runCordovaRes(project);
   });

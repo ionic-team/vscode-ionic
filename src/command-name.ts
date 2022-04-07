@@ -10,6 +10,7 @@ export enum CommandName {
   Login = 'ionic.login',
   Stop = 'ionic.stop',
   Rebuild = 'ionic.rebuild',
+  RefreshDebug = 'ionic.refreshDebug',
   Function = 'ionic.function',
   Open = 'ionic.open',
   SkipLogin = 'ionic.skipLogin',

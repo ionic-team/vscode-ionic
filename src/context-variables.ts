@@ -36,6 +36,12 @@ export enum Context {
 
   // Shell (eg /bin/zsh)
   shell = 'shell',
+
+  // Rebuild used for splash screen
+  rebuild = 'rebuild',
+
+  // Refresh used for debug instances
+  refreshDebug = 'refreshDebug',
 }
 
 // Commands from vs code

@@ -277,6 +277,11 @@ export async function activate(context: vscode.ExtensionContext) {
     ionicProvider.refresh();
   });
 
+  vscode.commands.registerCommand(CommandName.RefreshDebug, async () => {
+    ionicState.refreshDebugDevices = true;
+    ionicProvider.refresh();
+  });
+
   vscode.commands.registerCommand(CommandName.BuildConfig, async (r: Recommendation) => {
     const config = await buildConfiguration(context.extensionPath, context, r.tip.actionArg(0));
     if (!config) return;

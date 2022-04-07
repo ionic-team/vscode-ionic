@@ -25,6 +25,7 @@ interface IonicState {
   selectedIOSDeviceName?: string;
   projectDirty?: boolean; // Was there a likely change in the project (ie file saved)
   outputIsFocused: boolean;
+  refreshDebugDevices: boolean; // Should we refresh the list of debuggable devices
 }
 export const ionicState: IonicState = {
   view: undefined,
@@ -35,6 +36,7 @@ export const ionicState: IonicState = {
   repoType: MonoRepoType.none,
   workspace: undefined,
   outputIsFocused: false,
+  refreshDebugDevices: false,
 };
 
 export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {
