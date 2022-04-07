@@ -12,7 +12,7 @@
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
 - (16) Lerna support
 - (32) Debugging for iOS
-  (4) Conference starter is using Cordova, probably should be using Capacitor
+  x (4) Conference starter is using Cordova, probably should be using Capacitor (https://github.com/ionic-team/ionic-conference-app/pull/1761)
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand
 - (2) Show gotchas page for Angular migration x to x+1
@@ -55,9 +55,7 @@
 
 # Large Feature Requests
 
-- (feat) Capture console/network etc https://medium.com/swlh/chrome-dev-tools-protocol-2d0ef2baf4bf
-  - See chrome-remote-interface for debugging with Chrome/Edge/Firefox/Android
-- (feat) Debugger for iOS and Android (add breakpoints, inspection etc)
+- (feat) Debugger for iOS (add breakpoints, inspection etc)
 - (feat) Bundle Analyser button, use stats.json for own report
 - (feat) Use npm audit to list vulnerable packages
 - (feat) info.plist editing
