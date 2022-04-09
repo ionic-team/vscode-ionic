@@ -10,6 +10,7 @@ import { handleError } from './error-handler';
 import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { getMonoRepoFolder, getPackageJSONFilename } from './monorepo';
 import { InternalCommand } from './command-name';
+import { exists } from './analyzer';
 
 export interface CancelObject {
   proc: child_process.ChildProcess;
@@ -41,6 +42,7 @@ function runOptions(command: string, folder: string) {
   ) {
     env.LANG = 'en_US.UTF-8';
   }
+
   if (javaHome) {
     env.JAVA_HOME = javaHome;
   }
@@ -67,6 +69,8 @@ export async function run(
     // Change the work directory for monorepos as folder is the root folder
     folder = getMonoRepoFolder(ionicState.workspace);
   }
+  command = qualifyCommand(command);
+
   let viewEditor = features.includes(TipFeature.debugOnWeb) || features.includes(TipFeature.viewInEditor);
 
   let logs: Array<string> = [];
@@ -200,9 +204,23 @@ function replaceAll(str: string, find: string, replace: string): string {
   return str.replace(new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replace);
 }
 
+// This will use the local @ionic/cli from the extension if one is not installed locally
+function qualifyCommand(command: string): string {
+  if (command.startsWith('npx ionic')) {
+    if (!exists('@ionic/cli')) {
+      const cli = path.join(ionicState.context.extensionPath, 'node_modules/@ionic/cli/bin');
+      if (fs.existsSync(cli)) {
+        command = command.replace('npx ionic', path.join(cli, 'ionic'));
+      }
+    }
+  }
+  return command;
+}
+
 export async function getRunOutput(command: string, folder: string): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';
+    command = qualifyCommand(command);
     child_process.exec(
       command,
       runOptions(command, folder),

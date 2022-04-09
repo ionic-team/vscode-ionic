@@ -11,7 +11,7 @@ import { getRunOutput } from './utilities';
 export async function starterProject(folder: string): Promise<Recommendation[]> {
   const project: Project = new Project('New Project');
 
-  const out = await getRunOutput('ionic start -l', folder);
+  const out = await getRunOutput('npx ionic start -l', folder);
   const projects = parseIonicStart(out);
   let type = undefined;
   for (const starter of projects) {
@@ -27,7 +27,7 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
         TipType.Run,
         'Create Project',
         [
-          `ionic start @app ${starter.name} --type=${starter.type} --capacitor`,
+          `npx ionic start @app ${starter.name} --type=${starter.type} --capacitor`,
           process.platform === 'win32'
             ? `robocopy @app . /MOVE /E /NFL /NDL /NJH /NJS /nc /ns /np`
             : `mv @app/{,.[^.]}* . && rmdir @app`,

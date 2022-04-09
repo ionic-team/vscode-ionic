@@ -1,10 +1,11 @@
 ## Changelog
 
-### Version 1.5.x
+### Version 1.5.2
 
 - Debugging added for Android devices
 - Launch and debug option added for web
 - Improved tooltips
+- Fix for using an internal Ionic CLI (so commands work even if @ionic/cli not installed globally)
 - Detection and recommendations for plugins that depend on other plugins
 - Recommendation to replace @ionic/native with @awesome-cordova-plugins
 - Handling of older typescript style errors
