@@ -1,6 +1,6 @@
 ## Changelog
 
-### Version 1.5.2
+### Version 1.5.3
 
 - Debugging added for Android devices
 - Launch and debug option added for web

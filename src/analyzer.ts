@@ -19,7 +19,7 @@ import { setStringIn } from './utilities';
 import { npmInstall, npmUninstall } from './node-commands';
 
 let packageFile;
-let allDependencies;
+let allDependencies = {};
 let cordovaConfig;
 let androidManifest;
 
