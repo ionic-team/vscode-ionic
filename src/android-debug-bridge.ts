@@ -2,6 +2,7 @@ import * as child_process from 'child_process';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import * as os from 'os';
+import * as fs from 'fs';
 
 import {
   AdbOptions,
@@ -245,6 +246,14 @@ function getAdbExecutable(): string {
   if (adbPath) {
     return resolvePath(adbPath);
   } else {
+    // Tries a default location for the default android debugger bridge
+    if (process.platform !== 'win32') {
+      const adbDefault = '~/Library/Android/sdk/platform-tools/adb';
+      if (fs.existsSync(resolvePath(adbDefault))) {
+        return resolvePath(adbDefault);
+      }
+    }
+
     return 'adb';
   }
 }

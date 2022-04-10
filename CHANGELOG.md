@@ -1,8 +1,9 @@
 ## Changelog
 
-### Version 1.5.4
+### Version 1.5.5
 
 - Fix for when ANDROID_HOME or ANDROID_SDK_ROOT is not set in environment variables
+- Fix for default folder for Android Debugger Bridge
 
 ### Version 1.5.3
 
