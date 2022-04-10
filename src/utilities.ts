@@ -45,6 +45,11 @@ function runOptions(command: string, folder: string) {
 
   if (javaHome) {
     env.JAVA_HOME = javaHome;
+  } else if (!env.JAVA_HOME && process.platform !== 'win32') {
+    const jhome = '/Applications/Android Studio.app/Contents/jre/Contents/Home';
+    if (fs.existsSync(jhome)) {
+      env.JAVA_HOME = jhome;
+    }
   }
 
   return { cwd: folder, shell: ionicState.shell, encoding: 'utf8', env: env };
