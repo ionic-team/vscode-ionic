@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.5.4
+
+- Fix for when ANDROID_HOME or ANDROID_SDK_ROOT is not set in environment variables
+
 ### Version 1.5.3
 
 - Debugging added for Android devices

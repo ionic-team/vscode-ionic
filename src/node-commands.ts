@@ -33,7 +33,13 @@ export function npmInstall(name: string, ...args): string {
  */
 export function preflightNPMCheck(project: Project): string {
   const nmf = project.getNodeModulesFolder();
-  const preop = !fs.existsSync(nmf) ? 'npm install && ' : '';
+  let preop = !fs.existsSync(nmf) ? 'npm install && ' : '';
+
+  // If not set then set to a default value to prevent failrue
+  if (!process.env.ANDROID_SDK_ROOT && !process.env.ANDROID_HOME && process.platform !== 'win32') {
+    preop = preop + 'export ANDROID_HOME=~/Library/Android/sdk && ';
+  }
+
   return preop;
 }
 
