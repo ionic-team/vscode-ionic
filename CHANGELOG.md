@@ -1,6 +1,6 @@
 ## Changelog
 
-### Version 1.5.6
+### Version 1.5.7
 
 - Fix for when ANDROID_HOME or ANDROID_SDK_ROOT is not set in environment variables
 - Fix to set default Java Home if not set as an environment variable
