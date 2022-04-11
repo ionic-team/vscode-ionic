@@ -215,7 +215,7 @@ function qualifyCommand(command: string): string {
     if (!exists('@ionic/cli')) {
       const cli = path.join(ionicState.context.extensionPath, 'node_modules/@ionic/cli/bin');
       if (fs.existsSync(cli)) {
-        command = command.replace('npx ionic', path.join(cli, 'ionic'));
+        command = command.replace('npx ionic', 'node ' + path.join(cli, 'ionic'));
       }
     }
   }

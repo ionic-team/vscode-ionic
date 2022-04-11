@@ -1,7 +1,8 @@
 ## Changelog
 
-### Version 1.5.7
+### Version 1.5.8
 
+- Fix for Windows error when ionic cli is not installed globally or locally
 - Fix for when ANDROID_HOME or ANDROID_SDK_ROOT is not set in environment variables
 - Fix to set default Java Home if not set as an environment variable
 - Fix for default folder for Android Debugger Bridge
