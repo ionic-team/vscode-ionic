@@ -11,7 +11,6 @@
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
 - (16) Lerna support
 - (32) Debugging for iOS
-  x (4) Conference starter is using Cordova, probably should be using Capacitor (https://github.com/ionic-team/ionic-conference-app/pull/1761)
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand
 - (2) Show gotchas page for Angular migration x to x+1
