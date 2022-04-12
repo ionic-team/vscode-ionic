@@ -39,13 +39,11 @@
 ## Bugs
 
 - (bug) Debugging with Android web view without live reload doesnt allow breakpoints (see https://ionic-cloud.atlassian.net/browse/WN-391)
-- (bug) Re-running an app will sync the app again. I dont think that is required
 - (bug) Handle scenarios where npx/npm cannot be found (eg bash)
 - (bug) Project like a standard vue app (no ionic) will not launch the browser (even though url is captured). Maybe Ionic serve issue
 - (bug) Bug capturing of inspection with telemetry reporting on exception
 - (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
 - (bug) Bundle id validate doesnt accept "stuff"
-- (bug) Creating a new Ionic project should allow changing version number/bundleid (see bug WN-276 in Capacitor project)
 
 ## Docs
 
