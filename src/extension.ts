@@ -59,6 +59,12 @@ export function isRunning(tip: Tip) {
   return found != undefined;
 }
 
+export async function cancelLastOperation() {
+  if (!lastOperation) return;
+  if (!isRunning(lastOperation)) return;
+  await cancelRunning(lastOperation);
+}
+
 function cancelRunning(tip: Tip): Promise<void> {
   const found: Tip = runningOperations.find((found) => {
     return found.sameAs(tip);

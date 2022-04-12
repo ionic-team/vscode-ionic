@@ -8,7 +8,6 @@
   Starting an appflow trial directly from the extension… thinking a 1-click experience to install AC/IV/etc
 
 - (1) Add .vs-code/extensions.json to recommend Ionic extension on starters
-- (2) When finishing a debug session for web return back to ionic extension and stop run
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
 - (16) Lerna support
 - (32) Debugging for iOS

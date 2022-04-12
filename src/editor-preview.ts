@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { cancelLastOperation } from './extension';
 import { ionicState } from './ionic-tree-provider';
 
 interface device {
@@ -46,7 +47,7 @@ export function getDebugBrowserName(): string {
   return browser;
 }
 
-export function debugBrowser(url: string) {
+export async function debugBrowser(url: string) {
   try {
     const browserType: string = vscode.workspace.getConfiguration('ionic').get('browser');
     const launchConfig: vscode.DebugConfiguration = {
@@ -56,7 +57,15 @@ export function debugBrowser(url: string) {
       url: url,
       webRoot: '${workspaceFolder}',
     };
-    vscode.debug.startDebugging(undefined, launchConfig);
+
+    vscode.debug.onDidTerminateDebugSession(async (e) => {
+      // This stops the dev server
+      await cancelLastOperation();
+      // Swtich back to Ionic View
+      ionicState.view.reveal(undefined, { focus: true });
+    });
+
+    await vscode.debug.startDebugging(undefined, launchConfig);
   } catch {
     //
   }

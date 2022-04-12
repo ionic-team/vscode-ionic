@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.5.x
+
+- When finishing a debug session for web we now return back to ionic extension and stop running
+
 ### Version 1.5.8
 
 - Fix for Windows error when ionic cli is not installed globally or locally
