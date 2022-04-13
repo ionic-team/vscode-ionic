@@ -15,7 +15,8 @@
   "license": "MIT",
   "scripts": {
     "prepare": "husky install",
-    "build": "npm run esbuild && npm run vsix-package",
+    "clean": "find ./node_modules -name '*.md' -delete && find ./node_modules -name '*.ts' -delete && find ./node_modules -name 'LICENSE' -delete && find ./node_modules -name '*.map' -delete",
+    "build": "npm run clean && npm run esbuild && npm run vsix-package",
     "vsix-package": "vsce package",
     "pre-release": "npm run build && vsce publish --pre-release",
     "vscode:prepublish": "npm run esbuild-base -- --minify",
@@ -410,8 +411,6 @@
     "@capacitor/project": "2.0.3",
     "@ionic/cli": "6.19.0",
     "fast-xml-parser": "^3.21.1",
-    "mkdirp": "^0.5.1",
-    "rimraf": "^2.6.2",
     "semver": "7.3.5"
   },
   "volta": {

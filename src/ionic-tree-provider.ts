@@ -9,6 +9,7 @@ import { Recommendation } from './recommendation';
 import { Context, VSCommand } from './context-variables';
 import { starterProject } from './ionic-start';
 import { isFolderBasedMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
+import { PackageManager } from './node-commands';
 
 interface IonicState {
   view: vscode.TreeView<any>;
@@ -26,6 +27,7 @@ interface IonicState {
   projectDirty?: boolean; // Was there a likely change in the project (ie file saved)
   outputIsFocused: boolean;
   refreshDebugDevices: boolean; // Should we refresh the list of debuggable devices
+  packageManager: PackageManager;
 }
 export const ionicState: IonicState = {
   view: undefined,
@@ -37,6 +39,7 @@ export const ionicState: IonicState = {
   workspace: undefined,
   outputIsFocused: false,
   refreshDebugDevices: false,
+  packageManager: PackageManager.npm,
 };
 
 export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {

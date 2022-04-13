@@ -124,7 +124,11 @@ export function capacitorRecommendations(project: Project): Tip[] {
   const tips: Tip[] = [];
 
   // Capacitor Integrations
-  if (!project.fileExists('capacitor.config.ts') && !project.fileExists('capacitor.config.json')) {
+  if (
+    !project.fileExists('capacitor.config.ts') &&
+    !project.fileExists('capacitor.config.js') &&
+    !project.fileExists('capacitor.config.json')
+  ) {
     const local = project.repoType != MonoRepoType.none ? InternalCommand.cwd : '';
     tips.push(
       new Tip(

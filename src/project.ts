@@ -15,7 +15,7 @@ import { CommandName, InternalCommand } from './command-name';
 import { angularMigrate } from './rules-angular-migrate';
 import { checkForMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
 import { CapacitorPlatform } from './capacitor-platform';
-import { npmInstall, npmUninstall } from './node-commands';
+import { npmInstall, npmUninstall, PackageManager } from './node-commands';
 
 export class Project {
   name: string;
@@ -527,6 +527,7 @@ export async function reviewProject(
 
   const project: Project = new Project('My Project');
   project.folder = folder;
+  setPackageManager(folder);
   let packages = await load(folder, project, context);
   ionicState.view.title = project.name;
   project.type = isCapacitor() ? 'Capacitor' : 'Cordova';
@@ -556,4 +557,12 @@ export async function reviewProject(
   vscode.commands.executeCommand(VSCommand.setContext, Context.inspectedProject, true);
   console.log(`Analysed Project in ${Date.now() - startedOp}ms`);
   return project.groups;
+}
+
+function setPackageManager(folder: string) {
+  ionicState.packageManager = PackageManager.npm;
+  const yarnLock = path.join(folder, 'yarn.lock');
+  if (fs.existsSync(yarnLock)) {
+    ionicState.packageManager = PackageManager.yarn;
+  }
 }

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { fixIssue } from './extension';
+import { npmInstall } from './node-commands';
 import { Tip } from './tip';
 import { getRunOutput } from './utilities';
 
@@ -22,7 +23,7 @@ export async function packageUpgrade(info: PackageInfo, folder: string) {
 
   const message = `Upgrade ${info.name} to ${selection}`;
   await fixIssue(
-    `npm install ${info.name}@${selection} --save-exact`,
+    npmInstall(`${info.name}@${selection}`),
     folder,
     undefined,
     new Tip(message, undefined).showProgressDialog(),

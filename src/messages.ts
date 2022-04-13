@@ -16,7 +16,7 @@ export const writeMinVersionError = (library: string, version: string, minVersio
     `${library} must be upgraded from ${version} to at least version ${minVersion}${reason ? ' ' + reason : ''}`,
     TipType.Error,
     undefined,
-    `npm install ${library}@latest --save-exact`,
+    npmInstall(library + '@latest'),
     `Upgrade`,
     `${library} successfully updated.`
   ).canIgnore();
