@@ -34,6 +34,7 @@ export function npmInstall(name: string, ...args): string {
     case MonoRepoType.npm:
       return `${pm(PMOperation.install, name)} ${argList} --workspace=${ionicState.workspace}`;
     case MonoRepoType.folder:
+    case MonoRepoType.pnpm:
       return InternalCommand.cwd + `${pm(PMOperation.install, name)} ${argList}`;
     default:
       return `${pm(PMOperation.install, name)} ${argList}`;
@@ -65,6 +66,7 @@ export function preflightNPMCheck(project: Project): string {
 
 export function npmInstallAll(): string {
   switch (ionicState.repoType) {
+    case MonoRepoType.pnpm:
     case MonoRepoType.folder:
       return InternalCommand.cwd + pm(PMOperation.installAll);
     default:
@@ -129,6 +131,7 @@ export function npmUninstall(name: string): string {
     case MonoRepoType.npm:
       return `${pm(PMOperation.uninstall, name)} --workspace=${ionicState.workspace}`;
     case MonoRepoType.folder:
+    case MonoRepoType.pnpm:
       return `${InternalCommand.cwd}${pm(PMOperation.uninstall, name)}`;
     default:
       return pm(PMOperation.uninstall, name);
@@ -140,6 +143,7 @@ export function npmRun(name: string): string {
     case MonoRepoType.npm:
       return `${pm(PMOperation.run, name)} --workspace=${ionicState.workspace}`;
     case MonoRepoType.folder:
+    case MonoRepoType.pnpm:
       return `${InternalCommand.cwd}${pm(PMOperation.run, name)}`;
     default:
       return pm(PMOperation.run, name);

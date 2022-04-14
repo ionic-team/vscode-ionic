@@ -33,6 +33,7 @@ export function capacitorRun(project: Project, platform: CapacitorPlatform): str
   switch (project.repoType) {
     case MonoRepoType.none:
     case MonoRepoType.folder:
+    case MonoRepoType.pnpm:
     case MonoRepoType.npm:
       return preop + capRun(platform, project.repoType);
     case MonoRepoType.nx:
@@ -64,7 +65,10 @@ function capRun(platform: CapacitorPlatform, repoType: MonoRepoType): string {
     capRunFlags += '--external';
   }
 
-  const pre = repoType == MonoRepoType.npm || repoType == MonoRepoType.folder ? InternalCommand.cwd : '';
+  const pre =
+    repoType == MonoRepoType.npm || repoType == MonoRepoType.folder || repoType == MonoRepoType.pnpm
+      ? InternalCommand.cwd
+      : '';
   const ionic = exists('@ionic/cli') ? 'ionic ' : '';
   return `${pre}npx ${ionic}cap run ${platform}${capRunFlags} --target=${InternalCommand.target}`;
 }

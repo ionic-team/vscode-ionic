@@ -92,6 +92,7 @@
 !node_modules/stream-buffers
 !node_modules/bplist-parser
 !node_modules/big-integer
+!node_modules/globule
 !README.md
 !media/**
 !resources/**

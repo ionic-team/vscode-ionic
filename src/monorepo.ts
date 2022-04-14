@@ -9,6 +9,7 @@ import { getNpmWorkspaceProjects } from './monorepos-npm';
 import { getNXProjects } from './monorepos-nx';
 import { Project } from './project';
 import { Context, VSCommand } from './context-variables';
+import { getPnpmWorkspaces } from './monorepos-pnpm';
 
 export interface MonoRepoProject {
   name: string;
@@ -55,6 +56,15 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
     if (projects?.length > 0) {
       project.repoType = MonoRepoType.folder;
       ionicState.projectsView.title = 'Projects';
+    } else {
+      // Might be pnpm based
+      const pw = path.join(project.folder, 'pnpm-workspace.yaml');
+      if (fs.existsSync(pw)) {
+        project.repoType = MonoRepoType.pnpm;
+        projects = getPnpmWorkspaces(project);
+        ionicState.projects = projects;
+        ionicState.projectsView.title = 'Workspaces';
+      }
     }
     ionicState.projects = projects;
   }
@@ -72,7 +82,9 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
       ionicState.view.title = project.monoRepo.name;
 
       // npm workspaces uses the package.json of the local folder
-      project.monoRepo.localPackageJson = [MonoRepoType.npm, MonoRepoType.folder].includes(project.repoType);
+      project.monoRepo.localPackageJson = [MonoRepoType.npm, MonoRepoType.folder, MonoRepoType.pnpm].includes(
+        project.repoType
+      );
 
       vscode.commands.executeCommand(CommandName.ProjectsRefresh, project.monoRepo.name);
     }

@@ -16,6 +16,7 @@ export function capacitorOpen(project: Project, platform: CapacitorPlatform): st
     case MonoRepoType.none:
       return ionicCLI ? capCLIOpen(platform) : ionicCLIOpen(platform);
     case MonoRepoType.folder:
+    case MonoRepoType.pnpm:
     case MonoRepoType.npm:
       return InternalCommand.cwd + (ionicCLI ? capCLIOpen(platform) : ionicCLIOpen(platform));
     case MonoRepoType.nx:

@@ -114,6 +114,12 @@ export async function load(fn: string, project: Project, context: vscode.Extensi
   project.modified = fs.statSync(packageJsonFilename).mtime;
   packageFile = JSON.parse(fs.readFileSync(packageJsonFilename, 'utf8'));
   project.name = packageFile.name;
+  if (!project.name) {
+    project.name = project.monoRepo?.name;
+  }
+  if (!project.name) {
+    project.name = 'unnamed';
+  }
   project.workspaces = packageFile.workspaces;
   allDependencies = {
     ...packageFile.dependencies,

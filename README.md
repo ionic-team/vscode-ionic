@@ -17,6 +17,7 @@ This extension for Visual Studio Code features:
 - [Mono Repo Support for Nx](#nx-support) - Support for Capacitor and Ionic Angular/React with Nx and `nxtend.dev`
 - [Mono Repo Support for npm workspaces](#npm-workspaces-support) - Support for npm workspaces
 - [Mono Repo Support for Folders](#mono-repos-in-folders) - Support for multiple apps in folders
+- [Mono Repo Support for pnpm workspaces](#pnpm-workspaces-support) - Support for pnpm workspaces
 - [Debugging for Web](#debugging-for-web) - Support for debugging via browser (Chrome or Edge)
 - [Debugging for Android](#debugging-for-android) - Support for debugging for Android devices
 - **Package Managers** - Support for npm, Yarn and Pnpm
@@ -129,6 +130,10 @@ Detects a workspace where subfolders contain Ionic applications and provides a p
 ## Npm Workspaces Support
 
 Detects when npm workspaces are used as part of a mono repo and provides a project selector.
+
+## pnpm Workspaces Support
+
+Detects when pnpm workspaces are used as part of a mono repo and provides a project selector.
 
 ## Debugging for Web
 

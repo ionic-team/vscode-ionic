@@ -8,13 +8,15 @@ import { getPackageJSON, PackageFile } from './utilities';
 export function addScripts(project: Project) {
   project.setGroup(`Scripts`, `Any scripts from your package.json will appear here`, TipType.Files, false);
 
-  const packages: PackageFile = getPackageJSON(project.folder);
-  for (const script of Object.keys(packages.scripts)) {
-    project.add(
-      new Tip(script, '', TipType.Run, '', npmRun(script), `Running ${script}`, `Ran ${script}`)
-        .canStop()
-        .setTooltip(`Runs 'npm run ${script}' found in package.json`)
-    );
+  const packages: PackageFile = getPackageJSON(project.projectFolder());
+  if (packages.scripts) {
+    for (const script of Object.keys(packages.scripts)) {
+      project.add(
+        new Tip(script, '', TipType.Run, '', npmRun(script), `Running ${script}`, `Ran ${script}`)
+          .canStop()
+          .setTooltip(`Runs 'npm run ${script}' found in package.json`)
+      );
+    }
   }
 
   if (project.repoType == MonoRepoType.nx) {
