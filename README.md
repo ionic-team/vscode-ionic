@@ -19,6 +19,7 @@ This extension for Visual Studio Code features:
 - [Mono Repo Support for Folders](#mono-repos-in-folders) - Support for multiple apps in folders
 - [Debugging for Web](#debugging-for-web) - Support for debugging via browser (Chrome or Edge)
 - [Debugging for Android](#debugging-for-android) - Support for debugging for Android devices
+- **Package Managers** - Support for npm, Yarn and Pnpm
 
 ## Creating Ionic Projects
 

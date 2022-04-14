@@ -15,7 +15,7 @@ import { CommandName, InternalCommand } from './command-name';
 import { angularMigrate } from './rules-angular-migrate';
 import { checkForMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
 import { CapacitorPlatform } from './capacitor-platform';
-import { npmInstall, npmUninstall, PackageManager } from './node-commands';
+import { addCommand, npmInstall, npmUninstall, PackageManager } from './node-commands';
 
 export class Project {
   name: string;
@@ -303,11 +303,12 @@ export class Project {
 
   private updatePackages(r: Recommendation): string {
     let command = '';
+    const addCmd = addCommand();
     for (const child of r.children) {
       // Command will be npm install @capacitor/android@3.4.3 --save-exact
-      if ((child.tip.command as string).includes('npm install')) {
+      if ((child.tip.command as string).includes(addCmd)) {
         const npackage = (child.tip.command as string)
-          .replace('npm install ', '')
+          .replace(addCmd + ' ', '')
           .replace(' --save-exact', '')
           .replace(InternalCommand.cwd, '');
 
@@ -322,8 +323,9 @@ export class Project {
 
   private updatePackagesTitle(r: Recommendation): string {
     let title = '';
+    const addCmd = addCommand();
     for (const child of r.children) {
-      if ((child.tip.command as string).includes('npm install')) {
+      if ((child.tip.command as string).includes(addCmd)) {
         if (title != '') {
           title += ', ';
         }
@@ -562,7 +564,10 @@ export async function reviewProject(
 function setPackageManager(folder: string) {
   ionicState.packageManager = PackageManager.npm;
   const yarnLock = path.join(folder, 'yarn.lock');
+  const pnpmLock = path.join(folder, 'pnpm-lock.yaml');
   if (fs.existsSync(yarnLock)) {
     ionicState.packageManager = PackageManager.yarn;
+  } else if (fs.existsSync(pnpmLock)) {
+    ionicState.packageManager = PackageManager.pnpm;
   }
 }

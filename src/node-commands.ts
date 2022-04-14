@@ -9,6 +9,7 @@ import { Project } from './project';
 export enum PackageManager {
   npm,
   yarn,
+  pnpm,
 }
 
 export enum PMOperation {
@@ -37,6 +38,12 @@ export function npmInstall(name: string, ...args): string {
     default:
       return `${pm(PMOperation.install, name)} ${argList}`;
   }
+}
+
+// The package manager add command (without arguments)
+export function addCommand(): string {
+  const a = pm(PMOperation.install, '*');
+  return a.replace('*', '').replace('--save-exact', '').replace('--exact', '').trim();
 }
 
 /**
@@ -71,6 +78,8 @@ function pm(operation: PMOperation, name?: string): string {
       return npm(operation, name);
     case PackageManager.yarn:
       return yarn(operation, name);
+    case PackageManager.pnpm:
+      return pnpm(operation, name);
     default:
       vscode.window.showErrorMessage('Unknown package manager');
   }
@@ -99,6 +108,19 @@ function npm(operation: PMOperation, name?: string): string {
       return `npm uninstall ${name}`;
     case PMOperation.run:
       return `npm run ${name}`;
+  }
+}
+
+function pnpm(operation: PMOperation, name?: string): string {
+  switch (operation) {
+    case PMOperation.installAll:
+      return 'pnpm install';
+    case PMOperation.install:
+      return `pnpm add ${name}  --save-exact`;
+    case PMOperation.uninstall:
+      return `pnpm remove ${name}`;
+    case PMOperation.run:
+      return `pnpm ${name}`;
   }
 }
 
