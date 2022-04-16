@@ -1,9 +1,9 @@
 ## Changelog
 
-### Version 1.5.12
+### Version 1.5.13
 
 - When finishing a debug session for web we now return back to ionic extension and stop running
-- Support for Yarn
+- Support for Yarn and yarn workspaces
 - Support for pnpm and pnpm workspaces
 - Extension size has been reduced by 50%
 

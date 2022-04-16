@@ -10,6 +10,7 @@ import { getNXProjects } from './monorepos-nx';
 import { Project } from './project';
 import { Context, VSCommand } from './context-variables';
 import { getPnpmWorkspaces } from './monorepos-pnpm';
+import { PackageManager } from './node-commands';
 
 export interface MonoRepoProject {
   name: string;
@@ -25,6 +26,7 @@ export enum MonoRepoType {
   pnpm,
   lerna,
   npm,
+  yarn,
   folder,
 }
 
@@ -45,9 +47,12 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
     ionicState.projects = projects;
     ionicState.projectsView.title = 'NX Projects';
   } else if (project.workspaces?.length > 0) {
-    // For npm workspaces check package.jsonß
+    // For npm workspaces check package.json
     projects = getNpmWorkspaceProjects(project);
     project.repoType = MonoRepoType.npm;
+    if (ionicState.packageManager == PackageManager.yarn) {
+      project.repoType = MonoRepoType.yarn;
+    }
     ionicState.projects = projects;
     ionicState.projectsView.title = 'Workspaces';
   } else {
@@ -82,9 +87,12 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
       ionicState.view.title = project.monoRepo.name;
 
       // npm workspaces uses the package.json of the local folder
-      project.monoRepo.localPackageJson = [MonoRepoType.npm, MonoRepoType.folder, MonoRepoType.pnpm].includes(
-        project.repoType
-      );
+      project.monoRepo.localPackageJson = [
+        MonoRepoType.npm,
+        MonoRepoType.folder,
+        MonoRepoType.yarn,
+        MonoRepoType.pnpm,
+      ].includes(project.repoType);
 
       vscode.commands.executeCommand(CommandName.ProjectsRefresh, project.monoRepo.name);
     }
@@ -126,6 +134,7 @@ export function getPackageJSONFilename(rootFolder: string): string {
 export function getLocalFolder(rootFolder: string): string {
   switch (ionicState.repoType) {
     case MonoRepoType.npm:
+    case MonoRepoType.yarn:
     case MonoRepoType.folder:
       return getMonoRepoFolder(ionicState.workspace);
   }

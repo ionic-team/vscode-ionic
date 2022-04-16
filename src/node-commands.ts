@@ -34,6 +34,7 @@ export function npmInstall(name: string, ...args): string {
     case MonoRepoType.npm:
       return `${pm(PMOperation.install, name)} ${argList} --workspace=${ionicState.workspace}`;
     case MonoRepoType.folder:
+    case MonoRepoType.yarn:
     case MonoRepoType.pnpm:
       return InternalCommand.cwd + `${pm(PMOperation.install, name)} ${argList}`;
     default:
@@ -131,6 +132,7 @@ export function npmUninstall(name: string): string {
     case MonoRepoType.npm:
       return `${pm(PMOperation.uninstall, name)} --workspace=${ionicState.workspace}`;
     case MonoRepoType.folder:
+    case MonoRepoType.yarn:
     case MonoRepoType.pnpm:
       return `${InternalCommand.cwd}${pm(PMOperation.uninstall, name)}`;
     default:
@@ -143,6 +145,7 @@ export function npmRun(name: string): string {
     case MonoRepoType.npm:
       return `${pm(PMOperation.run, name)} --workspace=${ionicState.workspace}`;
     case MonoRepoType.folder:
+    case MonoRepoType.yarn:
     case MonoRepoType.pnpm:
       return `${InternalCommand.cwd}${pm(PMOperation.run, name)}`;
     default:

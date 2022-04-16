@@ -16,6 +16,7 @@ export function capacitorAdd(project: Project, platform: CapacitorPlatform): str
     case MonoRepoType.none:
       return `npx ${ionic}cap add ${platform}`;
     case MonoRepoType.npm:
+    case MonoRepoType.yarn:
     case MonoRepoType.folder:
     case MonoRepoType.pnpm:
       return `${InternalCommand.cwd}npx ${ionic}cap add ${platform}`;

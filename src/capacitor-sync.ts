@@ -18,6 +18,7 @@ export function capacitorSync(project: Project): string {
       return preop + (ionicCLI ? capCLISync() : ionicCLISync());
     case MonoRepoType.folder:
     case MonoRepoType.pnpm:
+    case MonoRepoType.yarn:
     case MonoRepoType.npm:
       return InternalCommand.cwd + preop + (ionicCLI ? capCLISync() : ionicCLISync());
     case MonoRepoType.nx:

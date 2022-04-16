@@ -16,6 +16,7 @@ export function ionicServe(project: Project, dontOpenBrowser: boolean): string {
     case MonoRepoType.nx:
       return nxServe(project);
     case MonoRepoType.npm:
+    case MonoRepoType.yarn:
     case MonoRepoType.pnpm:
     case MonoRepoType.folder:
       return InternalCommand.cwd + ionicCLIServe(project, dontOpenBrowser);

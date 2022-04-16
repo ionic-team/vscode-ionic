@@ -34,6 +34,7 @@ export function capacitorRun(project: Project, platform: CapacitorPlatform): str
     case MonoRepoType.none:
     case MonoRepoType.folder:
     case MonoRepoType.pnpm:
+    case MonoRepoType.yarn:
     case MonoRepoType.npm:
       return preop + capRun(platform, project.repoType);
     case MonoRepoType.nx:
@@ -66,7 +67,10 @@ function capRun(platform: CapacitorPlatform, repoType: MonoRepoType): string {
   }
 
   const pre =
-    repoType == MonoRepoType.npm || repoType == MonoRepoType.folder || repoType == MonoRepoType.pnpm
+    repoType == MonoRepoType.npm ||
+    repoType == MonoRepoType.folder ||
+    repoType == MonoRepoType.pnpm ||
+    repoType == MonoRepoType.yarn
       ? InternalCommand.cwd
       : '';
   const ionic = exists('@ionic/cli') ? 'ionic ' : '';
