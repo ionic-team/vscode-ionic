@@ -4,6 +4,7 @@
 
 - Report deprecated packages and plugins
 - Report warning on remote dependencies
+- Recommend removal of rxjs-compat (as you should migrate v5 to v6+)
 
 ### Version 1.5.13
 

@@ -42,6 +42,15 @@ export function checkPackages(project: Project) {
     `Refactor your code to remove the dependency on jquery. Much of the API for Jquery is now available in browsers and often Jquery code conflicts with code written in your framework of choice.`
   );
 
+  // Remove rxjs-compat by migrating v5 to v6+
+  project.recommendRemove(
+    'rxjs-compat',
+    'rxjs-compat',
+    `Migrate your code from rxjs v5 to v6+ so that rxjs-compat is not necessary.`,
+    undefined,
+    'https://ncjamieson.com/avoiding-rxjs-compat/'
+  );
+
   project.recommendRemove(
     'protractor',
     `Protractor`,
