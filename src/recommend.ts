@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { exists, isCapacitor, isCordova } from './analyzer';
+import { deprecatedPackages, exists, isCapacitor, isCordova } from './analyzer';
 import { reviewCapacitorConfig } from './capacitor-configure';
 import { ionicBuild } from './ionic-build';
 import { ionicServe } from './ionic-serve';
@@ -175,6 +175,15 @@ export async function getRecommendations(
 
   // General Rules around node modules (eg Jquery)
   checkPackages(project);
+
+  // Deprecated removals
+  for (const deprecated of deprecatedPackages(packages)) {
+    project.recommendRemove(
+      deprecated.name,
+      deprecated.name,
+      `${deprecated.name} is deprecated: ${deprecated.message}`
+    );
+  }
 
   // Deprecated plugins
   checkDeprecatedPlugins(project);

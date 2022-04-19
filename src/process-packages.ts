@@ -258,7 +258,27 @@ function markIfPlugin(folder: string): boolean {
   return false;
 }
 
+function markDeprecated(lockFile: string, packages) {
+  const txt = fs.readFileSync(lockFile, { encoding: 'utf8' });
+  const data = JSON.parse(txt);
+  for (const library of Object.keys(data.packages)) {
+    const warning = data.packages[library].deprecated;
+    if (warning) {
+      const l = library.replace('node_modules/', '');
+      if (packages[l]) {
+        packages[l].deprecated = warning;
+      }
+    }
+  }
+}
+
 function inspectPackages(folder: string, packages) {
+  // Use package-lock.json for deprecated packages
+  const lockFile = path.join(folder, 'package-lock.json');
+  if (fs.existsSync(lockFile)) {
+    markDeprecated(lockFile, packages);
+  }
+
   // plugins
   for (const library of Object.keys(packages)) {
     const plugin = join(folder, 'node_modules', library, 'plugin.xml');

@@ -151,6 +151,16 @@ export function exists(library: string) {
   return !!allDependencies[library];
 }
 
+export function deprecatedPackages(packages: any): Array<any> {
+  const result = [];
+  for (const library of Object.keys(packages)) {
+    if (packages[library].deprecated) {
+      result.push({ name: library, message: packages[library].deprecated });
+    }
+  }
+  return result;
+}
+
 export function checkCordovaAndroidPreference(project: Project, preference: string, value: string | boolean): Tip {
   if (!cordovaConfig) {
     return;

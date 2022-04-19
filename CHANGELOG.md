@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.5.x
+
+- Report deprecated packages and plugins
+
 ### Version 1.5.13
 
 - When finishing a debug session for web we now return back to ionic extension and stop running
