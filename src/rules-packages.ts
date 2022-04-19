@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 
 import { Project } from './project';
-import { Tip, TipType } from './tip';
-import { exists, isGreaterOrEqual, warnMinVersion } from './analyzer';
+import { Command, Tip, TipType } from './tip';
+import { exists, isGreaterOrEqual, remotePackages, warnMinVersion } from './analyzer';
 import { npmInstallAll } from './node-commands';
 
 /**
@@ -86,6 +86,24 @@ export function checkPackages(project: Project) {
     project.checkNotExists(
       'ionicons',
       'The @ionic/angular packages includes icons so the "ionicons" package is not required.'
+    );
+  }
+}
+
+export function checkRemoteDependencies(project: Project) {
+  // Look for dependencies that come from github etc
+  const packages = remotePackages();
+  if (packages.length > 0) {
+    project.add(
+      new Tip(
+        'Remote Dependencies',
+        `Your project uses remote dependencies that can change at any time.`,
+        TipType.Warning,
+        `Using dependencies from locations like github or http mean that no 2 builds are guaranteed to produce the same binary. These packages should use versioned dependencies: ${packages.join(
+          ', '
+        )}`,
+        Command.NoOp
+      ).canIgnore()
     );
   }
 }

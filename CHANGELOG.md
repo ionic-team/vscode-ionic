@@ -3,6 +3,7 @@
 ### Version 1.5.x
 
 - Report deprecated packages and plugins
+- Report warning on remote dependencies
 
 ### Version 1.5.13
 

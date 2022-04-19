@@ -151,6 +151,16 @@ export function exists(library: string) {
   return !!allDependencies[library];
 }
 
+export function remotePackages(): Array<string> {
+  const result = [];
+  for (const library of Object.keys(allDependencies)) {
+    if (allDependencies[library].startsWith('git')) {
+      result.push(library);
+    }
+  }
+  return result;
+}
+
 export function deprecatedPackages(packages: any): Array<any> {
   const result = [];
   for (const library of Object.keys(packages)) {
