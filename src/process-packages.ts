@@ -271,6 +271,9 @@ function markIfPlugin(folder: string): boolean {
 function markDeprecated(lockFile: string, packages) {
   const txt = fs.readFileSync(lockFile, { encoding: 'utf8' });
   const data = JSON.parse(txt);
+  if (!data.packages) {
+    return;
+  }
   for (const library of Object.keys(data.packages)) {
     const warning = data.packages[library].deprecated;
     if (warning) {
