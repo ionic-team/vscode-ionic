@@ -11,6 +11,7 @@ import { NpmDependency, NpmOutdatedDependency, NpmPackage, PackageType, PackageV
 import { listCommand, outdatedCommand } from './node-commands';
 import { CapProjectCache, PackageCacheList, PackageCacheModified, PackageCacheOutdated } from './context-variables';
 import { join } from 'path';
+import { exists } from './analyzer';
 
 export interface PluginInformation {
   androidPermissions: Array<string>;
@@ -168,16 +169,25 @@ export function reviewPluginsWithHooks(packages: object): Tip[] {
   if (Object.keys(packages).length == 0) return;
   for (const library of Object.keys(packages)) {
     if (packages[library].plugin && packages[library].plugin.hasHooks && !dontReport.includes(library)) {
-      tips.push(
-        new Tip(
-          library,
-          `contains Cordova hooks that may require manual migration to use with Capacitor.`,
-          TipType.Warning,
-          `${library} contains Cordova hooks that may to require manual migration to use with Capacitor.`,
-          Command.NoOp,
-          'OK'
-        )
-      );
+      let msg = 'contains Cordova hooks that may require manual migration to use with Capacitor.';
+      if (library == 'branch-cordova-sdk') {
+        msg = ' can be replaced with capacitor-branch-deep-links which is compatible with Capacitor.';
+      }
+      tips.push(new Tip(library, msg, TipType.Warning, `${library} ${msg}`, Command.NoOp, 'OK'));
+    } else {
+      if (packages[library].version == PackageVersion.Custom) {
+        tips.push(
+          new Tip(
+            library,
+            `Review ${library}`,
+            TipType.Warning,
+            `${library} cannot be inspected to check for Capacitor compatibility as it is a custom plugin or is a remote dependency. You will need to manually test this plugin after migration to Capacitor - the good news is that most plugins will work.`,
+            Command.NoOp,
+            'OK'
+          )
+        );
+        //
+      }
     }
   }
   return tips;
