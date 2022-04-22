@@ -22,6 +22,7 @@ import { androidDebugUnforward } from './android-debug-bridge';
 import { AndroidDebugProvider } from './android-debug-provider';
 import { AndroidDebugType } from './android-debug';
 import { CapacitorPlatform } from './capacitor-platform';
+import { kill } from './process-list';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
@@ -152,7 +153,7 @@ export async function fixIssue(
       let increment = undefined;
       let percentage = undefined;
 
-      const interval = setInterval(() => {
+      const interval = setInterval(async () => {
         // Kill the process if the user cancels
         if (token.isCancellationRequested || tip.cancelRequested) {
           tip.cancelRequested = false;
@@ -163,11 +164,7 @@ export async function fixIssue(
           cancelObject.cancelled = true;
 
           console.log(`Killing process ${cancelObject.proc.pid}`);
-          const killed = cancelObject.proc.kill('SIGTERM');
-          if (!killed) {
-            vscode.window.showErrorMessage('Unable to stop operation');
-          }
-
+          await kill(cancelObject.proc, rootPath);
           if (ionicProvider) {
             ionicProvider.refresh();
           }
@@ -406,6 +403,7 @@ async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, ro
     execute(tip);
   }
 }
+
 async function fix(
   tip: Tip,
   rootPath: string,

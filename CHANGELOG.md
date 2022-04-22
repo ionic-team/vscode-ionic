@@ -6,6 +6,7 @@
 - Report warning on remote dependencies
 - Recommend removal of rxjs-compat (as you should migrate v5 to v6+)
 - Report Cordova plugins in a Cordova project that cannot be inspected for Capacitor compatibility
+- Fix when pressing stop would not stop all created child processes
 
 ### Version 1.5.13
 

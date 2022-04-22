@@ -29,7 +29,7 @@ export function estimateRunTime(command: string) {
   }
 }
 
-function runOptions(command: string, folder: string) {
+function runOptions(command: string, folder: string, shell?: string) {
   const env = { ...process.env };
   const javaHome: string = vscode.workspace.getConfiguration('ionic').get('javaHome');
 
@@ -52,7 +52,7 @@ function runOptions(command: string, folder: string) {
     }
   }
 
-  return { cwd: folder, shell: ionicState.shell, encoding: 'utf8', env: env };
+  return { cwd: folder, shell: shell ? shell : ionicState.shell, encoding: 'utf8', env: env };
 }
 
 export async function run(
@@ -222,13 +222,13 @@ function qualifyCommand(command: string): string {
   return command;
 }
 
-export async function getRunOutput(command: string, folder: string): Promise<string> {
+export async function getRunOutput(command: string, folder: string, shell?: string): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';
     command = qualifyCommand(command);
     child_process.exec(
       command,
-      runOptions(command, folder),
+      runOptions(command, folder, shell),
       (error: child_process.ExecException, stdout: string, stderror: string) => {
         if (stdout) {
           out += stdout;
