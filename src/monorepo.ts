@@ -135,6 +135,7 @@ export function getLocalFolder(rootFolder: string): string {
   switch (ionicState.repoType) {
     case MonoRepoType.npm:
     case MonoRepoType.yarn:
+    case MonoRepoType.lerna:
     case MonoRepoType.folder:
       return getMonoRepoFolder(ionicState.workspace);
   }

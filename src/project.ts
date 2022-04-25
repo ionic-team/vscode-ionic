@@ -71,6 +71,7 @@ export class Project {
         return this.folder;
       case MonoRepoType.npm:
       case MonoRepoType.yarn:
+      case MonoRepoType.lerna:
       case MonoRepoType.pnpm:
       case MonoRepoType.folder:
         return this.monoRepo.folder;
