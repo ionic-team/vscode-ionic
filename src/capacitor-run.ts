@@ -69,9 +69,10 @@ function capRun(platform: CapacitorPlatform, repoType: MonoRepoType): string {
 
   const pre =
     repoType == MonoRepoType.npm ||
-      repoType == MonoRepoType.folder ||
-      repoType == MonoRepoType.pnpm ||
-      repoType == MonoRepoType.yarn
+    repoType == MonoRepoType.folder ||
+    repoType == MonoRepoType.pnpm ||
+    repoType == MonoRepoType.yarn ||
+    repoType == MonoRepoType.lerna
       ? InternalCommand.cwd
       : '';
   const ionic = exists('@ionic/cli') ? 'ionic ' : '';

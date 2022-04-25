@@ -17,8 +17,9 @@ This extension for Visual Studio Code features:
 - [Mono Repo Support for Nx](#nx-support) - Support for Capacitor and Ionic Angular/React with Nx and `nxtend.dev`
 - [Mono Repo Support for npm workspaces](#npm-workspaces-support) - Support for npm workspaces
 - [Mono Repo Support for Folders](#mono-repos-in-folders) - Support for multiple apps in folders
+- [Mono Repo Support for Lerna](#lerna-support) - Support for Lerna
 - [Mono Repo Support for pnpm workspaces](#pnpm-workspaces-support) - Support for pnpm workspaces
-- [Mono Repo Support for yarn workspaces](#yarn-workspaces-support) - Support for yarn workspaces
+- [Mono Repo Support for yarn workspaces](#yarn-workspaces-support) - Support for Yarn workspaces
 - [Debugging for Web](#debugging-for-web) - Support for debugging via browser (Chrome or Edge)
 - [Debugging for Android](#debugging-for-android) - Support for debugging for Android devices
 - **Package Managers** - Support for npm, Yarn and Pnpm
@@ -134,7 +135,11 @@ Detects when npm workspaces are used as part of a mono repo and provides a works
 
 ## pnpm Workspaces Support
 
-Detects when pnpm workspaces are used as part of a mono repo and provides a workspace selector.
+Detects when [pnpm](https://pnpm.io/) workspaces are used as part of a mono repo and provides a workspace selector.
+
+## Lerna Support
+
+Detects when [Lerna](https://lerna.js.org/) is used as part of a mono repo and provides a workspace selector.
 
 ## Yarn Workspaces Support
 

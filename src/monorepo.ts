@@ -11,6 +11,7 @@ import { Project } from './project';
 import { Context, VSCommand } from './context-variables';
 import { getPnpmWorkspaces } from './monorepos-pnpm';
 import { PackageManager } from './node-commands';
+import { getLernaWorkspaces } from './monorepos-lerna';
 
 export interface MonoRepoProject {
   name: string;
@@ -70,6 +71,15 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
         ionicState.projects = projects;
         ionicState.projectsView.title = 'Workspaces';
       }
+
+      // Might be lerna based
+      const lerna = path.join(project.folder, 'lerna.json');
+      if (fs.existsSync(lerna)) {
+        project.repoType = MonoRepoType.lerna;
+        projects = getLernaWorkspaces(project);
+        ionicState.projects = projects;
+        ionicState.projectsView.title = 'Workspaces';
+      }
     }
     ionicState.projects = projects;
   }
@@ -91,6 +101,7 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
         MonoRepoType.npm,
         MonoRepoType.folder,
         MonoRepoType.yarn,
+        MonoRepoType.lerna,
         MonoRepoType.pnpm,
       ].includes(project.repoType);
 

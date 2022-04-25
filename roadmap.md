@@ -11,7 +11,6 @@
 
 - (1) Add .vs-code/extensions.json to recommend Ionic extension on starters
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
-- (16) Lerna support
 - (32) Debugging for iOS
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand
@@ -56,9 +55,6 @@
 - (feat) Bundle Analyser button, use stats.json for own report
 - (feat) Use npm audit to list vulnerable packages
 - (feat) info.plist editing
-- (feat) pnpm support
-- (feat) pnpm monorepo support
-- (feat) lerna support
 - (feat) Tool to capture plugins, cap community and paid plugins, evaluate (rank on archived, stars etc) and capture in json. Then use as part of an option to install known good plugins
 - (feat) Review output folder www and report any assets that are too large (eg photos that are png etc)
 - (feat) Twitter to RSS feed - pull news into plugin ??

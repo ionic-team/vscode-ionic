@@ -1,6 +1,10 @@
 ## Changelog
 
-### Version 1.5.x
+### Version 1.6.0
+
+- Support for Lerna
+
+### Version 1.5.14
 
 - Report deprecated packages and plugins
 - Report warning on remote dependencies
