@@ -12,6 +12,13 @@ export function checkDeprecatedPlugins(project: Project) {
     'https://experienceleague.adobe.com/docs/mobile-services/using/eol.html?lang=en'
   );
 
+  // Cordova Plugin Crop deprecation
+  project.deprecatedPlugin(
+    'cordova-plugin-crop',
+    'cordova-plugin-crop is deprecated and does not support Android 11+',
+    'https://github.com/jeduan/cordova-plugin-crop#readme'
+  );
+
   // App Center deprecated Cordova SDK
   project.deprecatedPlugin(
     'cordova-plugin-appcenter-analytics',

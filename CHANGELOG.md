@@ -3,6 +3,7 @@
 ### Version 1.6.0
 
 - Support for Lerna
+- Report deprecated plugin cordova-plugin-crop and Android 11 compatibility issues
 
 ### Version 1.5.14
 
