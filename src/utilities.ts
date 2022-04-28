@@ -202,7 +202,7 @@ function handleUrl(url: string, features: Array<TipFeature>) {
  */
 function focusOutput(channel: vscode.OutputChannel) {
   if (ionicState.outputIsFocused) return;
-  channel.show();
+  channelShow(channel);
 }
 
 function replaceAll(str: string, find: string, replace: string): string {
@@ -247,6 +247,13 @@ export async function getRunOutput(command: string, folder: string, shell?: stri
       }
     );
   });
+}
+
+export function channelShow(channel: vscode.OutputChannel) {
+  const focusOutputWindow = vscode.workspace.getConfiguration('ionic').get('focusOutputWindow');
+  if (focusOutputWindow) {
+    channel.show();
+  }
 }
 
 export function getPackageJSON(folder: string): PackageFile {
