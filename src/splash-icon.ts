@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { run } from './utilities';
+import { channelShow, run } from './utilities';
 import { getOutputChannel } from './extension';
 import { Tip, TipType } from './tip';
 import { Project } from './project';
@@ -163,7 +163,7 @@ async function runCordovaRes(project: Project) {
 
   const channel = getOutputChannel();
   channel.appendLine('[Ionic] Generating Splash Screen and Icon Assets...');
-  channel.show();
+  channelShow(channel);
   await showProgress('Generating Splash Screen and Icon Assets', async () => {
     if (!hasCordovaRes) {
       await run(folder, npmInstall('cordova-res', '--save-dev'), channel, undefined, [], undefined, undefined);
@@ -176,7 +176,7 @@ async function runCordovaRes(project: Project) {
     }
   });
   channel.appendLine('[Ionic] Completed created Splash Screen and Icon Assets');
-  channel.show();
+  channelShow(channel);
 }
 
 async function showProgress(message: string, func: () => Promise<any>) {

@@ -8,7 +8,7 @@ import { CapacitorProjectState } from './cap-project';
 import { getOutputChannel } from './extension';
 import { Project } from './project';
 import { Tip, TipType } from './tip';
-import { getStringFrom, setStringIn } from './utilities';
+import { channelShow, getStringFrom, setStringIn } from './utilities';
 import { CapProjectCache } from './context-variables';
 
 enum NativePlatform {
@@ -177,7 +177,7 @@ async function setBundleId(bundleId: string, prj: Project, platform: NativePlatf
     await project.android?.setPackageName(newBundleId);
   }
   await project.commit();
-  channel.show();
+  channelShow(channel);
   clearCapProjectCache();
 }
 
@@ -225,7 +225,7 @@ async function setVersion(version: string, prj: Project, platform: NativePlatfor
     await project.android?.setVersionName(newVersion);
   }
   await project.commit();
-  channel.show();
+  channelShow(channel);
   clearCapProjectCache();
 }
 
@@ -269,7 +269,7 @@ async function setBuild(build: string, prj: Project, platform: NativePlatform) {
   }
   await project.commit();
   clearCapProjectCache();
-  channel.show();
+  channelShow(channel);
 }
 
 /**
@@ -318,7 +318,7 @@ async function setDisplayName(currentDisplayName: string, prj: Project, folder: 
       vscode.window.showErrorMessage('Unable to write to ' + filename);
     }
   }
-  channel.show();
+  channelShow(channel);
   project.commit();
   clearCapProjectCache();
 }

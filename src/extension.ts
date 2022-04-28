@@ -10,7 +10,7 @@ import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './project';
 import { Command, Tip } from './tip';
-import { CancelObject, run, estimateRunTime } from './utilities';
+import { CancelObject, run, estimateRunTime, channelShow } from './utilities';
 import { ignore } from './ignore';
 import { CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
@@ -93,13 +93,14 @@ function startCommand(tip: Tip, cmd: string, ionicProvider: IonicTreeProvider) {
       channel.appendLine(`> Workspace: ${ionicState.workspace}`);
     }
     channel.appendLine(`> ${command}`);
-    channel.show();
+    channelShow(channel);
   }
 }
 
 export function getOutputChannel(): vscode.OutputChannel {
   if (!channel) {
     channel = vscode.window.createOutputChannel('Ionic');
+    channel.show();
   }
   return channel;
 }
@@ -132,7 +133,7 @@ export async function fixIssue(
   if (isRunning(tip)) {
     await cancelRunning(tip);
     if (tip.data == Context.stop) {
-      channel.show();
+      channelShow(channel);
       return; // User clicked stop
     }
   }
@@ -158,7 +159,7 @@ export async function fixIssue(
         if (token.isCancellationRequested || tip.cancelRequested) {
           tip.cancelRequested = false;
           channel.appendLine(`[Ionic] Stopped "${tip.title}"`);
-          channel.show();
+          channelShow(channel);
           clearInterval(interval);
           finishCommand(tip);
           cancelObject.cancelled = true;
@@ -221,7 +222,7 @@ export async function fixIssue(
   if (tip.title) {
     channel.appendLine(`[Ionic] ${tip.title} Completed.`);
     channel.appendLine('');
-    channel.show();
+    channelShow(channel);
   }
 }
 

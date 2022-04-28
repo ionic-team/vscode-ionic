@@ -1,8 +1,9 @@
 ## Changelog
 
-### Version 1.6.0
+### Version 1.6.1
 
 - Support for Lerna
+- Option to prevent focus of the Output Window
 - Report deprecated plugin cordova-plugin-crop and Android 11 compatibility issues
 
 ### Version 1.5.14
