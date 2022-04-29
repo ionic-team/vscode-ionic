@@ -250,9 +250,9 @@ export async function getRunOutput(command: string, folder: string, shell?: stri
 }
 
 export function channelShow(channel: vscode.OutputChannel) {
-  const focusOutputWindow = vscode.workspace.getConfiguration('ionic').get('focusOutputWindow');
-  if (focusOutputWindow) {
+  if (ionicState.channelFocus) {
     channel.show();
+    ionicState.channelFocus = false;
   }
 }
 
