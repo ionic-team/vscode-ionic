@@ -212,13 +212,6 @@ export async function getRecommendations(
   // Plugin Properties
   reviewPluginProperties(packages, project);
 
-  project.setGroup(`Stuff`, 'Whatever', TipType.Ionic, true);
-  project.add(
-    new Tip('Do Stuff', 'more info about the stuff', TipType.None, 'more stuff here').setAction(() => {
-      doStuff();
-    }, 'option1')
-  );
-
   // Support and Feedback
   project.setGroup(`Support`, 'Feature requests and bug fixes', TipType.Ionic, true);
   project.add(
