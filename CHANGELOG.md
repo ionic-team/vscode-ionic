@@ -1,6 +1,6 @@
 ## Changelog
 
-### Version 1.7.0
+### Version 1.7.1
 
 - Debugging for Android now allows breakpointing source code
 

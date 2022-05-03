@@ -153,7 +153,7 @@ Debugging for web will launch a seperate web browser instance that is debuggable
 ## Debugging for Android
 
 Debugging for Android can be done by first running for Android. Any web view instances found will appear under the `Debug` folder. This allows any in-app browser instances to also be debugged.
-For the best experience ensure the Ionic CLI is installed and Live Reload is turned on (in `Settings`), this will allow breakpoints to be set. Without Ionic's Live Reload you will need to inline sourcemaps to be able set breakpoints in code.
+Note: When debugging the extension will run a static web server on `http://localhost:80` which is used to serve source map files which allows breakpoints to work correctly in VS Code.
 
 ## Debugging for iOS
 
