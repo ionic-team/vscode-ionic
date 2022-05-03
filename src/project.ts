@@ -16,6 +16,7 @@ import { angularMigrate } from './rules-angular-migrate';
 import { checkForMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
 import { CapacitorPlatform } from './capacitor-platform';
 import { addCommand, npmInstall, npmUninstall, PackageManager } from './node-commands';
+import { getCapacitorConfigWebDir } from './capacitor-configure';
 
 export class Project {
   name: string;
@@ -476,6 +477,10 @@ export class Project {
 
   public fileExists(filename: string): boolean {
     return fs.existsSync(path.join(this.projectFolder(), filename));
+  }
+
+  public getDistFolder(): string {
+    return getCapacitorConfigWebDir(this.projectFolder());
   }
 }
 

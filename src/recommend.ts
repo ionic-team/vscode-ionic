@@ -99,7 +99,10 @@ export async function getRecommendations(
         Context.refreshDebug
       );
       r.whenExpanded = async () => {
-        return [project.asRecommendation(debugOnWeb(project)), ...(await getAndroidWebViewList(hasCapAndroid))];
+        return [
+          project.asRecommendation(debugOnWeb(project)),
+          ...(await getAndroidWebViewList(hasCapAndroid, project.getDistFolder())),
+        ];
       };
     }
 
@@ -209,6 +212,13 @@ export async function getRecommendations(
   // Plugin Properties
   reviewPluginProperties(packages, project);
 
+  project.setGroup(`Stuff`, 'Whatever', TipType.Ionic, true);
+  project.add(
+    new Tip('Do Stuff', 'more info about the stuff', TipType.None, 'more stuff here').setAction(() => {
+      doStuff();
+    }, 'option1')
+  );
+
   // Support and Feedback
   project.setGroup(`Support`, 'Feature requests and bug fixes', TipType.Ionic, true);
   project.add(
@@ -237,4 +247,9 @@ function debugOnWeb(project: Project): Tip {
     .canStop()
     .canAnimate()
     .setTooltip(`Debug using ${getDebugBrowserName()}. The browser can be changed in Settings.`);
+}
+
+async function doStuff() {
+  const selection = await vscode.window.showQuickPick(['Item 1', 'item 2', 'item 3']);
+  vscode.window.showInformationMessage('Chose ' + selection);
 }

@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.7.0
+
+- Debugging for Android now allows breakpointing source code
+
 ### Version 1.6.2
 
 - Support for Lerna

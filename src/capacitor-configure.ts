@@ -93,6 +93,22 @@ export async function reviewCapacitorConfig(project: Project, context: vscode.Ex
   }
 }
 
+/**
+ * Gets the full path using a folder and the webDir property from capacitor.config.ts
+ * @param  {string} folder
+ * @returns string
+ */
+export function getCapacitorConfigWebDir(folder: string): string {
+  let result = 'www';
+  // Try to find capacitor.config.ts to find the webDir
+  const capConfigFile = path.join(folder, 'capacitor.config.ts');
+  if (fs.existsSync(capConfigFile)) {
+    const config = fs.readFileSync(capConfigFile, 'utf-8');
+    result = getStringFrom(config, `webDir: '`, `'`);
+  }
+  return path.join(folder, result);
+}
+
 async function getCapacitorProjectState(
   prj: Project,
   context: vscode.ExtensionContext
