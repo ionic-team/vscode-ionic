@@ -11,6 +11,7 @@ import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { getMonoRepoFolder, getPackageJSONFilename } from './monorepo';
 import { InternalCommand } from './command-name';
 import { exists } from './analyzer';
+import { ionicInit } from './ionic-init';
 
 export interface CancelObject {
   proc: child_process.ChildProcess;
@@ -67,6 +68,10 @@ export async function run(
 ): Promise<boolean> {
   if (command == InternalCommand.removeCordova) {
     return await removeCordovaFromPackageJSON(folder);
+  }
+  if (command == InternalCommand.ionicInit) {
+    await ionicInit(folder);
+    return false;
   }
 
   if (command.includes(InternalCommand.cwd)) {

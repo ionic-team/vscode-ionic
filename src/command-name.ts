@@ -26,5 +26,6 @@ export enum CommandName {
 export enum InternalCommand {
   cwd = '[@cwd]', // Used to change the working directory for a commmand if we are in a monorepo
   target = '[@target]', // Used to change the target to the device selected
-  removeCordova = 'rem-cordova', // Will remove cordova from the projcet
+  removeCordova = 'rem-cordova', // Will remove cordova from the project
+  ionicInit = '[@ionic-init]', // Will call ionic init if ionic.config.json is missing
 }

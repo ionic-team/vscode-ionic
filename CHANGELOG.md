@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.7.4
+
+- Fix to allow Capacitor integrations to web projects by running ionic init
+
 ### Version 1.7.3
 
 - Debugging for Android now allows breakpointing source code

@@ -7,17 +7,20 @@ import * as path from 'path';
 
 import { getOutputChannel } from './extension';
 import { getRunOutput } from './utilities';
-import * as vscode from 'vscode';
 
 // Create ionic:serve if there is a serve script
 export async function ionicInit(folder: string): Promise<boolean> {
   const channel = getOutputChannel();
+
   channel.appendLine('[Ionic] Creating Ionic project...');
   try {
     const filename = path.join(folder, 'package.json');
     const packageFile = JSON.parse(fs.readFileSync(filename, 'utf8'));
     const name = packageFile.name;
-    const result = await getRunOutput(`npx ionic init "${name}" --type=custom`, folder);
+    const cfg = path.join(folder, 'ionic.config.json');
+    if (!fs.existsSync(cfg)) {
+      const result = await getRunOutput(`npx ionic init "${name}" --type=custom`, folder);
+    }
     if (packageFile.scripts?.build) {
       packageFile.scripts['ionic:build'] = 'npm run build';
     }
@@ -31,7 +34,7 @@ export async function ionicInit(folder: string): Promise<boolean> {
     channel.appendLine('[Ionic] Created Ionic Project');
     return true;
   } catch (err) {
-    channel.appendLine('[Ionic] Unable to create Ionic project');
+    channel.appendLine('[Ionic] Unable to create Ionic project:' + err);
     return false;
   }
 }
