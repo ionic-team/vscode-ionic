@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.7.5
+
+- Live reload now works with Auth Connect if version is at least v3.9.4
+
 ### Version 1.7.4
 
 - Fix to allow Capacitor integrations to web projects by running ionic init

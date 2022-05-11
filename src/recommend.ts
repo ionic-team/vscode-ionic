@@ -25,6 +25,7 @@ import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
 import { features } from './features';
 import { checkIonicNativePackages } from './rules-ionic-native';
+import { startLogServer as startStopLogServer } from './log-server';
 
 export async function getRecommendations(
   project: Project,
@@ -101,6 +102,8 @@ export async function getRecommendations(
       r.whenExpanded = async () => {
         return [
           project.asRecommendation(debugOnWeb(project)),
+          // REMOTE LOGGING ENABLED ################
+          //          project.asRecommendation(remoteLogging(project)),
           ...(await getAndroidWebViewList(hasCapAndroid, project.getDistFolder())),
         ];
       };
@@ -242,7 +245,14 @@ function debugOnWeb(project: Project): Tip {
     .setTooltip(`Debug using ${getDebugBrowserName()}. The browser can be changed in Settings.`);
 }
 
-async function doStuff() {
-  const selection = await vscode.window.showQuickPick(['Item 1', 'item 2', 'item 3']);
-  vscode.window.showInformationMessage('Chose ' + selection);
+function remoteLogging(project: Project): Tip {
+  return new Tip('Remote Logging', ionicState.remoteLogging ? '(on)' : '(off)', TipType.Media, undefined)
+    .setTooltip('Remote logging captures console logs from the device and displays them in the output window')
+    .setAction(toggleRemoteLogging, project, ionicState.remoteLogging)
+    .canRefreshAfter();
+}
+
+function toggleRemoteLogging(project: Project, current: boolean) {
+  ionicState.remoteLogging = !current;
+  startStopLogServer(project.folder);
 }

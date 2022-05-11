@@ -28,6 +28,7 @@ interface IonicState {
   outputIsFocused: boolean; // True if the output window is focused
   channelFocus: boolean; // Whether to focus the output window
   refreshDebugDevices: boolean; // Should we refresh the list of debuggable devices
+  remoteLogging: boolean; // Whether remote logging is enabled
   packageManager: PackageManager;
 }
 export const ionicState: IonicState = {
@@ -41,6 +42,7 @@ export const ionicState: IonicState = {
   outputIsFocused: false,
   channelFocus: true,
   refreshDebugDevices: false,
+  remoteLogging: false,
   packageManager: PackageManager.npm,
 };
 

@@ -383,7 +383,6 @@ async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, ro
   tip.generateCommand();
   tip.generateTitle();
   if (tip.command) {
-    const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
     let command = tip.command;
     if (tip.doRequestAppName) {
       command = await requestAppName(tip);
@@ -402,6 +401,9 @@ async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, ro
     }
   } else {
     execute(tip);
+    if (tip.refresh) {
+      ionicProvider.refresh();
+    }
   }
 }
 

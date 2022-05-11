@@ -20,6 +20,7 @@ export class Tip {
   public runPoints: Array<RunPoint>;
   public contextValue?: string;
   public ignorable: boolean;
+  public refresh: boolean; // Whether the tree provider is refresh after action is run
   public data?: any;
   public features: Array<TipFeature> = [];
 
@@ -106,6 +107,11 @@ export class Tip {
 
   canIgnore() {
     this.ignorable = true;
+    return this;
+  }
+
+  canRefreshAfter() {
+    this.refresh = true;
     return this;
   }
 
