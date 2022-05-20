@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.7.6
+
+- Login and Signup are now fixed
+- Cordova based Ionic Enterprise plugins are no longer flagged for review
+
 ### Version 1.7.5
 
 - Live reload now works with Auth Connect if version is at least v3.9.4
