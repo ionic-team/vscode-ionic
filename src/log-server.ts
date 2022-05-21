@@ -85,7 +85,7 @@ export function startLogServer(folder: string) {
   removeInjectedScript(folder);
   if (injectInIndexHtml(folder, addressInfo, port)) {
     channel.appendLine(
-      `[Ionic] Remote logging has started on ${addressInfo} port ${port} and the remote logging script was added to index.html.`
+      `[Ionic] Remote logging was added to index.html (Server is running at ${addressInfo} port ${port}).`
     );
     channel.appendLine(`[Ionic] Build and run your application on a device to start logging.`);
   } else {

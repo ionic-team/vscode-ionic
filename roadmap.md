@@ -72,8 +72,3 @@
 - (feat) Detect missing @nxtend/ionic-angular or @nxtend/ionic-react. Option to add
 - (feat) Detect missing @nxtend/capacitor. Option to add
 - Starters for NX?
-
-# Remote Logging
-
-- Make icon as checkbox
-- Stack trace fix

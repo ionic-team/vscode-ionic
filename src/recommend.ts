@@ -23,7 +23,6 @@ import { Context } from './context-variables';
 import { ionicState } from './ionic-tree-provider';
 import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
-import { features } from './features';
 import { checkIonicNativePackages } from './rules-ionic-native';
 import { startLogServer as startStopLogServer } from './log-server';
 
@@ -90,26 +89,23 @@ export async function getRecommendations(
       );
     }
 
-    //project.add(remoteLogging(project));
+    project.add(remoteLogging(project));
 
-    if (features.debugAndroid) {
-      // Experimental Feature
-      const r = project.setGroup(
-        'Debug',
-        'Running Ionic applications you can debug',
-        TipType.Ionic,
-        ionicState.refreshDebugDevices,
-        Context.refreshDebug
-      );
-      r.whenExpanded = async () => {
-        return [
-          project.asRecommendation(debugOnWeb(project)),
-          // REMOTE LOGGING ENABLED ################
-          //project.asRecommendation(remoteLogging(project)),
-          ...(await getAndroidWebViewList(hasCapAndroid, project.getDistFolder())),
-        ];
-      };
-    }
+    const r = project.setGroup(
+      'Debug',
+      'Running Ionic applications you can debug',
+      TipType.Ionic,
+      ionicState.refreshDebugDevices,
+      Context.refreshDebug
+    );
+    r.whenExpanded = async () => {
+      return [
+        project.asRecommendation(debugOnWeb(project)),
+        // REMOTE LOGGING ENABLED ################
+        //project.asRecommendation(remoteLogging(project)),
+        ...(await getAndroidWebViewList(hasCapAndroid, project.getDistFolder())),
+      ];
+    };
 
     project.setGroup(`Capacitor`, 'Capacitor Features', TipType.Capacitor, true);
     project.add(
@@ -248,7 +244,7 @@ function debugOnWeb(project: Project): Tip {
 }
 
 function remoteLogging(project: Project): Tip {
-  return new Tip('Remote Logging', ionicState.remoteLogging ? '(on)' : '(off)', TipType.Media, undefined)
+  return new Tip('Remote Logging', undefined, ionicState.remoteLogging ? TipType.Check : TipType.Box, undefined)
     .setTooltip('Remote logging captures console logs from the device and displays them in the output window')
     .setAction(toggleRemoteLogging, project, ionicState.remoteLogging)
     .canRefreshAfter();

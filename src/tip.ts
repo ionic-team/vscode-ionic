@@ -203,6 +203,8 @@ export enum TipType {
   Idea,
   Capacitor,
   Cordova,
+  Check,
+  Box,
   Ionic,
   Run,
   Link,

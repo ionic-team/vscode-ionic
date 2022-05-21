@@ -145,6 +145,12 @@ export class Project {
       case TipType.Files:
         r.setIcon('files');
         break;
+      case TipType.Box:
+        r.setIcon('box');
+        break;
+      case TipType.Check:
+        r.setIcon('checkbox');
+        break;
       case TipType.Media:
         r.setIcon('file-media');
         break;
