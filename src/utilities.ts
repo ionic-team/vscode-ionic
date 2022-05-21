@@ -284,6 +284,15 @@ export function setStringIn(data: string, start: string, end: string, replacemen
   return data.substring(0, idx) + replacement + data.substring(data.indexOf(end, idx));
 }
 
+export function replaceStringIn(data: string, start: string, end: string, replacement: string): string {
+  const foundIdx = data.lastIndexOf(start);
+  if (foundIdx == -1) {
+    return data;
+  }
+  const idx = foundIdx;
+  return data.substring(0, idx) + replacement + data.substring(data.indexOf(end, idx) + end.length);
+}
+
 export function generateUUID(): string {
   return new Date().getTime().toString(36) + Math.random().toString(36).slice(2);
 }

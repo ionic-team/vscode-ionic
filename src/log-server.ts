@@ -4,17 +4,18 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { getOutputChannel } from './extension';
 import { ionicState } from './ionic-tree-provider';
+import { replaceStringIn, setStringIn } from './utilities';
+import { OutputChannel } from 'vscode';
 
 let logServer: http.Server;
 
 export function startLogServer(folder: string) {
   const channel = getOutputChannel();
   if (logServer) {
-    logServer.close(() => {
-      logServer = undefined;
-      channel.appendLine(`[Ionic] Remote logging stopped.`);
-    });
-    channel.appendLine(`[Ionic] Stopping remote logging...`);
+    logServer.close();
+    removeInjectedScript(folder);
+    logServer = undefined;
+    channel.appendLine(`[Ionic] Remote logging stopped.`);
     return;
   }
 
@@ -22,20 +23,41 @@ export function startLogServer(folder: string) {
   const basePath = path.join(ionicState.context.extensionPath, 'log-client');
   logServer = http
     .createServer((request, response) => {
-      const filePath = path.join(basePath, request.url);
-      channel.appendLine(`[Ionic] Serving ${filePath}`);
+      let body = '';
+
+      response.setHeader('Access-Control-Allow-Origin', '*');
+      response.setHeader('Access-Control-Request-Method', '*');
+      response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
+      response.setHeader('Access-Control-Allow-Headers', '*');
 
       if (request.method == 'OPTIONS') {
         response.writeHead(200);
-        response.end;
+        response.end();
         return;
       }
       if (request.method == 'POST') {
-        if (request.url == '/log') {
-          // logging
-        }
+        request.on('data', (chunk) => {
+          body += chunk.toString();
+        });
+        request.on('end', () => {
+          if (request.url == '/log') {
+            writeLog(body, channel);
+          } else if (request.url == '/devices') {
+            writeDevices(body, channel);
+          } else {
+            channel.appendLine('[Ionic] ' + body);
+          }
+          response.writeHead(200);
+          response.end();
+        });
+        // logging
+        //        response.writeHead(200);
+        //        response.end();
+        return;
       }
 
+      const name = request.url.includes('?') ? request.url.split('?')[0] : request.url;
+      const filePath = path.join(basePath, name);
       const extname = path.extname(filePath);
       const contentType = getMimeType(extname);
       fs.readFile(filePath, (error, content) => {
@@ -58,34 +80,90 @@ export function startLogServer(folder: string) {
     })
     .listen(port);
 
-  const addressInfo = listAddresses(true);
+  const addressInfo = getAddress();
 
-  channel.appendLine(
-    `[Ionic] Remote logging has started on ${addressInfo} port ${port} and the remote logging script was added to index.html.`
-  );
-  channel.appendLine(`[Ionic] Build and run your application on a device to start logging.`);
+  removeInjectedScript(folder);
+  if (injectInIndexHtml(folder, addressInfo, port)) {
+    channel.appendLine(
+      `[Ionic] Remote logging has started on ${addressInfo} port ${port} and the remote logging script was added to index.html.`
+    );
+    channel.appendLine(`[Ionic] Build and run your application on a device to start logging.`);
+  } else {
+    channel.appendLine(`[Ionic] Error: Unable to start remote logging. index.html couldn't be found or written to.`);
+  }
 }
 
-function listAddresses(asText: boolean): any {
+function getAddress(): string {
   const nets = os.networkInterfaces();
-  const results = {};
-  const text = [];
   for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
       // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
       if (net.family === 'IPv4' && !net.internal) {
-        text.push(`${net.address} (${name})`);
-        if (!results[name]) {
-          results[name] = [];
-        }
-        results[name].push(net.address);
+        return net.address;
       }
     }
   }
-  if (asText) {
-    return text.join(', ');
+}
+
+// [{"Id":"712087700","Message":"","LogLevel":"info","CodeRef":"logger (http://localhost:8100/polyfills.js:1938:22)"},{"Id":"712087700","Message":"","LogLevel":"warn","CodeRef":"new BrowserVault (http://localhost:8100/vendor.js:6246:13)"},{"Id":"712087700","Message":"","LogLevel":"log","CodeRef":"AppComponent.<anonymous> (http://localhost:8100/main.js:119:21)"},{"Id":"712087700","Message":"","LogLevel":"log","CodeRef":"Console.log (http://localhost:8100/vendor.js:86806:17)"},{"Id":"712087700","Message":"","LogLevel":"log","CodeRef":"BrowserVault.unlockCallback (http://localhost:8100/main.js:469:25)"},{"Id":"712087700","Message":"","LogLevel":"log","CodeRef":"BrowserVault.unlockCallback (http://localhost:8100/main.js:469:25)"},{"Id":"712087700","Message":"","LogLevel":"log","CodeRef":"http://192.168.0.107:8042/ionic-logger.js:1:3633"}]
+function writeLog(body: string, channel: OutputChannel) {
+  try {
+    const lines = JSON.parse(body);
+    for (const line of lines) {
+      channel.appendLine(`[${line.LogLevel}] ${line.Message}`);
+    }
+  } catch {
+    channel.appendLine(body);
   }
-  return results;
+}
+
+// {"Id":"712087700","UserAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36 Edg/101.0.1210.53","Title":""}
+function writeDevices(body: string, channel: OutputChannel) {
+  try {
+    const device = JSON.parse(body);
+    channel.appendLine(`[Ionic] ${device.UserAgent}`);
+  } catch {
+    channel.appendLine(body);
+  }
+}
+
+function injectInIndexHtml(folder: string, address: string, port: number): boolean {
+  const indexHtml = path.join(folder, 'src', 'index.html');
+  if (!fs.existsSync(indexHtml)) {
+    return false;
+  }
+  let txt = fs.readFileSync(indexHtml, 'utf8');
+
+  if (!txt.includes('</head>')) {
+    return false;
+  }
+  txt = setStringIn(
+    txt,
+    '<head>',
+    '',
+    `${commentStart()}<script src="http://${address}:${port}/ionic-logger.js?${Math.random()}"></script>${commentEnd()}`
+  );
+  fs.writeFileSync(indexHtml, txt);
+  return true;
+}
+
+function commentStart(): string {
+  return '\r\n<!-- Ionic Extension Remote Logging -->';
+}
+
+function commentEnd(): string {
+  return '<!--  End Ionic Extension -->\r\n';
+}
+
+function removeInjectedScript(folder: string): boolean {
+  const indexHtml = path.join(folder, 'src', 'index.html');
+  if (!fs.existsSync(indexHtml)) {
+    return false;
+  }
+  let txt = fs.readFileSync(indexHtml, 'utf8');
+  txt = replaceStringIn(txt, commentStart(), commentEnd(), '');
+  fs.writeFileSync(indexHtml, txt);
+  return true;
 }
 
 function getMimeType(extname: string): string {

@@ -60,7 +60,14 @@
                 <string>^(npm WARN|WARNING:).*</string>
                 <key>name</key>
                 <string>entity.name.function</string>
-            </dict>	 		
+            </dict>	 	
+            <dict>
+                <!-- Warning -->
+                <key>match</key>
+                <string>^\[warn\].*</string>
+                <key>name</key>
+                <string>entity.name.function</string>
+            </dict>	             	
         </array>
         <key>uuid</key>
         <string>ab259404-3072-4cd4-a943-7cbbd32e373f</string>

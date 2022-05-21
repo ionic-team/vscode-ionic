@@ -73,6 +73,7 @@
 - (feat) Detect missing @nxtend/capacitor. Option to add
 - Starters for NX?
 
-# Support for pnpm
+# Remote Logging
 
-- See: https://github.com/reslear/ionic-vue-pnpm-monorepo
+- Make icon as checkbox
+- Stack trace fix

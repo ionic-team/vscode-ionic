@@ -19,23 +19,31 @@ class IonicLogger {
   private static _this;
 
   async post(url: string, data: any): Promise<any> {
-    // TODO: Replace dynamically
-    const remoteHost = '192.168.0.112:8042';
+    const scripts = document.getElementsByTagName('script');
+    const found = Array.from(scripts).find((script) => script.src.includes('ionic-logger.js'));
+    const remoteHost = new URL(found.src).hostname + ':' + new URL(found.src).port;
+    if (!data) {
+      return Promise.resolve();
+    }
 
-    const response: Response = await fetch(`http://${remoteHost}${url}`, {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-        //'Authorization': `bearer ${apiKey}`
-      },
-      body: JSON.stringify(data),
-    });
+    try {
+      const response: Response = await fetch(`http://${remoteHost}${url}`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          //'Authorization': `bearer ${apiKey}`
+        },
+        body: JSON.stringify(data),
+      });
+    } catch {
+      // Logging should cause failures
+    }
     //return response.json();
   }
 
-  private write(_arguments, level) {
+  private write(message, _arguments, level) {
     const args = Array.prototype.slice.call(_arguments);
-    let msg = '';
+    let msg = message;
     args.forEach((element) => {
       if (msg != '') {
         msg += ' ';
@@ -46,16 +54,18 @@ class IonicLogger {
         msg += element;
       }
     });
-    const stack = this.getStack();
+    // Commenting out for now. Stack is hard as it may be in the source map
+    //const stack = this.getStack();
+
     if (!this.pending) {
       setTimeout(() => {
         // Push pending log entries. We wait around for 1 second to see how much accumulates
         IonicLogger._this.post('/log', this.pending);
         this.pending = undefined;
-      }, 1000);
+      }, 500);
       this.pending = [];
     }
-    this.pending.push({ Id: this.getDeviceIdentifier(), Message: msg, LogLevel: level, CodeRef: stack });
+    this.pending.push({ Id: this.getDeviceIdentifier(), Message: msg, LogLevel: level });
   }
 
   private getStack(): string {
@@ -66,23 +76,23 @@ class IonicLogger {
   }
 
   public log(message, ...args) {
-    IonicLogger._this.write(args, 'log');
-    IonicLogger._privateLog.apply(this, args);
+    IonicLogger._privateLog.call(this, message, ...args);
+    IonicLogger._this.write(message, args, 'log');
   }
 
   public warn(message, ...args) {
-    IonicLogger._this.write(args, 'warn');
-    IonicLogger._privateWarn.apply(this, args);
+    IonicLogger._privateWarn.call(this, message, ...args);
+    IonicLogger._this.write(message, args, 'warn');
   }
 
   public error(message, ...args) {
-    IonicLogger._this.write(args, 'error');
-    IonicLogger._privateError.apply(this, args);
+    IonicLogger._privateError.call(this, message, ...args);
+    IonicLogger._this.write(message, args, 'error');
   }
 
   public info(message, ...args) {
-    IonicLogger._this.write(args, 'info');
-    IonicLogger._privateInfo.apply(this, args);
+    IonicLogger._privateInfo.call(this, message, ...args);
+    IonicLogger._this.write(message, args, 'info');
   }
 
   constructor() {

@@ -4,7 +4,8 @@
   "description": "",
   "main": "ionic-logger.js",
   "scripts": {
-    "build": "tsc ionic-logger.ts && uglifyjs --compress --mangle -o ionic-logger.js -- ionic-logger.js && cp ionic-logger.js ../client/ionic-logger.js"
+    "build": "tsc ionic-logger.ts && uglifyjs --compress --mangle -o ionic-logger.js -- ionic-logger.js",
+    "build-dev": "tsc ionic-logger.ts"
   },
   "author": "",
   "license": "ISC",
