@@ -1,6 +1,6 @@
 ## Changelog
 
-### Version 1.7.7
+### Version 1.7.9
 
 - Login and Signup are now fixed
 - Cordova based Ionic Enterprise plugins are no longer flagged for review

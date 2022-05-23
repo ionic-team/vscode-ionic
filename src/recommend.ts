@@ -89,7 +89,8 @@ export async function getRecommendations(
       );
     }
 
-    project.add(remoteLogging(project));
+    // REMOTE LOGGING ENABLED ################
+    //project.add(remoteLogging(project));
 
     const r = project.setGroup(
       'Debug',
@@ -101,8 +102,6 @@ export async function getRecommendations(
     r.whenExpanded = async () => {
       return [
         project.asRecommendation(debugOnWeb(project)),
-        // REMOTE LOGGING ENABLED ################
-        //project.asRecommendation(remoteLogging(project)),
         ...(await getAndroidWebViewList(hasCapAndroid, project.getDistFolder())),
       ];
     };

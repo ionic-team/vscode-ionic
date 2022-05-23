@@ -65,7 +65,7 @@ class IonicLogger {
       }, 500);
       this.pending = [];
     }
-    this.pending.push({ Id: this.getDeviceIdentifier(), Message: msg, LogLevel: level });
+    this.pending.push({ Id: this.getDeviceIdentifier(), Message: msg, LogLevel: level, stack: this.getStack() });
   }
 
   private getStack(): string {

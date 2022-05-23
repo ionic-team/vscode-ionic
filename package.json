@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.7.7",
+  "version": "1.7.9",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -16,7 +16,7 @@
   "scripts": {
     "prepare": "husky install",
     "clean": "find ./node_modules -name '*.md' -delete && find ./node_modules -name '*.ts' -delete && find ./node_modules -name 'LICENSE' -delete && find ./node_modules -name '*.map' -delete",
-    "build": "npm run clean && npm run esbuild && npm run vsix-package",
+    "build": "npm run compile && npm run clean && npm run esbuild && npm run vsix-package",
     "vsix-package": "vsce package",
     "pre-release": "npm run build && vsce publish --pre-release",
     "vscode:prepublish": "npm run esbuild-base -- --minify",
@@ -25,7 +25,7 @@
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "npm run build && cp ionic-1.7.7.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+    "package": "npm run build && cp ionic-1.7.9.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
     "lint": "npm run eslint && npm run prettier -- --check",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write",
     "prettier": "prettier \"**/*.ts\"",
