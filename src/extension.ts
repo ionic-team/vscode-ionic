@@ -9,7 +9,7 @@ import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './project';
-import { Command, Tip } from './tip';
+import { Command, Tip, TipType } from './tip';
 import { CancelObject, run, estimateRunTime, channelShow } from './utilities';
 import { ignore } from './ignore';
 import { CommandName, InternalCommand } from './command-name';
@@ -453,8 +453,8 @@ async function fix(
 
 async function execute(tip: Tip): Promise<void> {
   await tip.executeAction();
-  if (tip.title == 'Settings') {
-    vscode.commands.executeCommand('workbench.action.openSettings', 'Ionic');
+  if (tip.type == TipType.Settings) {
+    vscode.commands.executeCommand('workbench.action.openSettings', "Ionic'");
   } else if (tip.url) {
     vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
   }

@@ -89,9 +89,6 @@ export async function getRecommendations(
       );
     }
 
-    // REMOTE LOGGING ENABLED ################
-    //project.add(remoteLogging(project));
-
     const r = project.setGroup(
       'Debug',
       'Running Ionic applications you can debug',
@@ -212,8 +209,15 @@ export async function getRecommendations(
   // Plugin Properties
   reviewPluginProperties(packages, project);
 
+  project.setGroup(`Settings`, 'Settings', TipType.Settings, false);
+  // REMOTE LOGGING ENABLED ################
+  project.add(remoteLogging(project));
+  project.add(liveReload());
+  project.add(viewInEditor());
+  project.add(new Tip('Advanced', '', TipType.Settings));
+
   // Support and Feedback
-  project.setGroup(`Support`, 'Feature requests and bug fixes', TipType.Ionic, true);
+  project.setGroup(`Support`, 'Feature requests and bug fixes', TipType.Ionic, false);
   project.add(
     new Tip(
       'Provide Feedback',
@@ -226,7 +230,19 @@ export async function getRecommendations(
       `https://github.com/ionic-team/vscode-extension/issues`
     )
   );
-  project.add(new Tip('Settings', '', TipType.Settings));
+
+  project.add(
+    new Tip(
+      'Ionic Framework',
+      '',
+      TipType.Ionic,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      `https://ionicframework.com`
+    )
+  );
 }
 
 function debugOnWeb(project: Project): Tip {
@@ -244,12 +260,37 @@ function debugOnWeb(project: Project): Tip {
 
 function remoteLogging(project: Project): Tip {
   return new Tip('Remote Logging', undefined, ionicState.remoteLogging ? TipType.Check : TipType.Box, undefined)
-    .setTooltip('Remote logging captures console logs from the device and displays them in the output window')
+    .setTooltip('Captures console logs from the device and displays in the output window')
     .setAction(toggleRemoteLogging, project, ionicState.remoteLogging)
     .canRefreshAfter();
 }
 
+function liveReload(): Tip {
+  const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
+  return new Tip('Live Reload', undefined, liveReload ? TipType.Check : TipType.Box, undefined)
+    .setTooltip('Live reload will refresh the app whenever source code is changed.')
+    .setAction(toggleLiveReload, liveReload)
+    .canRefreshAfter();
+}
+
+function viewInEditor(): Tip {
+  const viewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
+  return new Tip('View In Editor', undefined, viewInEditor ? TipType.Check : TipType.Box, undefined)
+    .setTooltip('Whether the app will be previewed in VS Code rather than a web browser')
+    .setAction(toggleViewInEditor, viewInEditor)
+    .canRefreshAfter();
+}
+
 function toggleRemoteLogging(project: Project, current: boolean) {
-  ionicState.remoteLogging = !current;
-  startStopLogServer(project.folder);
+  if (startStopLogServer(project.folder)) {
+    ionicState.remoteLogging = !current;
+  }
+}
+
+async function toggleLiveReload(current: boolean) {
+  await vscode.workspace.getConfiguration('ionic').update('liveReload', !current);
+}
+
+async function toggleViewInEditor(current: boolean) {
+  await vscode.workspace.getConfiguration('ionic').update('previewInEditor', !current);
 }

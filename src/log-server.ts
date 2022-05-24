@@ -9,7 +9,7 @@ import { OutputChannel } from 'vscode';
 
 let logServer: http.Server;
 
-export function startLogServer(folder: string) {
+export function startLogServer(folder: string): boolean {
   const channel = getOutputChannel();
   if (logServer) {
     logServer.close();
@@ -89,8 +89,11 @@ export function startLogServer(folder: string) {
     );
     channel.appendLine(`[Ionic] Build and run your application on a device to start logging.`);
   } else {
-    channel.appendLine(`[Ionic] Error: Unable to start remote logging. index.html couldn't be found or written to.`);
+    channel.appendLine(`[error] Unable to start remote logging. Cannot find or write to index.html`);
+    channel.show();
+    return false;
   }
+  return true;
 }
 
 function getAddress(): string {

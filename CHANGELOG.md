@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.8.0
+
+- Remote logging feature added
+- Settings for live reload and preview in editor now displayed
+
 ### Version 1.7.9
 
 - Login and Signup are now fixed

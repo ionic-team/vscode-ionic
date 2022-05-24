@@ -3,7 +3,7 @@
 ## Features
 
 - Remove the progress window for run->device and put in the treeview: Build Web, Build Native, Deploy
-
+- New projects - set the bundle id to something different based on app name chosen
 - See tslint.json and angular 12+ then link to https://ionicframework.com/blog/eslint-for-ionic-angular/ for migration
 
 - Listing recent appflow builds and allowing users to sideload the artifacts from those builds onto their simulators/devices (lots of potential cert issues with iOS here)
