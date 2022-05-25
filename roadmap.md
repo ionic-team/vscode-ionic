@@ -72,3 +72,8 @@
 - (feat) Detect missing @nxtend/ionic-angular or @nxtend/ionic-react. Option to add
 - (feat) Detect missing @nxtend/capacitor. Option to add
 - Starters for NX?
+
+# Remote Logging Issues
+
+- Need this in capacitor config to allow Remote Logging to work: server: { cleartext: true }
+- Add for React and Vue

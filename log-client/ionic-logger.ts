@@ -65,13 +65,16 @@ class IonicLogger {
       }, 500);
       this.pending = [];
     }
-    this.pending.push({ Id: this.getDeviceIdentifier(), Message: msg, LogLevel: level, stack: this.getStack() });
+    this.pending.push({ Id: this.getDeviceIdentifier(), Message: msg, LogLevel: level, stack: undefined }); // this.getStack() });
   }
 
   private getStack(): string {
     const stack = new Error().stack;
     const lines = stack.split('\n');
     lines.splice(0, 4);
+    if (!lines || lines.length == 0) {
+      return;
+    }
     return lines[0].substr(7, lines[0].length - 7); // This returns just the top of the stack
   }
 

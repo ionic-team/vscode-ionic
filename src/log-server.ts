@@ -113,7 +113,7 @@ function writeLog(body: string, channel: OutputChannel) {
   try {
     const lines = JSON.parse(body);
     for (const line of lines) {
-      channel.appendLine(`[${line.LogLevel}] ${line.Message} ${line.stack}`);
+      channel.appendLine(`[${line.LogLevel}] ${line.Message}`);
     }
   } catch {
     channel.appendLine(body);
