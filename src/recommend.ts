@@ -47,7 +47,7 @@ export async function getRecommendations(
         ])
         .canStop()
         .canAnimate()
-        .setTooltip('Run a developement server and open using the default web browser')
+        .setTooltip('Run a development server and open using the default web browser')
     );
 
     // project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
@@ -66,12 +66,14 @@ export async function getRecommendations(
       const title = ionicState.selectedAndroidDevice ? `${ionicState.selectedAndroidDeviceName}` : 'Android';
       project.add(
         new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
-          .showProgressDialog()
           .requestDeviceSelection()
           .setDynamicCommand(capacitorRun, project, CapacitorPlatform.android)
           .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.android))
           .setData(project.projectFolder())
           .setRunPoints(runPoints)
+          .canStop()
+          .canAnimate()
+          .canRefreshAfter()
           .setContextValue(Context.selectDevice)
       );
     }
@@ -79,12 +81,14 @@ export async function getRecommendations(
       const title = ionicState.selectedIOSDevice ? `${ionicState.selectedIOSDeviceName}` : 'iOS';
       project.add(
         new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
-          .showProgressDialog()
           .requestDeviceSelection()
           .setDynamicCommand(capacitorRun, project, CapacitorPlatform.ios)
           .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.ios))
           .setData(project.projectFolder())
           .setRunPoints(runPoints)
+          .canStop()
+          .canAnimate()
+          .canRefreshAfter()
           .setContextValue(Context.selectDevice)
       );
     }

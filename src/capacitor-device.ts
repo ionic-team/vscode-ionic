@@ -89,7 +89,7 @@ function parseDevice(line: string) {
 async function showProgress(message: string, func: () => Promise<any>) {
   await vscode.window.withProgress(
     {
-      location: vscode.ProgressLocation.Notification,
+      location: vscode.ProgressLocation.Window,
       title: `${message}`,
       cancellable: true,
     },

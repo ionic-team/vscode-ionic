@@ -26,6 +26,7 @@ import { kill } from './process-list';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
+let runningActions = [];
 export let lastOperation: Tip;
 
 async function requestAppName(tip: Tip) {
@@ -57,6 +58,12 @@ export function isRunning(tip: Tip) {
   const found: Tip = runningOperations.find((found) => {
     return found.sameAs(tip);
   });
+  if (found == undefined) {
+    const foundAction: Tip = runningActions.find((found) => {
+      return found.sameAs(tip);
+    });
+    return foundAction != undefined;
+  }
   return found != undefined;
 }
 
@@ -81,6 +88,9 @@ function finishCommand(tip: Tip) {
   runningOperations = runningOperations.filter((op: Tip) => {
     return !op.sameAs(tip);
   });
+  runningActions = runningActions.filter((op: Tip) => {
+    return !op.sameAs(tip);
+  });
 }
 
 function startCommand(tip: Tip, cmd: string, ionicProvider: IonicTreeProvider) {
@@ -103,6 +113,16 @@ export function getOutputChannel(): vscode.OutputChannel {
     channel.show();
   }
   return channel;
+}
+
+export function markActionAsRunning(tip: Tip) {
+  runningActions.push(tip);
+}
+
+export function markActionAsCancelled(tip: Tip) {
+  runningActions = runningActions.filter((op: Tip) => {
+    return !op.sameAs(tip);
+  });
 }
 
 /**
@@ -378,6 +398,7 @@ function trackProjectChange() {
 async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, rootPath: string) {
   const tip = r.tip;
   if (tip.stoppable) {
+    markActionAsRunning(tip);
     ionicProvider.refresh();
   }
   tip.generateCommand();
@@ -390,6 +411,8 @@ async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, ro
     if (tip.doDeviceSelection) {
       const target = await selectDevice(tip.secondCommand as string, tip.data, tip);
       if (!target) {
+        markActionAsCancelled(tip);
+        ionicProvider.refresh();
         return;
       }
       command = (tip.command as string).replace(InternalCommand.target, target);

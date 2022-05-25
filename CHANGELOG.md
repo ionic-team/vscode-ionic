@@ -4,6 +4,8 @@
 
 - Remote logging feature added
 - Settings for live reload and preview in editor now displayed
+- Hide progress dialogs for running on iOS and Android
+- Animated icons for running tasks
 
 ### Version 1.7.9
 

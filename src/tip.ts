@@ -132,6 +132,9 @@ export class Tip {
   }
 
   setContextValue(contextValue: string) {
+    if (this.contextValue == Context.stop) {
+      return this;
+    }
     this.contextValue = contextValue;
     return this;
   }
