@@ -14,13 +14,13 @@ export function capacitorOpen(project: Project, platform: CapacitorPlatform): st
   const ionicCLI = exists('@ionic/cli');
   switch (project.repoType) {
     case MonoRepoType.none:
-      return ionicCLI ? capCLIOpen(platform) : ionicCLIOpen(platform);
+      return ionicCLI ? ionicCLIOpen(platform) : capCLIOpen(platform);
     case MonoRepoType.folder:
     case MonoRepoType.pnpm:
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
     case MonoRepoType.npm:
-      return InternalCommand.cwd + (ionicCLI ? capCLIOpen(platform) : ionicCLIOpen(platform));
+      return InternalCommand.cwd + (ionicCLI ? ionicCLIOpen(platform) : capCLIOpen(platform));
     case MonoRepoType.nx:
       return nxOpen(project, platform);
     default:

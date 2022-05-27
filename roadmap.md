@@ -2,7 +2,6 @@
 
 ## Features
 
-- Remove the progress window for run->device and put in the treeview: Build Web, Build Native, Deploy
 - New projects - set the bundle id to something different based on app name chosen
 - See tslint.json and angular 12+ then link to https://ionicframework.com/blog/eslint-for-ionic-angular/ for migration
 
@@ -60,10 +59,6 @@
 - (feat) Tool to capture plugins, cap community and paid plugins, evaluate (rank on archived, stars etc) and capture in json. Then use as part of an option to install known good plugins
 - (feat) Review output folder www and report any assets that are too large (eg photos that are png etc)
 - (feat) Twitter to RSS feed - pull news into plugin ??
-
-# Known Issues
-
-- Badge option is not available for VS Code Extensions
 
 # Support For NX
 

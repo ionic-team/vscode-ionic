@@ -19,7 +19,7 @@ export function startLogServer(folder: string): boolean {
     return;
   }
 
-  const port = 8042;
+  const port = 8942;
   const basePath = path.join(ionicState.context.extensionPath, 'log-client');
   logServer = http
     .createServer((request, response) => {
@@ -84,12 +84,10 @@ export function startLogServer(folder: string): boolean {
 
   removeInjectedScript(folder);
   if (injectInIndexHtml(folder, addressInfo, port)) {
-    channel.appendLine(
-      `[Ionic] Remote logging was added to index.html (Server is running at ${addressInfo} port ${port}).`
-    );
+    channel.appendLine(`[Ionic] Remote logging service has started at http://${addressInfo}:${port}`);
     channel.appendLine(`[Ionic] Build and run your application on a device to start logging.`);
   } else {
-    channel.appendLine(`[error] Unable to start remote logging. Cannot find or write to index.html`);
+    channel.appendLine(`[error] Unable to start remote logging.`);
     channel.show();
     return false;
   }
@@ -108,29 +106,32 @@ function getAddress(): string {
   }
 }
 
-// [{"Id":"712087700","Message":"","LogLevel":"info","CodeRef":"logger (http://localhost:8100/polyfills.js:1938:22)"},{"Id":"712087700","Message":"","LogLevel":"warn","CodeRef":"new BrowserVault (http://localhost:8100/vendor.js:6246:13)"},{"Id":"712087700","Message":"","LogLevel":"log","CodeRef":"AppComponent.<anonymous> (http://localhost:8100/main.js:119:21)"},{"Id":"712087700","Message":"","LogLevel":"log","CodeRef":"Console.log (http://localhost:8100/vendor.js:86806:17)"},{"Id":"712087700","Message":"","LogLevel":"log","CodeRef":"BrowserVault.unlockCallback (http://localhost:8100/main.js:469:25)"},{"Id":"712087700","Message":"","LogLevel":"log","CodeRef":"BrowserVault.unlockCallback (http://localhost:8100/main.js:469:25)"},{"Id":"712087700","Message":"","LogLevel":"log","CodeRef":"http://192.168.0.107:8042/ionic-logger.js:1:3633"}]
 function writeLog(body: string, channel: OutputChannel) {
   try {
     const lines = JSON.parse(body);
-    for (const line of lines) {
-      channel.appendLine(`[${line.LogLevel}] ${line.Message}`);
+    if (!Array.isArray(lines)) {
+      channel.appendLine(`[${lines.level}] ${lines.message}`);
+    } else {
+      for (const line of lines) {
+        channel.appendLine(`[${line.level}] ${line.message}`);
+      }
     }
   } catch {
     channel.appendLine(body);
   }
 }
 
-// {"Id":"712087700","UserAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.64 Safari/537.36 Edg/101.0.1210.53","Title":""}
 function writeDevices(body: string, channel: OutputChannel) {
   try {
     const device = JSON.parse(body);
-    channel.appendLine(`[Ionic] ${device.UserAgent}`);
+    channel.appendLine(`[Ionic] ${device.userAgent}`);
   } catch {
     channel.appendLine(body);
   }
 }
 
 function injectInIndexHtml(folder: string, address: string, port: number): boolean {
+  return true;
   const indexHtml = path.join(folder, 'src', 'index.html');
   if (!fs.existsSync(indexHtml)) {
     return false;
@@ -159,6 +160,7 @@ function commentEnd(): string {
 }
 
 function removeInjectedScript(folder: string): boolean {
+  return true;
   const indexHtml = path.join(folder, 'src', 'index.html');
   if (!fs.existsSync(indexHtml)) {
     return false;

@@ -41,13 +41,16 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
     selectedProject = context.workspaceState.get('SelectedProject');
   }
   let projects: Array<MonoRepoProject> = undefined;
+  // Might be pnpm based
+  const pw = path.join(project.folder, 'pnpm-workspace.yaml');
+  const isPnpm = fs.existsSync(pw);
 
   if (exists('@nrwl/cli')) {
     project.repoType = MonoRepoType.nx;
     projects = getNXProjects(project);
     ionicState.projects = projects;
     ionicState.projectsView.title = 'NX Projects';
-  } else if (project.workspaces?.length > 0) {
+  } else if (project.workspaces?.length > 0 && !isPnpm) {
     // For npm workspaces check package.json
     projects = getNpmWorkspaceProjects(project);
     project.repoType = MonoRepoType.npm;
@@ -59,26 +62,25 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
   } else {
     // See if it looks like a folder based repo
     projects = getFolderBasedProjects(project);
-    if (projects?.length > 0) {
+
+    if (projects?.length > 0 && !isPnpm) {
       project.repoType = MonoRepoType.folder;
       ionicState.projectsView.title = 'Projects';
     } else {
-      // Might be pnpm based
-      const pw = path.join(project.folder, 'pnpm-workspace.yaml');
-      if (fs.existsSync(pw)) {
+      if (isPnpm) {
         project.repoType = MonoRepoType.pnpm;
         projects = getPnpmWorkspaces(project);
         ionicState.projects = projects;
         ionicState.projectsView.title = 'Workspaces';
-      }
-
-      // Might be lerna based
-      const lerna = path.join(project.folder, 'lerna.json');
-      if (fs.existsSync(lerna)) {
-        project.repoType = MonoRepoType.lerna;
-        projects = getLernaWorkspaces(project);
-        ionicState.projects = projects;
-        ionicState.projectsView.title = 'Workspaces';
+      } else {
+        // Might be lerna based
+        const lerna = path.join(project.folder, 'lerna.json');
+        if (fs.existsSync(lerna)) {
+          project.repoType = MonoRepoType.lerna;
+          projects = getLernaWorkspaces(project);
+          ionicState.projects = projects;
+          ionicState.projectsView.title = 'Workspaces';
+        }
       }
     }
     ionicState.projects = projects;
