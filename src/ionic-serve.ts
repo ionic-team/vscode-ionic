@@ -30,12 +30,16 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
   const preop = preflightNPMCheck(project);
   const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
   const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
+  const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
   let serveFlags = '';
   if (previewInEditor || dontOpenBrowser) {
     serveFlags += ' --no-open';
   }
   if (httpsForWeb) {
     serveFlags += ' --ssl';
+  }
+  if (externalIP) {
+    serveFlags += ' --external';
   }
 
   return `${preop}npx ionic serve${serveFlags}`;

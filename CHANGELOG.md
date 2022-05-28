@@ -1,12 +1,13 @@
 ## Changelog
 
-### Version 1.8.0
+### Version 1.8.1
 
 - Remote logging feature added
-- Settings for live reload and preview in editor now displayed
+- Settings for live reload, external IP and preview in editor now displayed
 - Hide progress dialogs for running on iOS and Android
 - Fix for mono repos when ionic cli is installed and capacitor sync is called
 - Fix for mono repos for projects neither Capacitor or Cordova
+- When serving for web, if the External IP address is turned on it will use it
 - Animated icons for running tasks
 
 ### Version 1.7.9

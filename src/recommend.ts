@@ -216,10 +216,13 @@ export async function getRecommendations(
   reviewPluginProperties(packages, project);
 
   project.setGroup(`Settings`, 'Settings', TipType.Settings, false);
-  // REMOTE LOGGING ENABLED ################
-  project.add(remoteLogging(project));
+  project.add(externalAddress());
   project.add(liveReload());
   project.add(viewInEditor());
+
+  // REMOTE LOGGING ENABLED ################
+  //project.add(remoteLogging(project));
+
   project.add(new Tip('Advanced', '', TipType.Settings));
 
   // Support and Feedback
@@ -279,6 +282,16 @@ function liveReload(): Tip {
     .canRefreshAfter();
 }
 
+function externalAddress(): Tip {
+  const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
+  return new Tip('External Address', undefined, externalIP ? TipType.Check : TipType.Box, undefined)
+    .setTooltip(
+      'Using an external IP Address allows you to navigate to your application from other devices on the network.'
+    )
+    .setAction(toggleExternalAddress, externalIP)
+    .canRefreshAfter();
+}
+
 function viewInEditor(): Tip {
   const viewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
   return new Tip('View In Editor', undefined, viewInEditor ? TipType.Check : TipType.Box, undefined)
@@ -295,6 +308,10 @@ function toggleRemoteLogging(project: Project, current: boolean) {
 
 async function toggleLiveReload(current: boolean) {
   await vscode.workspace.getConfiguration('ionic').update('liveReload', !current);
+}
+
+async function toggleExternalAddress(current: boolean) {
+  await vscode.workspace.getConfiguration('ionic').update('externalAddress', !current);
 }
 
 async function toggleViewInEditor(current: boolean) {
