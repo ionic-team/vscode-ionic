@@ -6,6 +6,7 @@
 - Settings for live reload and preview in editor now displayed
 - Hide progress dialogs for running on iOS and Android
 - Fix for mono repos when ionic cli is installed and capacitor sync is called
+- Fix for mono repos for projects neither Capacitor or Cordova
 - Animated icons for running tasks
 
 ### Version 1.7.9

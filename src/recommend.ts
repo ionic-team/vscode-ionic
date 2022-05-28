@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { deprecatedPackages, exists, isCapacitor, isCordova } from './analyzer';
+import { deprecatedPackages, exists } from './analyzer';
 import { reviewCapacitorConfig } from './capacitor-configure';
 import { ionicBuild } from './ionic-build';
 import { ionicServe } from './ionic-serve';
@@ -31,7 +31,7 @@ export async function getRecommendations(
   context: vscode.ExtensionContext,
   packages: any
 ): Promise<void> {
-  if (isCapacitor() && !isCordova()) {
+  if (project.isCapacitor && !project.isCordova) {
     project.setGroup(`Run`, 'Options to run on various platforms', TipType.Ionic, true);
 
     const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
@@ -156,7 +156,7 @@ export async function getRecommendations(
   // Script Running
   addScripts(project);
 
-  if (isCapacitor() || project.hasACapacitorProject()) {
+  if (project.isCapacitor || project.hasACapacitorProject()) {
     // Capacitor Configure Features
     project.setGroup(
       `Configuration`,
@@ -165,7 +165,9 @@ export async function getRecommendations(
       false
     );
     await reviewCapacitorConfig(project, context);
+  }
 
+  if (project.isCapacitor) {
     // Splash Screen and Icon Features
     addSplashAndIconFeatures(project);
   }
@@ -194,10 +196,10 @@ export async function getRecommendations(
   // Deprecated plugins
   checkDeprecatedPlugins(project);
 
-  if (isCordova()) {
+  if (project.isCordova) {
     checkCordovaRules(project);
     checkCapacitorMigrationRules(packages, project);
-  } else if (isCapacitor()) {
+  } else if (project.isCapacitor) {
     checkCapacitorRules(project);
     checkIonicNativePackages(packages, project);
     checkCordovaPlugins(packages, project);

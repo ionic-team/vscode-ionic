@@ -125,7 +125,12 @@ async function getCapacitorProjectState(
     }
   }
 
-  const project = await getCapacitorProject(prj);
+  let project: CapacitorProject;
+  try {
+    project = await getCapacitorProject(prj);
+  } catch {
+    return undefined;
+  }
 
   if (project.ios) {
     const appTarget = project.ios?.getAppTarget();
