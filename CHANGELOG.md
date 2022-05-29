@@ -1,8 +1,8 @@
 ## Changelog
 
-### Version 1.8.1
+### Version 1.8.2
 
-- Remote logging feature added
+- Fix for splashscreen/icon viewing on Windows
 - Settings for live reload, external IP and preview in editor now displayed
 - Hide progress dialogs for running on iOS and Android
 - Fix for mono repos when ionic cli is installed and capacitor sync is called

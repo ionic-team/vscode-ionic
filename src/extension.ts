@@ -10,7 +10,7 @@ import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './project';
 import { Command, Tip, TipType } from './tip';
-import { CancelObject, run, estimateRunTime, channelShow } from './utilities';
+import { CancelObject, run, estimateRunTime, channelShow, openUri } from './utilities';
 import { ignore } from './ignore';
 import { CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
@@ -322,7 +322,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   vscode.commands.registerCommand(CommandName.Open, async (recommendation: Recommendation) => {
     if (fs.existsSync(recommendation.tip.secondCommand)) {
-      vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(recommendation.tip.secondCommand));
+      openUri(recommendation.tip.secondCommand);
     }
   });
 
@@ -370,7 +370,7 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   vscode.commands.registerCommand(CommandName.Link, async (tip: Tip) => {
-    vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
+    await openUri(tip.url);
   });
 
   context.subscriptions.push(
@@ -457,7 +457,7 @@ async function fix(
       fixIssue(tip.secondCommand, rootPath, ionicProvider, tip, undefined, tip.secondTitle);
     }
     if (selection && selection == urlBtn) {
-      vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
+      openUri(tip.url);
     }
     if (selection && selection == ignoreTitle) {
       ignore(tip, context);
@@ -477,8 +477,8 @@ async function fix(
 async function execute(tip: Tip): Promise<void> {
   await tip.executeAction();
   if (tip.type == TipType.Settings) {
-    vscode.commands.executeCommand('workbench.action.openSettings', "Ionic'");
+    await vscode.commands.executeCommand('workbench.action.openSettings', "Ionic'");
   } else if (tip.url) {
-    vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
+    await openUri(tip.url);
   }
 }

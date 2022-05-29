@@ -227,6 +227,14 @@ function qualifyCommand(command: string): string {
   return command;
 }
 
+export async function openUri(uri: string): Promise<void> {
+  if (uri?.includes('\\')) {
+    await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(uri));
+  } else {
+    await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(uri));
+  }
+}
+
 export async function getRunOutput(command: string, folder: string, shell?: string): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';
