@@ -235,6 +235,27 @@ export async function openUri(uri: string): Promise<void> {
   }
 }
 
+export function debugSkipFiles(): string {
+  try {
+    let debugSkipFiles: string = vscode.workspace.getConfiguration('ionic').get('debugSkipFiles');
+    if (!debugSkipFiles) {
+      return undefined;
+    }
+    if (debugSkipFiles.includes("'")) {
+      debugSkipFiles = debugSkipFiles.replace(/'/g, '"');
+    }
+    const list = JSON.parse(debugSkipFiles);
+    if (!Array.isArray(list)) {
+      throw new Error('debugSkipFiles not a valid array');
+    }
+  } catch (error) {
+    vscode.window.showErrorMessage(
+      `Unable to parse debugSkipFiles variable. Ensure it is a valid JSON array. ${error}`
+    );
+    return undefined;
+  }
+}
+
 export async function getRunOutput(command: string, folder: string, shell?: string): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';

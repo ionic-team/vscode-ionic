@@ -384,6 +384,12 @@
           "scope": "application",
           "default": "",
           "description": "Location of JAVA_HOME. Used to specify how Android will be built"
+        },
+        "ionic.debugSkipFiles": {
+          "type": "string",
+          "scope": "application",
+          "default": "",
+          "description": "Array of glob patterns to skip during debugging. Eg: [\"!**/node_modules/**\",\"<node_internals>/**\"]"
         }
       }
     }

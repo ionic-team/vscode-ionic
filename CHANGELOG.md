@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.8.4
+
+- Option added in Settings -> Advanced to define skipFiles for debugging
+
 ### Version 1.8.3
 
 - Fix for splashscreen/icon viewing on Windows
