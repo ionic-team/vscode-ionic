@@ -94,10 +94,6 @@ function getAndroidManifestIntent(actionName) {
   return undefined;
 }
 
-export const isCapacitor = () => !!allDependencies['@capacitor/core'];
-export const isCordova = () =>
-  !!(allDependencies['cordova-ios'] || allDependencies['cordova-android'] || packageFile.cordova);
-
 export async function load(fn: string, project: Project, context: vscode.ExtensionContext): Promise<any> {
   let packageJsonFilename = fn;
   if (fs.lstatSync(fn).isDirectory()) {
@@ -125,6 +121,11 @@ export async function load(fn: string, project: Project, context: vscode.Extensi
     ...packageFile.dependencies,
     ...packageFile.devDependencies,
   };
+
+  // Its a capacitor project only if its a dependency and not a dev dependency
+  project.isCapacitor = !!(packageFile.dependencies && packageFile.dependencies['@capacitor/core']);
+
+  project.isCordova = !!(allDependencies['cordova-ios'] || allDependencies['cordova-android'] || packageFile.cordova);
 
   return await processPackages(fn, allDependencies, packageFile.devDependencies, context, project);
 }

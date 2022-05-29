@@ -20,6 +20,7 @@ export class Tip {
   public runPoints: Array<RunPoint>;
   public contextValue?: string;
   public ignorable: boolean;
+  public refresh: boolean; // Whether the tree provider is refresh after action is run
   public data?: any;
   public features: Array<TipFeature> = [];
 
@@ -109,6 +110,11 @@ export class Tip {
     return this;
   }
 
+  canRefreshAfter() {
+    this.refresh = true;
+    return this;
+  }
+
   // The action is executed when the user clicks the item in the treeview
   setAction(func: (...argsIn) => unknown, ...args) {
     this.onAction = func;
@@ -126,6 +132,9 @@ export class Tip {
   }
 
   setContextValue(contextValue: string) {
+    if (this.contextValue == Context.stop) {
+      return this;
+    }
     this.contextValue = contextValue;
     return this;
   }
@@ -197,6 +206,8 @@ export enum TipType {
   Idea,
   Capacitor,
   Cordova,
+  Check,
+  Box,
   Ionic,
   Run,
   Link,

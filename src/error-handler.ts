@@ -1,10 +1,9 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import * as os from 'os';
 import * as path from 'path';
 import { lastOperation } from './extension';
 import { CommandName } from './command-name';
-import { showMessage } from './utilities';
+import { openUri, showMessage } from './utilities';
 import { ionicInit } from './ionic-init';
 import { Context } from './context-variables';
 import { ionicState } from './ionic-tree-provider';
@@ -304,7 +303,7 @@ async function handleErrorLine(number: number, errors: Array<ErrorLine>, folder:
   }
   currentErrorFilename = uri;
   if (fs.existsSync(uri) && !fs.lstatSync(uri).isDirectory()) {
-    await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(uri));
+    await openUri(uri);
     const myPos = new vscode.Position(errors[number].line, errors[number].position);
     vscode.window.activeTextEditor.selection = new vscode.Selection(myPos, myPos);
     vscode.commands.executeCommand('revealLine', { lineNumber: myPos.line, at: 'bottom' });

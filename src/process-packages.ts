@@ -168,7 +168,12 @@ export function reviewPluginsWithHooks(packages: object): Tip[] {
 
   if (Object.keys(packages).length == 0) return;
   for (const library of Object.keys(packages)) {
-    if (packages[library].plugin && packages[library].plugin.hasHooks && !dontReport.includes(library)) {
+    if (
+      packages[library].plugin &&
+      packages[library].plugin.hasHooks &&
+      !dontReport.includes(library) &&
+      !library.startsWith('@ionic-enterprise')
+    ) {
       let msg = 'contains Cordova hooks that may require manual migration to use with Capacitor.';
       if (library == 'branch-cordova-sdk') {
         msg = ' can be replaced with capacitor-branch-deep-links which is compatible with Capacitor.';

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { exists } from './analyzer';
+import { exists, isLess } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
 import { InternalCommand } from './command-name';
 import { getOutputChannel } from './extension';
@@ -55,11 +55,13 @@ function capRun(platform: CapacitorPlatform, repoType: MonoRepoType): string {
   const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
   let capRunFlags = liveReload ? ' -l' : '';
 
-  if (exists('@ionic-enterprise/auth') && liveReload) {
+  if (liveReload && exists('@ionic-enterprise/auth') && isLess('@ionic-enterprise/auth', '3.9.4')) {
     capRunFlags = '';
     // @ionic-enterprise/auth gets a crypt error when running with an external IP address. So avoid the issue
     const channel = getOutputChannel();
-    channel.appendLine('[Ionic] Live Update was ignored as you have @ionic-enterprise/auth included in your project');
+    channel.appendLine(
+      '[Ionic] Live Update was ignored as you have less than v3.9.4 of @ionic-enterprise/auth in your project'
+    );
   }
 
   if (externalIP) {

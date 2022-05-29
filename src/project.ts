@@ -4,7 +4,7 @@ import * as path from 'path';
 
 import { Recommendation } from './recommendation';
 import { Tip, TipType } from './tip';
-import { load, isCapacitor, exists } from './analyzer';
+import { load, exists } from './analyzer';
 import { fixIssue, isRunning } from './extension';
 import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
@@ -21,6 +21,8 @@ import { getCapacitorConfigWebDir } from './capacitor-configure';
 export class Project {
   name: string;
   type: string = undefined;
+  isCapacitor: boolean;
+  isCordova: boolean;
   workspaces: Array<string>;
   folder: string;
   modified: Date; // Last modified date of package.json
@@ -144,6 +146,12 @@ export class Project {
         break;
       case TipType.Files:
         r.setIcon('files');
+        break;
+      case TipType.Box:
+        r.setIcon('box');
+        break;
+      case TipType.Check:
+        r.setIcon('checkbox');
         break;
       case TipType.Media:
         r.setIcon('file-media');
@@ -540,7 +548,7 @@ export async function reviewProject(
   setPackageManager(folder);
   let packages = await load(folder, project, context);
   ionicState.view.title = project.name;
-  project.type = isCapacitor() ? 'Capacitor' : 'Cordova';
+  project.type = project.isCapacitor ? 'Capacitor' : project.isCordova ? 'Cordova' : 'Other';
 
   const gConfig = getGlobalIonicConfig();
 

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { deprecatedPackages, exists, isCapacitor, isCordova } from './analyzer';
+import { deprecatedPackages, exists } from './analyzer';
 import { reviewCapacitorConfig } from './capacitor-configure';
 import { ionicBuild } from './ionic-build';
 import { ionicServe } from './ionic-serve';
@@ -23,15 +23,15 @@ import { Context } from './context-variables';
 import { ionicState } from './ionic-tree-provider';
 import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
-import { features } from './features';
 import { checkIonicNativePackages } from './rules-ionic-native';
+import { startLogServer as startStopLogServer } from './log-server';
 
 export async function getRecommendations(
   project: Project,
   context: vscode.ExtensionContext,
   packages: any
 ): Promise<void> {
-  if (isCapacitor() && !isCordova()) {
+  if (project.isCapacitor && !project.isCordova) {
     project.setGroup(`Run`, 'Options to run on various platforms', TipType.Ionic, true);
 
     const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
@@ -47,7 +47,7 @@ export async function getRecommendations(
         ])
         .canStop()
         .canAnimate()
-        .setTooltip('Run a developement server and open using the default web browser')
+        .setTooltip('Run a development server and open using the default web browser')
     );
 
     // project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
@@ -66,12 +66,14 @@ export async function getRecommendations(
       const title = ionicState.selectedAndroidDevice ? `${ionicState.selectedAndroidDeviceName}` : 'Android';
       project.add(
         new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
-          .showProgressDialog()
           .requestDeviceSelection()
           .setDynamicCommand(capacitorRun, project, CapacitorPlatform.android)
           .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.android))
           .setData(project.projectFolder())
           .setRunPoints(runPoints)
+          .canStop()
+          .canAnimate()
+          .canRefreshAfter()
           .setContextValue(Context.selectDevice)
       );
     }
@@ -79,32 +81,31 @@ export async function getRecommendations(
       const title = ionicState.selectedIOSDevice ? `${ionicState.selectedIOSDeviceName}` : 'iOS';
       project.add(
         new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
-          .showProgressDialog()
           .requestDeviceSelection()
           .setDynamicCommand(capacitorRun, project, CapacitorPlatform.ios)
           .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.ios))
           .setData(project.projectFolder())
           .setRunPoints(runPoints)
+          .canStop()
+          .canAnimate()
+          .canRefreshAfter()
           .setContextValue(Context.selectDevice)
       );
     }
 
-    if (features.debugAndroid) {
-      // Experimental Feature
-      const r = project.setGroup(
-        'Debug',
-        'Running Ionic applications you can debug',
-        TipType.Ionic,
-        ionicState.refreshDebugDevices,
-        Context.refreshDebug
-      );
-      r.whenExpanded = async () => {
-        return [
-          project.asRecommendation(debugOnWeb(project)),
-          ...(await getAndroidWebViewList(hasCapAndroid, project.getDistFolder())),
-        ];
-      };
-    }
+    const r = project.setGroup(
+      'Debug',
+      'Running Ionic applications you can debug',
+      TipType.Ionic,
+      ionicState.refreshDebugDevices,
+      Context.refreshDebug
+    );
+    r.whenExpanded = async () => {
+      return [
+        project.asRecommendation(debugOnWeb(project)),
+        ...(await getAndroidWebViewList(hasCapAndroid, project.getDistFolder())),
+      ];
+    };
 
     project.setGroup(`Capacitor`, 'Capacitor Features', TipType.Capacitor, true);
     project.add(
@@ -155,7 +156,7 @@ export async function getRecommendations(
   // Script Running
   addScripts(project);
 
-  if (isCapacitor() || project.hasACapacitorProject()) {
+  if (project.isCapacitor || project.hasACapacitorProject()) {
     // Capacitor Configure Features
     project.setGroup(
       `Configuration`,
@@ -164,7 +165,9 @@ export async function getRecommendations(
       false
     );
     await reviewCapacitorConfig(project, context);
+  }
 
+  if (project.isCapacitor) {
     // Splash Screen and Icon Features
     addSplashAndIconFeatures(project);
   }
@@ -193,10 +196,10 @@ export async function getRecommendations(
   // Deprecated plugins
   checkDeprecatedPlugins(project);
 
-  if (isCordova()) {
+  if (project.isCordova) {
     checkCordovaRules(project);
     checkCapacitorMigrationRules(packages, project);
-  } else if (isCapacitor()) {
+  } else if (project.isCapacitor) {
     checkCapacitorRules(project);
     checkIonicNativePackages(packages, project);
     checkCordovaPlugins(packages, project);
@@ -212,8 +215,18 @@ export async function getRecommendations(
   // Plugin Properties
   reviewPluginProperties(packages, project);
 
+  project.setGroup(`Settings`, 'Settings', TipType.Settings, false);
+  project.add(externalAddress());
+  project.add(liveReload());
+  project.add(viewInEditor());
+
+  // REMOTE LOGGING ENABLED ################
+  //project.add(remoteLogging(project));
+
+  project.add(new Tip('Advanced', '', TipType.Settings));
+
   // Support and Feedback
-  project.setGroup(`Support`, 'Feature requests and bug fixes', TipType.Ionic, true);
+  project.setGroup(`Support`, 'Feature requests and bug fixes', TipType.Ionic, false);
   project.add(
     new Tip(
       'Provide Feedback',
@@ -226,7 +239,19 @@ export async function getRecommendations(
       `https://github.com/ionic-team/vscode-extension/issues`
     )
   );
-  project.add(new Tip('Settings', '', TipType.Settings));
+
+  project.add(
+    new Tip(
+      'Ionic Framework',
+      '',
+      TipType.Ionic,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      `https://ionicframework.com`
+    )
+  );
 }
 
 function debugOnWeb(project: Project): Tip {
@@ -242,7 +267,53 @@ function debugOnWeb(project: Project): Tip {
     .setTooltip(`Debug using ${getDebugBrowserName()}. The browser can be changed in Settings.`);
 }
 
-async function doStuff() {
-  const selection = await vscode.window.showQuickPick(['Item 1', 'item 2', 'item 3']);
-  vscode.window.showInformationMessage('Chose ' + selection);
+function remoteLogging(project: Project): Tip {
+  return new Tip('Remote Logging', undefined, ionicState.remoteLogging ? TipType.Check : TipType.Box, undefined)
+    .setTooltip('Captures console logs from the device and displays in the output window')
+    .setAction(toggleRemoteLogging, project, ionicState.remoteLogging)
+    .canRefreshAfter();
+}
+
+function liveReload(): Tip {
+  const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
+  return new Tip('Live Reload', undefined, liveReload ? TipType.Check : TipType.Box, undefined)
+    .setTooltip('Live reload will refresh the app whenever source code is changed.')
+    .setAction(toggleLiveReload, liveReload)
+    .canRefreshAfter();
+}
+
+function externalAddress(): Tip {
+  const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
+  return new Tip('External Address', undefined, externalIP ? TipType.Check : TipType.Box, undefined)
+    .setTooltip(
+      'Using an external IP Address allows you to navigate to your application from other devices on the network.'
+    )
+    .setAction(toggleExternalAddress, externalIP)
+    .canRefreshAfter();
+}
+
+function viewInEditor(): Tip {
+  const viewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
+  return new Tip('View In Editor', undefined, viewInEditor ? TipType.Check : TipType.Box, undefined)
+    .setTooltip('Whether the app will be previewed in VS Code rather than a web browser')
+    .setAction(toggleViewInEditor, viewInEditor)
+    .canRefreshAfter();
+}
+
+function toggleRemoteLogging(project: Project, current: boolean) {
+  if (startStopLogServer(project.folder)) {
+    ionicState.remoteLogging = !current;
+  }
+}
+
+async function toggleLiveReload(current: boolean) {
+  await vscode.workspace.getConfiguration('ionic').update('liveReload', !current);
+}
+
+async function toggleExternalAddress(current: boolean) {
+  await vscode.workspace.getConfiguration('ionic').update('externalAddress', !current);
+}
+
+async function toggleViewInEditor(current: boolean) {
+  await vscode.workspace.getConfiguration('ionic').update('previewInEditor', !current);
 }

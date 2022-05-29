@@ -9,8 +9,8 @@ import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './project';
-import { Command, Tip } from './tip';
-import { CancelObject, run, estimateRunTime, channelShow } from './utilities';
+import { Command, Tip, TipType } from './tip';
+import { CancelObject, run, estimateRunTime, channelShow, openUri } from './utilities';
 import { ignore } from './ignore';
 import { CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
@@ -26,6 +26,7 @@ import { kill } from './process-list';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
+let runningActions = [];
 export let lastOperation: Tip;
 
 async function requestAppName(tip: Tip) {
@@ -57,6 +58,12 @@ export function isRunning(tip: Tip) {
   const found: Tip = runningOperations.find((found) => {
     return found.sameAs(tip);
   });
+  if (found == undefined) {
+    const foundAction: Tip = runningActions.find((found) => {
+      return found.sameAs(tip);
+    });
+    return foundAction != undefined;
+  }
   return found != undefined;
 }
 
@@ -81,6 +88,9 @@ function finishCommand(tip: Tip) {
   runningOperations = runningOperations.filter((op: Tip) => {
     return !op.sameAs(tip);
   });
+  runningActions = runningActions.filter((op: Tip) => {
+    return !op.sameAs(tip);
+  });
 }
 
 function startCommand(tip: Tip, cmd: string, ionicProvider: IonicTreeProvider) {
@@ -103,6 +113,16 @@ export function getOutputChannel(): vscode.OutputChannel {
     channel.show();
   }
   return channel;
+}
+
+export function markActionAsRunning(tip: Tip) {
+  runningActions.push(tip);
+}
+
+export function markActionAsCancelled(tip: Tip) {
+  runningActions = runningActions.filter((op: Tip) => {
+    return !op.sameAs(tip);
+  });
 }
 
 /**
@@ -302,7 +322,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   vscode.commands.registerCommand(CommandName.Open, async (recommendation: Recommendation) => {
     if (fs.existsSync(recommendation.tip.secondCommand)) {
-      vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(recommendation.tip.secondCommand));
+      openUri(recommendation.tip.secondCommand);
     }
   });
 
@@ -350,7 +370,7 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   vscode.commands.registerCommand(CommandName.Link, async (tip: Tip) => {
-    vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
+    await openUri(tip.url);
   });
 
   context.subscriptions.push(
@@ -378,12 +398,12 @@ function trackProjectChange() {
 async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, rootPath: string) {
   const tip = r.tip;
   if (tip.stoppable) {
+    markActionAsRunning(tip);
     ionicProvider.refresh();
   }
   tip.generateCommand();
   tip.generateTitle();
   if (tip.command) {
-    const info = tip.description ? tip.description : `${tip.title}: ${tip.message}`;
     let command = tip.command;
     if (tip.doRequestAppName) {
       command = await requestAppName(tip);
@@ -391,6 +411,8 @@ async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, ro
     if (tip.doDeviceSelection) {
       const target = await selectDevice(tip.secondCommand as string, tip.data, tip);
       if (!target) {
+        markActionAsCancelled(tip);
+        ionicProvider.refresh();
         return;
       }
       command = (tip.command as string).replace(InternalCommand.target, target);
@@ -402,6 +424,9 @@ async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, ro
     }
   } else {
     execute(tip);
+    if (tip.refresh) {
+      ionicProvider.refresh();
+    }
   }
 }
 
@@ -432,7 +457,7 @@ async function fix(
       fixIssue(tip.secondCommand, rootPath, ionicProvider, tip, undefined, tip.secondTitle);
     }
     if (selection && selection == urlBtn) {
-      vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
+      openUri(tip.url);
     }
     if (selection && selection == ignoreTitle) {
       ignore(tip, context);
@@ -451,9 +476,9 @@ async function fix(
 
 async function execute(tip: Tip): Promise<void> {
   await tip.executeAction();
-  if (tip.title == 'Settings') {
-    vscode.commands.executeCommand('workbench.action.openSettings', 'Ionic');
+  if (tip.type == TipType.Settings) {
+    await vscode.commands.executeCommand('workbench.action.openSettings', "Ionic'");
   } else if (tip.url) {
-    vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(tip.url));
+    await openUri(tip.url);
   }
 }

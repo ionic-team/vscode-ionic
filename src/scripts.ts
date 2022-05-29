@@ -14,6 +14,7 @@ export function addScripts(project: Project) {
       project.add(
         new Tip(script, '', TipType.Run, '', npmRun(script), `Running ${script}`, `Ran ${script}`)
           .canStop()
+          .canAnimate()
           .setTooltip(`Runs 'npm run ${script}' found in package.json`)
       );
     }

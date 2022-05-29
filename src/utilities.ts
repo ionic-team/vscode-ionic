@@ -210,7 +210,7 @@ function focusOutput(channel: vscode.OutputChannel) {
   channelShow(channel);
 }
 
-function replaceAll(str: string, find: string, replace: string): string {
+export function replaceAll(str: string, find: string, replace: string): string {
   return str.replace(new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replace);
 }
 
@@ -225,6 +225,14 @@ function qualifyCommand(command: string): string {
     }
   }
   return command;
+}
+
+export async function openUri(uri: string): Promise<void> {
+  if (uri?.includes('//')) {
+    await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(uri));
+  } else {
+    await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(uri));
+  }
 }
 
 export async function getRunOutput(command: string, folder: string, shell?: string): Promise<string> {
@@ -282,6 +290,15 @@ export function setStringIn(data: string, start: string, end: string, replacemen
   }
   const idx = foundIdx + start.length;
   return data.substring(0, idx) + replacement + data.substring(data.indexOf(end, idx));
+}
+
+export function replaceStringIn(data: string, start: string, end: string, replacement: string): string {
+  const foundIdx = data.lastIndexOf(start);
+  if (foundIdx == -1) {
+    return data;
+  }
+  const idx = foundIdx;
+  return data.substring(0, idx) + replacement + data.substring(data.indexOf(end, idx) + end.length);
 }
 
 export function generateUUID(): string {

@@ -2,6 +2,7 @@
 
 ## Features
 
+- New projects - set the bundle id to something different based on app name chosen
 - See tslint.json and angular 12+ then link to https://ionicframework.com/blog/eslint-for-ionic-angular/ for migration
 
 - Listing recent appflow builds and allowing users to sideload the artifacts from those builds onto their simulators/devices (lots of potential cert issues with iOS here)
@@ -59,10 +60,6 @@
 - (feat) Review output folder www and report any assets that are too large (eg photos that are png etc)
 - (feat) Twitter to RSS feed - pull news into plugin ??
 
-# Known Issues
-
-- Badge option is not available for VS Code Extensions
-
 # Support For NX
 
 - (bug) Package reconciliation (from root and project)
@@ -71,6 +68,7 @@
 - (feat) Detect missing @nxtend/capacitor. Option to add
 - Starters for NX?
 
-# Support for pnpm
+# Remote Logging Issues
 
-- See: https://github.com/reslear/ionic-vue-pnpm-monorepo
+- Need this in capacitor config to allow Remote Logging to work: server: { cleartext: true }
+- Add for React and Vue

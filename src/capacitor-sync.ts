@@ -15,13 +15,13 @@ export function capacitorSync(project: Project): string {
   const ionicCLI = exists('@ionic/cli');
   switch (project.repoType) {
     case MonoRepoType.none:
-      return preop + (ionicCLI ? capCLISync() : ionicCLISync());
+      return preop + (ionicCLI ? ionicCLISync() : capCLISync());
     case MonoRepoType.folder:
     case MonoRepoType.pnpm:
     case MonoRepoType.lerna:
     case MonoRepoType.yarn:
     case MonoRepoType.npm:
-      return InternalCommand.cwd + preop + (ionicCLI ? capCLISync() : ionicCLISync());
+      return InternalCommand.cwd + preop + (ionicCLI ? ionicCLISync() : capCLISync());
     case MonoRepoType.nx:
       return preop + nxSync(project);
     default:

@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as globule from 'globule';
 
 import { MonoRepoProject } from './monorepo';
+import { replaceAll } from './utilities';
 import { Project } from './project';
 
 export function getPnpmWorkspaces(project: Project): Array<MonoRepoProject> {
@@ -15,7 +16,8 @@ export function getPnpmWorkspaces(project: Project): Array<MonoRepoProject> {
     const list = [];
     for (const line of yaml.split('\n')) {
       if (line.trim().startsWith('-')) {
-        const folder = line.replace('-', '').trim();
+        let folder = line.replace('-', '').trim();
+        folder = replaceAll(folder, '"', '');
         list.push(folder);
         // packages/*
         // '.'
