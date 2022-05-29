@@ -1,6 +1,6 @@
 ## Changelog
 
-### Version 1.8.2
+### Version 1.8.3
 
 - Fix for splashscreen/icon viewing on Windows
 - Settings for live reload, external IP and preview in editor now displayed

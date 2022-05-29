@@ -228,7 +228,7 @@ function qualifyCommand(command: string): string {
 }
 
 export async function openUri(uri: string): Promise<void> {
-  if (uri?.includes('\\')) {
+  if (uri?.includes('//')) {
     await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(uri));
   } else {
     await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(uri));
