@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.8.3",
+  "version": "1.8.4",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -25,7 +25,7 @@
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "npm run build && cp ionic-1.8.3.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+    "package": "npm run build && cp ionic-1.8.4.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
     "lint": "npm run eslint && npm run prettier -- --check",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write",
     "prettier": "prettier \"**/*.ts\"",
@@ -384,6 +384,12 @@
           "scope": "application",
           "default": "",
           "description": "Location of JAVA_HOME. Used to specify how Android will be built"
+        },
+        "ionic.debugSkipFiles": {
+          "type": "string",
+          "scope": "application",
+          "default": "",
+          "description": "Array of glob patterns to skip during debugging. Eg: [\"!**/node_modules/**\",\"<node_internals>/**\"]"
         }
       }
     }

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { startSourceMapServer } from './source-map-server';
+import { debugSkipFiles } from './utilities';
 
 // The debug provider type for VS Code
 export const AndroidDebugType = 'android-web';
@@ -25,6 +26,7 @@ export function debugAndroid(packageName: string, wwwFolder: string) {
     request: 'attach',
     packageName: packageName,
     webRoot: '${workspaceFolder}',
+    skipFiles: debugSkipFiles(),
   });
 
   startSourceMapServer(wwwFolder);

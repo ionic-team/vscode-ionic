@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { cancelLastOperation } from './extension';
 import { ionicState } from './ionic-tree-provider';
+import { debugSkipFiles } from './utilities';
 
 interface device {
   name: string;
@@ -56,6 +57,7 @@ export async function debugBrowser(url: string) {
       request: 'launch',
       url: url,
       webRoot: '${workspaceFolder}',
+      skipFiles: debugSkipFiles(),
     };
 
     vscode.debug.onDidTerminateDebugSession(async (e) => {
