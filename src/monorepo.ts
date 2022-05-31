@@ -158,21 +158,29 @@ export function getLocalFolder(rootFolder: string): string {
 function getFolderBasedProjects(prj: Project): Array<MonoRepoProject> {
   const projects = isFolderBasedMonoRepo(prj.folder);
   let result: Array<MonoRepoProject> = [];
+  let hasIonicBasedProjects = false;
   for (const project of projects) {
     // Look for suitable dependencies: @ionic/*, @angular/*
     try {
       const pck = JSON.parse(fs.readFileSync(project.packageJson, 'utf8'));
-      const isIonic =
+      const isIonic = !!(
         pck?.dependencies?.['@ionic/vue'] ||
         pck?.dependencies?.['@ionic/angular'] ||
         pck?.dependencies?.['@ionic/react'] ||
-        pck?.dependencies?.['@angular/core'];
+        pck?.dependencies?.['@angular/core']
+      );
       if (pck.dependencies) {
         result.push({ name: project.name, folder: project.path, isIonic: isIonic });
+      }
+      if (isIonic) {
+        hasIonicBasedProjects = true;
       }
     } catch {
       //
     }
+  }
+  if (!hasIonicBasedProjects) {
+    return [];
   }
   result = result.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
   return result;

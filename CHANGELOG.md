@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.8.5
+
+- Fix for mono repos that have only non-ionic subjects
+
 ### Version 1.8.4
 
 - Option added in Settings -> Advanced to define skipFiles for debugging
