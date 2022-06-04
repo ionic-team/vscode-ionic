@@ -198,6 +198,7 @@ export function capacitorRecommendations(project: Project): Tip[] {
   tips.push(incompatiblePlugin('cordova-plugin-qrscanner', 'https://github.com/ionic-team/capacitor/issues/1213'));
   tips.push(incompatiblePlugin('cordova-plugin-googlemaps', 'It causes build failures on iOS, skipped for iOS only'));
   tips.push(incompatiblePlugin('cordova-plugin-swrve', 'It relies on Cordova specific feature CDVViewController'));
+  tips.push(incompatiblePlugin('cordova-plugin-ios-keychain', 'It is not compatible with Capacitor'));
 
   tips.push(
     incompatiblePlugin(
@@ -271,6 +272,10 @@ export function capacitorRecommendations(project: Project): Tip[] {
   // Plugins which have a minimum versions
   tips.push(checkMinVersion('cordova-plugin-inappbrowser', '5.0.0', 'to compile in a Capacitor project'));
   tips.push(checkMinVersion('cordova-plugin-camera', '6.0.0', 'to compile in a Capacitor project'));
+  tips.push(checkMinVersion('cordova.plugins.diagnostic', '6.1.1', 'to compile in a Capacitor project'));
+  tips.push(checkMinVersion('cordova-plugin-file-opener2', '2.1.1', 'to compile in a Capacitor project'));
+  tips.push(checkMinVersion('cordova-plugin-statusbar', '3.0.0', 'to compile in a Capacitor project'));
+
   tips.push(
     checkMinVersion(
       'branch-cordova-sdk',
