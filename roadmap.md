@@ -10,7 +10,8 @@
 - Augmenting the New Project functionality to create the app in appflow and begin with the project linked, similar to the Ionic App Wizard
   Starting an appflow trial directly from the extension… thinking a 1-click experience to install AC/IV/etc
 
-- (1) Add .vs-code/extensions.json to recommend Ionic extension on starters
+- (2) For mono-repos include root package.json scripts
+- (1) Add .vs-code/extensions.json to recommend Ionic extension on starters (pr: https://github.com/ionic-team/starters/pull/1720)
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
 - (32) Debugging for iOS
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)
@@ -40,7 +41,6 @@
 ## Bugs
 
 - (bug) Debugging with Android web view without live reload doesnt allow breakpoints (see https://ionic-cloud.atlassian.net/browse/WN-391)
-- (bug) Handle scenarios where npx/npm cannot be found (eg bash)
 - (bug) Bug capturing of inspection with telemetry reporting on exception
 - (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
 - (bug) Bundle id validate doesnt accept "stuff"

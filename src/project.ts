@@ -17,6 +17,7 @@ import { checkForMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
 import { CapacitorPlatform } from './capacitor-platform';
 import { addCommand, npmInstall, npmUninstall, PackageManager } from './node-commands';
 import { getCapacitorConfigWebDir } from './capacitor-configure';
+import { ionicExport } from './ionic-export';
 
 export class Project {
   name: string;
@@ -362,7 +363,7 @@ export class Project {
           `${npmInstall(replacement)} && ${npmUninstall(name)}`,
           'Replace',
           `Replaced ${name} with ${replacement}`
-        )
+        ).setRelatedDependency(name)
       );
     }
   }
@@ -379,7 +380,9 @@ export class Project {
           'Uninstall',
           `Uninstalled ${name}`,
           url
-        ).canIgnore()
+        )
+          .canIgnore()
+          .setRelatedDependency(name)
       );
     }
   }
@@ -387,7 +390,15 @@ export class Project {
   public recommendAdd(name: string, title: string, message: string, description: string, devDependency: boolean) {
     const flags = devDependency ? ' --save-dev' : undefined;
     this.add(
-      new Tip(title, message, TipType.Warning, description, npmInstall(name, flags), 'Install', `Installed ${name}`)
+      new Tip(
+        title,
+        message,
+        TipType.Warning,
+        description,
+        npmInstall(name, flags),
+        'Install',
+        `Installed ${name}`
+      ).setRelatedDependency(name)
     );
   }
 
@@ -466,7 +477,7 @@ export class Project {
           npmUninstall(library),
           'Uninstall',
           `Uninstalled ${library}`
-        )
+        ).setRelatedDependency(library)
       );
     }
   }
@@ -518,6 +529,12 @@ export async function installPackage(extensionPath: string, folder: string) {
   //const selected = await vscode.window.showQuickPick(items, { placeHolder: 'Select a package to install' });
   const selected = await vscode.window.showInputBox({ placeHolder: 'Enter package name to install' });
   if (!selected) return;
+
+  if (selected == 'export') {
+    ionicExport(folder, ionicState.context);
+    return;
+  }
+
   await fixIssue(
     npmInstall(selected),
     folder,
@@ -534,11 +551,25 @@ export async function installPackage(extensionPath: string, folder: string) {
   );
 }
 
+export interface ProjectSummary {
+  project: Project;
+  packages: any;
+}
+
 export async function reviewProject(
   folder: string,
   context: vscode.ExtensionContext,
   selectedProject: string
 ): Promise<Recommendation[]> {
+  const summary = await inspectProject(folder, context, selectedProject);
+  return summary.project.groups;
+}
+
+export async function inspectProject(
+  folder: string,
+  context: vscode.ExtensionContext,
+  selectedProject: string
+): Promise<ProjectSummary> {
   const startedOp = Date.now();
   vscode.commands.executeCommand(VSCommand.setContext, Context.inspectedProject, false);
   vscode.commands.executeCommand(VSCommand.setContext, Context.isLoggingIn, false);
@@ -573,8 +604,9 @@ export async function reviewProject(
   await getRecommendations(project, context, packages);
 
   vscode.commands.executeCommand(VSCommand.setContext, Context.inspectedProject, true);
+
   console.log(`Analysed Project in ${Date.now() - startedOp}ms`);
-  return project.groups;
+  return { project, packages };
 }
 
 function setPackageManager(folder: string) {

@@ -23,6 +23,7 @@ export class Tip {
   public refresh: boolean; // Whether the tree provider is refresh after action is run
   public data?: any;
   public features: Array<TipFeature> = [];
+  public relatedDependency: string;
 
   private onAction: (...args) => unknown;
   private onCommand: (...args) => string;
@@ -149,6 +150,11 @@ export class Tip {
 
   setData(data: any) {
     this.data = data;
+    return this;
+  }
+
+  setRelatedDependency(name: string) {
+    this.relatedDependency = name;
     return this;
   }
 

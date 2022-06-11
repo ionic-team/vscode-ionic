@@ -108,7 +108,11 @@ export async function load(fn: string, project: Project, context: vscode.Extensi
     return undefined;
   }
   project.modified = fs.statSync(packageJsonFilename).mtime;
-  packageFile = JSON.parse(fs.readFileSync(packageJsonFilename, 'utf8'));
+  try {
+    packageFile = JSON.parse(fs.readFileSync(packageJsonFilename, 'utf8'));
+  } catch (err) {
+    throw new Error(`The package.json is malformed: ` + err);
+  }
   project.name = packageFile.name;
   if (!project.name) {
     project.name = project.monoRepo?.name;
@@ -133,7 +137,7 @@ export async function load(fn: string, project: Project, context: vscode.Extensi
 export const checkMinVersion = (library: string, minVersion: string, reason?: string, url?: string): Tip => {
   const v = coerce(allDependencies[library]);
   if (v && lt(v, minVersion)) {
-    const tip = writeMinVersionError(library, v, minVersion, reason);
+    const tip = writeMinVersionError(library, v, minVersion, reason).setRelatedDependency(library);
     tip.url = url;
     return tip;
   }
@@ -142,7 +146,7 @@ export const checkMinVersion = (library: string, minVersion: string, reason?: st
 export const warnMinVersion = (library: string, minVersion: string, reason?: string, url?: string): Tip => {
   const v = coerce(allDependencies[library]);
   if (v && lt(v, minVersion)) {
-    const tip = writeMinVersionWarning(library, v, minVersion, reason, url);
+    const tip = writeMinVersionWarning(library, v, minVersion, reason, url).setRelatedDependency(library);
     tip.url = url;
     return tip;
   }
@@ -155,7 +159,7 @@ export function exists(library: string) {
 export function remotePackages(): Array<string> {
   const result = [];
   for (const library of Object.keys(allDependencies)) {
-    if (allDependencies[library].startsWith('git')) {
+    if (allDependencies[library]?.startsWith('git')) {
       result.push(library);
     }
   }
@@ -343,7 +347,9 @@ export function incompatiblePlugin(name: string, url?: string): Tip {
       `The plugin ${name} is incompatible with Capacitor. ${msg}`,
       Command.NoOp,
       'OK'
-    ).canIgnore();
+    )
+      .canIgnore()
+      .setRelatedDependency(name);
     if (isUrl) {
       tip.url = url;
     } else {

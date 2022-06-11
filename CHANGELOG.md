@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.8.6
+
+- Detect malformed package.json and report better error
+
 ### Version 1.8.5
 
 - Fix for mono repos that have only non-ionic subjects
