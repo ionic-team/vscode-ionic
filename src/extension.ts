@@ -23,6 +23,7 @@ import { AndroidDebugProvider } from './android-debug-provider';
 import { AndroidDebugType } from './android-debug';
 import { CapacitorPlatform } from './capacitor-platform';
 import { kill } from './process-list';
+import { selectExternalIPAddress } from './ionic-serve';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
@@ -408,6 +409,12 @@ async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, ro
     if (tip.doRequestAppName) {
       command = await requestAppName(tip);
     }
+    if (tip.doIpSelection) {
+      const host = await selectExternalIPAddress();
+      if (host) {
+        command = (tip.command as string) + ` --public-host=${host}`;
+      }
+    }
     if (tip.doDeviceSelection) {
       const target = await selectDevice(tip.secondCommand as string, tip.data, tip);
       if (!target) {
@@ -415,7 +422,7 @@ async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, ro
         ionicProvider.refresh();
         return;
       }
-      command = (tip.command as string).replace(InternalCommand.target, target);
+      command = (command as string).replace(InternalCommand.target, target);
     }
     if (command) {
       execute(tip);

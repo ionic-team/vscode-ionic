@@ -2,6 +2,7 @@
 
 ### Version 1.8.6
 
+- Support for multiple network interfaces with using live reload and external Ip addresses
 - Detect malformed package.json and report better error
 
 ### Version 1.8.5

@@ -11,6 +11,7 @@ export class Tip {
   public doRun: boolean;
   public doRequestAppName: boolean;
   public doDeviceSelection: boolean;
+  public doIpSelection: boolean;
   public cancelRequested: boolean;
   public animates: boolean;
   public stoppable: boolean;
@@ -60,6 +61,11 @@ export class Tip {
 
   requestDeviceSelection() {
     this.doDeviceSelection = true;
+    return this;
+  }
+
+  requestIPSelection() {
+    this.doIpSelection = true;
     return this;
   }
 

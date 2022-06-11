@@ -1,3 +1,4 @@
+import { networkInterfaces } from 'os';
 import * as vscode from 'vscode';
 
 import { InternalCommand } from './command-name';
@@ -47,4 +48,35 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
 
 function nxServe(project: Project): string {
   return `npx nx serve ${project.monoRepo.name}`;
+}
+
+export async function selectExternalIPAddress(): Promise<string> {
+  const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
+  const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
+  if (!externalIP && !liveReload) {
+    return;
+  }
+  const list = getAddresses();
+  if (list.length <= 1) {
+    return;
+  }
+  const selected = await vscode.window.showQuickPick(list, {
+    placeHolder: 'Select the external network address to use',
+  });
+  return selected;
+}
+
+function getAddresses(): Array<string> {
+  const nets = networkInterfaces();
+  const result = [];
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+      // Skip over link-local addresses (same as Ionic CLI)
+      if (net.family === 'IPv4' && !net.internal && !net.address.startsWith('169.254')) {
+        result.push(net.address);
+      }
+    }
+  }
+  return result;
 }

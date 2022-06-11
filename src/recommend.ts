@@ -40,6 +40,7 @@ export async function getRecommendations(
     project.add(
       new Tip('Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`)
         .setDynamicCommand(ionicServe, project, false)
+        .requestIPSelection()
         .setFeatures([TipFeature.viewInEditor])
         .setRunPoints([
           { title: 'Building...', text: 'Generating browser application bundles' },
@@ -67,6 +68,7 @@ export async function getRecommendations(
       project.add(
         new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
           .requestDeviceSelection()
+          .requestIPSelection()
           .setDynamicCommand(capacitorRun, project, CapacitorPlatform.android)
           .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.android))
           .setData(project.projectFolder())
@@ -82,6 +84,7 @@ export async function getRecommendations(
       project.add(
         new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
           .requestDeviceSelection()
+          .requestIPSelection()
           .setDynamicCommand(capacitorRun, project, CapacitorPlatform.ios)
           .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.ios))
           .setData(project.projectFolder())
