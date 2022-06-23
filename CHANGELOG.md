@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.8.7
+
+- Fix for retrying builds when a bug is fixed in code and file saved
+
 ### Version 1.8.6
 
 - Support for multiple network interfaces with using live reload and external Ip addresses

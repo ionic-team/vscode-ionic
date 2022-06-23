@@ -7,6 +7,7 @@ import { openUri, showMessage } from './utilities';
 import { ionicInit } from './ionic-init';
 import { Context } from './context-variables';
 import { ionicState } from './ionic-tree-provider';
+import { Project } from './project';
 
 interface ErrorLine {
   uri: string;
@@ -69,7 +70,8 @@ export async function handleError(error: string, logs: Array<string>, folder: st
       if (document.fileName == currentErrorFilename) {
         onSave.dispose();
         const title = lastOperation.title;
-        vscode.commands.executeCommand(CommandName.Run, lastOperation);
+        const r = new Project('').asRecommendation(lastOperation);
+        vscode.commands.executeCommand(CommandName.Run, r);
         showMessage(`Lets try to ${title} again...`, 3000);
       }
     });
