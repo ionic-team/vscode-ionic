@@ -6,17 +6,12 @@ import { join } from "path";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { ionicBuild } from "./ionic-build";
 
+/**
+ * Generates a readable analysis of Javascript bundle sizes
+ * Uses source-map-explorer on a production build of the app with source maps turned on
+ * @param  {Project} project
+ */
 export async function analyzeSize(project: Project) {
-	// export NODE_OPTIONS="--max-old-space-size=8192" && npx ionic build --configuration=production
-	// In angular.json check production has "sourceMap": true
-	// npx source-map-explorer www/**/*.js --json result.json --gzip
-
-	// Parse and sort by size
-	// Group by 3rd party vs local
-	// List filename, folder, size, bundle
-	// Group by bundle option y/n
-	// Lines of Code inspect and highlight > X lines
-	// Show bar graph
 	const channel = getOutputChannel();
 	const dist = project.getDistFolder();
 	showProgress('Generating Project Statistics', async () => {
@@ -24,7 +19,6 @@ export async function analyzeSize(project: Project) {
 		try {
 			previousValue = enableSourceMaps(project);
 			writeIonic('Building for production with Sourcemaps...');
-			//npx ionic build --configuration=production
 			const cmd = ionicBuild(project, '--prod');
 			await run2(project,
 				`export NODE_OPTIONS="--max-old-space-size=8192" && ${cmd}`, undefined);
@@ -39,9 +33,13 @@ export async function analyzeSize(project: Project) {
 			revertSourceMaps(project, previousValue);
 		}
 	});
-
 }
 
+/**
+ * Enables the configuration for source maps in the projects configuration
+ * @param  {Project} project
+ * @returns string
+ */
 function enableSourceMaps(project: Project): string {
 	try {
 		const filename = join(project.folder, 'angular.json');
@@ -74,6 +72,11 @@ function enableSourceMaps(project: Project): string {
 	return undefined;
 }
 
+/**
+ * Reverts the projects configuation back to its previous settings before source maps were turned on
+ * @param  {Project} project
+ * @param  {string} previousValue
+ */
 function revertSourceMaps(project: Project, previousValue: string) {
 	if (previousValue == undefined) {
 		return;
