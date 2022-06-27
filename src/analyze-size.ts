@@ -2,8 +2,8 @@ import { getOutputChannel, writeIonic } from "./extension";
 import { Project } from "./project";
 import { openUri, run, RunResults, showProgress } from "./utilities";
 import * as vscode from 'vscode';
-import { join } from "path";
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { basename, extname, join } from "path";
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "fs";
 import { ionicBuild } from "./ionic-build";
 
 /**
@@ -12,7 +12,6 @@ import { ionicBuild } from "./ionic-build";
  * @param  {Project} project
  */
 export async function analyzeSize(project: Project) {
-	const channel = getOutputChannel();
 	const dist = project.getDistFolder();
 	showProgress('Generating Project Statistics', async () => {
 		let previousValue;
@@ -27,7 +26,17 @@ export async function analyzeSize(project: Project) {
 			const result: RunResults = { output: '', success: undefined };
 			await run2(project, `npx source-map-explorer ${dist}/**/*.js --json --exclude-source-map`, result);
 
-			analyseResults(result.output, project.projectFolder());
+
+			const html =
+				analyseResults(
+					analyzeBundles(result.output),
+					'Bundle Analysis',
+					'Size of Javascript bundles for your code and 3rd party packages.') +
+				analyseResults(
+					analyseAssets(dist, project.projectFolder()),
+					'Asset Analysis',
+					'Size of assets in your distribution folder.');
+			showWindow(project.projectFolder(), html);
 			writeIonic('Launched project statistics window.');
 		} finally {
 			revertSourceMaps(project, previousValue);
@@ -61,7 +70,7 @@ function enableSourceMaps(project: Project): string {
 				}
 			}
 			if (changeMade) {
-				writeFileSync(filename, JSON.stringify(config, null, 2));				
+				writeFileSync(filename, JSON.stringify(config, null, 2));
 				return json;
 			}
 		}
@@ -83,7 +92,7 @@ function revertSourceMaps(project: Project, previousValue: string) {
 	}
 	const filename = join(project.folder, 'angular.json');
 	if (existsSync(filename)) {
-		writeFileSync(filename, previousValue, {encoding: 'utf-8'});
+		writeFileSync(filename, previousValue, { encoding: 'utf-8' });
 	}
 }
 
@@ -156,47 +165,47 @@ function htmlHead() {
 	<body>`;
 }
 
-function analyseResults(json: string, folder: string) {
+function analyzeBundles(json: string): Array<FileInfo> {
 	const data: SizeResults = JSON.parse(json);
-	let html = htmlHead();
-
 	const ignoreList = ['[EOLs]'];
-	let files: Array<FileInfo> = [];
-	let largest = 0;
-	let largestGroup = 0;
-	const groups = {};
-	const groupLargest = {};
-	const groupCount = {};
-	const groupFiles = {};
-	for (const result of data.results) {
-		for (const key of Object.keys(result.files)) {
-			if (result.files[key].size > largest) {
-				largest = result.files[key].size;
-			}
-		}
-	}
+	const files: Array<FileInfo> = [];
 	for (const result of data.results) {
 		for (const key of Object.keys(result.files)) {
 			if (!ignoreList.includes(key)) {
 				const info = getInfo(key, result.files[key].size, result.bundleName);
 				files.push(info);
-				if (!groups[info.type]) {
-					groups[info.type] = 0;
-					groupLargest[info.type] = 0;
-					groupCount[info.type] = 0;
-					groupFiles[info.type] = [];
-				}
-				if (!groupFiles[info.type].includes(result.bundleName)) {
-					groupFiles[info.type].push(result.bundleName);
-				}
-				groupCount[info.type] += 1;
-				if (result.files[key].size > groupLargest[info.type]) {
-					groupLargest[info.type] = result.files[key].size;
-				}
-				groups[info.type] = groups[info.type] + result.files[key].size;
 			}
 		}
 	}
+	return files;
+}
+
+function analyseResults(files: Array<FileInfo>, title: string, blurb: string): string {
+	let html = '';
+	let largestGroup = 0;
+	const groups = {};
+	const groupLargest = {};
+	const groupCount = {};
+	const groupFiles = {};
+
+	// Calculate totals
+	for (const file of files) {
+		if (!groups[file.type]) {
+			groups[file.type] = 0;
+			groupLargest[file.type] = 0;
+			groupCount[file.type] = 0;
+			groupFiles[file.type] = [];
+		}
+		if (!groupFiles[file.type].includes(file.bundlename)) {
+			groupFiles[file.type].push(file.bundlename);
+		}
+		groupCount[file.type] += 1;
+		if (file.size > groupLargest[file.type]) {
+			groupLargest[file.type] = file.size;
+		}
+		groups[file.type] = groups[file.type] + file.size;
+	}
+
 	for (const group of Object.keys(groups)) {
 		if (groups[group] > largestGroup) {
 			largestGroup = groups[group];
@@ -205,19 +214,20 @@ function analyseResults(json: string, folder: string) {
 	files = files.sort((a, b) => {
 		return cmp(groups[b.type], groups[a.type]) || cmp(b.size, a.size);
 	});
-	let lastType;
-	html += `<h1>Bundle Analysis</h1>
-	<p class="shade">Size of Javascript bundles for your code and 3rd party packages.</p>`;
+	let lastType: string;
+	html += `<h1>${title}</h1>
+	<p class="shade">${blurb}</p>`;
 	for (const file of files) {
 		if (file.type != lastType) {
 			if (lastType) {
 				html += '</details>';
 			}
 			lastType = file.type;
+			const onclick = groupCount[lastType] == 1 ? `onclick="send('${file.filename}')"` : '';
 			html += `<details><summary>
 			<div class="row">
 			   <div class="col">${graph(groups[lastType], largestGroup)}</div>
-			   <p class="col tooltip">${lastType}
+			   <p ${onclick} class="col tooltip">${lastType}
 			      <span class="tooltiptext">${friendlySize(groups[lastType])} (${groupFiles[lastType].length} Files)</span>
 			   </p>			
 			</div>
@@ -225,19 +235,20 @@ function analyseResults(json: string, folder: string) {
 		}
 		if (groupCount[lastType] != 1) {
 			html += `
-		<div class="row">
-		   <div class="col">${graph(file.size, groupLargest[file.type], true)}</div>
-		   <p onclick="send('${file.filename}')" class="col tooltip shade hover">&nbsp;&nbsp;&nbsp;${file.name}
-		      <span class="tooltiptext">${file.path}<br/>${file.size} bytes<br/>${file.bundlename}</span>
-		   </p>
-		   
-		</div>`;
+		    <div class="row">
+		       <div class="col">${graph(file.size, groupLargest[file.type], true)}</div>
+		       <p onclick="send('${file.filename}')" class="col tooltip shade hover">&nbsp;&nbsp;&nbsp;${file.name}
+		          <span class="tooltiptext">${file.path}<br/>${file.size} bytes<br/>${file.bundlename}</span>
+		       </p>		   
+		    </div>`;
 		}
 	}
 	html += '</details>';
 
+	return html;
+}
 
-	html += '</body></html>';
+function showWindow(folder: string, html: string) {
 	const panel = vscode.window.createWebviewPanel('viewApp', 'Project Statistics', vscode.ViewColumn.Active, {
 		enableScripts: true,
 	});
@@ -245,7 +256,7 @@ function analyseResults(json: string, folder: string) {
 		const path = join(folder, filename);
 		openUri(path);
 	});
-	panel.webview.html = html;
+	panel.webview.html = htmlHead() + html + '</body></html>';
 }
 
 function graph(size: number, largest: number, indent = false) {
@@ -334,7 +345,7 @@ function friendlyName(name: string, path?: string): string {
 		if (result.endsWith(` ${i}`)) {
 			result = result.replace(` ${i}`, '');
 		}
-		
+
 	}
 	// Ionic component
 	if (result.startsWith('ion ')) {
@@ -410,6 +421,60 @@ function friendlyPath(path: string): string {
 async function run2(project: Project, command: string, output: RunResults): Promise<boolean> {
 	const channel = getOutputChannel();
 	return await run(project.projectFolder(), command, channel, undefined, [], [], undefined, undefined, output, true);
+}
+
+function analyseAssets(distFolder: string, prjFolder: string): Array<FileInfo> {
+	// Summarize files other than js
+	const files = getAllFiles(distFolder);
+	const excludedFileTypes = ['.js', '.map'];
+	const result: Array<FileInfo> = [];	
+	for (const file of files) {
+		const ext = extname(file);
+		if (!excludedFileTypes.includes(ext)) {
+			const size = statSync(file).size;
+			result.push({
+				name: basename(file),
+				path: file,
+				bundlename: file,
+				type: assetType(ext),
+				size,
+				filename: file.replace(prjFolder,'')
+			});
+		}
+	}
+	return result;
+}
+
+function assetType(ext: string): string {
+	switch (ext) {
+		case '.png':
+		case '.jpg':
+		case '.gif':
+		case '.jpeg':
+			return 'Images';
+		case '.svg':
+			return 'Vector Images';
+		case '.woff':
+		case '.woff2':
+		case '.eot':
+		case '.ttf':
+			return 'Fonts';
+		default: return 'Other';
+	}
+}
+
+function getAllFiles(dirPath: string, arrayOfFiles?: Array<string>): Array<string> {
+	const files = readdirSync(dirPath);
+	arrayOfFiles = arrayOfFiles || [];
+	files.forEach((file) => {
+		if (statSync(join(dirPath, file)).isDirectory()) {
+			arrayOfFiles = getAllFiles(join(dirPath, file), arrayOfFiles);
+		} else {
+			arrayOfFiles.push(join(dirPath, file));
+		}
+	});
+
+	return arrayOfFiles;
 }
 
 interface FileInfo {
