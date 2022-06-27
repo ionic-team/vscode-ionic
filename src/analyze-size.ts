@@ -280,12 +280,31 @@ function cmp(a, b) {
 
 function getInfo(fullname: string, size: number, bundlename: string): FileInfo {
 	let url: URL;
+	let name: string;
+	let pathname: string;
 	try {
 		url = new URL(fullname);
+		name = url.pathname;
+		pathname = url.pathname;
 	} catch {
-		return { name: friendlyName(bundlename), type: friendlyType(fullname), path: fullname, size, bundlename, filename: bundlename };
+		if (fullname.startsWith('../node_modules')) {
+			name = fullname.replace('../node_modules', '/node_modules');
+			pathname = name;
+		} else {
+			name = fullname;
+			let filename = bundlename;
+			if (name == '[unmapped]' || name == '[no source]') {
+				name = bundlename;
+			} else {
+				if (bundlename.endsWith('chunk.js')) {
+					filename = fullname; // TODO: React projects dont seem to set the path well
+				}
+			}
+
+			return { name: friendlyName(name), type: friendlyType(fullname), path: fullname, size, bundlename, filename };
+		}
 	}
-	let name = url.pathname;
+
 	const filename = name.replace('webpack://', '.');
 
 	if (name.startsWith('/node_modules/')) {
@@ -293,7 +312,7 @@ function getInfo(fullname: string, size: number, bundlename: string): FileInfo {
 	}
 	const names = name.split('/');
 	const path = friendlyPath(names.join(' '));
-	const type = friendlyType(url.pathname);
+	const type = friendlyType(pathname);
 	name = friendlyName(names.pop(), path);
 	return { name, path, type, size, bundlename, filename };
 }
@@ -326,6 +345,9 @@ function friendlyType(name: string): string {
 	if (name.startsWith('/webpack/')) {
 		return 'Webpack';
 	}
+	if (name.startsWith('/node_modules/react')) {
+		return 'React';
+	}
 	if (name.startsWith('/node_modules/@')) {
 		const names = name.replace('/node_modules/@', '').split('/');
 		type = names[0];
@@ -344,6 +366,7 @@ function friendlyName(name: string, path?: string): string {
 	result = result.split('-').join(' ');
 	result = result.split('_').join(' ');
 	result = result.split('.').join(' ');
+	result = result.split('/').join(' ');
 	result = result.split('%20').join(' ');
 	for (let i = 1; i < 9; i++) {
 		if (result.endsWith(` ${i}`)) {
@@ -360,6 +383,7 @@ function friendlyName(name: string, path?: string): string {
 		result += ' Component';
 	}
 	result = result.replace(' dist', '');
+	result = result.replace(' tsx', '');
 
 	if (result.endsWith(' js')) {
 		result = result.replace(' js', '');
@@ -369,6 +393,8 @@ function friendlyName(name: string, path?: string): string {
 		result = result.replace(' mjs', '');
 	} else if (result.endsWith(' vue')) {
 		result = result.replace(' vue', '');
+	} else if (result.endsWith(' index')) {
+		result = result.replace(' index', '');
 	}
 
 	if (result == 'index' || result == 'runtime') {
@@ -377,6 +403,10 @@ function friendlyName(name: string, path?: string): string {
 		if (path?.startsWith('Moment Locale')) {
 			result = path;
 		}
+	}
+
+	if (!result) {
+		return name;
 	}
 
 	if (result.toLowerCase() != result) {
@@ -393,7 +423,7 @@ function toTitleCase(text: string) {
 		(txt: string) => {
 			return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
 		}
-	);
+	).trim();
 }
 
 function friendlyPath(path: string): string {
@@ -470,6 +500,8 @@ function assetType(ext: string): string {
 		case '.eot':
 		case '.ttf':
 			return 'Fonts';
+		case '.css':
+			return 'Style Sheets';
 		default: return 'Other';
 	}
 }
