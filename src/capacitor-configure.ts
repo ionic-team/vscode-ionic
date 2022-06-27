@@ -10,6 +10,7 @@ import { Project } from './project';
 import { Tip, TipType } from './tip';
 import { channelShow, getStringFrom, setStringIn } from './utilities';
 import { CapProjectCache } from './context-variables';
+import { join } from 'path';
 
 enum NativePlatform {
   iOSOnly,
@@ -105,6 +106,10 @@ export function getCapacitorConfigWebDir(folder: string): string {
   if (fs.existsSync(capConfigFile)) {
     const config = fs.readFileSync(capConfigFile, 'utf-8');
     result = getStringFrom(config, `webDir: '`, `'`);
+  } else {
+    if (fs.existsSync(join(folder, 'dist'))) {
+      result = 'dist';
+    }
   }
   return path.join(folder, result);
 }

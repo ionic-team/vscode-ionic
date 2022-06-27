@@ -24,7 +24,11 @@ export async function analyzeSize(project: Project) {
 
 			writeIonic('Analysing Sourcemaps...');
 			const result: RunResults = { output: '', success: undefined };
-			await run2(project, `npx source-map-explorer ${dist}/**/*.js --json --exclude-source-map`, result);
+			try {
+				await run2(project, `npx source-map-explorer ${dist}/**/*.js --json --exclude-source-map`, result);
+			} catch (err) {
+				vscode.window.showErrorMessage('Unable to analyze source maps: ' + err, 'OK');
+			}
 
 
 			const html =
@@ -363,6 +367,8 @@ function friendlyName(name: string, path?: string): string {
 		result = result.replace(' ts', '');
 	} else if (result.endsWith(' mjs')) {
 		result = result.replace(' mjs', '');
+	} else if (result.endsWith(' vue')) {
+		result = result.replace(' vue', '');
 	}
 
 	if (result == 'index' || result == 'runtime') {
@@ -371,6 +377,11 @@ function friendlyName(name: string, path?: string): string {
 		if (path?.startsWith('Moment Locale')) {
 			result = path;
 		}
+	}
+
+	if (result.toLowerCase() != result) {
+		// Given OneAndTwoAndThree => One And Two And Three
+		result = result.replace(/([A-Z])/g, ' $1').trim();
 	}
 
 	return toTitleCase(result);
@@ -427,7 +438,7 @@ function analyseAssets(distFolder: string, prjFolder: string): Array<FileInfo> {
 	// Summarize files other than js
 	const files = getAllFiles(distFolder);
 	const excludedFileTypes = ['.js', '.map'];
-	const result: Array<FileInfo> = [];	
+	const result: Array<FileInfo> = [];
 	for (const file of files) {
 		const ext = extname(file);
 		if (!excludedFileTypes.includes(ext)) {
@@ -438,7 +449,7 @@ function analyseAssets(distFolder: string, prjFolder: string): Array<FileInfo> {
 				bundlename: file,
 				type: assetType(ext),
 				size,
-				filename: file.replace(prjFolder,'')
+				filename: file.replace(prjFolder, '')
 			});
 		}
 	}
