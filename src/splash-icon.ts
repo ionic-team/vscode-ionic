@@ -10,6 +10,7 @@ import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall } from './node-commands';
 import { Context } from './context-variables';
+import { join } from 'path';
 
 export enum AssetType {
   splash = 'splash.png',
@@ -170,13 +171,28 @@ async function runCordovaRes(project: Project) {
     }
     if (ios) {
       await run(folder, 'npx cordova-res ios --skip-config --copy', channel, undefined, [], undefined, undefined);
+      addToGitIgnore(folder, 'resources/ios/**/*');
     }
     if (android) {
       await run(folder, 'npx cordova-res android --skip-config --copy', channel, undefined, [], undefined, undefined);
+      addToGitIgnore(folder, 'resources/android/**/*');
     }
+  
   });
   channel.appendLine('[Ionic] Completed created Splash Screen and Icon Assets');
   channelShow(channel);
+}
+
+function addToGitIgnore(folder: string, ignoreGlob: string) {
+  const filename = join(folder, '.gitignore');
+  if (fs.existsSync(filename)) {
+    let txt = fs.readFileSync(filename, { encoding: 'utf-8' });
+    const lines = txt.split('\n');
+    if (!txt.includes(ignoreGlob)) {
+      txt = txt + `\n${ignoreGlob}`;
+      fs.writeFileSync(filename, txt);
+    }  
+  }
 }
 
 async function showProgress(message: string, func: () => Promise<any>) {
