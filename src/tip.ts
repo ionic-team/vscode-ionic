@@ -232,6 +232,7 @@ export enum TipType {
   Files,
   Sync,
   Add,
+  Dependency,
   Media,
   Debug,
   None,

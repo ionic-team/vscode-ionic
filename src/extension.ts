@@ -116,6 +116,11 @@ export function getOutputChannel(): vscode.OutputChannel {
   return channel;
 }
 
+export function writeIonic(message: string) {
+  const channel = getOutputChannel();
+  channel.appendLine(`[Ionic] ${message}`);
+}
+
 export function markActionAsRunning(tip: Tip) {
   runningActions.push(tip);
 }
