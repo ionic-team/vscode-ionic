@@ -112,7 +112,9 @@ export function getCapacitorConfigWebDir(folder: string): string {
     result = getStringFrom(config, `webDir: '`, `'`);
   } else {
     // No config file take a best guess
-    if (fs.existsSync(join(folder, 'dist'))) {
+    if (fs.existsSync(join(folder, 'www'))) {
+      result = 'www';
+    } else if (fs.existsSync(join(folder, 'dist'))) {
       result = 'dist';
     } else if (fs.existsSync(join(folder, 'build'))) {
       result = 'build';
