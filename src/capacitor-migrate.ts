@@ -38,7 +38,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
 
 			// Variables gradle
 			const variables = {
-				minSdkVersion: 21,
+				minSdkVersion: 22,
 				androidxActivityVersion: '1.4.0',
 				androidxAppCompatVersion: '1.4.1',
 				androidxCoordinatorLayoutVersion: '1.2.0',
