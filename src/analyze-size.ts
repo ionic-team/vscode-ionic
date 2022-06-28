@@ -257,8 +257,11 @@ function showWindow(folder: string, html: string) {
 		enableScripts: true,
 	});
 	panel.webview.onDidReceiveMessage(async (filename) => {
-		const path = join(folder, filename);
-		openUri(path);
+		if (!filename.startsWith(folder)) {
+			openUri(join(folder, filename));
+		} else {
+			openUri(filename);
+		}
 	});
 	panel.webview.html = htmlHead() + html + '</body></html>';
 }

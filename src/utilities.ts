@@ -12,6 +12,7 @@ import { getMonoRepoFolder, getPackageJSONFilename } from './monorepo';
 import { InternalCommand } from './command-name';
 import { exists } from './analyzer';
 import { ionicInit } from './ionic-init';
+import { request } from 'https';
 
 export interface CancelObject {
   proc: child_process.ChildProcess;
@@ -391,6 +392,41 @@ export async function showProgress(message: string, func: () => Promise<any>) {
       await func();
     }
   );
+}
+
+export function httpRequest(method: string, host: string, path: string, postData?: string) {
+  const params = {
+    host,
+    port: 443,
+    method,
+    path
+  };
+  return new Promise(function (resolve, reject) {
+    const req = request(params, function (res) {
+      if (res.statusCode < 200 || res.statusCode >= 300) {
+        return reject(new Error('statusCode=' + res.statusCode));
+      }
+      let body = [];
+      res.on('data', function (chunk) {
+        body.push(chunk);
+      });
+      res.on('end', function () {
+        try {
+          body = JSON.parse(Buffer.concat(body).toString());
+        } catch (e) {
+          reject(e);
+        }
+        resolve(body);
+      });
+    });
+    req.on('error', function (err) {
+      reject(err);
+    });
+    if (postData) {
+      req.write(postData);
+    }
+    req.end();
+  });
 }
 
 function timeout(ms: number) {
