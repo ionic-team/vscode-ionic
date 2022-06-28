@@ -376,3 +376,11 @@ export function warnIfNotUsing(name: string): Tip {
     return new Tip(name, `package is not using ${name}`);
   }
 }
+
+/**
+ * Returns a list of all packages used in the project
+ * @returns Array
+ */
+export function getAllPackageNames(): Array<string> {
+  return Object.keys(allDependencies);
+}

@@ -121,6 +121,11 @@ export function writeIonic(message: string) {
   channel.appendLine(`[Ionic] ${message}`);
 }
 
+export function writeError(message: string) {
+  const channel = getOutputChannel();
+  channel.appendLine(`[Error] ${message}`);
+}
+
 export function markActionAsRunning(tip: Tip) {
   runningActions.push(tip);
 }

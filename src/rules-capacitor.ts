@@ -5,6 +5,7 @@ import {
   checkConsistentVersions,
   checkMinVersion,
   exists,
+  getPackageVersion,
   incompatiblePlugin,
   incompatibleReplacementPlugin,
   isGreaterOrEqual,
@@ -21,6 +22,7 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall } from './node-commands';
 import { InternalCommand } from './command-name';
 import { MonoRepoType } from './monorepo';
+import { migrateCapacitor } from './capacitor-migrate';
 
 /**
  * Check rules for Capacitor projects
@@ -80,6 +82,13 @@ export function checkCapacitorRules(project: Project) {
   if (isLess('@capacitor/android', '3.2.3')) {
     // Check minifyEnabled is false for release
     checkBuildGradleForMinifyInRelease(project);
+  }
+
+  if (isLess('@capacitor/core', '4.0.0')) {
+    if (isGreaterOrEqual('@capacitor/core', '3.0.0')) {
+      // Recommend migration from 3 to 4
+      project.tip(new Tip('Migrate Capacitor 3 to 4', '', TipType.Idea).setAction(migrateCapacitor, project, getPackageVersion('@capacitor/core')));
+    }
   }
 
   if (exists('@ionic-enterprise/auth')) {

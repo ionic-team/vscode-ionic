@@ -333,6 +333,23 @@ export function setStringIn(data: string, start: string, end: string, replacemen
   return data.substring(0, idx) + replacement + data.substring(data.indexOf(end, idx));
 }
 
+export function setAllStringIn(data: string, start: string, end: string, replacement: string): string {
+  let position = 0;
+  let result = data;
+  let replaced = true;
+  while (replaced) {
+    const foundIdx = result.indexOf(start, position);
+    if (foundIdx == -1) {
+      replaced = false;
+    } else {
+      const idx = foundIdx + start.length;
+      position = idx;
+      result = result.substring(0, idx) + replacement + result.substring(result.indexOf(end, idx));
+    }
+  }
+  return result;
+}
+
 export function replaceStringIn(data: string, start: string, end: string, replacement: string): string {
   const foundIdx = data.lastIndexOf(start);
   if (foundIdx == -1) {
