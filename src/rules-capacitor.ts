@@ -87,7 +87,10 @@ export function checkCapacitorRules(project: Project) {
   if (isLess('@capacitor/core', '4.0.0')) {
     if (isGreaterOrEqual('@capacitor/core', '3.0.0')) {
       // Recommend migration from 3 to 4
-      project.tip(new Tip('Migrate Capacitor 3 to 4', '', TipType.Idea).setAction(migrateCapacitor, project, getPackageVersion('@capacitor/core')));
+      project.tip(new Tip('Migrate to Capacitor 4 Beta', '', TipType.Idea)
+      .setAction(migrateCapacitor, project, getPackageVersion('@capacitor/core'))
+      .canIgnore()
+      );
     }
   }
 

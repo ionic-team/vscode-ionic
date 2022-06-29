@@ -189,7 +189,9 @@ export async function run(
 
         for (const logline of loglines) {
           if (logline.startsWith('[capacitor]')) {
-            channel.appendLine(logline.replace('[capacitor]', ''));
+            if (!supressInfo) {
+              channel.appendLine(logline.replace('[capacitor]', ''));
+            }
           } else if (logline && !supressInfo) {
             const nocolor = logline.replace(
               /[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
@@ -203,7 +205,9 @@ export async function run(
     });
 
     proc.stderr.on('data', (data) => {
-      channel.append(data);
+      if (!supressInfo) {
+        channel.append(data);
+      }
       focusOutput(channel);
     });
 
@@ -343,7 +347,7 @@ export function setAllStringIn(data: string, start: string, end: string, replace
       replaced = false;
     } else {
       const idx = foundIdx + start.length;
-      position = idx;
+      position = idx + replacement.length;
       result = result.substring(0, idx) + replacement + result.substring(result.indexOf(end, idx));
     }
   }

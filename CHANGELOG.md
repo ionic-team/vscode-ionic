@@ -3,6 +3,7 @@
 ### Version 1.8.7
 
 - Project Analysis feature added showing Javascript and Asset sizes
+- Capacitor 3 to 4 migration feature added
 - Add generated splash and icon resources to .gitignore when generating for Capacitor
 - Fix for retrying builds when a bug is fixed in code and file saved
 
