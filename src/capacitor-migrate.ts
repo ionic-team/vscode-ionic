@@ -1,9 +1,9 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import * as vscode from 'vscode';
-import { exists, getAllPackageNames } from './analyzer';
+import { exists } from './analyzer';
 import { getOutputChannel, writeError, writeIonic } from './extension';
-import { npmInstall } from './node-commands';
+import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
 import { run, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
@@ -53,7 +53,6 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
             '@capacitor/share',
             '@capacitor/splash-screen',
             '@capacitor/status-bar',
-            '@capacitor/storage',
             '@capacitor/text-zoom',
             '@capacitor/toast',
           ],
@@ -61,6 +60,12 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
           pluginVersion
         )
       );
+
+      if (exists('@capacitor/storage')) {
+        await run2(project, npmUninstall(`@capacitor/storage`));
+        await run2(project, npmInstall(`@capacitor/preferences@${pluginVersion}`));
+        writeIonic('Migrated @capacitor/storage to @capacitor/preferences.');
+      }
 
       if (exists('@capacitor/ios')) {
         // Set deployment target to 13.0
@@ -226,11 +231,11 @@ function updateGradleWrapper(filename: string) {
   }
   let replaced = txt;
   if (replaced.includes('gradle-7.0-all.zip')) {
-    // eslint-disable-next-line no-useless-escape
     replaced = setAllStringIn(
       replaced,
       'distributionUrl=',
       '\n',
+      // eslint-disable-next-line no-useless-escape
       `https\://services.gradle.org/distributions/gradle-7.4.2-bin.zip`
     );
     writeFileSync(filename, replaced, 'utf-8');

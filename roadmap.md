@@ -74,3 +74,9 @@
 
 - Need this in capacitor config to allow Remote Logging to work: server: { cleartext: true }
 - Add for React and Vue
+
+# Cap 4 Migration TOODO
+
+- Remove NSAppTransportSecurity: https://github.com/ionic-team/capacitor/commit/ca2690ded1372daea0930b2ac953303bbfa2c3c8
+- Remove USE_PUSH https://github.com/ionic-team/capacitor/commit/6d54243108883e0b07d725dcc7a1cb8700f1b35e
+- Add Dependenciy CoordinatorLayout: https://github.com/ionic-team/capacitor/commit/206d11b7518af08498ff733a538d2addd9b3dbf3

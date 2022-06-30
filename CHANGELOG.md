@@ -1,6 +1,6 @@
 ## Changelog
 
-### Version 1.8.8
+### Version 1.8.9
 
 - Project Analysis feature added showing Javascript and Asset sizes
 - Capacitor 3 to 4 migration feature added
