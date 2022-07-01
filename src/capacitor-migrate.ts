@@ -82,6 +82,15 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
 
         // Remove touchesBegan
         updateFile(project, join('ios', 'App', 'App', 'AppDelegate.swift'), `override func touchesBegan`, `}`);
+
+        // Remove NSAppTransportSecurity
+        removeKey(join(project.folder, 'ios', 'App', 'App', 'info.plist'), 'NSAppTransportSecurity');
+
+        // Remove USE_PUSH
+        replacePush(join(project.folder, 'ios', 'App', 'App.xcodeproj', 'project.pbxproj'));
+
+        // Remove from App Delegate
+        removeInFile(join(project.folder, 'ios', 'App', 'App', 'AppDelegate.swift'), `#if USE_PUSH`, `#endif`);
       }
 
       if (exists('@capacitor/android')) {
@@ -90,6 +99,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
 
         // Update build.gradle
         updateBuildGradle(join(project.folder, 'android', 'build.gradle'));
+        updateAppBuildGradle(join(project.folder, 'android', 'app', 'build.gradle'));
 
         // Update gradle-wrapper.properties
         updateGradleWrapper(join(project.folder, 'android', 'gradle', 'wrapper', 'gradle-wrapper.properties'));
@@ -108,6 +118,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
           `App/App/capacitor.config.json`,
           `App/App/config.xml`,
         ]);
+
         // Variables gradle
         const variables = {
           minSdkVersion: 22,
@@ -147,6 +158,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
         }
       }
 
+      // Ran Cap Sync
       await run2(project, capacitorSync(project), true);
 
       writeIonic('Capacitor 4 Migration Completed.');
@@ -207,6 +219,32 @@ function updateAndroidManifest(filename: string) {
   writeIonic(`Migrated AndroidManifest.xml by adding android:exported attribute to Activity.`);
 }
 
+function removeKey(filename: string, key: string) {
+  const txt = readFile(filename);
+  if (!txt) {
+    return;
+  }
+  let lines = txt.split('\n');
+  let removed = false;
+  let removing = false;
+  lines = lines.filter((line) => {
+    if (removing && line.includes('</dict>')) {
+      removing = false;
+      return false;
+    }
+    if (line.includes(`<key>${key}</key`)) {
+      removing = true;
+      removed = true;
+    }
+    return !removing;
+  });
+
+  if (removed) {
+    writeFileSync(filename, lines.join('\n'), 'utf-8');
+    writeIonic(`Migrated info.plist by removing  ${key} key.`);
+  }
+}
+
 function updateGitIgnore(filename: string, lines: Array<string>) {
   const txt = readFile(filename);
   if (!txt) {
@@ -221,6 +259,45 @@ function updateGitIgnore(filename: string, lines: Array<string>) {
   if (replaced !== txt) {
     writeFileSync(filename, replaced, 'utf-8');
     writeIonic(`Migrated .gitignore by adding generated config files.`);
+  }
+}
+
+function removeInFile(filename: string, startLine: string, endLine: string) {
+  const txt = readFile(filename);
+  if (!txt) {
+    return;
+  }
+  let changed = false;
+  let lines = txt.split('\n');
+  let removing = false;
+  lines = lines.filter((line) => {
+    if (line.includes(endLine)) {
+      removing = false;
+      return false;
+    }
+    if (line.includes(startLine)) {
+      removing = true;
+      changed = true;
+    }
+    return !removing;
+  });
+  if (changed) {
+    writeFileSync(filename, lines.join('\n'), 'utf-8');
+    writeIonic(`Migrated ${filename} by removing ${startLine}.`);
+  }
+}
+
+function replacePush(filename: string) {
+  const txt = readFile(filename);
+  if (!txt) {
+    return;
+  }
+  let replaced = txt;
+  replaced = replaced.replace('DEBUG USE_PUSH', 'DEBUG');
+  replaced = replaced.replace('USE_PUSH', '""');
+  if (replaced != txt) {
+    writeFileSync(filename, replaced, 'utf-8');
+    writeIonic(`Migrated ${filename} by removing USE_PUSH.`);
   }
 }
 
@@ -253,6 +330,24 @@ function readFile(filename: string): string {
   } catch (err) {
     writeError(`Unable to read ${filename}. Verify it is not already open. ${err}`);
   }
+}
+
+function updateAppBuildGradle(filename: string) {
+  const txt = readFile(filename);
+  if (!txt) {
+    return;
+  }
+  if (txt.includes('androidx.coordinatorlayout:coordinatorlayout:')) {
+    return;
+  }
+
+  const replaced = txt.replace(
+    'dependencies {',
+    'dependencies {\n    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"'
+  );
+  const lines = txt.split('\n');
+  writeFileSync(filename, replaced, 'utf-8');
+  writeIonic(`Migrated ${filename} by adding androidx.coordinatorlayout dependency.`);
 }
 
 function updateBuildGradle(filename: string) {
