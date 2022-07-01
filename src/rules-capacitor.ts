@@ -220,6 +220,24 @@ export function capacitorRecommendations(project: Project): Tip[] {
   tips.push(incompatiblePlugin('cordova-plugin-code-push', 'https://github.com/microsoft/code-push/issues/615'));
   tips.push(incompatiblePlugin('cordova-plugin-fcm', 'https://github.com/ionic-team/capacitor/issues/584'));
   tips.push(incompatiblePlugin('cordova-plugin-firebase', 'https://github.com/ionic-team/capacitor/issues/815'));
+
+  tips.push(notRequiredPlugin('cordova-support-google-services'));
+  tips.push(incompatiblePlugin('cordova-plugin-passbook'));
+  tips.push(
+    incompatibleReplacementPlugin(
+      'cordova-plugin-ionic-keyboard',
+      '@capacitor/keyboard',
+      'It is not compatible with Capacitor'
+    )
+  );
+  tips.push(
+    incompatibleReplacementPlugin(
+      'cordova-plugin-splashscreen',
+      '@capacitor/splash-screen',
+      'It is not compatible with Capacitor'
+    )
+  );
+
   tips.push(
     incompatiblePlugin(
       'cordova-plugin-firebasex',
