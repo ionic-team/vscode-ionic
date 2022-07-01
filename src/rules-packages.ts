@@ -2,7 +2,7 @@ import * as fs from 'fs';
 
 import { Project } from './project';
 import { Command, Tip, TipType } from './tip';
-import { exists, isGreaterOrEqual, remotePackages, warnMinVersion } from './analyzer';
+import { exists, isGreaterOrEqual, matchingBeginingWith, remotePackages, warnMinVersion } from './analyzer';
 import { npmInstallAll } from './node-commands';
 
 /**
@@ -85,6 +85,20 @@ export function checkPackages(project: Project) {
       'https://angular.io/guide/releases#support-policy-and-schedule'
     )
   );
+
+  if (!exists('@awesome-cordova-plugins/core')) {
+    const matching = matchingBeginingWith('@awesome-cordova-plugins');
+    if (matching.length > 0) {
+      project.recommendAdd(
+        '@awesome-cordova-plugins/core',
+        '@awesome-cordova-plugins/core',
+        'Missing @awesome-cordova-plugins/core',
+        'You are using awesome-cordova-plugins which require @awesome-cordova-plugins/core.',
+        false
+      );
+    }
+  }
+
   if (isGreaterOrEqual('@angular/core', '11.0.0')) {
     project.checkNotExists(
       'codelyzer',

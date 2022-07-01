@@ -226,11 +226,20 @@ export function capacitorRecommendations(project: Project): Tip[] {
       'https://github.com/dpa99c/cordova-plugin-firebasex/issues/610#issuecomment-810236545'
     )
   );
+
   tips.push(incompatiblePlugin('cordova-plugin-music-controls', 'It causes build failures, skipped'));
   tips.push(incompatiblePlugin('cordova-plugin-qrscanner', 'https://github.com/ionic-team/capacitor/issues/1213'));
-  tips.push(incompatiblePlugin('cordova-plugin-googlemaps', 'It causes build failures on iOS, skipped for iOS only'));
   tips.push(incompatiblePlugin('cordova-plugin-swrve', 'It relies on Cordova specific feature CDVViewController'));
   tips.push(incompatiblePlugin('cordova-plugin-ios-keychain', 'It is not compatible with Capacitor'));
+
+  tips.push(
+    replacementPlugin(
+      'cordova-plugin-googlemaps',
+      '@capacitor/google-maps',
+      'It causes build failures on iOS but can be replaced with @capacitor/google-maps and will require code refactoring.',
+      TipType.Error
+    )
+  );
 
   tips.push(
     incompatiblePlugin(

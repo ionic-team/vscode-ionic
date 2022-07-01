@@ -156,6 +156,16 @@ export function exists(library: string) {
   return !!allDependencies[library];
 }
 
+export function matchingBeginingWith(start: string) {
+  const result = [];
+  for (const library of Object.keys(allDependencies)) {
+    if (library.startsWith(start)) {
+      result.push(library);
+    }
+  }
+  return result;
+}
+
 export function remotePackages(): Array<string> {
   const result = [];
   for (const library of Object.keys(allDependencies)) {
@@ -304,12 +314,12 @@ export function notRequiredPlugin(name: string, message?: string): Tip {
   }
 }
 
-export function replacementPlugin(name: string, replacement: string, url?: string): Tip {
+export function replacementPlugin(name: string, replacement: string, url?: string, tipType?: TipType): Tip {
   if (exists(name)) {
     return new Tip(
       name,
       `Replace with ${replacement}${url ? ' (' + url + ')' : ''}`,
-      TipType.Idea,
+      tipType ? tipType : TipType.Idea,
       `The plugin ${name} could be replaced with ${replacement}${url ? ' (' + url + ')' : ''}`,
       npmInstall(replacement) + ' && ' + npmUninstall(name),
       'Replace Plugin',
