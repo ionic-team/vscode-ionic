@@ -21,7 +21,6 @@
 - (2) Show gotchas page for Angular migration x to x+1
 - (2) For web based projects have "Run on Web" under an Ionic Project
 - (2) On Web projects that are Angular based hook up dist or configured folder
-- (2) Recommend: Capacitor 2 to 3 migration
 - (4) Recommend applying exact version numbers in package.json rather than ~ or ^
 - (16) Allow add of plugins: list all official capacitor, ionic enterprise, supported plugins
 - (16) If using say @capacitor/camera then allow editing of info.plist and Android permissions (highlight if empty)

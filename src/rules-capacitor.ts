@@ -84,12 +84,32 @@ export function checkCapacitorRules(project: Project) {
     checkBuildGradleForMinifyInRelease(project);
   }
 
+  if (isLess('@capacitor/android', '3.0.0')) {
+    project.tip(
+      new Tip(
+        `Your app cannot be submitted to the Play Store after 1st November 2022`,
+        undefined,
+        TipType.Error,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        'https://capacitorjs.com/docs/updating/3-0'
+      ).setTooltip(
+        `Capacitor ${getPackageVersion(
+          '@capacitor/core'
+        )} must be migrated to Capacitor 4 to meet Play Store requirements of minimum target of SDK 31. Migration to Capacitor 3 is required. Click for more information.`
+      )
+    );
+  }
+
   if (isLess('@capacitor/core', '4.0.0')) {
     if (isGreaterOrEqual('@capacitor/core', '3.0.0')) {
       // Recommend migration from 3 to 4
-      project.tip(new Tip('Migrate to Capacitor 4 Beta', '', TipType.Idea)
-      .setAction(migrateCapacitor, project, getPackageVersion('@capacitor/core'))
-      .canIgnore()
+      project.tip(
+        new Tip('Migrate to Capacitor 4 Beta', '', TipType.Idea)
+          .setAction(migrateCapacitor, project, getPackageVersion('@capacitor/core'))
+          .canIgnore()
       );
     }
   }
