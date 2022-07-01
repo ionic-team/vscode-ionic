@@ -348,8 +348,8 @@ export function incompatibleReplacementPlugin(name: string, replacement: string,
 
 export function incompatiblePlugin(name: string, url?: string): Tip {
   if (exists(name)) {
-    const isUrl = url.startsWith('http');
-    const msg = isUrl ? `See ${url}` : url;
+    const isUrl = url?.startsWith('http');
+    const msg = isUrl ? `See ${url}` : url ? url : '';
     const tip = new Tip(
       name,
       `Incompatible with Capacitor. ${msg}`,
