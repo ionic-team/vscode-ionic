@@ -8,6 +8,7 @@
 - Recommend @capacitor/google-maps on Capacitor migration where cordova-plugin-googlemaps is present
 - Add generated splash and icon resources to .gitignore when generating for Capacitor
 - Fix for retrying builds when a bug is fixed in code and file saved
+- Fix incorrect migration of cordova-plugin-push
 
 ### Version 1.8.6
 

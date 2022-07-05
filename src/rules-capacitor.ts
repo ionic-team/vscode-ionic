@@ -269,7 +269,7 @@ export function capacitorRecommendations(project: Project): Tip[] {
   tips.push(
     replacementPlugin(
       'phonegap-plugin-push',
-      'cordova-plugin-push',
+      '@havesource/cordova-plugin-push',
       'It will not compile but can be replaced with the plugin cordova-plugin-push'
     )
   );
