@@ -399,8 +399,8 @@ function updateBuildGradle(filename: string) {
     }
   }
 
-  if (txt !== replaced) {
-    writeFileSync(filename, replaced, 'utf-8');
+  if (txt !== final) {
+    writeFileSync(filename, final, 'utf-8');
     return;
   }
 }
