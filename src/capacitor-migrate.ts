@@ -396,6 +396,9 @@ function updateBuildGradle(filename: string) {
       }
       inRepositories = false;
     }
+    if (inRepositories && line.trim() === 'mavenCentral()') {
+      hasMavenCentral = true;
+    }
     if (inRepositories && line.trim() === 'jcenter()') {
       // skip jCentral()
       writeIonic(`Migrated build.gradle removed jcenter().`);
