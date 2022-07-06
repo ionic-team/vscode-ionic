@@ -29,3 +29,8 @@ export enum InternalCommand {
   removeCordova = 'rem-cordova', // Will remove cordova from the project
   ionicInit = '[@ionic-init]', // Will call ionic init if ionic.config.json is missing
 }
+
+export enum ActionResult {
+  None = '',
+  Ignore = 'ignore',
+}

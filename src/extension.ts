@@ -12,7 +12,7 @@ import { installPackage } from './project';
 import { Command, Tip, TipType } from './tip';
 import { CancelObject, run, estimateRunTime, channelShow, openUri } from './utilities';
 import { ignore } from './ignore';
-import { CommandName, InternalCommand } from './command-name';
+import { ActionResult, CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
 import { IonicProjectsreeProvider } from './ionic-projects-provider';
 import { buildConfiguration } from './build-configuration';
@@ -435,12 +435,12 @@ async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, ro
       command = (command as string).replace(InternalCommand.target, target);
     }
     if (command) {
-      execute(tip);
+      execute(tip, ionicState.context);
       fixIssue(command, rootPath, ionicProvider, tip);
       return;
     }
   } else {
-    execute(tip);
+    execute(tip, ionicState.context);
     if (tip.refresh) {
       ionicProvider.refresh();
     }
@@ -483,7 +483,7 @@ async function fix(
       }
     }
   } else {
-    await execute(tip);
+    await execute(tip, context);
 
     if (ionicProvider) {
       ionicProvider.refresh();
@@ -491,8 +491,11 @@ async function fix(
   }
 }
 
-async function execute(tip: Tip): Promise<void> {
-  await tip.executeAction();
+async function execute(tip: Tip, context: vscode.ExtensionContext): Promise<void> {
+  const result: ActionResult = (await tip.executeAction()) as ActionResult;
+  if (result == ActionResult.Ignore) {
+    ignore(tip, context);
+  }
   if (tip.type == TipType.Settings) {
     await vscode.commands.executeCommand('workbench.action.openSettings', "Ionic'");
   } else if (tip.url) {

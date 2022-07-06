@@ -306,10 +306,11 @@ function viewInEditor(): Tip {
     .canRefreshAfter();
 }
 
-function toggleRemoteLogging(project: Project, current: boolean) {
+function toggleRemoteLogging(project: Project, current: boolean): Promise<void> {
   if (startStopLogServer(project.folder)) {
     ionicState.remoteLogging = !current;
   }
+  return;
 }
 
 async function toggleLiveReload(current: boolean) {

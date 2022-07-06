@@ -199,7 +199,7 @@ export function checkCordovaAndroidPreference(project: Project, preference: stri
   }
 }
 
-function AddCordovaAndroidPreference(folder: string, preference: string, value: string | boolean) {
+function AddCordovaAndroidPreference(folder: string, preference: string, value: string | boolean): Promise<void> {
   const configXMLFilename = `${folder}/config.xml`;
   if (!fs.existsSync(configXMLFilename)) return;
   const txt = fs.readFileSync(configXMLFilename, 'utf8');

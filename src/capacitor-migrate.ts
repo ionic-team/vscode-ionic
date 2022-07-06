@@ -7,8 +7,9 @@ import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
 import { run, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
+import { ActionResult } from './command-name';
 
-export async function migrateCapacitor(project: Project, currentVersion: string) {
+export async function migrateCapacitor(project: Project, currentVersion: string): Promise<ActionResult> {
   const coreVersion = '4.0.0-beta.1';
   const pluginVersion = '4.0.0-beta.0';
 
@@ -19,8 +20,12 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
   }
   const result = await vscode.window.showInformationMessage(
     `Capacitor 4 sets a deployment target of iOS 13 and Android 12 (SDK 32). ${warning}`,
-    'Migrate to v4 Beta'
+    'Migrate to v4 Beta',
+    'Ignore'
   );
+  if (result == 'Ignore') {
+    return ActionResult.Ignore;
+  }
   if (!result) {
     return;
   }
