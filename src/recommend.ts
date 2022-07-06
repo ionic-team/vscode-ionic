@@ -25,6 +25,7 @@ import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
 import { checkIonicNativePackages } from './rules-ionic-native';
 import { startLogServer as startStopLogServer } from './log-server';
+import { analyzeSize } from './analyze-size';
 
 export async function getRecommendations(
   project: Project,
@@ -243,6 +244,8 @@ export async function getRecommendations(
     )
   );
 
+  project.add(new Tip('Project Statistics', '', TipType.Dependency).setAction(analyzeSize, project));
+
   project.add(
     new Tip(
       'Ionic Framework',
@@ -303,10 +306,11 @@ function viewInEditor(): Tip {
     .canRefreshAfter();
 }
 
-function toggleRemoteLogging(project: Project, current: boolean) {
+function toggleRemoteLogging(project: Project, current: boolean): Promise<void> {
   if (startStopLogServer(project.folder)) {
     ionicState.remoteLogging = !current;
   }
+  return;
 }
 
 async function toggleLiveReload(current: boolean) {

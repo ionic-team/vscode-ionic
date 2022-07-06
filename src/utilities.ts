@@ -12,6 +12,7 @@ import { getMonoRepoFolder, getPackageJSONFilename } from './monorepo';
 import { InternalCommand } from './command-name';
 import { exists } from './analyzer';
 import { ionicInit } from './ionic-init';
+import { request } from 'https';
 
 export interface CancelObject {
   proc: child_process.ChildProcess;
@@ -56,6 +57,11 @@ function runOptions(command: string, folder: string, shell?: string) {
   return { cwd: folder, shell: shell ? shell : ionicState.shell, encoding: 'utf8', env: env };
 }
 
+export interface RunResults {
+  output: string;
+  success: boolean;
+}
+
 export async function run(
   folder: string,
   command: string,
@@ -64,7 +70,9 @@ export async function run(
   features: Array<TipFeature>,
   runPoints: Array<RunPoint>,
   progress: any,
-  ionicProvider?: IonicTreeProvider
+  ionicProvider?: IonicTreeProvider,
+  output?: RunResults,
+  supressInfo?: boolean
 ): Promise<boolean> {
   if (command == InternalCommand.removeCordova) {
     return await removeCordovaFromPackageJSON(folder);
@@ -112,6 +120,9 @@ export async function run(
           // Allows handling of linting and tests
           retry = await handleError(undefined, logs, folder);
           clearInterval(interval);
+          if (output) {
+            output.success = true;
+          }
           resolve(retry);
         } else {
           if (!cancelObject?.cancelled) {
@@ -119,8 +130,14 @@ export async function run(
           }
           clearInterval(interval);
           if (retry) {
+            if (output) {
+              output.success = true;
+            }
             resolve(retry);
           } else {
+            if (output) {
+              output.success = false;
+            }
             reject(`${command} Failed`);
           }
         }
@@ -129,6 +146,9 @@ export async function run(
 
     proc.stdout.on('data', (data) => {
       if (data) {
+        if (output) {
+          output.output += data;
+        }
         const loglines = data.split('\n');
         logs = logs.concat(loglines);
         if (viewEditor) {
@@ -169,8 +189,10 @@ export async function run(
 
         for (const logline of loglines) {
           if (logline.startsWith('[capacitor]')) {
-            channel.appendLine(logline.replace('[capacitor]', ''));
-          } else if (logline) {
+            if (!supressInfo) {
+              channel.appendLine(logline.replace('[capacitor]', ''));
+            }
+          } else if (logline && !supressInfo) {
             const nocolor = logline.replace(
               /[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
               ''
@@ -183,7 +205,9 @@ export async function run(
     });
 
     proc.stderr.on('data', (data) => {
-      channel.append(data);
+      if (!supressInfo) {
+        channel.append(data);
+      }
       focusOutput(channel);
     });
 
@@ -313,6 +337,23 @@ export function setStringIn(data: string, start: string, end: string, replacemen
   return data.substring(0, idx) + replacement + data.substring(data.indexOf(end, idx));
 }
 
+export function setAllStringIn(data: string, start: string, end: string, replacement: string): string {
+  let position = 0;
+  let result = data;
+  let replaced = true;
+  while (replaced) {
+    const foundIdx = result.indexOf(start, position);
+    if (foundIdx == -1) {
+      replaced = false;
+    } else {
+      const idx = foundIdx + start.length;
+      position = idx + replacement.length;
+      result = result.substring(0, idx) + replacement + result.substring(result.indexOf(end, idx));
+    }
+  }
+  return result;
+}
+
 export function replaceStringIn(data: string, start: string, end: string, replacement: string): string {
   const foundIdx = data.lastIndexOf(start);
   if (foundIdx == -1) {
@@ -359,6 +400,54 @@ export async function showMessage(message: string, ms: number) {
       await timeout(ms); // Show the message for 3 seconds
     }
   );
+}
+
+export async function showProgress(message: string, func: () => Promise<any>) {
+  await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: `${message}`,
+      cancellable: false,
+    },
+    async (progress, token) => {
+      await func();
+    }
+  );
+}
+
+export function httpRequest(method: string, host: string, path: string, postData?: string) {
+  const params = {
+    host,
+    port: 443,
+    method,
+    path
+  };
+  return new Promise(function (resolve, reject) {
+    const req = request(params, function (res) {
+      if (res.statusCode < 200 || res.statusCode >= 300) {
+        return reject(new Error('statusCode=' + res.statusCode));
+      }
+      let body = [];
+      res.on('data', function (chunk) {
+        body.push(chunk);
+      });
+      res.on('end', function () {
+        try {
+          body = JSON.parse(Buffer.concat(body).toString());
+        } catch (e) {
+          reject(e);
+        }
+        resolve(body);
+      });
+    });
+    req.on('error', function (err) {
+      reject(err);
+    });
+    if (postData) {
+      req.write(postData);
+    }
+    req.end();
+  });
 }
 
 function timeout(ms: number) {

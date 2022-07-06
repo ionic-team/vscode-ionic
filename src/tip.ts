@@ -1,3 +1,4 @@
+import { ActionResult } from './command-name';
 import { Context } from './context-variables';
 import { isRunning } from './extension';
 
@@ -26,7 +27,7 @@ export class Tip {
   public features: Array<TipFeature> = [];
   public relatedDependency: string;
 
-  private onAction: (...args) => unknown;
+  private onAction: (...args) => Promise<ActionResult> | Promise<void>;
   private onCommand: (...args) => string;
   private onTitle: (...args) => string;
   private actionArgs: any[];
@@ -123,14 +124,14 @@ export class Tip {
   }
 
   // The action is executed when the user clicks the item in the treeview
-  setAction(func: (...argsIn) => unknown, ...args) {
+  setAction(func: (...argsIn) => Promise<ActionResult> | Promise<void>, ...args) {
     this.onAction = func;
     this.actionArgs = args;
     return this;
   }
 
   // The action is executed when the user clicks the button called title
-  setAfterClickAction(title: string, func: (...argsIn) => unknown, ...args) {
+  setAfterClickAction(title: string, func: (...argsIn) => Promise<ActionResult> | Promise<void>, ...args) {
     this.commandTitle = title;
     this.command = Command.NoOp;
     this.onAction = func;
@@ -187,9 +188,9 @@ export class Tip {
     return this;
   }
 
-  async executeAction() {
+  async executeAction(): Promise<ActionResult | void> {
     if (this.onAction) {
-      await this.onAction(...this.actionArgs);
+      return await this.onAction(...this.actionArgs);
     }
   }
 
@@ -232,6 +233,7 @@ export enum TipType {
   Files,
   Sync,
   Add,
+  Dependency,
   Media,
   Debug,
   None,

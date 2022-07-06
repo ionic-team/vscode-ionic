@@ -5,6 +5,7 @@ import {
   checkConsistentVersions,
   checkMinVersion,
   exists,
+  getPackageVersion,
   incompatiblePlugin,
   incompatibleReplacementPlugin,
   isGreaterOrEqual,
@@ -21,6 +22,7 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall } from './node-commands';
 import { InternalCommand } from './command-name';
 import { MonoRepoType } from './monorepo';
+import { migrateCapacitor } from './capacitor-migrate';
 
 /**
  * Check rules for Capacitor projects
@@ -80,6 +82,36 @@ export function checkCapacitorRules(project: Project) {
   if (isLess('@capacitor/android', '3.2.3')) {
     // Check minifyEnabled is false for release
     checkBuildGradleForMinifyInRelease(project);
+  }
+
+  if (isLess('@capacitor/android', '3.0.0')) {
+    project.tip(
+      new Tip(
+        `Your app cannot be submitted to the Play Store after 1st November 2022`,
+        undefined,
+        TipType.Error,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        'https://capacitorjs.com/docs/updating/3-0'
+      ).setTooltip(
+        `Capacitor ${getPackageVersion(
+          '@capacitor/core'
+        )} must be migrated to Capacitor 4 to meet Play Store requirements of minimum target of SDK 31. Migration to Capacitor 3 is required. Click for more information.`
+      )
+    );
+  }
+
+  if (isLess('@capacitor/core', '4.0.0')) {
+    if (isGreaterOrEqual('@capacitor/core', '3.0.0')) {
+      // Recommend migration from 3 to 4
+      project.tip(
+        new Tip('Migrate to Capacitor 4 Beta', '', TipType.Idea)
+          .setAction(migrateCapacitor, project, getPackageVersion('@capacitor/core'))
+          .canIgnore()
+      );
+    }
   }
 
   if (exists('@ionic-enterprise/auth')) {
@@ -188,17 +220,44 @@ export function capacitorRecommendations(project: Project): Tip[] {
   tips.push(incompatiblePlugin('cordova-plugin-code-push', 'https://github.com/microsoft/code-push/issues/615'));
   tips.push(incompatiblePlugin('cordova-plugin-fcm', 'https://github.com/ionic-team/capacitor/issues/584'));
   tips.push(incompatiblePlugin('cordova-plugin-firebase', 'https://github.com/ionic-team/capacitor/issues/815'));
+
+  tips.push(notRequiredPlugin('cordova-support-google-services'));
+  tips.push(incompatiblePlugin('cordova-plugin-passbook'));
+  tips.push(
+    incompatibleReplacementPlugin(
+      'cordova-plugin-ionic-keyboard',
+      '@capacitor/keyboard',
+      'It is not compatible with Capacitor'
+    )
+  );
+  tips.push(
+    incompatibleReplacementPlugin(
+      'cordova-plugin-splashscreen',
+      '@capacitor/splash-screen',
+      'It is not compatible with Capacitor'
+    )
+  );
+
   tips.push(
     incompatiblePlugin(
       'cordova-plugin-firebasex',
       'https://github.com/dpa99c/cordova-plugin-firebasex/issues/610#issuecomment-810236545'
     )
   );
+
   tips.push(incompatiblePlugin('cordova-plugin-music-controls', 'It causes build failures, skipped'));
   tips.push(incompatiblePlugin('cordova-plugin-qrscanner', 'https://github.com/ionic-team/capacitor/issues/1213'));
-  tips.push(incompatiblePlugin('cordova-plugin-googlemaps', 'It causes build failures on iOS, skipped for iOS only'));
   tips.push(incompatiblePlugin('cordova-plugin-swrve', 'It relies on Cordova specific feature CDVViewController'));
   tips.push(incompatiblePlugin('cordova-plugin-ios-keychain', 'It is not compatible with Capacitor'));
+
+  tips.push(
+    replacementPlugin(
+      'cordova-plugin-googlemaps',
+      '@capacitor/google-maps',
+      'It causes build failures on iOS but can be replaced with @capacitor/google-maps and will require code refactoring.',
+      TipType.Error
+    )
+  );
 
   tips.push(
     incompatiblePlugin(
@@ -210,7 +269,7 @@ export function capacitorRecommendations(project: Project): Tip[] {
   tips.push(
     replacementPlugin(
       'phonegap-plugin-push',
-      'cordova-plugin-push',
+      '@havesource/cordova-plugin-push',
       'It will not compile but can be replaced with the plugin cordova-plugin-push'
     )
   );

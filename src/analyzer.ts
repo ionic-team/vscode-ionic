@@ -156,6 +156,16 @@ export function exists(library: string) {
   return !!allDependencies[library];
 }
 
+export function matchingBeginingWith(start: string) {
+  const result = [];
+  for (const library of Object.keys(allDependencies)) {
+    if (library.startsWith(start)) {
+      result.push(library);
+    }
+  }
+  return result;
+}
+
 export function remotePackages(): Array<string> {
   const result = [];
   for (const library of Object.keys(allDependencies)) {
@@ -189,7 +199,7 @@ export function checkCordovaAndroidPreference(project: Project, preference: stri
   }
 }
 
-function AddCordovaAndroidPreference(folder: string, preference: string, value: string | boolean) {
+function AddCordovaAndroidPreference(folder: string, preference: string, value: string | boolean): Promise<void> {
   const configXMLFilename = `${folder}/config.xml`;
   if (!fs.existsSync(configXMLFilename)) return;
   const txt = fs.readFileSync(configXMLFilename, 'utf8');
@@ -304,12 +314,12 @@ export function notRequiredPlugin(name: string, message?: string): Tip {
   }
 }
 
-export function replacementPlugin(name: string, replacement: string, url?: string): Tip {
+export function replacementPlugin(name: string, replacement: string, url?: string, tipType?: TipType): Tip {
   if (exists(name)) {
     return new Tip(
       name,
       `Replace with ${replacement}${url ? ' (' + url + ')' : ''}`,
-      TipType.Idea,
+      tipType ? tipType : TipType.Idea,
       `The plugin ${name} could be replaced with ${replacement}${url ? ' (' + url + ')' : ''}`,
       npmInstall(replacement) + ' && ' + npmUninstall(name),
       'Replace Plugin',
@@ -338,8 +348,8 @@ export function incompatibleReplacementPlugin(name: string, replacement: string,
 
 export function incompatiblePlugin(name: string, url?: string): Tip {
   if (exists(name)) {
-    const isUrl = url.startsWith('http');
-    const msg = isUrl ? `See ${url}` : url;
+    const isUrl = url?.startsWith('http');
+    const msg = isUrl ? `See ${url}` : url ? url : '';
     const tip = new Tip(
       name,
       `Incompatible with Capacitor. ${msg}`,
@@ -375,4 +385,12 @@ export function warnIfNotUsing(name: string): Tip {
   if (!allDependencies[name]) {
     return new Tip(name, `package is not using ${name}`);
   }
+}
+
+/**
+ * Returns a list of all packages used in the project
+ * @returns Array
+ */
+export function getAllPackageNames(): Array<string> {
+  return Object.keys(allDependencies);
 }

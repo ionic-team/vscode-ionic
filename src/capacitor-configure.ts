@@ -10,6 +10,7 @@ import { Project } from './project';
 import { Tip, TipType } from './tip';
 import { channelShow, getStringFrom, setStringIn } from './utilities';
 import { CapProjectCache } from './context-variables';
+import { join } from 'path';
 
 enum NativePlatform {
   iOSOnly,
@@ -101,10 +102,24 @@ export async function reviewCapacitorConfig(project: Project, context: vscode.Ex
 export function getCapacitorConfigWebDir(folder: string): string {
   let result = 'www';
   // Try to find capacitor.config.ts to find the webDir
-  const capConfigFile = path.join(folder, 'capacitor.config.ts');
+  let capConfigFile = path.join(folder, 'capacitor.config.ts');
+  if (!fs.existsSync(capConfigFile)) {
+    // React projects may use .js
+    capConfigFile = path.join(folder, 'capacitor.config.js');
+  }
   if (fs.existsSync(capConfigFile)) {
     const config = fs.readFileSync(capConfigFile, 'utf-8');
     result = getStringFrom(config, `webDir: '`, `'`);
+  } else {
+    // No config file take a best guess
+    if (fs.existsSync(join(folder, 'www'))) {
+      result = 'www';
+    } else if (fs.existsSync(join(folder, 'dist'))) {
+      result = 'dist';
+    } else if (fs.existsSync(join(folder, 'build'))) {
+      result = 'build';
+    }
+
   }
   return path.join(folder, result);
 }

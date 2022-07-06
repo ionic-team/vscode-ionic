@@ -52,8 +52,9 @@ export async function getAndroidWebViewList(
   return result;
 }
 
-function debug(device: Device, webview: WebView, wwwfolder: string) {
+async function debug(device: Device, webview: WebView, wwwfolder: string): Promise<void> {
   debugAndroid(webview.packageName, wwwfolder);
+  return;
 }
 
 function getCommand(): vscode.Command {

@@ -73,7 +73,7 @@ export function checkCordovaRules(project: Project) {
     'phonegap-plugin-push',
     `Replace with cordova-plugin-push due to deprecation`,
     `The plugin phonegap-plugin-push should be replaced with cordova-plugin-push as phonegap-plugin-push was deprecated in 2017`,
-    'cordova-plugin-push'
+    '@havesource/cordova-plugin-push'
   );
 
   if (exists('@ionic-enterprise/identity-vault')) {
