@@ -51,6 +51,15 @@ export function checkPackages(project: Project) {
     'https://ncjamieson.com/avoiding-rxjs-compat/'
   );
 
+  // cordova-plugin-android-fingerprint-auth and Identity Vault clash with a duplicate resources error
+  if (exists('@ionic-enterprise/identity-vault') && exists('cordova-plugin-android-fingerprint-auth')) {
+    project.recommendRemove(
+      'cordova-plugin-android-fingerprint-auth',
+      `cordova-plugin-android-fingerprint-auth`,
+      `This plugin should be removed as it cannot be used in conjuction with Identity Vault (which provides the same functionality).`
+    );
+  }
+
   project.recommendRemove(
     'protractor',
     `Protractor`,

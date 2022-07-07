@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.8.12
+
+- Add rule for cordova-plugin-android-fingerprint-auth and Identity Vault
+
 ### Version 1.8.11
 
 - Project Analysis feature added showing Javascript and Asset sizes
