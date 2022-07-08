@@ -3,6 +3,7 @@
 ### Version 1.8.12
 
 - Add rule for cordova-plugin-android-fingerprint-auth and Identity Vault
+- Capacitor 4 migrations now use Beta 2
 
 ### Version 1.8.11
 

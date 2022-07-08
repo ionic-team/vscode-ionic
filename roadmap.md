@@ -12,6 +12,8 @@
 - Augmenting the New Project functionality to create the app in appflow and begin with the project linked, similar to the Ionic App Wizard
   Starting an appflow trial directly from the extension… thinking a 1-click experience to install AC/IV/etc
 
+- Bug - For a regular Angular app where in angular.json the project has been renamed from app to say fuse the build command fails.
+
 - (2) For mono-repos include root package.json scripts
 - (1) Add .vs-code/extensions.json to recommend Ionic extension on starters (pr: https://github.com/ionic-team/starters/pull/1720)
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time

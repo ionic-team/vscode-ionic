@@ -10,8 +10,8 @@ import { capacitorSync } from './capacitor-sync';
 import { ActionResult } from './command-name';
 
 export async function migrateCapacitor(project: Project, currentVersion: string): Promise<ActionResult> {
-  const coreVersion = '4.0.0-beta.1';
-  const pluginVersion = '4.0.0-beta.0';
+  const coreVersion = '4.0.0-beta.2';
+  const pluginVersion = '4.0.0-beta.2';
 
   const daysLeft = daysUntil(new Date('11/01/2022'));
   let warning = `Google Play Store requires a minimum target of SDK 31 by 1st November 2022`;
