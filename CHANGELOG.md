@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.8.13
+
+- Bundle Id, Version numbers no longer show as blank when only iOS platform is added
+
 ### Version 1.8.12
 
 - Add rule for cordova-plugin-android-fingerprint-auth and Identity Vault

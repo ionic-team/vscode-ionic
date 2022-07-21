@@ -33,8 +33,10 @@ export async function reviewCapacitorConfig(project: Project, context: vscode.Ex
   // Allow the user to set the bundle id
   if (state.androidBundleId == state.iosBundleId || !state.iosBundleId || !state.androidBundleId) {
     // Create a single Bundle Id the user can edit
-    const tip = new Tip('Bundle Id', state.androidBundleId, TipType.None);
-    tip.setAction(setBundleId, state.androidBundleId, project);
+    const bundleId = state.androidBundleId ? state.androidBundleId : state.iosBundleId;
+    const tip = new Tip('Bundle Id', bundleId, TipType.None);
+
+    tip.setAction(setBundleId, bundleId, project);
     project.add(tip);
   } else {
     // Bundle Ids different
@@ -65,8 +67,9 @@ export async function reviewCapacitorConfig(project: Project, context: vscode.Ex
 
   // Allow the user to set the version
   if (state.androidVersion == state.iosVersion || !state.iosVersion || !state.androidVersion) {
-    const tip = new Tip('Version Number', state.androidVersion, TipType.None);
-    tip.setAction(setVersion, state.androidVersion, project);
+    const version = state.androidVersion ? state.androidVersion : state.iosVersion;
+    const tip = new Tip('Version Number', version?.toString(), TipType.None);
+    tip.setAction(setVersion, version, project);
     project.add(tip);
   } else {
     const tip = new Tip('Android Version Number', state.androidVersion, TipType.None);
@@ -80,8 +83,9 @@ export async function reviewCapacitorConfig(project: Project, context: vscode.Ex
 
   // Allow the user to increment the build
   if (state.androidBuild == state.iosBuild || !state.iosBuild || !state.androidBuild) {
-    const tip = new Tip('Build Number', state.androidBuild?.toString(), TipType.None);
-    tip.setAction(setBuild, state.androidBuild, project);
+    const build = state.androidBuild ? state.androidBuild : state.iosBuild;
+    const tip = new Tip('Build Number', build?.toString(), TipType.None);
+    tip.setAction(setBuild, build, project);
     project.add(tip);
   } else {
     const tip = new Tip('Android Build Number', state.androidBuild?.toString(), TipType.None);
@@ -119,7 +123,6 @@ export function getCapacitorConfigWebDir(folder: string): string {
     } else if (fs.existsSync(join(folder, 'build'))) {
       result = 'build';
     }
-
   }
   return path.join(folder, result);
 }
