@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.9.1
+
+- Migration for Capacitor 4 includes splash screen fixes and updated versions for variables gradle
+
 ### Version 1.9.0
 
 - Migration for Capacitor 4

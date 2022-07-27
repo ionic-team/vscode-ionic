@@ -85,6 +85,9 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
         // Update Podfile to 13.0
         updateFile(project, join('ios', 'App', 'Podfile'), `platform :ios, '`, `'`, '13.0');
 
+        // Cannot patch until 4.0.1 of Capacitor/ios
+        //patchPodFile(join(project.folder, 'ios', 'App', 'Podfile'));
+
         // Remove touchesBegan
         updateFile(project, join('ios', 'App', 'App', 'AppDelegate.swift'), `override func touchesBegan`, `}`);
 
@@ -101,6 +104,9 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
       if (exists('@capacitor/android')) {
         // AndroidManifest.xml add attribute: <activity android:exported="true"
         updateAndroidManifest(join(project.folder, 'android', 'app', 'src', 'main', 'AndroidManifest.xml'));
+
+        // Update styles.xml for SplashScreen
+        updateStyles(join(project.folder, 'android', 'app', 'src', 'main', 'res', 'values', 'styles.xml'));
 
         // Update build.gradle
         updateBuildGradle(join(project.folder, 'android', 'build.gradle'));
@@ -129,10 +135,12 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
           minSdkVersion: 22,
           compileSdkVersion: 32,
           targetSdkVersion: 32,
+          coreSplashScreenVersion: '1.0.0-rc01',
+          androidxWebkitVersion: '1.4.0',
           androidxActivityVersion: '1.4.0',
-          androidxAppCompatVersion: '1.4.1',
+          androidxAppCompatVersion: '1.4.2',
           androidxCoordinatorLayoutVersion: '1.2.0',
-          androidxCoreVersion: '1.7.0',
+          androidxCoreVersion: '1.8.0',
           androidxFragmentVersion: '1.4.1',
           junitVersion: '4.13.2',
           androidxJunitVersion: '1.1.3',
@@ -151,14 +159,22 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
               true
             )
           ) {
-            updateFile(
-              project,
-              join('android', 'variables.gradle'),
-              `${variable} = `,
-              `\n`,
-              variables[variable].toString(),
-              true
-            );
+            if (
+              !updateFile(
+                project,
+                join('android', 'variables.gradle'),
+                `${variable} = `,
+                `\n`,
+                variables[variable].toString(),
+                true
+              )
+            ) {
+              updateVariablesGradle(
+                join(project.folder, 'android', 'variables.gradle'),
+                variable,
+                variables[variable].toString()
+              );
+            }
           }
         }
       }
@@ -205,6 +221,18 @@ function writeBreakingChanges() {
     );
   }
 }
+
+function updateVariablesGradle(filename: string, variable: string, value: string) {
+  let txt = readFile(filename);
+  if (!txt) {
+    return;
+  }
+
+  txt = txt.replace('}', `    ${variable}='${value}'\n}`);
+  writeFileSync(filename, txt, 'utf-8');
+  writeIonic(`Migrated variables.gradle by adding ${variable} = ${value}.`);
+}
+
 function updateAndroidManifest(filename: string) {
   const txt = readFile(filename);
   if (!txt) {
@@ -267,6 +295,27 @@ function updateGitIgnore(filename: string, lines: Array<string>) {
   }
 }
 
+function patchPodFile(filename: string) {
+  const txt = readFile(filename);
+  if (!txt) {
+    return;
+  }
+  let replaced = txt;
+
+  if (!replaced.includes('pods_helpers')) {
+    replaced = `require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'\n\n` + replaced;
+  }
+
+  if (!replaced.includes('post_install')) {
+    replaced += `\n\npost_install do |installer|\n  assertDeploymentTarget(installer)\nend\n`;
+  }
+
+  if (replaced !== txt) {
+    writeFileSync(filename, replaced, 'utf-8');
+    writeIonic(`Migrated Podfile by assertingDeploymentTarget.`);
+  }
+}
+
 function removeInFile(filename: string, startLine: string, endLine: string) {
   const txt = readFile(filename);
   if (!txt) {
@@ -312,14 +361,15 @@ function updateGradleWrapper(filename: string) {
     return;
   }
   let replaced = txt;
-  if (replaced.includes('gradle-7.0-all.zip')) {
-    replaced = setAllStringIn(
-      replaced,
-      'distributionUrl=',
-      '\n',
-      // eslint-disable-next-line no-useless-escape
-      `https\://services.gradle.org/distributions/gradle-7.4.2-bin.zip`
-    );
+
+  replaced = setAllStringIn(
+    replaced,
+    'distributionUrl=',
+    '\n',
+    // eslint-disable-next-line no-useless-escape
+    `https\://services.gradle.org/distributions/gradle-7.4.2-bin.zip`
+  );
+  if (txt != replaced) {
     writeFileSync(filename, replaced, 'utf-8');
     writeIonic(`Migrated gradle-wrapper.properties by updating gradle version from 7.0 to 7.4.2.`);
   }
@@ -348,24 +398,38 @@ function updateAppBuildGradle(filename: string) {
 
   const replaced = txt.replace(
     'dependencies {',
-    'dependencies {\n    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"'
+    `dependencies {\n    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    \n    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"`
   );
   const lines = txt.split('\n');
   writeFileSync(filename, replaced, 'utf-8');
   writeIonic(`Migrated ${filename} by adding androidx.coordinatorlayout dependency.`);
 }
 
+function updateStyles(filename: string) {
+  const txt = readFile(filename);
+  if (!txt) {
+    return;
+  }
+
+  let replaced = txt;
+  replaced = replaced.replace(
+    '<style name="AppTheme.NoActionBar" parent="Theme.AppCompat.NoActionBar">',
+    '<style name="Theme.SplashScreen" parent="Theme.AppCompat.NoActionBar">'
+  );
+}
+
 function updateBuildGradle(filename: string) {
   // In build.gradle add dependencies:
   // classpath 'com.android.tools.build:gradle:7.2.1'
-  // classpath 'com.google.gms:google-services:4.3.10'
+  // classpath 'com.google.gms:google-services:4.3.13'
   const txt = readFile(filename);
   if (!txt) {
     return;
   }
   const neededDeps = {
     'com.android.tools.build:gradle': '7.2.1',
-    'com.google.gms:google-services': '4.3.10',
+    'com.google.gms:google-services': '4.3.13',
   };
   let replaced = txt;
 
@@ -462,7 +526,7 @@ function updateFile(
   return false;
 }
 
-function install(libs: Array<string>, plugins: Array<string>, version: string, pluginVerison: string): string {
+function install(libs: Array<string>, plugins: Array<string>, version: string, pluginVersion: string): string {
   let result = '';
   for (const lib of libs) {
     if (exists(lib)) {
@@ -472,14 +536,14 @@ function install(libs: Array<string>, plugins: Array<string>, version: string, p
 
   for (const plugin of plugins) {
     if (exists(plugin)) {
-      result += `${plugin}@${pluginVerison} `;
+      result += `${plugin}@${pluginVersion} `;
     }
   }
 
   return npmInstall(result.trim());
 }
 
-async function run2(project: Project, command: string, supressOutput?: boolean): Promise<boolean> {
+async function run2(project: Project, command: string, suppressOutput?: boolean): Promise<boolean> {
   const channel = getOutputChannel();
   return await run(
     project.projectFolder(),
@@ -491,7 +555,7 @@ async function run2(project: Project, command: string, supressOutput?: boolean):
     undefined,
     undefined,
     undefined,
-    supressOutput
+    suppressOutput
   );
 }
 
