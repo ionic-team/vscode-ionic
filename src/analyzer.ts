@@ -276,6 +276,11 @@ export function isGreaterOrEqual(library: string, minVersion: string): boolean {
   return v && gte(v, minVersion);
 }
 
+export function startsWith(library: string, version: string): boolean {
+  const v = allDependencies[library];
+  return v && v.startsWith(version);
+}
+
 export function isLessOrEqual(library: string, minVersion: string): boolean {
   const v = coerce(allDependencies[library]);
   return v && lte(v, minVersion);

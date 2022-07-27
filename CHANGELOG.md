@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.9.0
+
+- Migration for Capacitor 4
+- Migration for Capacitor 4 beta to Capacitor 4 official
+
 ### Version 1.8.13
 
 - Bundle Id, Version numbers no longer show as blank when only iOS platform is added

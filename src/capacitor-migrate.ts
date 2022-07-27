@@ -10,8 +10,8 @@ import { capacitorSync } from './capacitor-sync';
 import { ActionResult } from './command-name';
 
 export async function migrateCapacitor(project: Project, currentVersion: string): Promise<ActionResult> {
-  const coreVersion = '4.0.0-beta.2';
-  const pluginVersion = '4.0.0-beta.2';
+  const coreVersion = '^4.0.0';
+  const pluginVersion = '^4.0.0';
 
   const daysLeft = daysUntil(new Date('11/01/2022'));
   let warning = `Google Play Store requires a minimum target of SDK 31 by 1st November 2022`;
@@ -20,7 +20,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
   }
   const result = await vscode.window.showInformationMessage(
     `Capacitor 4 sets a deployment target of iOS 13 and Android 12 (SDK 32). ${warning}`,
-    'Migrate to v4 Beta',
+    'Migrate to v4',
     'Ignore'
   );
   if (result == 'Ignore') {

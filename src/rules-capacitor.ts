@@ -12,6 +12,7 @@ import {
   isLess,
   notRequiredPlugin,
   replacementPlugin,
+  startsWith,
 } from './analyzer';
 import { checkMigrationAngularToolkit } from './rules-angular-toolkit';
 import { Project } from './project';
@@ -103,11 +104,11 @@ export function checkCapacitorRules(project: Project) {
     );
   }
 
-  if (isLess('@capacitor/core', '4.0.0')) {
+  if (isLess('@capacitor/core', '4.0.0') || startsWith('@capacitor/core', '4.0.0-beta')) {
     if (isGreaterOrEqual('@capacitor/core', '3.0.0')) {
       // Recommend migration from 3 to 4
       project.tip(
-        new Tip('Migrate to Capacitor 4 Beta', '', TipType.Idea)
+        new Tip('Migrate to Capacitor 4', '', TipType.Idea)
           .setAction(migrateCapacitor, project, getPackageVersion('@capacitor/core'))
           .canIgnore()
       );
