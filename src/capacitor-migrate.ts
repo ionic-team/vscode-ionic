@@ -417,6 +417,11 @@ function updateStyles(filename: string) {
     '<style name="AppTheme.NoActionBarLaunch" parent="AppTheme.NoActionBar">',
     '<style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">'
   );
+  replaced = replaced.replace(`parent="Theme.AppCompat.NoActionBar"`, `parent="Theme.AppCompat.DayNight.NoActionBar"`);
+  if (txt != replaced) {
+    writeFileSync(filename, replaced, 'utf-8');
+    writeIonic(`Migrated ${filename} for Android 12 splash screen.`);
+  }
 }
 
 function updateBuildGradle(filename: string) {
