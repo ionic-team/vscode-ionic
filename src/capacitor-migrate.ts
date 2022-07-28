@@ -414,8 +414,8 @@ function updateStyles(filename: string) {
 
   let replaced = txt;
   replaced = replaced.replace(
-    '<style name="AppTheme.NoActionBar" parent="Theme.AppCompat.NoActionBar">',
-    '<style name="Theme.SplashScreen" parent="Theme.AppCompat.NoActionBar">'
+    '<style name="AppTheme.NoActionBarLaunch" parent="AppTheme.NoActionBar">',
+    '<style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">'
   );
 }
 
