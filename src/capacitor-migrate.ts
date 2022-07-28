@@ -11,7 +11,7 @@ import { ActionResult } from './command-name';
 
 export async function migrateCapacitor(project: Project, currentVersion: string): Promise<ActionResult> {
   const coreVersion = '^4.0.1';
-  const pluginVersion = '^4.0.0';
+  const pluginVersion = '^4.0.1';
 
   const daysLeft = daysUntil(new Date('11/01/2022'));
   let warning = `Google Play Store requires a minimum target of SDK 31 by 1st November 2022`;
@@ -35,7 +35,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
       await run2(
         project,
         install(
-          ['@capacitor/core', '@capacitor/cli', '@capacitor/ios', '@capacitor/android'],
+          ['@capacitor/core', '@capacitor/ios', '@capacitor/android', '@capacitor/cli'],
           [
             '@capacitor/action-sheet',
             '@capacitor/app',
@@ -392,18 +392,19 @@ function updateAppBuildGradle(filename: string) {
   if (!txt) {
     return;
   }
-  if (txt.includes('androidx.coordinatorlayout:coordinatorlayout:')) {
-    return;
+  let replaced = txt;
+  function add(line: string) {
+    if (!replaced.includes(line)) {
+      replaced = replaced.replace('dependencies {', `dependencies {\n    ${line}`);
+    }
   }
+  add('implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"');
+  add('implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"');
 
-  const replaced = txt.replace(
-    'dependencies {',
-    `dependencies {\n    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
-    \n    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"`
-  );
-  const lines = txt.split('\n');
-  writeFileSync(filename, replaced, 'utf-8');
-  writeIonic(`Migrated ${filename} by adding androidx.coordinatorlayout dependency.`);
+  if (txt != replaced) {
+    writeFileSync(filename, replaced, 'utf-8');
+    writeIonic(`Migrated ${filename}`);
+  }
 }
 
 function updateStyles(filename: string) {
@@ -413,10 +414,12 @@ function updateStyles(filename: string) {
   }
 
   let replaced = txt;
+  //if (exists('@capacitor/splash-screen')) {
   replaced = replaced.replace(
     '<style name="AppTheme.NoActionBarLaunch" parent="AppTheme.NoActionBar">',
     '<style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">'
   );
+  //}
   replaced = replaced.replace(`parent="Theme.AppCompat.NoActionBar"`, `parent="Theme.AppCompat.DayNight.NoActionBar"`);
   if (txt != replaced) {
     writeFileSync(filename, replaced, 'utf-8');
@@ -491,14 +494,18 @@ function updateFile(
   skipIfNotFound?: boolean
 ): boolean {
   const path = join(project.folder, filename);
-  let txt = readFile(path);
+  const txt = readFile(path);
   if (!txt) {
     return;
   }
   if (txt.includes(textStart)) {
+    let changed = false;
     if (replacement) {
-      txt = setAllStringIn(txt, textStart, textEnd, replacement);
-      writeFileSync(path, txt, { encoding: 'utf-8' });
+      const replaced = setAllStringIn(txt, textStart, textEnd, replacement);
+      if (replaced != txt) {
+        writeFileSync(path, replaced, { encoding: 'utf-8' });
+        changed = true;
+      }
     } else {
       // Replacing in code so we need to count the number of brackets to find the end of the function in swift
       const lines = txt.split('\n');
@@ -517,12 +524,15 @@ function updateFile(
           }
         } else {
           replaced += line + '\n';
+          changed = true;
         }
       }
       writeFileSync(path, replaced, { encoding: 'utf-8' });
     }
     const message = replacement ? `${textStart} => ${replacement}` : '';
-    writeIonic(`Migrated ${filename} ${message}.`);
+    if (changed) {
+      writeIonic(`Migrated ${filename} ${message}.`);
+    }
     return true;
   } else if (!skipIfNotFound) {
     writeError(`Unable to find "${textStart}" in ${filename}. Try updating it manually`);
