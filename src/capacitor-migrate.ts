@@ -210,7 +210,7 @@ function writeBreakingChanges() {
   }
   if (broken.length > 0) {
     writeIonic(
-      `IMPORTANT: Review https://next.capacitorjs.com/docs/updating/4-0#plugins for breaking changes in these plugins that you use: ${broken.join(
+      `IMPORTANT: Review https://capacitorjs.com/docs/updating/4-0#plugins for breaking changes in these plugins that you use: ${broken.join(
         ', '
       )}.`
     );
