@@ -10,7 +10,7 @@ import { capacitorSync } from './capacitor-sync';
 import { ActionResult } from './command-name';
 
 export async function migrateCapacitor(project: Project, currentVersion: string): Promise<ActionResult> {
-  const coreVersion = '^4.0.0';
+  const coreVersion = '^4.0.1';
   const pluginVersion = '^4.0.0';
 
   const daysLeft = daysUntil(new Date('11/01/2022'));
@@ -30,7 +30,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
     return;
   }
 
-  await showProgress(`Migrating to Capacitor ${coreVersion}`, async () => {
+  await showProgress(`Migrating to Capacitor 4`, async () => {
     try {
       await run2(
         project,
@@ -84,9 +84,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
 
         // Update Podfile to 13.0
         updateFile(project, join('ios', 'App', 'Podfile'), `platform :ios, '`, `'`, '13.0');
-
-        // Cannot patch until 4.0.1 of Capacitor/ios
-        //patchPodFile(join(project.folder, 'ios', 'App', 'Podfile'));
+        patchPodFile(join(project.folder, 'ios', 'App', 'Podfile'));
 
         // Remove touchesBegan
         updateFile(project, join('ios', 'App', 'App', 'AppDelegate.swift'), `override func touchesBegan`, `}`);
@@ -214,10 +212,12 @@ function writeBreakingChanges() {
         ', '
       )}.`
     );
+  } else {
+    writeIonic('IMPORTANT: Review https://capacitorjs.com/docs/updating/4-0 for optional manual updates.');
   }
   if (exists('@capacitor/android')) {
     writeIonic(
-      'Warning: The Android Gradle plugin was updated and it requires Java 11 to run. You may need to select this in Android Studio.'
+      'Warning: The Android Gradle plugin was updated and it requires Java 11 to run (included with Android Studio). You may need to select this in Android Studio (Preferences > Build, Execution, Deployment > Build Tools > Gradle).'
     );
   }
 }
