@@ -104,7 +104,8 @@ export function checkCapacitorRules(project: Project) {
     );
   }
 
-  if (isLess('@capacitor/core', '4.0.0') || startsWith('@capacitor/core', '4.0.0-beta')) {
+  // Migration for 3.x, 4.0.0-beta, 4.0.0 to Capacitor 4.0.1+
+  if (isLess('@capacitor/core', '4.0.1') || startsWith('@capacitor/core', '4.0.0')) {
     if (isGreaterOrEqual('@capacitor/core', '3.0.0')) {
       // Recommend migration from 3 to 4
       project.tip(
