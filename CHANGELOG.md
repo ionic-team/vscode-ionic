@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.9.3
+
+- Add support for detecting Vite based projects
+
 ### Version 1.9.2
 
 - Migration for Capacitor 4 includes splash screen fixes and updated versions for variables gradle

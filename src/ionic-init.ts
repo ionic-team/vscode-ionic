@@ -24,6 +24,12 @@ export async function ionicInit(folder: string): Promise<boolean> {
     if (packageFile.scripts?.build) {
       packageFile.scripts['ionic:build'] = 'npm run build';
     }
+
+    // Typical for Vite
+    if (packageFile.scripts?.dev) {
+      packageFile.scripts['ionic:serve'] = 'npm run dev';
+    }
+
     if (packageFile.scripts?.serve) {
       packageFile.scripts['ionic:serve'] = 'npm run serve';
     } else if (packageFile.scripts?.start) {
