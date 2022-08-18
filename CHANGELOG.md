@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.9.4
+
+- Use the inline sync option to allow debugging via Edge/Chrome
+
 ### Version 1.9.3
 
 - Add support for detecting Vite based projects
