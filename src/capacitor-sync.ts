@@ -30,11 +30,11 @@ export function capacitorSync(project: Project): string {
 }
 
 function capCLISync(): string {
-  return `npx cap sync`;
+  return `npx cap sync --inline`;
 }
 
 function ionicCLISync(): string {
-  return `npx ionic cap sync`;
+  return `npx ionic cap sync --inline`;
 }
 
 function nxSync(project: Project): string {
