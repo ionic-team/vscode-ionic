@@ -3,6 +3,7 @@
 ### Version 1.9.4
 
 - Use the inline sync option to allow debugging via Edge/Chrome
+- Add Android version numbers to device selection
 
 ### Version 1.9.3
 

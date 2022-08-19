@@ -3,7 +3,7 @@ import { handleError } from './error-handler';
 import { ionicState } from './ionic-tree-provider';
 
 import { Tip } from './tip';
-import { getRunOutput } from './utilities';
+import { getRunOutput, replaceAll } from './utilities';
 
 /**
  * Uses vscodes Quick pick dialog to allow selection of a device and
@@ -16,12 +16,11 @@ export async function selectDevice(command: string, rootPath: string, tip: Tip):
   if (preselected) {
     return preselected;
   }
-  let devices;
+  let devices: Array<any>;
   await showProgress('Getting Devices...', async () => {
     devices = await getDevices(command, rootPath);
   });
 
-  //const devices = await getDevices(command, rootPath);
   const names = devices.map((device) => device.name);
   if (names.length == 0) {
     return;
@@ -38,6 +37,29 @@ export async function selectDevice(command: string, rootPath: string, tip: Tip):
     ionicState.selectedIOSDeviceName = device?.name;
   }
   return device?.target;
+}
+
+function friendlyName(name: string): string {
+  function fix(api: string, v: string) {
+    if (name.includes(`API ${api}`)) {
+      name = replaceAll(name, `API ${api}`, '').trim() + ` (Android ${v})`;
+    }
+  }
+  fix('33', '13');
+  fix('32', '12');
+  fix('31', '12');
+  fix('30', '11');
+  fix('29', '10');
+  fix('28', '9');
+  fix('27', '8');
+  fix('26', '8');
+  fix('25', '7');
+  fix('24', '7');
+  fix('23', '6');
+  fix('22', '5');
+  fix('21', '5');
+  name = name.replace(' (emulator)', 'Emulator');
+  return name;
 }
 
 /**
@@ -57,7 +79,7 @@ async function getDevices(command: string, rootPath: string) {
       if (data.length == 3) {
         const target = data[2].trim();
         if (target != '?') {
-          devices.push({ name: data[0].trim() + ' ' + data[1].trim(), target: target });
+          devices.push({ name: friendlyName(data[0].trim() + ' ' + data[1].trim()), target: target });
         }
       } else {
         const device = parseDevice(line);
