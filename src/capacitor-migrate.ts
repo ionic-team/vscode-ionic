@@ -32,6 +32,11 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
 
   await showProgress(`Migrating to Capacitor 4`, async () => {
     try {
+      let replaceStorage = false;
+      if (exists('@capacitor/storage')) {
+        await run2(project, npmUninstall(`@capacitor/storage`));
+        replaceStorage = true;
+      }
       await run2(
         project,
         install(
@@ -66,8 +71,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
         )
       );
 
-      if (exists('@capacitor/storage')) {
-        await run2(project, npmUninstall(`@capacitor/storage`));
+      if (replaceStorage) {
         await run2(project, npmInstall(`@capacitor/preferences@${pluginVersion}`));
         writeIonic('Migrated @capacitor/storage to @capacitor/preferences.');
       }

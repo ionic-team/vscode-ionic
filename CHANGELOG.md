@@ -4,6 +4,7 @@
 
 - Use the inline sync option to allow debugging via Edge/Chrome
 - Add Android version numbers to device selection
+- Fix to allow Capacitor 4 migration if @capacitor/storage is used
 
 ### Version 1.9.3
 
