@@ -6,6 +6,7 @@
 - Protractor deprecation removal removed as the npm package was marked deprecated
 - Recommend removal of @ionic-native/contacts
 - Fix reporting of dependent plugins on unsupported platforms (blackberry, windows phone)
+- If prod builds are set then a cap run will now include the --prod argument
 
 ### Version 1.9.4
 

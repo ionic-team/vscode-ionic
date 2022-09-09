@@ -53,6 +53,7 @@ export function capacitorDevicesCommand(platform: CapacitorPlatform): string {
 function capRun(platform: CapacitorPlatform, repoType: MonoRepoType): string {
   const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
   const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
+  const prod: boolean = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
   let capRunFlags = liveReload ? ' -l' : '';
 
   if (liveReload && exists('@ionic-enterprise/auth') && isLess('@ionic-enterprise/auth', '3.9.4')) {
@@ -64,9 +65,16 @@ function capRun(platform: CapacitorPlatform, repoType: MonoRepoType): string {
     );
   }
 
+  const ionic = exists('@ionic/cli') ? 'ionic ' : '';
+
   if (externalIP) {
     if (capRunFlags.length >= 0) capRunFlags += ' ';
     capRunFlags += '--external';
+  }
+
+  if (ionic != '' && prod) {
+    if (capRunFlags.length >= 0) capRunFlags += ' ';
+    capRunFlags += '--prod';
   }
 
   const pre =
@@ -77,7 +85,7 @@ function capRun(platform: CapacitorPlatform, repoType: MonoRepoType): string {
     repoType == MonoRepoType.lerna
       ? InternalCommand.cwd
       : '';
-  const ionic = exists('@ionic/cli') ? 'ionic ' : '';
+
   return `${pre}npx ${ionic}cap run ${platform}${capRunFlags} --target=${InternalCommand.target}`;
 }
 
