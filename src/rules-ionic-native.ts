@@ -6,7 +6,7 @@ export function checkIonicNativePackages(packages, project: Project) {
   for (const name of Object.keys(packages)) {
     if (name.startsWith('@ionic-native/')) {
       const replacement = name.replace('@ionic-native', '@awesome-cordova-plugins');
-      if (name == '@ionic-native/unique-device-id') {
+      if (name == '@ionic-native/unique-device-id' || name == '@ionic-native/contacts') {
         project.deprecatedPlugin(name, 'Its support was removed from @awesome-cordova-plugins');
       } else {
         replacePackage(project, name, replacement);

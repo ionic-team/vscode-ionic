@@ -60,15 +60,6 @@ export function checkPackages(project: Project) {
     );
   }
 
-  project.recommendRemove(
-    'protractor',
-    `Protractor`,
-    `Your project has a dependency on Protractor whose development is slated to end December 2022. Consider migrating to a different E2E Testing solution.`,
-    undefined,
-    'https://docs.cypress.io/guides/migrating-to-cypress/protractor'
-    //`Your project has a dependency on Protractor whose development is [slated to end December 2022](https://github.com/angular/protractor/issues/5502). Consider migrating to a different E2E Testing solution.`,
-  );
-
   // node-sass deprecated and not required
   project.recommendRemove(
     'node-sass',
@@ -112,12 +103,6 @@ export function checkPackages(project: Project) {
     project.checkNotExists(
       'codelyzer',
       'Codelyzer was popular in Angular projects before version 11 but has been superceded by angular-eslint. You can remove this dependency.'
-    );
-  }
-  if (exists('@ionic/angular')) {
-    project.checkNotExists(
-      'ionicons',
-      'The @ionic/angular packages includes icons so the "ionicons" package is not required.'
     );
   }
 }

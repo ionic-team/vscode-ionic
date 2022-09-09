@@ -1,5 +1,12 @@
 ## Changelog
 
+### Version 1.9.5
+
+- Removal recommendation for ionicons removed as it is no longer a peer dependency (due to pnpm bug)
+- Protractor deprecation removal removed as the npm package was marked deprecated
+- Recommend removal of @ionic-native/contacts
+- Fix reporting of dependent plugins on unsupported platforms (blackberry, windows phone)
+
 ### Version 1.9.4
 
 - Use the inline sync option to allow debugging via Edge/Chrome
