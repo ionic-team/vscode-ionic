@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.9.6
+
+- Fix for Capacitor 4 migration with NX projects
+
 ### Version 1.9.5
 
 - Removal recommendation for ionicons removed as it is no longer a peer dependency (due to pnpm bug)

@@ -88,37 +88,37 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
 
         // Update Podfile to 13.0
         updateFile(project, join('ios', 'App', 'Podfile'), `platform :ios, '`, `'`, '13.0');
-        patchPodFile(join(project.folder, 'ios', 'App', 'Podfile'));
+        patchPodFile(join(project.projectFolder(), 'ios', 'App', 'Podfile'));
 
         // Remove touchesBegan
         updateFile(project, join('ios', 'App', 'App', 'AppDelegate.swift'), `override func touchesBegan`, `}`);
 
         // Remove NSAppTransportSecurity
-        removeKey(join(project.folder, 'ios', 'App', 'App', 'info.plist'), 'NSAppTransportSecurity');
+        removeKey(join(project.projectFolder(), 'ios', 'App', 'App', 'info.plist'), 'NSAppTransportSecurity');
 
         // Remove USE_PUSH
-        replacePush(join(project.folder, 'ios', 'App', 'App.xcodeproj', 'project.pbxproj'));
+        replacePush(join(project.projectFolder(), 'ios', 'App', 'App.xcodeproj', 'project.pbxproj'));
 
         // Remove from App Delegate
-        removeInFile(join(project.folder, 'ios', 'App', 'App', 'AppDelegate.swift'), `#if USE_PUSH`, `#endif`);
+        removeInFile(join(project.projectFolder(), 'ios', 'App', 'App', 'AppDelegate.swift'), `#if USE_PUSH`, `#endif`);
       }
 
       if (exists('@capacitor/android')) {
         // AndroidManifest.xml add attribute: <activity android:exported="true"
-        updateAndroidManifest(join(project.folder, 'android', 'app', 'src', 'main', 'AndroidManifest.xml'));
+        updateAndroidManifest(join(project.projectFolder(), 'android', 'app', 'src', 'main', 'AndroidManifest.xml'));
 
         // Update styles.xml for SplashScreen
-        updateStyles(join(project.folder, 'android', 'app', 'src', 'main', 'res', 'values', 'styles.xml'));
+        updateStyles(join(project.projectFolder(), 'android', 'app', 'src', 'main', 'res', 'values', 'styles.xml'));
 
         // Update build.gradle
-        updateBuildGradle(join(project.folder, 'android', 'build.gradle'));
-        updateAppBuildGradle(join(project.folder, 'android', 'app', 'build.gradle'));
+        updateBuildGradle(join(project.projectFolder(), 'android', 'build.gradle'));
+        updateAppBuildGradle(join(project.projectFolder(), 'android', 'app', 'build.gradle'));
 
         // Update gradle-wrapper.properties
-        updateGradleWrapper(join(project.folder, 'android', 'gradle', 'wrapper', 'gradle-wrapper.properties'));
+        updateGradleWrapper(join(project.projectFolder(), 'android', 'gradle', 'wrapper', 'gradle-wrapper.properties'));
 
         // Update .gitIgnore
-        updateGitIgnore(join(project.folder, 'android', '.gitignore'), [
+        updateGitIgnore(join(project.projectFolder(), 'android', '.gitignore'), [
           `# Generated Config files`,
           `app/src/main/assets/capacitor.config.json`,
           `app/src/main/assets/capacitor.plugins.json`,
@@ -126,7 +126,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
         ]);
 
         // Update .gitIgnore
-        updateGitIgnore(join(project.folder, 'ios', '.gitignore'), [
+        updateGitIgnore(join(project.projectFolder(), 'ios', '.gitignore'), [
           `# Generated Config files`,
           `App/App/capacitor.config.json`,
           `App/App/config.xml`,
@@ -172,7 +172,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
               )
             ) {
               updateVariablesGradle(
-                join(project.folder, 'android', 'variables.gradle'),
+                join(project.projectFolder(), 'android', 'variables.gradle'),
                 variable,
                 variables[variable].toString()
               );
@@ -497,7 +497,7 @@ function updateFile(
   replacement?: string,
   skipIfNotFound?: boolean
 ): boolean {
-  const path = join(project.folder, filename);
+  const path = join(project.projectFolder(), filename);
   const txt = readFile(path);
   if (!txt) {
     return;
