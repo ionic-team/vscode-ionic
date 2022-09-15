@@ -34,7 +34,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
     try {
       let replaceStorage = false;
       if (exists('@capacitor/storage')) {
-        await run2(project, npmUninstall(`@capacitor/storage`));
+        await run2(project, npmUninstall(`@capacitor/storage --force`));
         replaceStorage = true;
       }
       await run2(
