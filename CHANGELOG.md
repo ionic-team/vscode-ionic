@@ -1,8 +1,9 @@
 ## Changelog
 
-### Version 1.9.7
+### Version 1.9.9
 
 - Fix for Capacitor 4 migration with NX projects
+- Fix for Capacitor 4 migration for users with custom Podfile in iOS
 - Fix for Capacitor 4 migration with preinstalled Capacitor 4 plugins
 
 ### Version 1.9.5

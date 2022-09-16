@@ -312,6 +312,13 @@ function patchPodFile(filename: string) {
 
   if (!replaced.includes('post_install')) {
     replaced += `\n\npost_install do |installer|\n  assertDeploymentTarget(installer)\nend\n`;
+  } else {
+    if (!replaced.includes('assertDeploymentTarget(installer)')) {
+      replaced = replaced.replace(
+        `post_install do |installer|`,
+        `post_install do |installer|\n  assertDeploymentTarget(installer)\n`
+      );
+    }
   }
 
   if (replaced !== txt) {
