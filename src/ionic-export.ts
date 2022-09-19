@@ -1,6 +1,6 @@
 import { inspectProject, ProjectSummary } from './project';
 import * as vscode from 'vscode';
-import { writeFileSync, readdirSync, statSync } from 'fs';
+import { writeFileSync, readdirSync, statSync, existsSync } from 'fs';
 import { join } from 'path';
 import { PackageInfo } from './package-info';
 import { getStringFrom } from './utilities';
@@ -57,6 +57,9 @@ function exportNamingStyles(folder: string): string {
 }
 
 function getAllFiles(folder: string, arrayOfFiles: Array<string>) {
+  if (!existsSync(folder)) {
+    return [];
+  }
   const files = readdirSync(folder);
   arrayOfFiles = arrayOfFiles || [];
 
