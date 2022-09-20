@@ -152,6 +152,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
           androidxBrowserVersion: '1.4.0',
           firebaseMessagingVersion: '23.0.5',
           playServicesLocationVersion: '20.0.0',
+          androidxExifInterfaceVersion: '1.3.3',
         };
 
         for (const variable of Object.keys(variables)) {
