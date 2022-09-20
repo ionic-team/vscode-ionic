@@ -137,7 +137,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
           minSdkVersion: 22,
           compileSdkVersion: 32,
           targetSdkVersion: 32,
-          coreSplashScreenVersion: '1.0.0-rc01',
+          coreSplashScreenVersion: '1.0.0',
           androidxWebkitVersion: '1.4.0',
           androidxActivityVersion: '1.4.0',
           androidxAppCompatVersion: '1.4.2',
@@ -148,6 +148,10 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
           androidxJunitVersion: '1.1.3',
           androidxEspressoCoreVersion: '3.4.0',
           cordovaAndroidVersion: '10.1.1',
+          androidxMaterialVersion: '1.6.1',
+          androidxBrowserVersion: '1.4.0',
+          firebaseMessagingVersion: '23.0.5',
+          playServicesLocationVersion: '20.0.0',
         };
 
         for (const variable of Object.keys(variables)) {
