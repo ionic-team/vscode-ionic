@@ -1,8 +1,9 @@
 ## Changelog
 
-### Version 1.10.0
+### Version 1.10.1
 
 - Pressing Cmd/Ctrl + R will run the last chosen platform (or run for web)
+- Path to ADB added to Settings -> Advanced
 
 ### Version 1.9.9
 

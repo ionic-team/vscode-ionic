@@ -242,7 +242,6 @@ function getAdbArguments(): string[] {
 
 function getAdbExecutable(): string {
   const adbPath = vscode.workspace.getConfiguration('ionic').get<string>('adbPath');
-
   if (adbPath) {
     return resolvePath(adbPath);
   } else {
