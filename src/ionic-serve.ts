@@ -2,6 +2,7 @@ import { networkInterfaces } from 'os';
 import * as vscode from 'vscode';
 
 import { InternalCommand } from './command-name';
+import { ionicState } from './ionic-tree-provider';
 import { MonoRepoType } from './monorepo';
 import { preflightNPMCheck } from './node-commands';
 import { Project } from './project';
@@ -11,6 +12,7 @@ import { Project } from './project';
  * @returns string
  */
 export function ionicServe(project: Project, dontOpenBrowser: boolean): string {
+  ionicState.lastRun = undefined;
   switch (project.repoType) {
     case MonoRepoType.none:
       return ionicCLIServe(project, dontOpenBrowser);

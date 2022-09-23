@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.10.0
+
+- Pressing Cmd/Ctrl + R will run the last chosen platform (or run for web)
+
 ### Version 1.9.9
 
 - Fix for Capacitor 4 migration with variables.grade for Camera and other plugins

@@ -29,6 +29,7 @@ export function capacitorRun(project: Project, platform: CapacitorPlatform): str
   }
 
   ionicState.refreshDebugDevices = true;
+  ionicState.lastRun = platform;
 
   switch (project.repoType) {
     case MonoRepoType.none:

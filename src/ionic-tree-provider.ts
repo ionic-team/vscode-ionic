@@ -10,6 +10,8 @@ import { Context, VSCommand } from './context-variables';
 import { starterProject } from './ionic-start';
 import { isFolderBasedMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
 import { PackageManager } from './node-commands';
+import { Tip } from './tip';
+import { CapacitorPlatform } from './capacitor-platform';
 
 interface IonicState {
   view: vscode.TreeView<any>;
@@ -30,6 +32,10 @@ interface IonicState {
   refreshDebugDevices: boolean; // Should we refresh the list of debuggable devices
   remoteLogging: boolean; // Whether remote logging is enabled
   packageManager: PackageManager;
+  runIOS: Tip;
+  runAndroid: Tip;
+  runWeb: Tip;
+  lastRun: CapacitorPlatform;
 }
 export const ionicState: IonicState = {
   view: undefined,
@@ -44,6 +50,10 @@ export const ionicState: IonicState = {
   refreshDebugDevices: false,
   remoteLogging: false,
   packageManager: PackageManager.npm,
+  runIOS: undefined,
+  runAndroid: undefined,
+  runWeb: undefined,
+  lastRun: undefined,
 };
 
 export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {

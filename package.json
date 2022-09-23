@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.9.9",
+  "version": "1.10.0",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -25,7 +25,7 @@
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "npm run build && cp ionic-1.9.9.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+    "package": "npm run build && cp ionic-1.10.0.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
     "lint": "npm run eslint && npm run prettier -- --check",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write",
     "prettier": "prettier \"**/*.ts\"",
@@ -52,6 +52,14 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "keybindings": [
+      {
+        "command": "ionic.run",
+        "key": "ctrl+r",
+        "mac": "cmd+r",
+        "when": "true"
+      }
+    ],
     "viewsWelcome": [
       {
         "view": "ionic",
@@ -174,6 +182,10 @@
         "title": "Rebuild"
       },
       {
+        "command": "ionic.runios",
+        "title": "Run on iOS"
+      },
+      {
         "command": "ionic.refreshDebug",
         "title": "Refresh",
         "icon": {
@@ -242,6 +254,10 @@
         },
         {
           "command": "ionic.rebuild",
+          "when": "false"
+        },
+        {
+          "command": "ionic.runios",
           "when": "false"
         },
         {

@@ -321,7 +321,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const config = await buildConfiguration(context.extensionPath, context, r.tip.actionArg(0));
     if (!config) return;
     r.tip.addActionArg(`--configuration=${config}`);
-    runAction(r, ionicProvider, rootPath);
+    runAction(r.tip, ionicProvider, rootPath);
   });
 
   vscode.commands.registerCommand(CommandName.SkipLogin, async () => {
@@ -337,6 +337,20 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   });
 
+  vscode.commands.registerCommand(CommandName.RunIOS, async (recommendation: Recommendation) => {
+    let runInfo = ionicState.runWeb;
+    switch (ionicState.lastRun) {
+      case CapacitorPlatform.android:
+        runInfo = ionicState.runAndroid;
+        break;
+      case CapacitorPlatform.ios:
+        runInfo = ionicState.runIOS;
+        break;
+    }
+    if (runInfo) {
+      runAction(runInfo, ionicProvider, rootPath);
+    }
+  });
   vscode.commands.registerCommand(CommandName.Rebuild, async (recommendation: Recommendation) => {
     await recommendation.tip.executeAction();
     ionicProvider.refresh();
@@ -366,7 +380,7 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   vscode.commands.registerCommand(CommandName.Run, async (r: Recommendation) => {
-    runAction(r, ionicProvider, rootPath);
+    runAction(r.tip, ionicProvider, rootPath);
   });
 
   vscode.commands.registerCommand(CommandName.SelectDevice, async (r: Recommendation) => {
@@ -377,7 +391,7 @@ export async function activate(context: vscode.ExtensionContext) {
       ionicState.selectedIOSDevice = undefined;
       ionicState.selectedIOSDeviceName = undefined;
     }
-    runAction(r, ionicProvider, rootPath);
+    runAction(r.tip, ionicProvider, rootPath);
   });
 
   vscode.commands.registerCommand(CommandName.Link, async (tip: Tip) => {
@@ -406,8 +420,7 @@ function trackProjectChange() {
   });
 }
 
-async function runAction(r: Recommendation, ionicProvider: IonicTreeProvider, rootPath: string) {
-  const tip = r.tip;
+async function runAction(tip: Tip, ionicProvider: IonicTreeProvider, rootPath: string) {
   if (tip.stoppable) {
     markActionAsRunning(tip);
     ionicProvider.refresh();

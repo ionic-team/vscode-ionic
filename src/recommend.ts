@@ -26,6 +26,7 @@ import { getDebugBrowserName } from './editor-preview';
 import { checkIonicNativePackages } from './rules-ionic-native';
 import { startLogServer as startStopLogServer } from './log-server';
 import { analyzeSize } from './analyze-size';
+import { cmdCtrl } from './utilities';
 
 export async function getRecommendations(
   project: Project,
@@ -33,24 +34,24 @@ export async function getRecommendations(
   packages: any
 ): Promise<void> {
   if (project.isCapacitor && !project.isCordova) {
-    project.setGroup(`Run`, 'Options to run on various platforms', TipType.Ionic, true);
+    project.setGroup(`Run`, `Press ${cmdCtrl()}+R to run the last chosen platform or Web.`, TipType.Ionic, true);
 
     const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
     const hasCapAndroid = project.hasCapacitorProject(CapacitorPlatform.android);
 
-    project.add(
-      new Tip('Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`)
-        .setDynamicCommand(ionicServe, project, false)
-        .requestIPSelection()
-        .setFeatures([TipFeature.viewInEditor])
-        .setRunPoints([
-          { title: 'Building...', text: 'Generating browser application bundles' },
-          { title: 'Serving', text: 'Development server running' },
-        ])
-        .canStop()
-        .canAnimate()
-        .setTooltip('Run a development server and open using the default web browser')
-    );
+    const runWeb = new Tip('Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`)
+      .setDynamicCommand(ionicServe, project, false)
+      .requestIPSelection()
+      .setFeatures([TipFeature.viewInEditor])
+      .setRunPoints([
+        { title: 'Building...', text: 'Generating browser application bundles' },
+        { title: 'Serving', text: 'Development server running' },
+      ])
+      .canStop()
+      .canAnimate()
+      .setTooltip('Run a development server and open using the default web browser');
+    project.add(runWeb);
+    ionicState.runWeb = runWeb;
 
     // project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
     const runPoints: Array<RunPoint> = [
@@ -66,35 +67,36 @@ export async function getRecommendations(
 
     if (hasCapAndroid) {
       const title = ionicState.selectedAndroidDevice ? `${ionicState.selectedAndroidDeviceName}` : 'Android';
-      project.add(
-        new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
-          .requestDeviceSelection()
-          .requestIPSelection()
-          .setDynamicCommand(capacitorRun, project, CapacitorPlatform.android)
-          .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.android))
-          .setData(project.projectFolder())
-          .setRunPoints(runPoints)
-          .canStop()
-          .canAnimate()
-          .canRefreshAfter()
-          .setContextValue(Context.selectDevice)
-      );
+      const runAndroid = new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
+        .requestDeviceSelection()
+        .requestIPSelection()
+        .setDynamicCommand(capacitorRun, project, CapacitorPlatform.android)
+        .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.android))
+        .setData(project.projectFolder())
+        .setRunPoints(runPoints)
+        .canStop()
+        .canAnimate()
+        .canRefreshAfter()
+        .setContextValue(Context.selectDevice);
+
+      project.add(runAndroid);
+      ionicState.runAndroid = runAndroid;
     }
     if (hasCapIos) {
       const title = ionicState.selectedIOSDevice ? `${ionicState.selectedIOSDeviceName}` : 'iOS';
-      project.add(
-        new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
-          .requestDeviceSelection()
-          .requestIPSelection()
-          .setDynamicCommand(capacitorRun, project, CapacitorPlatform.ios)
-          .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.ios))
-          .setData(project.projectFolder())
-          .setRunPoints(runPoints)
-          .canStop()
-          .canAnimate()
-          .canRefreshAfter()
-          .setContextValue(Context.selectDevice)
-      );
+      const runIos = new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
+        .requestDeviceSelection()
+        .requestIPSelection()
+        .setDynamicCommand(capacitorRun, project, CapacitorPlatform.ios)
+        .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.ios))
+        .setData(project.projectFolder())
+        .setRunPoints(runPoints)
+        .canStop()
+        .canAnimate()
+        .canRefreshAfter()
+        .setContextValue(Context.selectDevice);
+      project.add(runIos);
+      ionicState.runIOS = runIos;
     }
 
     const r = project.setGroup(

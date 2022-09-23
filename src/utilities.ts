@@ -328,6 +328,10 @@ export function getStringFrom(data: string, start: string, end: string): string 
   return data.substring(idx, data.indexOf(end, idx));
 }
 
+export function cmdCtrl(): string {
+  return process.platform == 'darwin' ? 'cmd' : 'ctrl';
+}
+
 export function setStringIn(data: string, start: string, end: string, replacement: string): string {
   const foundIdx = data.lastIndexOf(start);
   if (foundIdx == -1) {
@@ -420,7 +424,7 @@ export function httpRequest(method: string, host: string, path: string, postData
     host,
     port: 443,
     method,
-    path
+    path,
   };
   return new Promise(function (resolve, reject) {
     const req = request(params, function (res) {

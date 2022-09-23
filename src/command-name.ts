@@ -21,6 +21,7 @@ export enum CommandName {
   DebugMode = 'ionic.debugMode',
   RunMode = 'ionic.runMode',
   SelectDevice = 'ionic.selectDevice',
+  RunIOS = 'ionic.run',
 }
 
 export enum InternalCommand {
