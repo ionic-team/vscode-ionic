@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.10.2
+
+- Fix for Capacitor config files using double quotes
+
 ### Version 1.10.1
 
 - Pressing Cmd/Ctrl + R will run the last chosen platform (or run for web)

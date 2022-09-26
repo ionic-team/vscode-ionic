@@ -114,7 +114,11 @@ export function getCapacitorConfigWebDir(folder: string): string {
   if (fs.existsSync(capConfigFile)) {
     const config = fs.readFileSync(capConfigFile, 'utf-8');
     result = getStringFrom(config, `webDir: '`, `'`);
-  } else {
+    if (!result) {
+      result = getStringFrom(config, `webDir: "`, `"`);
+    }
+  }
+  if (!result) {
     // No config file take a best guess
     if (fs.existsSync(join(folder, 'www'))) {
       result = 'www';
