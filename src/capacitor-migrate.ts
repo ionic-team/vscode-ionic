@@ -37,6 +37,9 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
         await run2(project, npmUninstall(`@capacitor/storage --force`));
         replaceStorage = true;
       }
+      if (exists('@capacitor/cli')) {
+        await run2(project, npmInstall(`@capacitor/cli@4 --save-dev --force`));
+      }
       await run2(
         project,
         install(
@@ -172,7 +175,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
                 join('android', 'variables.gradle'),
                 `${variable} = `,
                 `\n`,
-                variables[variable].toString(),
+                addQuotes(variables[variable].toString()),
                 true
               )
             ) {
@@ -200,6 +203,13 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
       writeError(`Failed to migrate: ${err}`);
     }
   });
+}
+
+function addQuotes(value: string): string {
+  if (value && value.includes('.')) {
+    return `'${value}'`;
+  }
+  return value;
 }
 
 function writeBreakingChanges() {
@@ -571,7 +581,7 @@ function install(libs: Array<string>, plugins: Array<string>, version: string, p
     }
   }
 
-  return npmInstall(result.trim());
+  return npmInstall(result.trim() + ' --force');
 }
 
 async function run2(project: Project, command: string, suppressOutput?: boolean): Promise<boolean> {

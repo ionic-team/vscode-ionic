@@ -1,7 +1,8 @@
 ## Changelog
 
-### Version 1.10.2
+### Version 1.10.3
 
+- Fix for Capacitor 4 migration and variables.gradle with single quotes
 - Fix for Capacitor config files using double quotes
 
 ### Version 1.10.1
