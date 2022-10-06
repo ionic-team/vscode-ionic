@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.10.4
+
+- Fix for Capacitor 3 projects to not include --sync option in sync commands
+
 ### Version 1.10.3
 
 - Fix for Capacitor 4 migration and variables.gradle with single quotes

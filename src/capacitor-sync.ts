@@ -1,6 +1,6 @@
 import { Project } from './project';
 import { MonoRepoType } from './monorepo';
-import { exists } from './analyzer';
+import { exists, isGreaterOrEqual } from './analyzer';
 import { InternalCommand } from './command-name';
 import { preflightNPMCheck } from './node-commands';
 
@@ -30,7 +30,10 @@ export function capacitorSync(project: Project): string {
 }
 
 function capCLISync(): string {
-  return `npx cap sync --inline`;
+  if (isGreaterOrEqual('@capacitor/cli', '4.0.0')) {
+    return `npx cap sync --inline`;
+  }
+  return `npx cap sync`;
 }
 
 function ionicCLISync(): string {
