@@ -565,6 +565,7 @@ export async function reviewProject(
   selectedProject: string
 ): Promise<Recommendation[]> {
   const summary = await inspectProject(folder, context, selectedProject);
+  if (!summary && !summary.project) return [];
   return summary.project.groups;
 }
 

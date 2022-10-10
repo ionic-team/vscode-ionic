@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.10.5
+
+- Fix for an project undefined error during the first analysis of a project
+
 ### Version 1.10.4
 
 - Fix for Capacitor 3 projects to not include --sync option in sync commands
