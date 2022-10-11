@@ -1,7 +1,8 @@
 ## Changelog
 
-### Version 1.10.5
+### Version 1.10.6
 
+- Updated the inbuilt Ionic CLI to 6.20.3
 - Fix for an project undefined error during the first analysis of a project
 
 ### Version 1.10.4
