@@ -1,5 +1,12 @@
 ## Changelog
 
+### Version 1.11.0
+
+- Fix Capacitor 4 migration to change registerPlugin order (Fixes #66)
+- Fix Capacitor 4 migration to prevent adding unused variables (Fixes #65)
+- Fix Capacitor 4 migration to avoid downgrading gradle (Fixes #64)
+- Fix Capacitor 4 migration to prevent duplicates exported=true (Fixes #63)
+
 ### Version 1.10.6
 
 - Updated the inbuilt Ionic CLI to 6.20.3

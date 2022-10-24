@@ -1,11 +1,11 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, lstatSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import * as vscode from 'vscode';
-import { exists } from './analyzer';
+import { exists, isVersionGreaterOrEqual } from './analyzer';
 import { getOutputChannel, writeError, writeIonic } from './extension';
 import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
-import { run, setAllStringIn, showProgress } from './utilities';
+import { getStringFrom, run, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
 import { ActionResult } from './command-name';
 
@@ -117,6 +117,9 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
         updateBuildGradle(join(project.projectFolder(), 'android', 'build.gradle'));
         updateAppBuildGradle(join(project.projectFolder(), 'android', 'app', 'build.gradle'));
 
+        // Update MainActivity.java
+        updateMainActivity(join(project.projectFolder(), 'android', 'app', 'src', 'main'));
+
         // Update gradle-wrapper.properties
         updateGradleWrapper(join(project.projectFolder(), 'android', 'gradle', 'wrapper', 'gradle-wrapper.properties'));
 
@@ -179,11 +182,12 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
                 true
               )
             ) {
-              updateVariablesGradle(
-                join(project.projectFolder(), 'android', 'variables.gradle'),
-                variable,
-                variables[variable].toString()
-              );
+              // Variable doesnt exist. Dont add it #65
+              // updateVariablesGradle(
+              //   join(project.projectFolder(), 'android', 'variables.gradle'),
+              //   variable,
+              //   variables[variable].toString()
+              // );
             }
           }
         }
@@ -259,9 +263,11 @@ function updateAndroidManifest(filename: string) {
   }
 
   // AndroidManifest.xml add attribute: <activity android:exported="true"
-  if (txt.includes('<activity android:exported="')) {
-    return; // Probably already updated manually
+  const activity = getStringFrom(txt, '<activity', '>');
+  if (activity.includes('android:exported="')) {
+    return;
   }
+
   const replaced = setAllStringIn(txt, '<activity', ' ', ' android:exported="true"');
   if (txt == replaced) {
     writeError(`Unable to update Android Manifest. Missing <activity> tag`);
@@ -294,6 +300,62 @@ function removeKey(filename: string, key: string) {
   if (removed) {
     writeFileSync(filename, lines.join('\n'), 'utf-8');
     writeIonic(`Migrated info.plist by removing  ${key} key.`);
+  }
+}
+
+function updateMainActivity(path: string) {
+  function findFilesInDir(startPath: string, filter: string) {
+    let results = [];
+    if (!existsSync(startPath)) {
+      return;
+    }
+
+    const files = readdirSync(startPath);
+    for (let i = 0; i < files.length; i++) {
+      const filename = join(startPath, files[i]);
+      const stat = lstatSync(filename);
+      if (stat.isDirectory()) {
+        results = results.concat(findFilesInDir(filename, filter)); //recurse
+      } else if (filename.toLowerCase().indexOf(filter) >= 0) {
+        results.push(filename);
+      }
+    }
+    return results;
+  }
+
+  const list = findFilesInDir(path, 'mainactivity.java');
+  for (const file of list) {
+    let data = readFile(file);
+    if (data) {
+      const bindex = data.indexOf('this.init(savedInstanceState');
+      if (bindex !== -1) {
+        const eindex = data.indexOf('}});', bindex) + 4;
+
+        data = data.replace(data.substring(bindex, eindex), '');
+
+        data = data.replace('// Initializes the Bridge', '');
+      }
+
+      const rindex = data.indexOf('registerPlugin');
+      const superLine = 'super.onCreate(savedInstanceState);';
+      if (rindex !== -1) {
+        if (data.indexOf(superLine) < rindex) {
+          const linePadding = rindex - data.indexOf(superLine) - superLine.length - 1;
+          data = data.replace(`${superLine}\n${' '.repeat(linePadding)}`, '');
+          const eindex = data.lastIndexOf('.class);') + 8;
+          data = data.replace(
+            data.substring(bindex, eindex),
+            `${data.substring(bindex, eindex)}\n${' '.repeat(linePadding) + superLine.padStart(linePadding)}`
+          );
+        }
+      }
+
+      if (bindex == -1 && rindex == -1) {
+        return;
+      }
+
+      writeFileSync(file, data);
+    }
   }
 }
 
@@ -471,9 +533,12 @@ function updateBuildGradle(filename: string) {
     if (!replaced.includes(`classpath '${dep}`)) {
       replaced = txt.replace('dependencies {', `dependencies {\n        classpath '${dep}:${neededDeps[dep]}'`);
     } else {
-      // Update
-      replaced = setAllStringIn(replaced, `classpath '${dep}:`, `'`, neededDeps[dep]);
-      writeIonic(`Migrated build.gradle set ${dep} = ${neededDeps[dep]}.`);
+      const current = getStringFrom(replaced, `classpath '${dep}:`, `'`);
+      if (isVersionGreaterOrEqual(neededDeps[dep], current)) {
+        // Update
+        replaced = setAllStringIn(replaced, `classpath '${dep}:`, `'`, neededDeps[dep]);
+        writeIonic(`Migrated build.gradle set ${dep} = ${neededDeps[dep]}.`);
+      }
     }
   }
 
