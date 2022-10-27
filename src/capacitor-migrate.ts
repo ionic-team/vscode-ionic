@@ -182,12 +182,23 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
                 true
               )
             ) {
-              // Variable doesnt exist. Dont add it #65
-              // updateVariablesGradle(
-              //   join(project.projectFolder(), 'android', 'variables.gradle'),
-              //   variable,
-              //   variables[variable].toString()
-              // );
+              // Add variables if they are in the core list of required ones
+              if (
+                [
+                  'coreSplashScreenVersion',
+                  'cordovaAndroidVersion',
+                  'androidxCoordinatorLayoutVersion',
+                  'androidxCoordinatorLayoutVersion',
+                  'androidxFragmentVersion',
+                  'androidxActivityVersion',
+                ].includes(variable)
+              ) {
+                updateVariablesGradle(
+                  join(project.projectFolder(), 'android', 'variables.gradle'),
+                  variable,
+                  variables[variable].toString()
+                );
+              }
             }
           }
         }
