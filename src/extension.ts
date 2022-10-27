@@ -2,7 +2,6 @@
 
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-
 import { Context, VSCommand } from './context-variables';
 import { ionicLogin, ionicSignup } from './ionic-auth';
 import { ionicState, IonicTreeProvider } from './ionic-tree-provider';

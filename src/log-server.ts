@@ -106,13 +106,21 @@ function getAddress(): string {
 }
 
 function writeLog(body: string, channel: OutputChannel) {
+  function write(level, message) {
+    if (typeof message === 'object') {
+      channel.appendLine(`[${level}] ${JSON.stringify(message)}`);
+    } else {
+      channel.appendLine(`[${level}] ${message}`);
+    }
+  }
   try {
     const lines = JSON.parse(body);
+    console.log(lines);
     if (!Array.isArray(lines)) {
-      channel.appendLine(`[${lines.level}] ${lines.message}`);
+      write(lines.level, lines.message);
     } else {
       for (const line of lines) {
-        channel.appendLine(`[${line.level}] ${line.message}`);
+        write(line.level, line.message);
       }
     }
   } catch {
@@ -123,14 +131,14 @@ function writeLog(body: string, channel: OutputChannel) {
 function writeDevices(body: string, channel: OutputChannel) {
   try {
     const device = JSON.parse(body);
-    channel.appendLine(`[Ionic] ${device.userAgent}`);
+    channel.appendLine(`[Ionic] ${device.agent}`);
   } catch {
     channel.appendLine(body);
   }
 }
 
 function injectInIndexHtml(folder: string, address: string, port: number): boolean {
-  return true;
+  //return true;
   const indexHtml = path.join(folder, 'src', 'index.html');
   if (!fs.existsSync(indexHtml)) {
     return false;
@@ -159,7 +167,7 @@ function commentEnd(): string {
 }
 
 function removeInjectedScript(folder: string): boolean {
-  return true;
+  //return true;
   const indexHtml = path.join(folder, 'src', 'index.html');
   if (!fs.existsSync(indexHtml)) {
     return false;

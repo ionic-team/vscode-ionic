@@ -84,20 +84,15 @@ var __awaiter =
                     s = 0;
                     continue;
                   }
-                  if (3 === e[0] && (!c || (e[1] > c[0] && e[1] < c[3]))) {
-                    s.label = e[1];
-                    break;
-                  }
-                  if (6 === e[0] && s.label < c[1]) {
-                    (s.label = c[1]), (c = e);
-                    break;
-                  }
-                  if (c && s.label < c[2]) {
+                  if (3 === e[0] && (!c || (e[1] > c[0] && e[1] < c[3]))) s.label = e[1];
+                  else if (6 === e[0] && s.label < c[1]) (s.label = c[1]), (c = e);
+                  else {
+                    if (!(c && s.label < c[2])) {
+                      c[2] && s.ops.pop(), s.trys.pop();
+                      continue;
+                    }
                     (s.label = c[2]), s.ops.push(e);
-                    break;
                   }
-                  c[2] && s.ops.pop(), s.trys.pop();
-                  continue;
               }
               e = o.call(r, s);
             } catch (t) {
@@ -185,7 +180,7 @@ var __awaiter =
               i._this.post('/log', r.pending), (r.pending = void 0);
             }, 500),
             (this.pending = [])),
-          this.pending.push({ Id: this.getDeviceIdentifier(), Message: o, LogLevel: n, stack: void 0 });
+          this.pending.push({ id: this.getDeviceIdentifier(), message: o, level: n, stack: void 0 });
       }),
       (i.prototype.getStack = function () {
         var t = new Error().stack.split('\n');
@@ -211,23 +206,24 @@ var __awaiter =
         var e,
           n = this;
         i._this.post('/devices', {
-          Id: i._this.getDeviceIdentifier(),
-          UserAgent: window.navigator.userAgent,
-          Title: window.document.title,
+          id: i._this.getDeviceIdentifier(),
+          agent: window.navigator.userAgent,
+          title: window.document.title,
         }),
           setInterval(function () {
             document.location.href != e && ((e = document.location.href), n.log('Url changed to '.concat(e)));
           }, 1e3);
       }),
       (i.prototype.getDeviceIdentifier = function () {
-        if (this._deviceIdentifier) return this._deviceIdentifier.toString();
-        var t = localStorage.IonicLoggerDeviceId,
-          e = parseInt(t);
+        var t, e;
         return (
+          this._deviceIdentifier ||
+          ((t = localStorage.IonicLoggerDeviceId),
+          (e = parseInt(t)),
           (null != t && !isNaN(e)) ||
             ((e = Math.floor(999999999 * Math.random())), (localStorage.IonicLoggerDeviceId = e)),
-          (this._deviceIdentifier = e).toString()
-        );
+          (this._deviceIdentifier = e))
+        ).toString();
       }),
       i
     );

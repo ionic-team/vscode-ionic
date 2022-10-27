@@ -24,9 +24,9 @@ import { ionicState } from './ionic-tree-provider';
 import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
 import { checkIonicNativePackages } from './rules-ionic-native';
-import { startLogServer as startStopLogServer } from './log-server';
 import { analyzeSize } from './analyze-size';
 import { cmdCtrl } from './utilities';
+import { startLogServer } from './log-server';
 
 export async function getRecommendations(
   project: Project,
@@ -260,6 +260,14 @@ export async function getRecommendations(
       `https://ionicframework.com`
     )
   );
+
+  project.add(new Tip('Ionic Support', '', TipType.Ionic).setAction(supportTicket, project));
+}
+
+async function supportTicket(project: Project): Promise<void> {
+  const url =
+    'https://ionic.zendesk.com/hc/en-us/requests/new?tf_subject=blar&tf_description=desc&tf_anonymous_requester_email=blar@blar.com';
+  await vscode.env.openExternal(vscode.Uri.parse(url));
 }
 
 function debugOnWeb(project: Project): Tip {
@@ -309,7 +317,7 @@ function viewInEditor(): Tip {
 }
 
 function toggleRemoteLogging(project: Project, current: boolean): Promise<void> {
-  if (startStopLogServer(project.folder)) {
+  if (startLogServer(project.folder)) {
     ionicState.remoteLogging = !current;
   }
   return;

@@ -65,7 +65,7 @@ class IonicLogger {
       }, 500);
       this.pending = [];
     }
-    this.pending.push({ Id: this.getDeviceIdentifier(), Message: msg, LogLevel: level, stack: undefined }); // this.getStack() });
+    this.pending.push({ id: this.getDeviceIdentifier(), message: msg, level: level, stack: undefined }); // this.getStack() });
   }
 
   private getStack(): string {
@@ -113,9 +113,9 @@ class IonicLogger {
   public initialize(options) {
     let lastUrl;
     IonicLogger._this.post('/devices', {
-      Id: IonicLogger._this.getDeviceIdentifier(),
-      UserAgent: window.navigator.userAgent,
-      Title: window.document.title,
+      id: IonicLogger._this.getDeviceIdentifier(),
+      agent: window.navigator.userAgent,
+      title: window.document.title,
     });
 
     // Report urls
