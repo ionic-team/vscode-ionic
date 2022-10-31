@@ -27,6 +27,7 @@ import { checkIonicNativePackages } from './rules-ionic-native';
 import { analyzeSize } from './analyze-size';
 import { cmdCtrl } from './utilities';
 import { startLogServer } from './log-server';
+import { getConfigurationName } from './build-configuration';
 
 export async function getRecommendations(
   project: Project,
@@ -115,7 +116,7 @@ export async function getRecommendations(
 
     project.setGroup(`Capacitor`, 'Capacitor Features', TipType.Capacitor, true);
     project.add(
-      new Tip('Build', '', TipType.Build, 'Build', undefined, 'Building', undefined)
+      new Tip('Build', getConfigurationName(), TipType.Build, 'Build', undefined, 'Building', undefined)
         .setDynamicCommand(ionicBuild, project)
         .setContextValue(Context.buildConfig)
         .canStop()

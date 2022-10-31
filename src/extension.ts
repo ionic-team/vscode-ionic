@@ -319,7 +319,10 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(CommandName.BuildConfig, async (r: Recommendation) => {
     const config = await buildConfiguration(context.extensionPath, context, r.tip.actionArg(0));
     if (!config) return;
-    r.tip.addActionArg(`--configuration=${config}`);
+    if (config != 'default') {
+      r.tip.addActionArg(`--configuration=${config}`);
+    }
+    ionicState.configuration = config;
     runAction(r.tip, ionicProvider, rootPath);
   });
 

@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.12.0
+
+- Selection of build configuration will apply when the run command is used
+
 ### Version 1.11.0
 
 - Fix Capacitor 4 migration to change registerPlugin order (Fixes #66)

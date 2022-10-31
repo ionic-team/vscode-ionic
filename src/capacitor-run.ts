@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import { exists, isLess } from './analyzer';
+import { getConfigurationArgs } from './build-configuration';
 import { CapacitorPlatform } from './capacitor-platform';
 import { InternalCommand } from './command-name';
 import { getOutputChannel } from './extension';
@@ -77,6 +78,7 @@ function capRun(platform: CapacitorPlatform, repoType: MonoRepoType): string {
     if (capRunFlags.length >= 0) capRunFlags += ' ';
     capRunFlags += '--prod';
   }
+  capRunFlags += getConfigurationArgs();
 
   const pre =
     repoType == MonoRepoType.npm ||

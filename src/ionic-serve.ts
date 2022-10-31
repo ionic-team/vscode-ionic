@@ -1,5 +1,6 @@
 import { networkInterfaces } from 'os';
 import * as vscode from 'vscode';
+import { getConfigurationArgs } from './build-configuration';
 
 import { InternalCommand } from './command-name';
 import { ionicState } from './ionic-tree-provider';
@@ -44,6 +45,8 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
   if (externalIP) {
     serveFlags += ' --external';
   }
+
+  serveFlags += getConfigurationArgs();
 
   return `${preop}npx ionic serve${serveFlags}`;
 }

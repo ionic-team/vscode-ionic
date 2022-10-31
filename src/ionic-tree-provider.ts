@@ -31,6 +31,7 @@ interface IonicState {
   channelFocus: boolean; // Whether to focus the output window
   refreshDebugDevices: boolean; // Should we refresh the list of debuggable devices
   remoteLogging: boolean; // Whether remote logging is enabled
+  configuration: string; // Build configuration
   packageManager: PackageManager;
   runIOS: Tip;
   runAndroid: Tip;
@@ -54,6 +55,7 @@ export const ionicState: IonicState = {
   runAndroid: undefined,
   runWeb: undefined,
   lastRun: undefined,
+  configuration: undefined,
 };
 
 export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {

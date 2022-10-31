@@ -3,6 +3,23 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import { Project } from './project';
+import { ionicState } from './ionic-tree-provider';
+
+export function getConfigurationName(): string {
+  if (!ionicState.configuration || ionicState.configuration == 'default') {
+    return '';
+  } else {
+    return `(${ionicState.configuration})`;
+  }
+}
+
+export function getConfigurationArgs(): string {
+  if (!ionicState.configuration || ionicState.configuration == 'default') {
+    return '';
+  } else {
+    return ` --configuration=${ionicState.configuration}`;
+  }
+}
 
 export async function buildConfiguration(
   folder: string,
@@ -18,6 +35,7 @@ export async function buildConfiguration(
     vscode.window.showInformationMessage('No build configurations found in this project');
     return;
   }
+  configs.unshift('default');
   const selection = vscode.window.showQuickPick(configs, { placeHolder: 'Select a build configuration to use' });
   return selection;
 }
