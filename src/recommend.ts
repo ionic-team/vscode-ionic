@@ -262,7 +262,8 @@ export async function getRecommendations(
     )
   );
 
-  project.add(new Tip('Ionic Support', '', TipType.Ionic).setAction(supportTicket, project));
+  // Support tickets require Zendesk integration
+  //project.add(new Tip('Ionic Support', '', TipType.Ionic).setAction(supportTicket, project));
 }
 
 async function supportTicket(project: Project): Promise<void> {
