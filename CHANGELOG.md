@@ -1,7 +1,8 @@
 ## Changelog
 
-### Version 1.12.0
+### Version 1.12.1
 
+- Reduce chance of other Ionic extensions registering the same named commands
 - Selection of build configuration will apply when the run command is used
 
 ### Version 1.11.0

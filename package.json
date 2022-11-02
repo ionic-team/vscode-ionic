@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.12.0",
+  "version": "1.12.1",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -25,7 +25,7 @@
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "npm run build && cp ionic-1.12.0.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+    "package": "npm run build && cp ionic-1.12.1.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
     "lint": "npm run eslint && npm run prettier -- --check",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write",
     "prettier": "prettier \"**/*.ts\"",
@@ -45,16 +45,16 @@
     "onView:ionic",
     "onLanguage:json",
     "onLanguage:jsonc",
-    "onCommand:ionic.refresh",
-    "onCommand:ionic.add",
-    "onCommand:ionic.fix",
-    "onCommand:ionic.lightbulb"
+    "onCommand:ionic-official.refresh",
+    "onCommand:ionic-official.add",
+    "onCommand:ionic-official.fix",
+    "onCommand:ionic-official.lightbulb"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "keybindings": [
       {
-        "command": "ionic.run",
+        "command": "ionic-official.run",
         "key": "ctrl+r",
         "mac": "cmd+r",
         "when": "true"
@@ -73,7 +73,7 @@
       },
       {
         "view": "ionic",
-        "contents": "A free Ionic account is required to unlock all extension features or [Skip for Now](command:ionic.skipLogin).\n[Login](command:ionic.login)\n[Sign Up](command:ionic.signUp)\n",
+        "contents": "A free Ionic account is required to unlock all extension features or [Skip for Now](command:ionic-official.skipLogin).\n[Login](command:ionic-official.login)\n[Sign Up](command:ionic-official.signUp)\n",
         "when": "isAnonymous == true && isLoggingIn == false"
       },
       {
@@ -134,7 +134,7 @@
     ],
     "commands": [
       {
-        "command": "ionic.refresh",
+        "command": "ionic-official.refresh",
         "title": "Ionic: Refresh",
         "icon": {
           "light": "resources/light/refresh.svg",
@@ -142,7 +142,7 @@
         }
       },
       {
-        "command": "ionic.add",
+        "command": "ionic-official.add",
         "title": "Ionic: Install Package",
         "icon": {
           "light": "resources/light/add.svg",
@@ -150,7 +150,7 @@
         }
       },
       {
-        "command": "ionic.lightbulb",
+        "command": "ionic-official.lightbulb",
         "title": "Upgrade",
         "icon": {
           "light": "resources/light/lightbulb.svg",
@@ -158,35 +158,35 @@
         }
       },
       {
-        "command": "ionic.fix",
+        "command": "ionic-official.fix",
         "title": "Ionic: Fix Issue"
       },
       {
-        "command": "ionic.signUp",
+        "command": "ionic-official.signUp",
         "title": "Ionic: Sign Up"
       },
       {
-        "command": "ionic.login",
+        "command": "ionic-official.login",
         "title": "Ionic: Login"
       },
       {
-        "command": "ionic.skipLogin",
+        "command": "ionic-official.skipLogin",
         "title": "Ionic: Skip Login"
       },
       {
-        "command": "ionic.open",
+        "command": "ionic-official.open",
         "title": "View"
       },
       {
-        "command": "ionic.rebuild",
+        "command": "ionic-official.rebuild",
         "title": "Rebuild"
       },
       {
-        "command": "ionic.runios",
+        "command": "ionic-official.runios",
         "title": "Run on iOS"
       },
       {
-        "command": "ionic.refreshDebug",
+        "command": "ionic-official.refreshDebug",
         "title": "Refresh",
         "icon": {
           "light": "resources/light/sync.svg",
@@ -194,15 +194,15 @@
         }
       },
       {
-        "command": "ionic.function",
+        "command": "ionic-official.function",
         "title": "Execute"
       },
       {
-        "command": "ionic.stop",
+        "command": "ionic-official.stop",
         "title": "Stop"
       },
       {
-        "command": "ionic.buildConfig",
+        "command": "ionic-official.buildConfig",
         "title": "Build Configuration",
         "icon": {
           "light": "resources/light/more.svg",
@@ -210,7 +210,7 @@
         }
       },
       {
-        "command": "ionic.selectDevice",
+        "command": "ionic-official.selectDevice",
         "title": "Select device to run",
         "icon": {
           "light": "resources/light/more.svg",
@@ -218,7 +218,7 @@
         }
       },
       {
-        "command": "ionic.runMode",
+        "command": "ionic-official.runMode",
         "title": "Switch to run mode",
         "icon": {
           "light": "resources/light/run.svg",
@@ -226,7 +226,7 @@
         }
       },
       {
-        "command": "ionic.upgrade",
+        "command": "ionic-official.upgrade",
         "title": "Upgrade",
         "icon": {
           "light": "resources/light/more.svg",
@@ -237,112 +237,112 @@
     "menus": {
       "commandPalette": [
         {
-          "command": "ionic.skipLogin",
+          "command": "ionic-official.skipLogin",
           "when": "false"
         },
         {
-          "command": "ionic.refresh",
+          "command": "ionic-official.refresh",
           "when": "false"
         },
         {
-          "command": "ionic.fix",
+          "command": "ionic-official.fix",
           "when": "false"
         },
         {
-          "command": "ionic.open",
+          "command": "ionic-official.open",
           "when": "false"
         },
         {
-          "command": "ionic.rebuild",
+          "command": "ionic-official.rebuild",
           "when": "false"
         },
         {
-          "command": "ionic.runios",
+          "command": "ionic-official.runios",
           "when": "false"
         },
         {
-          "command": "ionic.refreshDebug",
+          "command": "ionic-official.refreshDebug",
           "when": "false"
         },
         {
-          "command": "ionic.function",
+          "command": "ionic-official.function",
           "when": "false"
         },
         {
-          "command": "ionic.buildConfig",
+          "command": "ionic-official.buildConfig",
           "when": "false"
         },
         {
-          "command": "ionic.selectDevice",
+          "command": "ionic-official.selectDevice",
           "when": "false"
         },
         {
-          "command": "ionic.runMode",
+          "command": "ionic-official.runMode",
           "when": "false"
         },
         {
-          "command": "ionic.lightbulb",
+          "command": "ionic-official.lightbulb",
           "when": "false"
         },
         {
-          "command": "ionic.upgrade",
+          "command": "ionic-official.upgrade",
           "when": "false"
         },
         {
-          "command": "ionic.stop",
+          "command": "ionic-official.stop",
           "when": "false"
         }
       ],
       "view/title": [
         {
-          "command": "ionic.refresh",
+          "command": "ionic-official.refresh",
           "when": "view == ionic",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
-          "command": "ionic.add",
+          "command": "ionic-official.add",
           "when": "view == ionic && viewItem == packages",
           "group": "inline"
         },
         {
-          "command": "ionic.lightbulb",
+          "command": "ionic-official.lightbulb",
           "when": "view == ionic && viewItem == lightbulb",
           "group": "inline"
         },
         {
-          "command": "ionic.stop",
+          "command": "ionic-official.stop",
           "when": "view == ionic && viewItem == stop",
           "group": "inline"
         },
         {
-          "command": "ionic.open",
+          "command": "ionic-official.open",
           "when": "view == ionic && viewItem == asset",
           "group": "inline"
         },
         {
-          "command": "ionic.rebuild",
+          "command": "ionic-official.rebuild",
           "when": "view == ionic && viewItem == rebuild",
           "group": "inline"
         },
         {
-          "command": "ionic.refreshDebug",
+          "command": "ionic-official.refreshDebug",
           "when": "view == ionic && viewItem == refreshDebug",
           "group": "inline"
         },
         {
-          "command": "ionic.upgrade",
+          "command": "ionic-official.upgrade",
           "when": "view == ionic && viewItem == upgrade",
           "group": "inline"
         },
         {
-          "command": "ionic.buildConfig",
+          "command": "ionic-official.buildConfig",
           "when": "view == ionic && viewItem == buildConfig",
           "group": "inline"
         },
         {
-          "command": "ionic.selectDevice",
+          "command": "ionic-official.selectDevice",
           "when": "view == ionic && viewItem == selectDevice",
           "group": "inline"
         }
