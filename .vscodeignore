@@ -15,6 +15,9 @@ node_modules/conventional-changelog
 node_modules/.bin
 node_modules/native-run
 node_modules/**/LICENSE
+log-client/node_modules
+log-client/*.ts
+log-client/*.map
 **/*.ts
 **/*.jar
 **/*.map
