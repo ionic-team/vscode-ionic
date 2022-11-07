@@ -56,11 +56,10 @@
 # Large Feature Requests
 
 - (feat) Debugger for iOS (add breakpoints, inspection etc)
-- (feat) Bundle Analyser button, use stats.json for own report
+- (feat) Build to ipa/apk/aab option - select options for keystore/password etc
 - (feat) Use npm audit to list vulnerable packages
 - (feat) info.plist editing
 - (feat) Tool to capture plugins, cap community and paid plugins, evaluate (rank on archived, stars etc) and capture in json. Then use as part of an option to install known good plugins
-- (feat) Review output folder www and report any assets that are too large (eg photos that are png etc)
 - (feat) Twitter to RSS feed - pull news into plugin ??
 
 # Support For NX
@@ -75,3 +74,17 @@
 
 - Need this in capacitor config to allow Remote Logging to work: server: { cleartext: true }
 - Add for React and Vue
+
+# Remote logging 2:
+
+Angular process:
+Instead of writing into index.html
+Add to angular.json:
+
+```json
+            "scripts": [
+              {
+                "input": "stuff/script.js"
+              }
+            ],
+```
