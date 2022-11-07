@@ -38,7 +38,7 @@ function capCLISync(): string {
 }
 
 function ionicCLISync(): string {
-  return `npx ionic cap sync --inline`;
+  return `npx ionic cap sync --inline${getConfigurationArgs()}`;
 }
 
 function nxSync(project: Project): string {
