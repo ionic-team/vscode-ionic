@@ -1,3 +1,4 @@
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import {
   checkCordovaAndroidPreference,
   checkCordovaAndroidPreferenceMinimum,
@@ -7,6 +8,7 @@ import {
   isGreaterOrEqual,
   warnMinVersion,
 } from './analyzer';
+import { getPackageJSONFilename } from './monorepo';
 import { npmInstall } from './node-commands';
 import { Project } from './project';
 import { Tip, TipType } from './tip';
@@ -55,6 +57,19 @@ export function checkCordovaRules(project: Project) {
     );
   }
 
+  if (project.isCapacitor) {
+    // Has both cordova and capacitor
+    project.add(
+      new Tip(
+        'Remove Cordova',
+        'Remnants of Cordova are present in package.json',
+        TipType.Error,
+        `Your project is based on Capacitor but has remnants of cordova in the package.json file.`,
+        undefined,
+        'Fix package.json'
+      ).setAfterClickAction('Fix package.json', fixPackageJson, project)
+    );
+  }
   if (isGreaterOrEqual('@ionic/angular-toolkit', '6.0.0')) {
     // In v6 Cordova projects require @ionic/cordova-builders
     if (!exists('@ionic/cordova-builders')) {
@@ -108,6 +123,18 @@ export function checkCordovaRules(project: Project) {
       'cordova-support-google-services',
       'Remove as the functionality is built into cordova-android 9+. See: https://github.com/chemerisuk/cordova-support-google-services'
     );
+  }
+}
+
+async function fixPackageJson(project: Project): Promise<void> {
+  // Remove cordova section
+  const filename = getPackageJSONFilename(project.projectFolder());
+  if (existsSync(filename)) {
+    const json = readFileSync(filename, 'utf8');
+    const data = JSON.parse(json);
+    delete data.cordova;
+    const updated = JSON.stringify(data, undefined, 2);
+    writeFileSync(filename, updated);
   }
 }
 

@@ -37,6 +37,7 @@ export function viewInEditor(url: string) {
 
   panel.webview.onDidReceiveMessage(async (message) => {
     const device = await selectMockDevice();
+    panel.title = device.name;
     panel.webview.postMessage(device);
   });
 }
@@ -63,7 +64,7 @@ export async function debugBrowser(url: string) {
     vscode.debug.onDidTerminateDebugSession(async (e) => {
       // This stops the dev server
       await cancelLastOperation();
-      // Swtich back to Ionic View
+      // Switch back to Ionic View
       ionicState.view.reveal(undefined, { focus: true });
     });
 
@@ -115,8 +116,11 @@ function getWebviewContent(url: string): string {
 		        <div onclick="change()"  style="border: 2px solid #333; width:5px; height: 70px; cursor: pointer; margin-top:20px; margin-left:-19px; position: absolute"></div>
 				<iframe id="frame" src="${url}" width="100%" height="100%" frameBorder="0"></iframe>
 		   </div>
-		  <div style="width: 100%; height: 50px; display: flex; align-items: center; justify-content: center;">
+		  <div style="width: 100%; height: 50px; display: flex; align-items: center; justify-content: space-between;">
+      <div style="cursor: pointer; height: 25px; width:25px; padding:5px" onclick="history.back()"><svg viewBox="0 0 512 512"><path fill="none" stroke="#333" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M244 400L100 256l144-144M120 256h292"/></svg></div>
 			<div style="background-color: #333; cursor: pointer; height: 25px; width:25px; border-radius:30px; padding:5px" onclick="document.getElementById('frame').src = '${url}'"></div>
+      <div style="cursor: pointer; height: 25px; width:25px; padding:5px" onclick="change()"><svg fill="#333" viewBox="0 0 512 512"><circle cx="256" cy="256" r="48"/><circle cx="416" cy="256" r="48"/><circle cx="96" cy="256" r="48"/></svg></div>
+      
 		  </div>  
 		 </div>
 	</body>

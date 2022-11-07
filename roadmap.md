@@ -2,7 +2,6 @@
 
 ## Features
 
-- New projects - set the bundle id to something different based on app name chosen
 - See tslint.json and angular 12+ then link to https://ionicframework.com/blog/eslint-for-ionic-angular/ for migration
 - Show git remote url somewhere (git config --get remote.origin.url)
 - Clicking build should clear output window
@@ -15,7 +14,6 @@
 - Bug - For a regular Angular app where in angular.json the project has been renamed from app to say fuse the build command fails.
 
 - (2) For mono-repos include root package.json scripts
-- (1) Add .vs-code/extensions.json to recommend Ionic extension on starters (pr: https://github.com/ionic-team/starters/pull/1720)
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
 - (32) Debugging for iOS
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)
@@ -29,7 +27,6 @@
 - (4) When running for web, if you close the browser, a button for "Open Browser" should allow opening it again.
 - (4) Add "Build", "Sync", "Run" etc to commmand palette with keyboard shortcut
 - (8) Show preview as soon as "Run on Web" is clicked and show progress until app is ready
-- (16) Option to export package/plugin list: version, latest, and dev dep or regular dep
 - (8) Amp eslink rules to 11: using https://gist.github.com/dtarnawsky/7c42cec330443c7093976136286b5473
 - (8) Evaluate age of packages: when current version was released, when latest was released. If latest > 365 then warn. If latest - current > 365 then warn
 - (4) Highlight dev dependencies in some way
@@ -43,10 +40,8 @@
 
 ## Bugs
 
-- (bug) Debugging with Android web view without live reload doesnt allow breakpoints (see https://ionic-cloud.atlassian.net/browse/WN-391)
 - (bug) Bug capturing of inspection with telemetry reporting on exception
 - (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
-- (bug) Bundle id validate doesnt accept "stuff"
 
 ## Docs
 
