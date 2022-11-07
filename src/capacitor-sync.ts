@@ -3,6 +3,7 @@ import { MonoRepoType } from './monorepo';
 import { exists, isGreaterOrEqual } from './analyzer';
 import { InternalCommand } from './command-name';
 import { preflightNPMCheck } from './node-commands';
+import { getConfigurationArgs } from './build-configuration';
 
 /**
  * Creates the capacitor sync command
@@ -31,9 +32,9 @@ export function capacitorSync(project: Project): string {
 
 function capCLISync(): string {
   if (isGreaterOrEqual('@capacitor/cli', '4.1.0')) {
-    return `npx cap sync --inline`;
+    return `npx cap sync --inline${getConfigurationArgs()}`;
   }
-  return `npx cap sync`;
+  return `npx cap sync${getConfigurationArgs()}`;
 }
 
 function ionicCLISync(): string {
@@ -41,5 +42,5 @@ function ionicCLISync(): string {
 }
 
 function nxSync(project: Project): string {
-  return `npx nx sync ${project.monoRepo.name}`;
+  return `npx nx sync ${project.monoRepo.name}${getConfigurationArgs()}`;
 }
