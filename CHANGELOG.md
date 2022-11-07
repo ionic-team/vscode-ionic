@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.13.0
+
+- New projects are given a unique package id based on the chosen name
+
 ### Version 1.12.2
 
 - Reduce chance of other Ionic extensions registering the same named commands

@@ -45,8 +45,13 @@ async function requestAppName(tip: Tip) {
   if (name && name.length > 1) {
     const result = [];
     name = name.replace(/ /g, '-');
+    const packageId = name.replace(/ /g, '.').replace(/-/g, '.');
     for (const command of tip.command) {
-      result.push(command.replace(new RegExp('@app', 'g'), `${name.trim()}`));
+      result.push(
+        command
+          .replace(new RegExp('@app', 'g'), `${name.trim()}`)
+          .replace(new RegExp('@package-id', 'g'), `${packageId.trim()}`)
+      );
     }
     return result;
   } else {
