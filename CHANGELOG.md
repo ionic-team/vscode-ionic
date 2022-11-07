@@ -4,6 +4,7 @@
 
 - Editor preview now has back button and titled by device selected
 - New projects are given a unique package id based on the chosen name
+- Added cleanup task on package.json for Capacitor projects with cordova configs
 
 ### Version 1.12.2
 
