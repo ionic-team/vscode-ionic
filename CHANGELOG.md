@@ -2,6 +2,7 @@
 
 ### Version 1.13.0
 
+- Editor preview now has back button and titled by device selected
 - New projects are given a unique package id based on the chosen name
 
 ### Version 1.12.2
