@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.14.0
+
+- Feature to check for minor dependency updates
+
 ### Version 1.13.0
 
 - Editor preview now has back button and titled by device selected

@@ -12,6 +12,7 @@ import { listCommand, outdatedCommand } from './node-commands';
 import { CapProjectCache, PackageCacheList, PackageCacheModified, PackageCacheOutdated } from './context-variables';
 import { join } from 'path';
 import { exists } from './analyzer';
+import { updateMinorDependencies } from './update-minor';
 
 export interface PluginInformation {
   androidPermissions: Array<string>;
@@ -415,6 +416,9 @@ function listPackages(
 
   if (title) {
     project.setGroup(`${count} ${title}`, description, tipType, undefined, 'packages');
+    if (!tipType) {
+      project.add(new Tip('Check for Minor Updates', undefined).setAction(updateMinorDependencies, project, packages));
+    }
   }
 
   let lastScope: string;
