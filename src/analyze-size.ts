@@ -19,9 +19,10 @@ export async function analyzeSize(project: Project) {
       previousValue = enableSourceMaps(project);
       writeIonic('Building for production with Sourcemaps...');
       const cmd = ionicBuild(project, '--prod');
-      await run2(project, `export NODE_OPTIONS="--max-old-space-size=8192" && ${cmd}`, undefined);
+      const bumpSize = process.platform !== 'win32' ? 'export NODE_OPTIONS="--max-old-space-size=8192" && ' : '';
+      await run2(project, `${bumpSize}${cmd}`, undefined);
 
-      writeIonic('Analysing Sourcemaps...');
+      writeIonic('Analyzing Sourcemaps...');
       const result: RunResults = { output: '', success: undefined };
       try {
         await run2(project, `npx source-map-explorer ${dist}/**/*.js --json --exclude-source-map`, result);
