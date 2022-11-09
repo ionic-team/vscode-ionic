@@ -27,9 +27,23 @@
                 <string>invalid.illegal</string>
             </dict>
             <dict>
+                <!-- Critical Vunerability -->
+                <key>match</key>
+                <string>^\[critical\].*</string>
+                <key>name</key>
+                <string>invalid.illegal</string>
+            </dict>
+            <dict>
+                <!-- Command line -->
+                <key>match</key>
+                <string>^\[high\].*</string>
+                <key>name</key>
+                <string>entity.name.function</string>
+            </dict>	 
+            <dict>
                 <!-- Test Fail -->
                 <key>match</key>
-                <string>^(FAIL|npm ERR|Error:|\[error\]).*</string>
+                <string>^(FAIL|npm ERR|Error:|\[error\]|\[Error\]).*</string>
                 <key>name</key>
                 <string>invalid.deprecated</string>
             </dict>

@@ -3,6 +3,7 @@
 ### Version 1.14.0
 
 - Feature to check for minor dependency updates
+- Feature to audit for security vulnerabilities in dependencies
 
 ### Version 1.13.0
 

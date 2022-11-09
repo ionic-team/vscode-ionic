@@ -177,7 +177,6 @@ async function runCordovaRes(project: Project) {
       await run(folder, 'npx cordova-res android --skip-config --copy', channel, undefined, [], undefined, undefined);
       addToGitIgnore(folder, 'resources/android/**/*');
     }
-  
   });
   channel.appendLine('[Ionic] Completed created Splash Screen and Icon Assets');
   channelShow(channel);
@@ -191,7 +190,7 @@ function addToGitIgnore(folder: string, ignoreGlob: string) {
     if (!txt.includes(ignoreGlob)) {
       txt = txt + `\n${ignoreGlob}`;
       fs.writeFileSync(filename, txt);
-    }  
+    }
   }
 }
 
