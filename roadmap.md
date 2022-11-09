@@ -25,7 +25,6 @@
 - (16) Allow add of plugins: list all official capacitor, ionic enterprise, supported plugins
 - (16) If using say @capacitor/camera then allow editing of info.plist and Android permissions (highlight if empty)
 - (4) When running for web, if you close the browser, a button for "Open Browser" should allow opening it again.
-- (4) Add "Build", "Sync", "Run" etc to commmand palette with keyboard shortcut
 - (8) Show preview as soon as "Run on Web" is clicked and show progress until app is ready
 - (8) Amp eslink rules to 11: using https://gist.github.com/dtarnawsky/7c42cec330443c7093976136286b5473
 - (8) Evaluate age of packages: when current version was released, when latest was released. If latest > 365 then warn. If latest - current > 365 then warn
@@ -46,13 +45,12 @@
 ## Docs
 
 - (docs) Record video of previewing in editor
-- (docs) Video of splashscreen and icon assets
+- (docs) Video of splash screen and icon assets
 
 # Large Feature Requests
 
 - (feat) Debugger for iOS (add breakpoints, inspection etc)
 - (feat) Build to ipa/apk/aab option - select options for keystore/password etc
-- (feat) Use npm audit to list vulnerable packages
 - (feat) info.plist editing
 - (feat) Tool to capture plugins, cap community and paid plugins, evaluate (rank on archived, stars etc) and capture in json. Then use as part of an option to install known good plugins
 - (feat) Twitter to RSS feed - pull news into plugin ??
