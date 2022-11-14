@@ -2,7 +2,14 @@ import * as fs from 'fs';
 
 import { Project } from './project';
 import { Command, Tip, TipType } from './tip';
-import { exists, isGreaterOrEqual, matchingBeginingWith, remotePackages, warnMinVersion } from './analyzer';
+import {
+  exists,
+  isGreaterOrEqual,
+  isLessOrEqual,
+  matchingBeginingWith,
+  remotePackages,
+  warnMinVersion,
+} from './analyzer';
 import { npmInstallAll } from './node-commands';
 
 /**
@@ -56,7 +63,7 @@ export function checkPackages(project: Project) {
     project.recommendRemove(
       'cordova-plugin-android-fingerprint-auth',
       `cordova-plugin-android-fingerprint-auth`,
-      `This plugin should be removed as it cannot be used in conjuction with Identity Vault (which provides the same functionality).`
+      `This plugin should be removed as it cannot be used in conjunction with Identity Vault (which provides the same functionality).`
     );
   }
 
@@ -66,6 +73,14 @@ export function checkPackages(project: Project) {
     'node-sass',
     `The dependency node-sass is deprecated and should be removed from package.json.`
   );
+
+  if (exists('cordova-plugin-file-opener2') && isLessOrEqual('cordova-plugin-file-opener2', '3.0.5')) {
+    project.recommendRemove(
+      'cordova-plugin-file-opener2',
+      'cordova-plugin-file-opener2',
+      'Your project uses cordova-plugin-file-opener2 which will be rejected from the Play Store due to use of REQUEST_INSTALL_PACKAGES permission.'
+    );
+  }
 
   // Ionic 3+
   if (exists('ionic-angular')) {

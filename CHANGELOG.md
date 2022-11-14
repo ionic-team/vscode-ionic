@@ -4,6 +4,7 @@
 
 - Feature to check for minor dependency updates
 - Feature to audit for security vulnerabilities in dependencies
+- Report play store issue with cordova-plugin-file-opener2
 
 ### Version 1.13.0
 
