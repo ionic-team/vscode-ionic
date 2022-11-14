@@ -8,6 +8,8 @@ This extension for Visual Studio Code features:
 - [Native Projects Settings](#native-project-settings) - Set Bundle id, display name, version number and build number of the native project
 - [Outdated Packages](#upgrading-packages) - Provides easy upgrade to the latest version
   `androidmanifest.xml`
+- [Minor Updates](#upgrading-packages) - Identifies minor dependency updates for one step upgrading
+- [Security Vulnerabilities](#upgrading-packages) - Identifies security vulnerabilities in dependencies using npm audit
 - [Configuration Issues](#upgrading-packages) - Recommends changes to `config.xml` and `androidmanifest.xml`
 - [Integrate Capacitor](#adding-capacitor) into web projects
 - [Run Scripts](#upgrading-packages) from `package.json`
