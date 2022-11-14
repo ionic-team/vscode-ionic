@@ -123,6 +123,13 @@ export function getOutputChannel(): vscode.OutputChannel {
   return channel;
 }
 
+export function clearOutput(): vscode.OutputChannel {
+  const channel = getOutputChannel();
+  channel.clear();
+  channel.show();
+  return channel;
+}
+
 export function writeIonic(message: string) {
   const channel = getOutputChannel();
   channel.appendLine(`[Ionic] ${message}`);

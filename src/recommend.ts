@@ -24,7 +24,6 @@ import { ionicState } from './ionic-tree-provider';
 import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
 import { checkIonicNativePackages } from './rules-ionic-native';
-import { analyzeSize } from './analyze-size';
 import { cmdCtrl } from './utilities';
 import { startLogServer } from './log-server';
 import { getConfigurationName } from './build-configuration';
@@ -246,8 +245,6 @@ export async function getRecommendations(
       `https://github.com/ionic-team/vscode-extension/issues`
     )
   );
-
-  project.add(new Tip('Project Statistics', '', TipType.Dependency).setAction(analyzeSize, project));
 
   project.add(
     new Tip(

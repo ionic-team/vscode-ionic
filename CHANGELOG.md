@@ -1,5 +1,11 @@
 ## Changelog
 
+### Version 1.14.0
+
+- Feature to check for minor dependency updates
+- Feature to audit for security vulnerabilities in dependencies
+- Report play store issue with cordova-plugin-file-opener2
+
 ### Version 1.13.0
 
 - Editor preview now has back button and titled by device selected
