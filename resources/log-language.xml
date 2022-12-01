@@ -29,7 +29,7 @@
             <dict>
                 <!-- Critical Vunerability -->
                 <key>match</key>
-                <string>^\[critical\].*</string>
+                <string>\[critical\]|\[fatal\].*</string>
                 <key>name</key>
                 <string>invalid.illegal</string>
             </dict>
@@ -78,7 +78,7 @@
             <dict>
                 <!-- Warning -->
                 <key>match</key>
-                <string>^\[warn\].*</string>
+                <string>\[warn\].*</string>
                 <key>name</key>
                 <string>entity.name.function</string>
             </dict>	             	

@@ -1,5 +1,7 @@
 # ToDo
 
+- Switch from cordova-res to capacitor/assets for splash and icon generation
+
 ## Features
 
 - See tslint.json and angular 12+ then link to https://ionicframework.com/blog/eslint-for-ionic-angular/ for migration
