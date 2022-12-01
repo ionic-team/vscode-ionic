@@ -24,6 +24,7 @@ import { npmInstall } from './node-commands';
 import { InternalCommand } from './command-name';
 import { MonoRepoType } from './monorepo';
 import { migrateCapacitor } from './capacitor-migrate';
+import { checkAngularJson } from './rules-angular-json';
 
 /**
  * Check rules for Capacitor projects
@@ -78,6 +79,10 @@ export function checkCapacitorRules(project: Project) {
 
   if (isGreaterOrEqual('@ionic/angular-toolkit', '6.0.0')) {
     checkMigrationAngularToolkit(project);
+  }
+
+  if (isGreaterOrEqual('@angular/core', '12.0.0')) {
+    checkAngularJson(project);
   }
 
   if (isLess('@capacitor/android', '3.2.3')) {
