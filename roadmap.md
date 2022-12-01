@@ -1,6 +1,9 @@
 # ToDo
 
 - Switch from cordova-res to capacitor/assets for splash and icon generation
+  -- need to have logo.png and logo-dark.png, icon background color, icon background color dark, splash background color, splash background color dark as a set of minimum options
+  -- option to switch to custom mode with icon and splash
+  -- generate will do ios, android and pwa
 
 ## Features
 
@@ -11,9 +14,11 @@
 
 - Augmenting the New Project functionality to create the app in appflow and begin with the project linked, similar to the Ionic App Wizard
   Starting an appflow trial directly from the extension… thinking a 1-click experience to install AC/IV/etc
-
-- Bug - For a regular Angular app where in angular.json the project has been renamed from app to say fuse the build command fails.
-
+- (feat) Debugger for iOS (add breakpoints, inspection etc)
+- (feat) Build to ipa/apk/aab option - select options for keystore/password etc
+- (feat) info.plist editing
+- (feat) Tool to capture plugins, cap community and paid plugins, evaluate (rank on archived, stars etc) and capture in json. Then use as part of an option to install known good plugins
+- (feat) Twitter to RSS feed - pull news into plugin ??
 - (2) For mono-repos include root package.json scripts
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
 - (32) Debugging for iOS
@@ -30,7 +35,6 @@
 - (8) Amp eslink rules to 11: using https://gist.github.com/dtarnawsky/7c42cec330443c7093976136286b5473
 - (8) Evaluate age of packages: when current version was released, when latest was released. If latest > 365 then warn. If latest - current > 365 then warn
 - (4) Highlight dev dependencies in some way
-- (8) Open selection of an update check versions and provide option to update to the latest minor version. Eg 12.1 -> 12.x or 12.1.0 -> 12.1.x
 - (4) Check for leftover platforms and plugins folders when removing cordova or when capacitor is detected
 - (4) Detect if Android Studio not installed
 
@@ -47,14 +51,6 @@
 
 - (docs) Record video of previewing in editor
 - (docs) Video of splash screen and icon assets
-
-# Large Feature Requests
-
-- (feat) Debugger for iOS (add breakpoints, inspection etc)
-- (feat) Build to ipa/apk/aab option - select options for keystore/password etc
-- (feat) info.plist editing
-- (feat) Tool to capture plugins, cap community and paid plugins, evaluate (rank on archived, stars etc) and capture in json. Then use as part of an option to install known good plugins
-- (feat) Twitter to RSS feed - pull news into plugin ??
 
 # Support For NX
 
