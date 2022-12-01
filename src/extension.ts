@@ -104,6 +104,7 @@ function finishCommand(tip: Tip) {
 function startCommand(tip: Tip, cmd: string, ionicProvider: IonicTreeProvider) {
   if (tip.title) {
     const message = tip.commandTitle ? tip.commandTitle : tip.title;
+    channel.clear();
     channel.appendLine(`[Ionic] ${message}...`);
     let command = cmd;
     if (command?.includes(InternalCommand.cwd)) {

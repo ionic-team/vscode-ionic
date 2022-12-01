@@ -4,6 +4,7 @@
 
 - Check angular.json and make sure aot is not false for Angular 12+ projects
 - Fix log coloring for fatal and warning messages
+- Commands like build and sync now clear output window
 
 ### Version 1.14.0
 
