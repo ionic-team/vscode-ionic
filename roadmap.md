@@ -1,5 +1,6 @@
 # ToDo
 
+- Use ionic generate to add page, component, service etc to an app
 - Switch from cordova-res to capacitor/assets for splash and icon generation
   -- need to have logo.png and logo-dark.png, icon background color, icon background color dark, splash background color, splash background color dark as a set of minimum options
   -- option to switch to custom mode with icon and splash
