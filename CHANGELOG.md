@@ -3,6 +3,7 @@
 ### Version 1.15.0
 
 - Check angular.json and make sure aot is not false for Angular 12+ projects
+- Fix log coloring for fatal and warning messages
 
 ### Version 1.14.0
 
