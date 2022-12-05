@@ -80,7 +80,7 @@
                 <key>match</key>
                 <string>\[warn\].*</string>
                 <key>name</key>
-                <string>entity.name.function</string>
+                <string>invalid.illegal</string>
             </dict>	             	
         </array>
         <key>uuid</key>
