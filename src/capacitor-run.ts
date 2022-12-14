@@ -19,12 +19,14 @@ import { Project } from './project';
  */
 export function capacitorRun(project: Project, platform: CapacitorPlatform): string {
   let preop = '';
+  let rebuilt = false;
 
   // If the user modified something in the editor then its likely they need to rebuild the app before running
   if (ionicState.projectDirty) {
     const channel = getOutputChannel();
     channel.appendLine('[Ionic] Rebuilding as you changed your project...');
     preop = ionicBuild(project) + ' && ';
+    rebuilt = true;
   } else {
     preop = preflightNPMCheck(project);
   }
@@ -39,7 +41,7 @@ export function capacitorRun(project: Project, platform: CapacitorPlatform): str
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
     case MonoRepoType.npm:
-      return preop + capRun(platform, project.repoType);
+      return preop + capRun(platform, project.repoType, rebuilt);
     case MonoRepoType.nx:
       return preop + nxRun(project, platform);
     default:
@@ -52,7 +54,7 @@ export function capacitorDevicesCommand(platform: CapacitorPlatform): string {
   return `npx ${ionic}cap run ${platform} --list`;
 }
 
-function capRun(platform: CapacitorPlatform, repoType: MonoRepoType): string {
+function capRun(platform: CapacitorPlatform, repoType: MonoRepoType, noBuild: boolean): string {
   const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
   const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
   const prod: boolean = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
@@ -77,6 +79,10 @@ function capRun(platform: CapacitorPlatform, repoType: MonoRepoType): string {
   if (ionic != '' && prod) {
     if (capRunFlags.length >= 0) capRunFlags += ' ';
     capRunFlags += '--prod';
+  }
+  if (noBuild) {
+    if (capRunFlags.length >= 0) capRunFlags += ' ';
+    capRunFlags += '--no-build';
   }
   capRunFlags += getConfigurationArgs();
 

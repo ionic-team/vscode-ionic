@@ -3,6 +3,7 @@
 ### Version 1.16.0
 
 - Display the build configuration used for Angular projects where DefaultConfiguration is set
+- Run speed optimization: if a project is changed and rebuilt make sure cap run does not build again
 - Fix for Capacitor Sync where non-default build configuration is used
 - Show Capacitor commands even if Cordova is still present
 

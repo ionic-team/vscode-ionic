@@ -2,6 +2,8 @@
 
 - Detect plugins/platforms folders in a capacitor project and recommend removal
 - Use ionic generate to add page, component, service etc to an app
+- If you rerun the run command but didnt change package.json then use --no-sync (only works for non ionic cli)
+- If you rerun the run command but changed source code and it is rebuilt then use the --no-build argument (if ionic cli)
 - Switch to standalone components (one SCAM at a time then the base app module)
 - Switch from cordova-res to capacitor/assets for splash and icon generation
   -- need to have logo.png and logo-dark.png, icon background color, icon background color dark, splash background color, splash background color dark as a set of minimum options
