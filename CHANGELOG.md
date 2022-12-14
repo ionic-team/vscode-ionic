@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.16.0
+
+- Display the build configuration used for Angular projects where DefaultConfiguration is set
+
 ### Version 1.15.0
 
 - Check angular.json and make sure aot is not false for Angular 12+ projects

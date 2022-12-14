@@ -1,5 +1,10 @@
 # ToDo
 
+- Detect cordova in package.json and recommend removal if Capacitor is detected as well
+- Detect plugins/platforms folders in a capacitor project and recommend removal
+- cap sync should use the bul
+- Bug: Check DefaultConfiguration in angular.json and show the particular configuration next to "build"
+- Smarter run commands - have it cap copy instead of sync if there were no changes to package.json
 - Use ionic generate to add page, component, service etc to an app
 - Switch to standalone components (one SCAM at a time then the base app module)
 - Switch from cordova-res to capacitor/assets for splash and icon generation
