@@ -3,6 +3,7 @@
 ### Version 1.16.0
 
 - Display the build configuration used for Angular projects where DefaultConfiguration is set
+- Fix for Capacitor Sync where non-default build configuration is used
 
 ### Version 1.15.0
 

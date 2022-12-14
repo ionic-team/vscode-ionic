@@ -4,6 +4,7 @@ import * as fs from 'fs';
 
 import { Project } from './project';
 import { ionicState } from './ionic-tree-provider';
+import { exists } from './analyzer';
 
 export function getConfigurationName(): string {
   if (!ionicState.configuration || ionicState.configuration == 'default') {
@@ -17,7 +18,11 @@ export function getConfigurationArgs(): string {
   if (!ionicState.configuration || ionicState.configuration == 'default') {
     return '';
   } else {
-    return ` --configuration=${ionicState.configuration}`;
+    if (exists('@ionic/cli')) {
+      return ` --configuration=${ionicState.configuration}`;
+    } else {
+      return ''; // Cap CLI doesnt know about --configuration
+    }
   }
 }
 
