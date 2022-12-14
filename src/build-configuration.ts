@@ -18,11 +18,7 @@ export function getConfigurationArgs(): string {
   if (!ionicState.configuration || ionicState.configuration == 'default') {
     return '';
   } else {
-    if (exists('@ionic/cli')) {
-      return ` --configuration=${ionicState.configuration}`;
-    } else {
-      return ''; // Cap CLI doesnt know about --configuration
-    }
+    return ` --configuration=${ionicState.configuration}`;
   }
 }
 

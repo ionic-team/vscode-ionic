@@ -32,7 +32,7 @@ export function capacitorSync(project: Project): string {
 
 function capCLISync(): string {
   if (isGreaterOrEqual('@capacitor/cli', '4.1.0')) {
-    return `npx cap sync --inline${getConfigurationArgs()}`;
+    return `npx cap sync --inline`;
   }
   return `npx cap sync${getConfigurationArgs()}`;
 }
