@@ -33,7 +33,7 @@ export async function getRecommendations(
   context: vscode.ExtensionContext,
   packages: any
 ): Promise<void> {
-  if (project.isCapacitor && !project.isCordova) {
+  if (project.isCapacitor) {
     project.setGroup(`Run`, `Press ${cmdCtrl()}+R to run the last chosen platform or Web.`, TipType.Ionic, true);
 
     const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
