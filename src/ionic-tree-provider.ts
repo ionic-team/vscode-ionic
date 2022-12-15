@@ -27,6 +27,7 @@ interface IonicState {
   selectedAndroidDeviceName?: string;
   selectedIOSDeviceName?: string;
   projectDirty?: boolean; // Was there a likely change in the project (ie file saved)
+  syncDone: Array<string>; // Was a cap sync done for a particular platform
   outputIsFocused: boolean; // True if the output window is focused
   channelFocus: boolean; // Whether to focus the output window
   refreshDebugDevices: boolean; // Should we refresh the list of debuggable devices
@@ -48,6 +49,7 @@ export const ionicState: IonicState = {
   workspace: undefined,
   outputIsFocused: false,
   channelFocus: true,
+  syncDone: [],
   refreshDebugDevices: false,
   remoteLogging: false,
   packageManager: PackageManager.npm,

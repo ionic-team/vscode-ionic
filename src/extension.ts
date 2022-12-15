@@ -270,6 +270,12 @@ export async function fixIssue(
     channel.appendLine('');
     channelShow(channel);
   }
+
+  if (tip.syncOnSuccess) {
+    if (!ionicState.syncDone.includes(tip.syncOnSuccess)) {
+      ionicState.syncDone.push(tip.syncOnSuccess);
+    }
+  }
 }
 
 export async function activate(context: vscode.ExtensionContext) {

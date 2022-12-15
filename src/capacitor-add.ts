@@ -1,5 +1,6 @@
 import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
+import { useIonicCLI } from './capacitor-run';
 import { InternalCommand } from './command-name';
 import { MonoRepoType } from './monorepo';
 import { Project } from './project';
@@ -11,7 +12,7 @@ import { Project } from './project';
  * @returns string
  */
 export function capacitorAdd(project: Project, platform: CapacitorPlatform): string {
-  const ionic = exists('@ionic/cli') ? 'ionic ' : '';
+  const ionic = useIonicCLI() ? 'ionic ' : '';
   switch (project.repoType) {
     case MonoRepoType.none:
       return `npx ${ionic}cap add ${platform}`;

@@ -63,6 +63,9 @@ export async function processPackages(
     outdated = context.workspaceState.get(PackageCacheOutdated(project));
     versions = context.workspaceState.get(PackageCacheList(project));
     const changed = packagesModified.toUTCString() != packageModifiedLast;
+    if (changed) {
+      ionicState.syncDone = [];
+    }
     if (changed || !outdated || !versions) {
       await Promise.all([
         getRunOutput(outdatedCommand(project), folder).then((data) => {

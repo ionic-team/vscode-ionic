@@ -4,6 +4,7 @@ import { exists, isGreaterOrEqual } from './analyzer';
 import { InternalCommand } from './command-name';
 import { preflightNPMCheck } from './node-commands';
 import { getConfigurationArgs } from './build-configuration';
+import { useIonicCLI } from './capacitor-run';
 
 /**
  * Creates the capacitor sync command
@@ -13,7 +14,7 @@ import { getConfigurationArgs } from './build-configuration';
 export function capacitorSync(project: Project): string {
   const preop = preflightNPMCheck(project);
 
-  const ionicCLI = exists('@ionic/cli');
+  const ionicCLI = useIonicCLI();
   switch (project.repoType) {
     case MonoRepoType.none:
       return preop + (ionicCLI ? ionicCLISync() : capCLISync());

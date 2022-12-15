@@ -77,6 +77,7 @@ export async function getRecommendations(
         .canStop()
         .canAnimate()
         .canRefreshAfter()
+        .setSyncOnSuccess(CapacitorPlatform.android)
         .setContextValue(Context.selectDevice);
 
       project.add(runAndroid);
@@ -94,6 +95,7 @@ export async function getRecommendations(
         .canStop()
         .canAnimate()
         .canRefreshAfter()
+        .setSyncOnSuccess(CapacitorPlatform.ios)
         .setContextValue(Context.selectDevice);
       project.add(runIos);
       ionicState.runIOS = runIos;
