@@ -157,27 +157,29 @@ export function reviewPackages(packages: object, project: Project) {
     TipType.Capacitor
   );
 
-  project.setGroup('Project', '', TipType.Ionic);
-  project.add(
-    new Tip('Check for Minor Updates', '', TipType.Dependency)
-      .setAction(updateMinorDependencies, project, packages)
-      .setTooltip('Find minor updates for project dependencies')
-  );
-  project.add(
-    new Tip('Security Audit', '', TipType.Files)
-      .setAction(audit, project)
-      .setTooltip('Analyze dependencies using npm audit for security vulnerabilities')
-  );
-  project.add(
-    new Tip('Statistics', '', TipType.Files)
-      .setAction(analyzeSize, project)
-      .setTooltip('Analyze the built project assets and Javascript bundles')
-  );
-  project.add(
-    new Tip('Export', '', TipType.Media)
-      .setAction(ionicExport, project.projectFolder(), ionicState.context)
-      .setTooltip('Export a markdown file with all project dependencies and plugins')
-  );
+  if (project.isCapacitor) {
+    project.setGroup('Project', '', TipType.Ionic);
+    project.add(
+      new Tip('Check for Minor Updates', '', TipType.Dependency)
+        .setAction(updateMinorDependencies, project, packages)
+        .setTooltip('Find minor updates for project dependencies')
+    );
+    project.add(
+      new Tip('Security Audit', '', TipType.Files)
+        .setAction(audit, project)
+        .setTooltip('Analyze dependencies using npm audit for security vulnerabilities')
+    );
+    project.add(
+      new Tip('Statistics', '', TipType.Files)
+        .setAction(analyzeSize, project)
+        .setTooltip('Analyze the built project assets and Javascript bundles')
+    );
+    project.add(
+      new Tip('Export', '', TipType.Media)
+        .setAction(ionicExport, project.projectFolder(), ionicState.context)
+        .setTooltip('Export a markdown file with all project dependencies and plugins')
+    );
+  }
 }
 
 // List any plugins that use Cordova Hooks as potential issue
