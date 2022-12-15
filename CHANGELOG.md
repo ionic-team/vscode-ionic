@@ -6,6 +6,7 @@
 - Run speed optimization: if a project is changed and rebuilt make sure cap run does not build again
 - Optimization: if dependencies do not change then avoid cap sync when re-running
 - Fix for Capacitor Sync where non-default build configuration is used
+- Show Android version instead of SDK level in Android Device List
 - Show Capacitor commands even if Cordova is still present
 
 ### Version 1.15.0
