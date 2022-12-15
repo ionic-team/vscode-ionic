@@ -92,7 +92,8 @@ function capRun(platform: CapacitorPlatform, repoType: MonoRepoType, noBuild: bo
     capRunFlags += '--prod';
   }
 
-  if (noBuild) {
+  // Live reload clashes with --no-build
+  if (noBuild && !liveReload) {
     if (capRunFlags.length >= 0) capRunFlags += ' ';
     capRunFlags += '--no-build';
   }

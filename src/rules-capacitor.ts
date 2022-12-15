@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as vscode from 'vscode';
 
 import {
   checkConsistentVersions,
@@ -127,7 +128,8 @@ export function checkCapacitorRules(project: Project) {
   }
 
   // Ionic CLI unlock live reload
-  if (!exists('@ionic/cli') && isIonicBasedProject()) {
+  const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
+  if (!exists('@ionic/cli') && isIonicBasedProject() && liveReload) {
     project.recommendAdd(
       '@ionic/cli',
       '@ionic/cli',
