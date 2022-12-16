@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.16.1
+
+- Default port number can be configured in Advanced -> Settings
+
 ### Version 1.16.0
 
 - Display the build configuration used for Angular projects where DefaultConfiguration is set

@@ -374,6 +374,11 @@
           "default": true,
           "description": "Whether to use an external IP address when using Live Reload."
         },
+        "ionic.defaultPort": {
+          "type": "number",
+          "default": 8100,
+          "description": "The default port number used when serving your Ionic app (default is 8100)."
+        },
         "ionic.shellPath": {
           "type": "string",
           "scope": "application",
