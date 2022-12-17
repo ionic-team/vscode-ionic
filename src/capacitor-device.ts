@@ -70,8 +70,6 @@ function friendlyName(name: string): string {
 async function getDevices(command: string, rootPath: string) {
   try {
     const result = await getRunOutput(command, rootPath);
-    console.log(`getDevices: ${command}`);
-    console.log(result);
 
     const lines = result.split('\n');
     lines.shift(); // Remove the header
