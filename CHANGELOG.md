@@ -1,7 +1,8 @@
 ## Changelog
 
-### Version 1.16.1
+### Version 1.17.0
 
+- Support for VS Code Workspaces
 - Default port number can be configured in Advanced -> Settings
 - Minimum version of locally installed @ionic/cli set to 6+
 - Support for Angular projects with project names other than app
