@@ -50,6 +50,10 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
     serveFlags += ` --port=${defaultPort}`;
   }
 
+  if (ionicState.project) {
+    serveFlags += ` --project=${ionicState.project}`;
+  }
+
   serveFlags += getConfigurationArgs();
 
   return `${preop}npx ionic serve${serveFlags}`;

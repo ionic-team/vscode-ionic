@@ -19,9 +19,13 @@ export function ionicBuild(project: Project, configurationArg?: string): string 
   ionicState.projectDirty = false;
 
   const prod: boolean = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
+  let projectName = '';
+  if (ionicState.project) {
+    projectName = ` --project=${ionicState.project}`;
+  }
   switch (project.repoType) {
     case MonoRepoType.none:
-      return `${preop}${ionicCLIBuild(prod, configurationArg)}`;
+      return `${preop}${ionicCLIBuild(prod, configurationArg)}${projectName}`;
     case MonoRepoType.npm:
       return `${preop}${ionicCLIBuild(prod, configurationArg)} --project=${ionicState.workspace}`;
     case MonoRepoType.nx:

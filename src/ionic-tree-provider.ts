@@ -33,6 +33,7 @@ interface IonicState {
   refreshDebugDevices: boolean; // Should we refresh the list of debuggable devices
   remoteLogging: boolean; // Whether remote logging is enabled
   configuration: string; // Build configuration
+  project: string; // Angular project name
   packageManager: PackageManager;
   runIOS: Tip;
   runAndroid: Tip;
@@ -58,6 +59,7 @@ export const ionicState: IonicState = {
   runWeb: undefined,
   lastRun: undefined,
   configuration: undefined,
+  project: undefined,
 };
 
 export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {
