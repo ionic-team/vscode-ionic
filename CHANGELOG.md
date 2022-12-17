@@ -1,5 +1,21 @@
 ## Changelog
 
+### Version 1.17.0
+
+- Support for VS Code Workspaces
+- Default port number can be configured in Advanced -> Settings
+- Minimum version of locally installed @ionic/cli set to 6+
+- Support for Angular projects with project names other than app
+
+### Version 1.16.0
+
+- Display the build configuration used for Angular projects where DefaultConfiguration is set
+- Run speed optimization: if a project is changed and rebuilt make sure cap run does not build again
+- Optimization: if dependencies do not change then avoid cap sync when re-running
+- Fix for Capacitor Sync where non-default build configuration is used
+- Show Android version instead of SDK level in Android Device List
+- Show Capacitor commands even if Cordova is still present
+
 ### Version 1.15.0
 
 - Check angular.json and make sure aot is not false for Angular 12+ projects

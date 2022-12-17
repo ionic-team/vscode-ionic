@@ -1,5 +1,8 @@
 # ToDo
 
+- (feat) Build to ipa/apk/aab option - select options for keystore/password etc. Call it Prepare
+- (feat) Support flavors and schemes using the CLI
+- Detect plugins/platforms folders in a capacitor project and recommend removal
 - Use ionic generate to add page, component, service etc to an app
 - Switch to standalone components (one SCAM at a time then the base app module)
 - Switch from cordova-res to capacitor/assets for splash and icon generation

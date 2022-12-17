@@ -4,6 +4,7 @@ import * as fs from 'fs';
 
 import { Project } from './project';
 import { ionicState } from './ionic-tree-provider';
+import { exists } from './analyzer';
 
 export function getConfigurationName(): string {
   if (!ionicState.configuration || ionicState.configuration == 'default') {

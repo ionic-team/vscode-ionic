@@ -72,7 +72,7 @@ export function checkCordovaRules(project: Project) {
   }
   if (isGreaterOrEqual('@ionic/angular-toolkit', '6.0.0')) {
     // In v6 Cordova projects require @ionic/cordova-builders
-    if (!exists('@ionic/cordova-builders')) {
+    if (!exists('@ionic/cordova-builders') && !project.isCapacitor) {
       project.recommendAdd(
         '@ionic/cordova-builders',
         '@ionic/cordova-builders',

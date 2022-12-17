@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import { Project } from './project';
 import { Tip, TipType } from './tip';
 import { writeError } from './extension';
+import { ionicState } from './ionic-tree-provider';
 
 /**
  * For Capacitor project if @angular/core >= v13 then
@@ -14,11 +15,17 @@ import { writeError } from './extension';
  * @param  {Project} project
  */
 export function checkAngularJson(project: Project) {
+  let defaultConfiguration = undefined;
   try {
     const filename = path.join(project.folder, 'angular.json');
     if (fs.existsSync(filename)) {
       const angular = JSON.parse(fs.readFileSync(filename, 'utf8'));
       for (const projectName of Object.keys(angular.projects)) {
+        defaultConfiguration = angular.projects[projectName].architect?.build?.defaultConfiguration;
+        if (!ionicState.configuration && defaultConfiguration) {
+          ionicState.configuration = defaultConfiguration;
+          ionicState.project = projectName == 'app' ? undefined : projectName;
+        }
         if (angular.projects[projectName].architect?.build?.options?.aot === false) {
           project.add(
             new Tip(

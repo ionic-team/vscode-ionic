@@ -3,6 +3,7 @@ import { MonoRepoType } from './monorepo';
 import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
 import { InternalCommand } from './command-name';
+import { useIonicCLI } from './capacitor-run';
 
 /**
  * Capacitor open command
@@ -11,7 +12,7 @@ import { InternalCommand } from './command-name';
  * @returns string
  */
 export function capacitorOpen(project: Project, platform: CapacitorPlatform): string {
-  const ionicCLI = exists('@ionic/cli');
+  const ionicCLI = useIonicCLI();
   switch (project.repoType) {
     case MonoRepoType.none:
       return ionicCLI ? ionicCLIOpen(platform) : capCLIOpen(platform);

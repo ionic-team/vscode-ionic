@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.15.0",
+  "version": "1.17.0",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -25,7 +25,7 @@
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "npm run build && cp ionic-1.15.0.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+    "package": "npm run build && cp ionic-1.17.0.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
     "lint": "npm run eslint && npm run prettier -- --check",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write",
     "prettier": "prettier \"**/*.ts\"",
@@ -373,6 +373,11 @@
           "type": "boolean",
           "default": true,
           "description": "Whether to use an external IP address when using Live Reload."
+        },
+        "ionic.defaultPort": {
+          "type": "number",
+          "default": 8100,
+          "description": "The default port number used when serving your Ionic app (default is 8100)."
         },
         "ionic.shellPath": {
           "type": "string",

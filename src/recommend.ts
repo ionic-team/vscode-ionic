@@ -33,7 +33,7 @@ export async function getRecommendations(
   context: vscode.ExtensionContext,
   packages: any
 ): Promise<void> {
-  if (project.isCapacitor && !project.isCordova) {
+  if (project.isCapacitor) {
     project.setGroup(`Run`, `Press ${cmdCtrl()}+R to run the last chosen platform or Web.`, TipType.Ionic, true);
 
     const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
@@ -77,6 +77,7 @@ export async function getRecommendations(
         .canStop()
         .canAnimate()
         .canRefreshAfter()
+        .setSyncOnSuccess(CapacitorPlatform.android)
         .setContextValue(Context.selectDevice);
 
       project.add(runAndroid);
@@ -94,6 +95,7 @@ export async function getRecommendations(
         .canStop()
         .canAnimate()
         .canRefreshAfter()
+        .setSyncOnSuccess(CapacitorPlatform.ios)
         .setContextValue(Context.selectDevice);
       project.add(runIos);
       ionicState.runIOS = runIos;

@@ -609,7 +609,7 @@ export async function inspectProject(
 
   vscode.commands.executeCommand(VSCommand.setContext, Context.inspectedProject, true);
 
-  console.log(`Analysed Project in ${Date.now() - startedOp}ms`);
+  //console.log(`Analysed Project in ${Date.now() - startedOp}ms`);
   return { project, packages };
 }
 

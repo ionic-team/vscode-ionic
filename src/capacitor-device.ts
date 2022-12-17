@@ -102,9 +102,33 @@ function parseDevice(line: string) {
     const name = line.substring(0, line.indexOf('  ')).trim();
     line = line.substring(line.indexOf('  ')).trim();
     const args = line.replace('  ', '|').split('|');
-    return { name: name + ' ' + args[0].trim(), target: args[1].trim() };
+    return { name: name + ' ' + replaceSDKLevel(args[0].trim()), target: args[1].trim() };
   } catch {
     return undefined;
+  }
+}
+
+function replaceSDKLevel(sdk: string): string {
+  switch (sdk) {
+    case 'API 34':
+      return 'Android 14';
+    case 'API 33':
+      return 'Android 13';
+    case 'API 32':
+    case 'API 31':
+      return 'Android 12';
+    case 'API 30':
+      return 'Android 11';
+    case 'API 29':
+      return 'Android 10';
+    case 'API 28':
+      return 'Android 9';
+    case 'API 27':
+      return 'Android 8.1';
+    case 'API 26':
+      return 'Android 8.0';
+    default:
+      return sdk;
   }
 }
 

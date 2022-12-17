@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as vscode from 'vscode';
 
 import {
   checkConsistentVersions,
@@ -36,6 +37,9 @@ export function checkCapacitorRules(project: Project) {
   project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/ios'));
   project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/android'));
 
+  if (exists('@ionic/cli')) {
+    project.tip(checkMinVersion('@ionic/cli', '6.0.0'));
+  }
   if (!exists('@capacitor/cli')) {
     // Capacitor CLI should be installed locally
     project.recommendAdd(
@@ -127,7 +131,8 @@ export function checkCapacitorRules(project: Project) {
   }
 
   // Ionic CLI unlock live reload
-  if (!exists('@ionic/cli') && isIonicBasedProject()) {
+  const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
+  if (!exists('@ionic/cli') && isIonicBasedProject() && liveReload) {
     project.recommendAdd(
       '@ionic/cli',
       '@ionic/cli',

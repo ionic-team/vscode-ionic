@@ -1,3 +1,4 @@
+import { CapacitorPlatform } from './capacitor-platform';
 import { ActionResult } from './command-name';
 import { Context } from './context-variables';
 import { isRunning } from './extension';
@@ -23,6 +24,7 @@ export class Tip {
   public contextValue?: string;
   public ignorable: boolean;
   public refresh: boolean; // Whether the tree provider is refresh after action is run
+  public syncOnSuccess: CapacitorPlatform; // Which platform was synced
   public data?: any;
   public features: Array<TipFeature> = [];
   public relatedDependency: string;
@@ -120,6 +122,11 @@ export class Tip {
 
   canRefreshAfter() {
     this.refresh = true;
+    return this;
+  }
+
+  setSyncOnSuccess(platform: CapacitorPlatform) {
+    this.syncOnSuccess = platform;
     return this;
   }
 

@@ -121,6 +121,9 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
  * @returns boolean
  */
 export function isFolderBasedMonoRepo(rootFolder: string): Array<any> {
+  if (vscode.workspace.workspaceFolders.length > 1) {
+    return vsCodeWorkSpaces();
+  }
   const folders = fs
     .readdirSync(rootFolder, { withFileTypes: true })
     .filter((dir) => dir.isDirectory())
@@ -130,6 +133,17 @@ export function isFolderBasedMonoRepo(rootFolder: string): Array<any> {
     const packagejson = path.join(rootFolder, folder, 'package.json');
     if (fs.existsSync(packagejson)) {
       result.push({ name: folder, packageJson: packagejson, path: path.join(rootFolder, folder) });
+    }
+  }
+  return result;
+}
+
+function vsCodeWorkSpaces(): Array<any> {
+  const result = [];
+  for (const workspace of vscode.workspace.workspaceFolders) {
+    const packageJson = path.join(workspace.uri.path, 'package.json');
+    if (fs.existsSync(packageJson)) {
+      result.push({ name: workspace.name, packageJson: packageJson, path: workspace.uri.path });
     }
   }
   return result;
