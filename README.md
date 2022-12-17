@@ -25,6 +25,7 @@ This extension for Visual Studio Code features:
 - [Debugging for Web](#debugging-for-web) - Support for debugging via browser (Chrome or Edge)
 - [Debugging for Android](#debugging-for-android) - Support for debugging for Android devices
 - **Package Managers** - Support for npm, Yarn and Pnpm
+- [VS Code Workspaces](https://code.visualstudio.com/docs/editor/workspaces#_multiroot-workspaces) - Support for Multi-Root VS Code Workspaces
 
 ## Creating Ionic Projects
 
