@@ -49,8 +49,9 @@ async function fixAngularJson(filename: string) {
       `Use Angular's recommended AOT (Ahead of Time) compilation? (this will find additional errors in your templates by switching from JIT to AOT compilation during development)`,
       'Yes, Apply Changes'
     ))
-  )
+  ) {
     return;
+  }
   const txt = fs.readFileSync(filename, 'utf8');
   const angular = JSON.parse(txt);
   try {

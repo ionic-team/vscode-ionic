@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.18.0
+
+- Detect browserlist settings that will cause blank page on older devices
+
 ### Version 1.17.0
 
 - Support for VS Code Workspaces
