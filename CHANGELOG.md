@@ -2,7 +2,7 @@
 
 ### Version 1.18.0
 
-- Detect browserlist settings that will cause blank page on older devices
+- Detect browserslist settings that will cause blank page on older devices
 
 ### Version 1.17.0
 
