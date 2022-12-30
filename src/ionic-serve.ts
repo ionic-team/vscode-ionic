@@ -1,12 +1,15 @@
+import { existsSync } from 'fs';
 import { networkInterfaces } from 'os';
 import * as vscode from 'vscode';
 import { getConfigurationArgs } from './build-configuration';
 
 import { InternalCommand } from './command-name';
 import { ionicState } from './ionic-tree-provider';
+import { certPath } from './live-reload';
 import { MonoRepoType } from './monorepo';
 import { preflightNPMCheck } from './node-commands';
 import { Project } from './project';
+import { liveReloadSSL } from './live-reload';
 
 /**
  * Create the ionic serve command
@@ -40,9 +43,7 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
   if (previewInEditor || dontOpenBrowser) {
     serveFlags += ' --no-open';
   }
-  if (httpsForWeb) {
-    serveFlags += ' --ssl';
-  }
+
   if (externalIP) {
     serveFlags += ' --external';
   }
@@ -55,6 +56,16 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
   }
 
   serveFlags += getConfigurationArgs();
+
+  if (httpsForWeb) {
+    serveFlags += ' --ssl';
+    if (!existsSync(certPath('crt'))) {
+      liveReloadSSL(project);
+      return '';
+    }
+    serveFlags += ` -- --ssl-cert='${certPath('crt')}'`;
+    serveFlags += ` --ssl-key='${certPath('key')}'`;
+  }
 
   return `${preop}npx ionic serve${serveFlags}`;
 }

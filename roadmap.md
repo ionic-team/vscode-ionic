@@ -1,5 +1,8 @@
 # ToDo
 
+- Certificate setup for Windows (for Live Reload with HTTPS)
+- Handle scenario where openssl is not installed
+- Add document on Live Reload with https
 - (feat) Build to ipa/apk/aab option - select options for keystore/password etc. Call it Prepare
 - (feat) Support flavors and schemes using the CLI
 - Detect plugins/platforms folders in a capacitor project and recommend removal

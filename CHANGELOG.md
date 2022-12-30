@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.19.0
+
+- HTTPS option added which supports trusted certificate setup
+
 ### Version 1.18.0
 
 - Detect browserslist settings that will cause blank page on older devices
