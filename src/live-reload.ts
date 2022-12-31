@@ -138,6 +138,7 @@ async function createRootCA(keyFilename: string): Promise<string> {
 	default_md = sha256
 	distinguished_name = subject
 	req_extensions = req_ext
+  x509_extensions = x509_ext
 	string_mask = utf8only
 	prompt = no
 	
@@ -156,7 +157,13 @@ async function createRootCA(keyFilename: string): Promise<string> {
 	subjectAltName          = @subject_alt_name
 	authorityKeyIdentifier = keyid:always,issuer:always
 	issuerAltName           = issuer:copy
-	
+
+	[ x509_ext ]
+  subjectKeyIdentifier      = hash
+  authorityKeyIdentifier    = keyid:always,issuer
+  basicConstraints          = critical, CA:TRUE
+  keyUsage                  = critical, digitalSignature, keyEncipherment, cRLSign, keyCertSign
+
 	[ subject_alt_name ]
 	URI                     = https://ionic.io/
 	email                   = support@ionic.io	
