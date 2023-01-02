@@ -87,6 +87,7 @@ async function fixFile(name: string, filename: string, title: string, message: s
     replace.push('Chrome >=60');
     replace.push('ChromeAndroid >=60');
     replace.push('Firefox >=63');
+    replace.push('Firefox ESR');
     replace.push('Edge >=79');
     replace.push('Safari >=13');
     replace.push('iOS >=13');

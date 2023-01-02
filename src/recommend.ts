@@ -24,9 +24,12 @@ import { ionicState } from './ionic-tree-provider';
 import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
 import { checkIonicNativePackages } from './rules-ionic-native';
-import { cmdCtrl } from './utilities';
+import { cmdCtrl, getRunOutput, showProgress } from './utilities';
 import { startLogServer } from './log-server';
 import { getConfigurationName } from './build-configuration';
+import { liveReloadSSL } from './live-reload';
+import { npmInstall, npmUninstall } from './node-commands';
+import { writeIonic } from './extension';
 
 export async function getRecommendations(
   project: Project,
@@ -226,6 +229,7 @@ export async function getRecommendations(
   project.setGroup(`Settings`, 'Settings', TipType.Settings, false);
   project.add(externalAddress());
   project.add(liveReload());
+  project.add(useHttps(project));
   project.add(viewInEditor());
 
   // REMOTE LOGGING ENABLED ################
@@ -299,7 +303,17 @@ function liveReload(): Tip {
     .canRefreshAfter();
 }
 
+function useHttps(project: Project): Tip {
+  if (!exists('@angular/core')) return;
+  const useHttps = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
+  return new Tip('Use HTTPS', undefined, useHttps ? TipType.Check : TipType.Box, undefined)
+    .setTooltip('Use HTTPS when running with web or Live Reload.')
+    .setAction(toggleHttps, useHttps, project)
+    .canRefreshAfter();
+}
+
 function externalAddress(): Tip {
+  if (!exists('@angular/core')) return;
   const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
   return new Tip('External Address', undefined, externalIP ? TipType.Check : TipType.Box, undefined)
     .setTooltip(
@@ -326,6 +340,22 @@ function toggleRemoteLogging(project: Project, current: boolean): Promise<void> 
 
 async function toggleLiveReload(current: boolean) {
   await vscode.workspace.getConfiguration('ionic').update('liveReload', !current);
+}
+
+async function toggleHttps(current: boolean, project: Project) {
+  await vscode.workspace.getConfiguration('ionic').update('httpsForWeb', !current);
+  if (!current) {
+    await showProgress('Enabling HTTPS', async () => {
+      writeIonic('Installing @jcesarmobile/ssl-skip');
+      await getRunOutput(npmInstall('@jcesarmobile/ssl-skip'), project.folder);
+      await liveReloadSSL(project);
+    });
+  } else {
+    await showProgress('Disabling HTTPS', async () => {
+      writeIonic('Uninstalling @jcesarmobile/ssl-skip');
+      await getRunOutput(npmUninstall('@jcesarmobile/ssl-skip'), project.folder);
+    });
+  }
 }
 
 async function toggleExternalAddress(current: boolean) {

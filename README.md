@@ -26,6 +26,7 @@ This extension for Visual Studio Code features:
 - [Debugging for Android](#debugging-for-android) - Support for debugging for Android devices
 - **Package Managers** - Support for npm, Yarn and Pnpm
 - [VS Code Workspaces](https://code.visualstudio.com/docs/editor/workspaces#_multiroot-workspaces) - Support for Multi-Root VS Code Workspaces
+- [Live Reload with HTTPS](#live-reload-with-https) - Use HTTPS with your Dev Server
 
 ## Creating Ionic Projects
 
@@ -147,6 +148,12 @@ Detects when [Lerna](https://lerna.js.org/) is used as part of a mono repo and p
 ## Yarn Workspaces Support
 
 Detects when Yarn workspaces are used as part of a mono repo and provides a workspace selector.
+
+## Live Reload with HTTPS
+
+The feature (`Settings` > `Use HTTPS`) will create a certificate and serve your application using HTTPS. Instructions to trust the certificate on web, iOS and Android are displayed.
+
+> Note: This feature is currently only available with Angular projects and will temporarily install a plugin due to a quirk with the Android web view not trusting user installed CA Certificates.
 
 ## Debugging for Web
 

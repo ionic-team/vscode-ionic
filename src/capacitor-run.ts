@@ -1,3 +1,4 @@
+import { existsSync } from 'fs';
 import * as vscode from 'vscode';
 
 import { exists, isLess } from './analyzer';
@@ -7,6 +8,7 @@ import { InternalCommand } from './command-name';
 import { getOutputChannel } from './extension';
 import { ionicBuild } from './ionic-build';
 import { ionicState } from './ionic-tree-provider';
+import { certPath, liveReloadSSL } from './live-reload';
 import { MonoRepoType } from './monorepo';
 import { preflightNPMCheck } from './node-commands';
 import { Project } from './project';
@@ -45,7 +47,7 @@ export function capacitorRun(project: Project, platform: CapacitorPlatform): str
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
     case MonoRepoType.npm:
-      return preop + capRun(platform, project.repoType, rebuilt, noSync);
+      return preop + capRun(platform, project.repoType, rebuilt, noSync, project);
     case MonoRepoType.nx:
       return preop + nxRun(project, platform);
     default:
@@ -65,11 +67,18 @@ export function useIonicCLI(): boolean {
   return exists('@ionic/cli');
 }
 
-function capRun(platform: CapacitorPlatform, repoType: MonoRepoType, noBuild: boolean, noSync: boolean): string {
+function capRun(
+  platform: CapacitorPlatform,
+  repoType: MonoRepoType,
+  noBuild: boolean,
+  noSync: boolean,
+  project: Project
+): string {
   const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
   const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
+  const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
   const prod: boolean = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
-  let capRunFlags = liveReload ? ' -l' : '';
+  let capRunFlags = liveReload ? ' --livereload' : '';
 
   if (liveReload && exists('@ionic-enterprise/auth') && isLess('@ionic-enterprise/auth', '3.9.4')) {
     capRunFlags = '';
@@ -105,6 +114,18 @@ function capRun(platform: CapacitorPlatform, repoType: MonoRepoType, noBuild: bo
 
   capRunFlags += getConfigurationArgs();
 
+  if (httpsForWeb) {
+    if (capRunFlags.length >= 0) capRunFlags += ' ';
+    capRunFlags += '--ssl';
+
+    if (!existsSync(certPath('crt'))) {
+      liveReloadSSL(project);
+      return '';
+    }
+    capRunFlags += ` -- --ssl-cert='${certPath('crt')}'`;
+    capRunFlags += ` --ssl-key='${certPath('key')}'`;
+  }
+
   const pre =
     repoType == MonoRepoType.npm ||
     repoType == MonoRepoType.folder ||
@@ -114,7 +135,7 @@ function capRun(platform: CapacitorPlatform, repoType: MonoRepoType, noBuild: bo
       ? InternalCommand.cwd
       : '';
 
-  return `${pre}npx ${ionic}cap run ${platform}${capRunFlags} --target=${InternalCommand.target}`;
+  return `${pre}npx ${ionic}cap run ${platform} --target=${InternalCommand.target} ${capRunFlags}`;
 }
 
 function nxRun(project: Project, platform: CapacitorPlatform): string {
