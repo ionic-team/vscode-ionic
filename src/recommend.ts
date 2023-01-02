@@ -351,7 +351,7 @@ async function toggleHttps(current: boolean, project: Project) {
       await liveReloadSSL(project);
     });
   } else {
-    await showProgress('Enabling HTTPS', async () => {
+    await showProgress('Disabling HTTPS', async () => {
       writeIonic('Uninstalling @jcesarmobile/ssl-skip');
       await getRunOutput(npmUninstall('@jcesarmobile/ssl-skip'), project.folder);
     });
