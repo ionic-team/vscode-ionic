@@ -2,7 +2,13 @@
 
 - Certificate setup for Windows (for Live Reload with HTTPS)
 - Handle scenario where openssl is not installed
+- SSL options for non-angular projects
 - Add document on Live Reload with https
+- Use @jcesarmobile/ssl-skip for trust issues?
+  Android Trust Issues
+- Android (https://github.com/react-native-webview/react-native-webview/issues/2147)
+- May need an intermediate cert: https://developer.android.com/training/articles/security-ssl
+
 - (feat) Build to ipa/apk/aab option - select options for keystore/password etc. Call it Prepare
 - (feat) Support flavors and schemes using the CLI
 - Detect plugins/platforms folders in a capacitor project and recommend removal

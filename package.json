@@ -388,7 +388,7 @@
         "ionic.httpsForWeb": {
           "type": "boolean",
           "default": false,
-          "description": "Whether to use https (rather than http) when running the application for the web."
+          "description": "Whether to use https (rather than http) when running the application (Angular Projects Only)."
         },
         "ionic.buildForProduction": {
           "type": "boolean",
