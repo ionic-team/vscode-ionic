@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.20.0
+
+- Fix for "Check for minor updates" related to Typescript 4.9.x compatibility
+
 ### Version 1.19.0
 
 - HTTPS option added which supports trusted certificate setup

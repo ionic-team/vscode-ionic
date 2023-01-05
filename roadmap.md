@@ -1,5 +1,20 @@
 # ToDo
 
+- (feat) Build to ipa/apk/aab option - select options for keystore/password etc. Call it Prepare
+- (feat) Support flavors and schemes using the CLI
+- Detect plugins/platforms folders in a capacitor project and recommend removal
+- Use ionic generate to add page, component, service etc to an app
+- Switch to standalone components (one SCAM at a time then the base app module)
+
+### Use Capacitor Assets
+
+- Switch from cordova-res to capacitor/assets for splash and icon generation
+  -- need to have logo.png and logo-dark.png, icon background color, icon background color dark, splash background color, splash background color dark as a set of minimum options
+  -- option to switch to custom mode with icon and splash
+  -- generate will do ios, android and pwa
+
+### Certificates
+
 - Certificate setup for Windows (for Live Reload with HTTPS)
 - Handle scenario where openssl is not installed
 - SSL options for non-angular projects
@@ -8,16 +23,6 @@
   Android Trust Issues
 - Android (https://github.com/react-native-webview/react-native-webview/issues/2147)
 - May need an intermediate cert: https://developer.android.com/training/articles/security-ssl
-
-- (feat) Build to ipa/apk/aab option - select options for keystore/password etc. Call it Prepare
-- (feat) Support flavors and schemes using the CLI
-- Detect plugins/platforms folders in a capacitor project and recommend removal
-- Use ionic generate to add page, component, service etc to an app
-- Switch to standalone components (one SCAM at a time then the base app module)
-- Switch from cordova-res to capacitor/assets for splash and icon generation
-  -- need to have logo.png and logo-dark.png, icon background color, icon background color dark, splash background color, splash background color dark as a set of minimum options
-  -- option to switch to custom mode with icon and splash
-  -- generate will do ios, android and pwa
 
 ## Features
 
