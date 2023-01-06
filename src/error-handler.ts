@@ -37,6 +37,10 @@ export async function handleError(error: string, logs: Array<string>, folder: st
     return await ionicInit(folder);
   }
 
+  if (error && error.includes(`Since you're using the custom project type, you must provide the ionic:serve`)) {
+    return await ionicInit(folder);
+  }
+
   if (error && error.startsWith('/bin/sh: npx')) {
     const zsh = '/bin/zsh';
     ionicState.shell = zsh;

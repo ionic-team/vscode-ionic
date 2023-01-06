@@ -27,7 +27,7 @@ export function ionicBuild(project: Project, configurationArg?: string): string 
     case MonoRepoType.none:
       return `${preop}${ionicCLIBuild(prod, configurationArg)}${projectName}`;
     case MonoRepoType.npm:
-      return `${preop}${ionicCLIBuild(prod, configurationArg)} --project=${ionicState.workspace}`;
+      return `${InternalCommand.cwd}${preop}${ionicCLIBuild(prod, configurationArg)}`;
     case MonoRepoType.nx:
       return `${preop}${nxBuild(prod, project)}`;
     case MonoRepoType.folder:

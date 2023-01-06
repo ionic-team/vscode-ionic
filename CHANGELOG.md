@@ -1,9 +1,11 @@
 ## Changelog
 
-### Version 1.19.1
+### Version 1.19.2
 
 - Fix for "Check for minor updates" related to Typescript 4.9.x compatibility
 - Fix for npm workspaces to recognize that node_modules are at the root
+- Fix live reload issue with npm workspaces
+- Fix run on web for vite based projects
 
 ### Version 1.19.0
 
