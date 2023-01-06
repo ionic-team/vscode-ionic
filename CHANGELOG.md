@@ -1,8 +1,9 @@
 ## Changelog
 
-### Version 1.20.0
+### Version 1.19.1
 
 - Fix for "Check for minor updates" related to Typescript 4.9.x compatibility
+- Fix for npm workspaces to recognize that node_modules are at the root
 
 ### Version 1.19.0
 

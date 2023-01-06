@@ -1,19 +1,23 @@
-# ToDo
+# Roadmap
+
+## Prepare Release
 
 - (feat) Build to ipa/apk/aab option - select options for keystore/password etc. Call it Prepare
 - (feat) Support flavors and schemes using the CLI
-- Detect plugins/platforms folders in a capacitor project and recommend removal
-- Use ionic generate to add page, component, service etc to an app
+
+## Angular Generate
+
+- Use `ionic generate` to add page, component, service etc to an app
 - Switch to standalone components (one SCAM at a time then the base app module)
 
-### Use Capacitor Assets
+## Use Capacitor Assets
 
 - Switch from cordova-res to capacitor/assets for splash and icon generation
-  -- need to have logo.png and logo-dark.png, icon background color, icon background color dark, splash background color, splash background color dark as a set of minimum options
-  -- option to switch to custom mode with icon and splash
-  -- generate will do ios, android and pwa
+- need to have logo.png and logo-dark.png, icon background color, icon background color dark, splash background color, splash background color dark as a set of minimum options
+- option to switch to custom mode with icon and splash
+- generate will do ios, android and pwa
 
-### Certificates
+## Certificates
 
 - Certificate setup for Windows (for Live Reload with HTTPS)
 - Handle scenario where openssl is not installed
@@ -21,20 +25,19 @@
 - Add document on Live Reload with https
 - Use @jcesarmobile/ssl-skip for trust issues?
   Android Trust Issues
-- Android (https://github.com/react-native-webview/react-native-webview/issues/2147)
-- May need an intermediate cert: https://developer.android.com/training/articles/security-ssl
+- Android ([info](https://github.com/react-native-webview/react-native-webview/issues/2147))
+- May need an intermediate cert ([info](https://developer.android.com/training/articles/security-ssl))
 
 ## Features
 
-- See tslint.json and angular 12+ then link to https://ionicframework.com/blog/eslint-for-ionic-angular/ for migration
-- Show git remote url somewhere (git config --get remote.origin.url)
-
+- See `tslint.json` and angular 12+ then link to [blog](https://ionicframework.com/blog/eslint-for-ionic-angular/) for migration
+- Show git remote url somewhere (`git config --get remote.origin.url`)
+- Detect plugins/platforms folders in a capacitor project and recommend removal
 - Listing recent appflow builds and allowing users to sideload the artifacts from those builds onto their simulators/devices (lots of potential cert issues with iOS here)
 
 - Augmenting the New Project functionality to create the app in appflow and begin with the project linked, similar to the Ionic App Wizard
   Starting an appflow trial directly from the extension… thinking a 1-click experience to install AC/IV/etc
 - (feat) Debugger for iOS (add breakpoints, inspection etc)
-- (feat) Build to ipa/apk/aab option - select options for keystore/password etc
 - (feat) info.plist editing
 - (feat) Tool to capture plugins, cap community and paid plugins, evaluate (rank on archived, stars etc) and capture in json. Then use as part of an option to install known good plugins
 - (feat) Twitter to RSS feed - pull news into plugin ??
@@ -71,7 +74,7 @@
 - (docs) Record video of previewing in editor
 - (docs) Video of splash screen and icon assets
 
-# Support For NX
+## Support For NX
 
 - (bug) Package reconciliation (from root and project)
 - (feat) Needs lint, test and e2e nx tasks added (assuming @nxtend/ionic-angular)
@@ -79,12 +82,12 @@
 - (feat) Detect missing @nxtend/capacitor. Option to add
 - Starters for NX?
 
-# Remote Logging Issues
+## Remote Logging Issues
 
 - Need this in capacitor config to allow Remote Logging to work: server: { cleartext: true }
 - Add for React and Vue
 
-# Remote logging 2:
+### Remote logging 2
 
 Angular process:
 Instead of writing into index.html

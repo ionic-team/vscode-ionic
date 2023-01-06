@@ -48,7 +48,7 @@ export class Project {
 
   public getNodeModulesFolder(): string {
     let nmf = path.join(this.folder, 'node_modules');
-    if (this.monoRepo?.localPackageJson) {
+    if (!this.monoRepo?.nodeModulesAtRoot) {
       nmf = path.join(this.monoRepo.folder, 'node_modules');
     }
     return nmf;
