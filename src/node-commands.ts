@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 
 import { InternalCommand } from './command-name';
 import { ionicState } from './ionic-tree-provider';
-import { MonoRepoType } from './monorepo';
+import { getMonoRepoFolder, MonoRepoType } from './monorepo';
 import { Project } from './project';
 
 export enum PackageManager {
@@ -32,7 +32,7 @@ export function npmInstall(name: string, ...args): string {
 
   switch (ionicState.repoType) {
     case MonoRepoType.npm:
-      return `${pm(PMOperation.install, name)} ${argList} --workspace=${ionicState.workspace}`;
+      return `${pm(PMOperation.install, name)} ${argList} --workspace=${getMonoRepoFolder(ionicState.workspace)}`;
     case MonoRepoType.folder:
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
@@ -132,7 +132,7 @@ function pnpm(operation: PMOperation, name?: string): string {
 export function npmUninstall(name: string): string {
   switch (ionicState.repoType) {
     case MonoRepoType.npm:
-      return `${pm(PMOperation.uninstall, name)} --workspace=${ionicState.workspace}`;
+      return `${pm(PMOperation.uninstall, name)} --workspace=${getMonoRepoFolder(ionicState.workspace)}`;
     case MonoRepoType.folder:
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
@@ -146,7 +146,7 @@ export function npmUninstall(name: string): string {
 export function npmRun(name: string): string {
   switch (ionicState.repoType) {
     case MonoRepoType.npm:
-      return `${pm(PMOperation.run, name)} --workspace=${ionicState.workspace}`;
+      return `${pm(PMOperation.run, name)} --workspace=${getMonoRepoFolder(ionicState.workspace)}`;
     case MonoRepoType.folder:
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
