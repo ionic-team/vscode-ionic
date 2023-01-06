@@ -17,6 +17,7 @@ export interface MonoRepoProject {
   name: string;
   folder: string;
   localPackageJson?: boolean; // Is the package.json in the local project folder
+  nodeModulesAtRoot?: boolean; // Is the node_modules folder at the root
   isIonic?: boolean; // Does it looks like an ionic project using @ionic/vue etc
 }
 
@@ -98,7 +99,6 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
     } else {
       ionicState.view.title = project.monoRepo.name;
 
-      // npm workspaces uses the package.json of the local folder
       project.monoRepo.localPackageJson = [
         MonoRepoType.npm,
         MonoRepoType.folder,
@@ -106,6 +106,9 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
         MonoRepoType.lerna,
         MonoRepoType.pnpm,
       ].includes(project.repoType);
+
+      // Is the node_modules folder kept only at the root of the mono repo
+      project.monoRepo.nodeModulesAtRoot = [MonoRepoType.npm].includes(project.repoType);
 
       vscode.commands.executeCommand(CommandName.ProjectsRefresh, project.monoRepo.name);
     }
