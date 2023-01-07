@@ -5,7 +5,7 @@ import { exists, isLess } from './analyzer';
 import { getConfigurationArgs } from './build-configuration';
 import { CapacitorPlatform } from './capacitor-platform';
 import { InternalCommand } from './command-name';
-import { getOutputChannel } from './extension';
+import { getOutputChannel, writeError } from './extension';
 import { ionicBuild } from './ionic-build';
 import { ionicState } from './ionic-tree-provider';
 import { certPath, liveReloadSSL } from './live-reload';
@@ -74,10 +74,15 @@ function capRun(
   noSync: boolean,
   project: Project
 ): string {
-  const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
+  let liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
   const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
   const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
   const prod: boolean = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
+
+  if (liveReload && project.repoType == MonoRepoType.npm) {
+    writeError('Live Reload is not supported with npm workspaces. Ignoring the live reload option');
+    liveReload = false;
+  }
   let capRunFlags = liveReload ? ' --livereload' : '';
 
   if (liveReload && exists('@ionic-enterprise/auth') && isLess('@ionic-enterprise/auth', '3.9.4')) {
