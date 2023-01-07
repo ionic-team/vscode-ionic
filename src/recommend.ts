@@ -41,12 +41,11 @@ export async function getRecommendations(
 
     const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
     const hasCapAndroid = project.hasCapacitorProject(CapacitorPlatform.android);
-    const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
 
     const runWeb = new Tip('Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`)
       .setDynamicCommand(ionicServe, project, false)
       .requestIPSelection()
-      .setFeatures([previewInEditor ? TipFeature.viewInEditor : TipFeature.debugOnWeb])
+      .setFeatures([TipFeature.viewInEditor])
       .setRunPoints([
         { title: 'Building...', text: 'Generating browser application bundles' },
         { title: 'Serving', text: 'Development server running' },
