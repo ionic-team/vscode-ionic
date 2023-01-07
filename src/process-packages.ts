@@ -11,7 +11,6 @@ import { NpmDependency, NpmOutdatedDependency, NpmPackage, PackageType, PackageV
 import { listCommand, outdatedCommand } from './node-commands';
 import { CapProjectCache, PackageCacheList, PackageCacheModified, PackageCacheOutdated } from './context-variables';
 import { join } from 'path';
-import { exists } from './analyzer';
 import { updateMinorDependencies } from './update-minor';
 import { analyzeSize } from './analyze-size';
 import { ionicExport } from './ionic-export';
@@ -454,7 +453,7 @@ function listPackages(
     if (packages[library].depType == depType) {
       let v = `${packages[library].version}`;
       let latest;
-      if (v == 'null') v = PackageVersion.Custom;
+      if (v == 'null') v = PackageVersion.Unknown;
 
       let url = packages[library].url;
       if (url) {

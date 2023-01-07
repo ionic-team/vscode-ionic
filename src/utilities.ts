@@ -172,6 +172,13 @@ export async function run(
             channel.appendLine(`[Ionic] Launching ${url}`);
             viewEditor = false;
             setTimeout(() => handleUrl(url, features), 500);
+          } else if (data.includes('> Local: ')) {
+            // Likely vite
+            serverUrl = stripColors(getStringFrom(data, 'Local: ', '\n'));
+            const url = stripColors(serverUrl.trim());
+            channel.appendLine(`[Ionic] Launching ${url}`);
+            viewEditor = false;
+            setTimeout(() => handleUrl(url, features), 500);
           }
         }
 
@@ -223,6 +230,11 @@ function handleUrl(url: string, features: Array<TipFeature>) {
   } else {
     debugBrowser(url);
   }
+}
+
+function stripColors(s: string): string {
+  // [36mhttp://localhost:[1m3002[22m/[39m
+  return replaceAllStringIn(s, '[', 'm', '');
 }
 
 /**
@@ -353,6 +365,23 @@ export function setAllStringIn(data: string, start: string, end: string, replace
       const idx = foundIdx + start.length;
       position = idx + replacement.length;
       result = result.substring(0, idx) + replacement + result.substring(result.indexOf(end, idx));
+    }
+  }
+  return result;
+}
+
+export function replaceAllStringIn(data: string, start: string, end: string, replacement: string): string {
+  let position = 0;
+  let result = data;
+  let replaced = true;
+  while (replaced) {
+    const foundIdx = result.indexOf(start, position);
+    if (foundIdx == -1) {
+      replaced = false;
+    } else {
+      const idx = foundIdx;
+      position = idx + replacement.length;
+      result = result.substring(0, idx) + replacement + result.substring(result.indexOf(end, idx) + end.length);
     }
   }
   return result;
