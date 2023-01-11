@@ -138,24 +138,6 @@ export async function getRecommendations(
             'Capacitor Sync copies the web app build assets to the native projects and updates native plugins and dependencies.'
           )
       );
-
-      // cap build was added in v4.4.0
-      if (isGreaterOrEqual('@capacitor/core', '4.4.0')) {
-        project.add(
-          new Tip(
-            'Prepare Release Build',
-            '',
-            TipType.Build,
-            'Capacitor Build',
-            undefined,
-            'Preparing Release Build',
-            undefined
-          )
-            .setAction(capacitorBuild, project)
-            .canAnimate()
-            .setTooltip('Prepares native binaries suitable for uploading to the App Store or Play Store.')
-        );
-      }
     }
     if (hasCapIos) {
       project.add(
@@ -179,6 +161,25 @@ export async function getRecommendations(
           .setDynamicCommand(capacitorOpen, project, CapacitorPlatform.android)
           .setTooltip('Opens the native Android project in Android Studio')
       );
+    }
+    if (hasCapAndroid || hasCapIos) {
+      // cap build was added in v4.4.0
+      if (isGreaterOrEqual('@capacitor/core', '4.4.0')) {
+        project.add(
+          new Tip(
+            'Prepare Release Build',
+            '',
+            TipType.Build,
+            'Capacitor Build',
+            undefined,
+            'Preparing Release Build',
+            undefined
+          )
+            .setAction(capacitorBuild, project)
+            .canAnimate()
+            .setTooltip('Prepares native binaries suitable for uploading to the App Store or Play Store.')
+        );
+      }
     }
   }
 
