@@ -105,19 +105,14 @@ export async function reviewCapacitorConfig(project: Project, context: vscode.Ex
  */
 export function getCapacitorConfigWebDir(folder: string): string {
   let result = 'www';
-  // Try to find capacitor.config.ts to find the webDir
-  let capConfigFile = path.join(folder, 'capacitor.config.ts');
-  if (!fs.existsSync(capConfigFile)) {
-    // React projects may use .js
-    capConfigFile = path.join(folder, 'capacitor.config.js');
-  }
-  if (fs.existsSync(capConfigFile)) {
-    const config = fs.readFileSync(capConfigFile, 'utf-8');
+  const config = getCapacitorConfigureFile(folder);
+  if (config) {
     result = getStringFrom(config, `webDir: '`, `'`);
     if (!result) {
       result = getStringFrom(config, `webDir: "`, `"`);
     }
   }
+
   if (!result) {
     // No config file take a best guess
     if (fs.existsSync(join(folder, 'www'))) {
@@ -129,6 +124,27 @@ export function getCapacitorConfigWebDir(folder: string): string {
     }
   }
   return path.join(folder, result);
+}
+
+export function getCapacitorConfigureFilename(folder: string): string {
+  let capConfigFile = path.join(folder, 'capacitor.config.ts');
+  if (!fs.existsSync(capConfigFile)) {
+    // React projects may use .js
+    capConfigFile = path.join(folder, 'capacitor.config.js');
+    if (!fs.existsSync(capConfigFile)) {
+      // might be a json file
+      capConfigFile = path.join(folder, 'capacitor.config.json');
+    }
+  }
+
+  return capConfigFile;
+}
+export function getCapacitorConfigureFile(folder: string): string {
+  const capConfigFile = getCapacitorConfigureFilename(folder);
+  if (capConfigFile && fs.existsSync(capConfigFile)) {
+    return fs.readFileSync(capConfigFile, 'utf-8');
+  }
+  return undefined; // not found
 }
 
 async function getCapacitorProjectState(

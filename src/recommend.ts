@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { deprecatedPackages, exists } from './analyzer';
+import { deprecatedPackages, exists, isGreaterOrEqual } from './analyzer';
 import { reviewCapacitorConfig } from './capacitor-configure';
 import { ionicBuild } from './ionic-build';
 import { ionicServe } from './ionic-serve';
@@ -30,6 +30,7 @@ import { getConfigurationName } from './build-configuration';
 import { liveReloadSSL } from './live-reload';
 import { npmInstall, npmUninstall } from './node-commands';
 import { writeIonic } from './extension';
+import { capacitorBuild } from './capacitor-build';
 
 export async function getRecommendations(
   project: Project,
@@ -56,7 +57,6 @@ export async function getRecommendations(
     project.add(runWeb);
     ionicState.runWeb = runWeb;
 
-    // project.add(new Tip('View In Editor', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`).setAction(viewInEditor, 'http://localhost:8100'));
     const runPoints: Array<RunPoint> = [
       { text: 'Copying web assets', title: 'Copying...' },
       { text: 'ng run app:build', title: 'Building Web...' },
@@ -128,7 +128,7 @@ export async function getRecommendations(
         .setTooltip('Builds the web project')
     );
 
-    if (exists('@capacitor/core')) {
+    if (hasCapIos || hasCapAndroid) {
       project.add(
         new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', undefined, 'Syncing', undefined)
           .setDynamicCommand(capacitorSync, project)
@@ -138,6 +138,24 @@ export async function getRecommendations(
             'Capacitor Sync copies the web app build assets to the native projects and updates native plugins and dependencies.'
           )
       );
+
+      // cap build was added in v4.4.0
+      if (isGreaterOrEqual('@capacitor/core', '4.4.0')) {
+        project.add(
+          new Tip(
+            'Prepare Release Build',
+            '',
+            TipType.Build,
+            'Capacitor Build',
+            undefined,
+            'Preparing Release Build',
+            undefined
+          )
+            .setAction(capacitorBuild, project)
+            .canAnimate()
+            .setTooltip('Prepares native binaries suitable for uploading to the App Store or Play Store.')
+        );
+      }
     }
     if (hasCapIos) {
       project.add(

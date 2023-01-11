@@ -326,6 +326,27 @@ export function channelShow(channel: vscode.OutputChannel) {
   }
 }
 
+export async function runWithProgress(
+  command: string,
+  title: string,
+  folder: string,
+  channel: vscode.OutputChannel
+): Promise<boolean> {
+  let result = false;
+  await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title,
+      cancellable: true,
+    },
+    async (progress, token: vscode.CancellationToken) => {
+      const cancelObject: CancelObject = { proc: undefined, cancelled: false };
+      result = await run(folder, command, channel, cancelObject, [], [], progress, undefined, undefined, false);
+    }
+  );
+  return result;
+}
+
 export function getPackageJSON(folder: string): PackageFile {
   const filename = getPackageJSONFilename(folder);
   return JSON.parse(fs.readFileSync(filename, 'utf8'));

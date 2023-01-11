@@ -1,8 +1,6 @@
 # Roadmap
 
-## Prepare Release
-
-- (feat) Build to ipa/apk/aab option - select options for keystore/password etc. Call it Prepare
+- Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - (feat) Support flavors and schemes using the CLI
 
 ## Angular Generate
@@ -30,6 +28,7 @@
 
 ## Features
 
+- Allow ignoring adding of iOS or Android platforms (may not want them)
 - See `tslint.json` and angular 12+ then link to [blog](https://ionicframework.com/blog/eslint-for-ionic-angular/) for migration
 - Show git remote url somewhere (`git config --get remote.origin.url`)
 - Detect plugins/platforms folders in a capacitor project and recommend removal

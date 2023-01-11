@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.20.0
+
+- Feature to prepare release build (.ipa, .apk, .aab) using the cap build command
+
 ### Version 1.19.2
 
 - Fix for "Check for minor updates" related to Typescript 4.9.x compatibility
