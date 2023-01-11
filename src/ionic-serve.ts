@@ -10,6 +10,7 @@ import { MonoRepoType } from './monorepo';
 import { preflightNPMCheck } from './node-commands';
 import { Project } from './project';
 import { liveReloadSSL } from './live-reload';
+import { getSetting, WorkspaceSetting } from './workspace-state';
 
 /**
  * Create the ionic serve command
@@ -35,9 +36,9 @@ export function ionicServe(project: Project, dontOpenBrowser: boolean): string {
 
 function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
   const preop = preflightNPMCheck(project);
-  const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
-  const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
-  const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
+  const httpsForWeb = getSetting(WorkspaceSetting.httpsForWeb);
+  const previewInEditor = getSetting(WorkspaceSetting.previewInEditor);
+  const externalIP = getSetting(WorkspaceSetting.externalAddress);
   const defaultPort = vscode.workspace.getConfiguration('ionic').get('defaultPort');
   let serveFlags = '';
   if (previewInEditor || dontOpenBrowser) {
@@ -75,8 +76,8 @@ function nxServe(project: Project): string {
 }
 
 export async function selectExternalIPAddress(): Promise<string> {
-  const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
-  const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
+  const liveReload = getSetting(WorkspaceSetting.liveReload);
+  const externalIP = getSetting(WorkspaceSetting.externalAddress);
   if (!externalIP && !liveReload) {
     return;
   }

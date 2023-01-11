@@ -31,6 +31,7 @@ import { liveReloadSSL } from './live-reload';
 import { npmInstall, npmUninstall } from './node-commands';
 import { writeIonic } from './extension';
 import { capacitorBuild } from './capacitor-build';
+import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 
 export async function getRecommendations(
   project: Project,
@@ -315,7 +316,7 @@ function remoteLogging(project: Project): Tip {
 }
 
 function liveReload(): Tip {
-  const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
+  const liveReload = getSetting(WorkspaceSetting.liveReload);
   return new Tip('Live Reload', undefined, liveReload ? TipType.Check : TipType.Box, undefined)
     .setTooltip('Live reload will refresh the app whenever source code is changed.')
     .setAction(toggleLiveReload, liveReload)
@@ -324,7 +325,7 @@ function liveReload(): Tip {
 
 function useHttps(project: Project): Tip {
   if (!exists('@angular/core')) return;
-  const useHttps = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
+  const useHttps = getSetting(WorkspaceSetting.httpsForWeb);
   return new Tip('Use HTTPS', undefined, useHttps ? TipType.Check : TipType.Box, undefined)
     .setTooltip('Use HTTPS when running with web or Live Reload.')
     .setAction(toggleHttps, useHttps, project)
@@ -333,7 +334,7 @@ function useHttps(project: Project): Tip {
 
 function externalAddress(): Tip {
   if (!exists('@angular/core')) return;
-  const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
+  const externalIP = getSetting(WorkspaceSetting.externalAddress);
   return new Tip('External Address', undefined, externalIP ? TipType.Check : TipType.Box, undefined)
     .setTooltip(
       'Using an external IP Address allows you to navigate to your application from other devices on the network.'
@@ -343,7 +344,7 @@ function externalAddress(): Tip {
 }
 
 function viewInEditor(): Tip {
-  const viewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
+  const viewInEditor = getSetting(WorkspaceSetting.previewInEditor);
   return new Tip('View In Editor', undefined, viewInEditor ? TipType.Check : TipType.Box, undefined)
     .setTooltip('Whether the app will be previewed in VS Code rather than a web browser')
     .setAction(toggleViewInEditor, viewInEditor)
@@ -358,11 +359,11 @@ function toggleRemoteLogging(project: Project, current: boolean): Promise<void> 
 }
 
 async function toggleLiveReload(current: boolean) {
-  await vscode.workspace.getConfiguration('ionic').update('liveReload', !current);
+  await setSetting(WorkspaceSetting.liveReload, !current);
 }
 
 async function toggleHttps(current: boolean, project: Project) {
-  await vscode.workspace.getConfiguration('ionic').update('httpsForWeb', !current);
+  await setSetting(WorkspaceSetting.httpsForWeb, !current);
   if (!current) {
     await showProgress('Enabling HTTPS', async () => {
       writeIonic('Installing @jcesarmobile/ssl-skip');
@@ -378,9 +379,9 @@ async function toggleHttps(current: boolean, project: Project) {
 }
 
 async function toggleExternalAddress(current: boolean) {
-  await vscode.workspace.getConfiguration('ionic').update('externalAddress', !current);
+  await setSetting(WorkspaceSetting.externalAddress, !current);
 }
 
 async function toggleViewInEditor(current: boolean) {
-  await vscode.workspace.getConfiguration('ionic').update('previewInEditor', !current);
+  await setSetting(WorkspaceSetting.previewInEditor, !current);
 }

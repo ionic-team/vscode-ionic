@@ -27,6 +27,7 @@ import { MonoRepoType } from './monorepo';
 import { migrateCapacitor } from './capacitor-migrate';
 import { checkAngularJson } from './rules-angular-json';
 import { checkBrowsersList } from './rules-browserslist';
+import { getSetting, WorkspaceSetting } from './workspace-state';
 
 /**
  * Check rules for Capacitor projects
@@ -135,7 +136,7 @@ export function checkCapacitorRules(project: Project) {
   }
 
   // Ionic CLI unlock live reload
-  const liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
+  const liveReload = getSetting(WorkspaceSetting.liveReload);
   if (!exists('@ionic/cli') && isIonicBasedProject() && liveReload) {
     project.recommendAdd(
       '@ionic/cli',
@@ -209,7 +210,9 @@ export function capacitorRecommendations(project: Project): Tip[] {
           'Android support added to your project',
           undefined,
           'Adding Native Android Project...'
-        ).showProgressDialog()
+        )
+          .showProgressDialog()
+          .canIgnore()
       );
     }
 
@@ -225,7 +228,9 @@ export function capacitorRecommendations(project: Project): Tip[] {
           'iOS support added to your project',
           undefined,
           'Adding Native iOS Project...'
-        ).showProgressDialog()
+        )
+          .showProgressDialog()
+          .canIgnore()
       );
     }
   }

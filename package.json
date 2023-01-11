@@ -369,11 +369,6 @@
           ],
           "description": "When Debugging for web which browser should be launched."
         },
-        "ionic.externalAddress": {
-          "type": "boolean",
-          "default": true,
-          "description": "Whether to use an external IP address when using Live Reload."
-        },
         "ionic.defaultPort": {
           "type": "number",
           "default": 8100,
@@ -385,20 +380,10 @@
           "default": "",
           "description": "Use this option to override the shell used (eg /bin/zsh). Default is /bin/sh or cmd on Windows."
         },
-        "ionic.httpsForWeb": {
-          "type": "boolean",
-          "default": false,
-          "description": "Whether to use https (rather than http) when running the application (Angular Projects Only)."
-        },
         "ionic.buildForProduction": {
           "type": "boolean",
           "default": false,
           "description": "Use the production configuration when building the application."
-        },
-        "ionic.previewInEditor": {
-          "type": "boolean",
-          "default": false,
-          "description": "Preview the application in the VS Code Editor."
         },
         "ionic.javaHome": {
           "type": "string",

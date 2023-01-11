@@ -12,6 +12,7 @@ import { certPath, liveReloadSSL } from './live-reload';
 import { MonoRepoType } from './monorepo';
 import { preflightNPMCheck } from './node-commands';
 import { Project } from './project';
+import { getSetting, WorkspaceSetting } from './workspace-state';
 
 /**
  * Creates the command line to run for Capacitor
@@ -74,9 +75,9 @@ function capRun(
   noSync: boolean,
   project: Project
 ): string {
-  let liveReload = vscode.workspace.getConfiguration('ionic').get('liveReload');
-  const externalIP = vscode.workspace.getConfiguration('ionic').get('externalAddress');
-  const httpsForWeb = vscode.workspace.getConfiguration('ionic').get('httpsForWeb');
+  let liveReload = getSetting(WorkspaceSetting.liveReload);
+  const externalIP = getSetting(WorkspaceSetting.externalAddress);
+  const httpsForWeb = getSetting(WorkspaceSetting.httpsForWeb);
   const prod: boolean = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
 
   if (liveReload && project.repoType == MonoRepoType.npm) {
