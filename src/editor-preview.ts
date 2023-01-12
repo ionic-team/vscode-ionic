@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { cancelLastOperation } from './extension';
 import { ionicState } from './ionic-tree-provider';
 import { debugSkipFiles } from './utilities';
+import { getSetting, WorkspaceSetting } from './workspace-state';
 
 interface device {
   name: string;
@@ -24,7 +25,7 @@ const devices: Array<device> = [
 ];
 
 export function viewInEditor(url: string) {
-  const previewInEditor = vscode.workspace.getConfiguration('ionic').get('previewInEditor');
+  const previewInEditor = getSetting(WorkspaceSetting.previewInEditor);
   if (!previewInEditor) {
     return;
   }

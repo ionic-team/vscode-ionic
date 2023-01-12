@@ -25,13 +25,13 @@ export async function updateMinorDependencies(project: Project, packages: object
     const updates = [];
     for (const library of Object.keys(packages).sort()) {
       const dep: NpmOutdatedDependency = out[library];
+      if (dep && library == 'typescript') {
+        dep.wanted = '4.8.4';
+      }
       if (dep && packages[library].version !== dep.wanted) {
-        const ignore = library == 'typescript';
-        if (!ignore) {
-          channel.appendLine(`${library} ${packages[library].version} → ${dep.wanted}`);
-          updates.push(`${library}@${dep.wanted}`);
-          count++;
-        }
+        channel.appendLine(`${library} ${packages[library].version} → ${dep.wanted}`);
+        updates.push(`${library}@${dep.wanted}`);
+        count++;
       }
     }
     rmSync(tmpFile);

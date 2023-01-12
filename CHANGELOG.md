@@ -1,5 +1,11 @@
 ## Changelog
 
+### Version 1.20.0
+
+- Feature to prepare release build (.ipa, .apk, .aab) using the cap build command
+- When build is done it will also copy the web assets to the native platforms
+- Adding iOS or Android platforms can be ignored (if you are only targeting a single platform)
+
 ### Version 1.19.2
 
 - Fix for "Check for minor updates" related to Typescript 4.9.x compatibility

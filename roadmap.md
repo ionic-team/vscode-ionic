@@ -1,8 +1,6 @@
 # Roadmap
 
-## Prepare Release
-
-- (feat) Build to ipa/apk/aab option - select options for keystore/password etc. Call it Prepare
+- Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - (feat) Support flavors and schemes using the CLI
 
 ## Angular Generate
@@ -23,8 +21,10 @@
 - Handle scenario where openssl is not installed
 - SSL options for non-angular projects
 - Add document on Live Reload with https
-- Use @jcesarmobile/ssl-skip for trust issues?
-  Android Trust Issues
+- (fix) - Add removal of `@jcesarmobile/ssl-skip` as recommendation
+
+### Android Trust Issues
+
 - Android ([info](https://github.com/react-native-webview/react-native-webview/issues/2147))
 - May need an intermediate cert ([info](https://developer.android.com/training/articles/security-ssl))
 
@@ -86,8 +86,6 @@
 
 - Need this in capacitor config to allow Remote Logging to work: server: { cleartext: true }
 - Add for React and Vue
-
-### Remote logging 2
 
 Angular process:
 Instead of writing into index.html
