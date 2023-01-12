@@ -21,14 +21,15 @@
 - Handle scenario where openssl is not installed
 - SSL options for non-angular projects
 - Add document on Live Reload with https
-- Use @jcesarmobile/ssl-skip for trust issues?
-  Android Trust Issues
+- (fix) - Add removal of `@jcesarmobile/ssl-skip` as recommendation
+
+### Android Trust Issues
+
 - Android ([info](https://github.com/react-native-webview/react-native-webview/issues/2147))
 - May need an intermediate cert ([info](https://developer.android.com/training/articles/security-ssl))
 
 ## Features
 
-- Allow ignoring adding of iOS or Android platforms (may not want them)
 - See `tslint.json` and angular 12+ then link to [blog](https://ionicframework.com/blog/eslint-for-ionic-angular/) for migration
 - Show git remote url somewhere (`git config --get remote.origin.url`)
 - Detect plugins/platforms folders in a capacitor project and recommend removal
@@ -85,8 +86,6 @@
 
 - Need this in capacitor config to allow Remote Logging to work: server: { cleartext: true }
 - Add for React and Vue
-
-### Remote logging 2
 
 Angular process:
 Instead of writing into index.html

@@ -126,7 +126,11 @@ export async function getRecommendations(
         .setContextValue(Context.buildConfig)
         .canStop()
         .canAnimate()
-        .setTooltip('Builds the web project')
+        .setTooltip(
+          hasCapIos || hasCapAndroid
+            ? 'Builds the web project and copies to native platforms'
+            : 'Builds the web project'
+        )
     );
 
     if (hasCapIos || hasCapAndroid) {

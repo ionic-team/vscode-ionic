@@ -7,6 +7,7 @@ import { MonoRepoType } from './monorepo';
 import { ionicState } from './ionic-tree-provider';
 import { InternalCommand } from './command-name';
 import { preflightNPMCheck } from './node-commands';
+import { exists } from './analyzer';
 
 /**
  * Creates the ionic build command
@@ -46,6 +47,9 @@ function ionicCLIBuild(prod: boolean, configurationArg?: string): string {
     cmd += ` ${configurationArg}`;
   } else if (prod) {
     cmd += ' --prod';
+  }
+  if (exists('@capacitor/ios') || exists('@capacitor/android')) {
+    cmd += ' && npx cap copy';
   }
   return cmd;
 }
