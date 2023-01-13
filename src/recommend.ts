@@ -172,7 +172,7 @@ export async function getRecommendations(
       if (isGreaterOrEqual('@capacitor/core', '4.4.0')) {
         project.add(
           new Tip(
-            'Prepare Release Build',
+            'Prepare Release',
             '',
             TipType.Build,
             'Capacitor Build',

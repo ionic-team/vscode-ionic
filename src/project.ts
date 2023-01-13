@@ -84,6 +84,19 @@ export class Project {
     }
   }
 
+  public setSubGroup(title: string, type: TipType, message?: string, contextValue?: string): Recommendation {
+    const tip = new Tip(title, undefined, undefined, undefined, undefined, 'Upgrade');
+    const r = new Recommendation(message, undefined, title, vscode.TreeItemCollapsibleState.Collapsed, undefined, tip);
+    r.children = [];
+    this.group.children.push(r);
+    this.subgroup = r;
+    if (contextValue) {
+      r.setContext(contextValue);
+    }
+    this.setIcon(type, r);
+    return r;
+  }
+
   public setGroup(
     title: string,
     message: string,
@@ -279,15 +292,6 @@ export class Project {
       r.setContext(tip.contextValue);
     }
 
-    return r;
-  }
-
-  public addSubFolder(title: string): Recommendation {
-    const tip = new Tip(title, undefined, undefined, undefined, undefined, 'Upgrade');
-    const r = new Recommendation(title, undefined, title, vscode.TreeItemCollapsibleState.Collapsed, undefined, tip);
-    r.children = [];
-    this.group.children.push(r);
-    this.subgroup = r;
     return r;
   }
 

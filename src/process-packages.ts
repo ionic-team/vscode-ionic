@@ -164,12 +164,7 @@ export function reviewPackages(packages: object, project: Project) {
   if (project.isCapacitor) {
     project.setGroup('Project', '', TipType.Ionic);
     if (exists('@angular/core')) {
-      // project.add(
-      //   new Tip('New', '', TipType.Angular)
-      //     .setAction(angularGenerate, project)
-      //     .setTooltip('Create a new Angular component, service, directive etc')
-      // );
-      project.setIcon(TipType.Add, project.addSubFolder('New'));
+      project.setSubGroup('New', TipType.Add);
 
       ['Page', 'Component', 'Service', 'Module', 'Class', 'Directive'].forEach((item) => {
         project.add(
