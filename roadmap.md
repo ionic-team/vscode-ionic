@@ -30,6 +30,7 @@
 
 ## Features
 
+- If you add a @capacitor/plugin then sync should be done as well
 - See `tslint.json` and angular 12+ then link to [blog](https://ionicframework.com/blog/eslint-for-ionic-angular/) for migration
 - Show git remote url somewhere (`git config --get remote.origin.url`)
 - Detect plugins/platforms folders in a capacitor project and recommend removal

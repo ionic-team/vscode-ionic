@@ -351,11 +351,6 @@
     "configuration": {
       "title": "Ionic",
       "properties": {
-        "ionic.liveReload": {
-          "type": "boolean",
-          "default": true,
-          "description": "Live Reload will refresh the app on the device when source code is changed in the editor."
-        },
         "ionic.browser": {
           "type": "string",
           "default": "chrome",
