@@ -16,6 +16,8 @@ import { analyzeSize } from './analyze-size';
 import { ionicExport } from './ionic-export';
 import { ionicState } from './ionic-tree-provider';
 import { audit } from './audit';
+import { angularGenerate } from './angular-generate';
+import { exists } from './analyzer';
 
 export interface PluginInformation {
   androidPermissions: Array<string>;
@@ -161,6 +163,24 @@ export function reviewPackages(packages: object, project: Project) {
 
   if (project.isCapacitor) {
     project.setGroup('Project', '', TipType.Ionic);
+    if (exists('@angular/core')) {
+      // project.add(
+      //   new Tip('New', '', TipType.Angular)
+      //     .setAction(angularGenerate, project)
+      //     .setTooltip('Create a new Angular component, service, directive etc')
+      // );
+      project.setIcon(TipType.Add, project.addSubFolder('New'));
+
+      ['Page', 'Component', 'Service', 'Module', 'Class', 'Directive'].forEach((item) => {
+        project.add(
+          new Tip(item, '', TipType.Angular)
+            .setAction(angularGenerate, project, item.toLowerCase())
+            .setTooltip(`Create a new Angular ${item.toLowerCase()}`)
+            .canRefreshAfter()
+        );
+      });
+      project.clearSubgroup();
+    }
     project.add(
       new Tip('Check for Minor Updates', '', TipType.Dependency)
         .setAction(updateMinorDependencies, project, packages)

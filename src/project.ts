@@ -166,6 +166,9 @@ export class Project {
       case TipType.Capacitor:
         r.setIcon('capacitor');
         break;
+      case TipType.Angular:
+        r.setIcon('angular');
+        break;
       case TipType.Ionic:
         r.setIcon('ionic');
         break;
@@ -276,6 +279,15 @@ export class Project {
       r.setContext(tip.contextValue);
     }
 
+    return r;
+  }
+
+  public addSubFolder(title: string): Recommendation {
+    const tip = new Tip(title, undefined, undefined, undefined, undefined, 'Upgrade');
+    const r = new Recommendation(title, undefined, title, vscode.TreeItemCollapsibleState.Collapsed, undefined, tip);
+    r.children = [];
+    this.group.children.push(r);
+    this.subgroup = r;
     return r;
   }
 
