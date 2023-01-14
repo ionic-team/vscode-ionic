@@ -25,11 +25,6 @@ const devices: Array<device> = [
 ];
 
 export function viewInEditor(url: string) {
-  const previewInEditor = getSetting(WorkspaceSetting.previewInEditor);
-  if (!previewInEditor) {
-    return;
-  }
-
   const panel = vscode.window.createWebviewPanel('viewApp', 'Preview', vscode.ViewColumn.Beside, {
     enableScripts: true,
   });

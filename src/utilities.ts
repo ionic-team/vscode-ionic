@@ -13,6 +13,7 @@ import { InternalCommand } from './command-name';
 import { exists } from './analyzer';
 import { ionicInit } from './ionic-init';
 import { request } from 'https';
+import { getSetting, WorkspaceSetting } from './workspace-state';
 
 export interface CancelObject {
   proc: child_process.ChildProcess;
@@ -152,9 +153,9 @@ export async function run(
         const loglines = data.split('\n');
         logs = logs.concat(loglines);
         if (viewEditor) {
-          if (data.includes('Local: http')) {
+          if (data.includes('Local:') && data.includes('http')) {
             serverUrl = getStringFrom(data, 'Local: ', '\n');
-            const url = serverUrl;
+            const url = serverUrl.trim();
             channel.appendLine(`[Ionic] Launching ${url}`);
             viewEditor = false;
             setTimeout(() => handleUrl(url, features), 500);
@@ -225,9 +226,10 @@ export async function run(
 }
 
 function handleUrl(url: string, features: Array<TipFeature>) {
-  if (features.includes(TipFeature.viewInEditor)) {
+  if (features.includes(TipFeature.viewInEditor) && getSetting(WorkspaceSetting.previewInEditor)) {
     viewInEditor(url);
   } else {
+    if (exists('@angular/core')) return;
     debugBrowser(url);
   }
 }
