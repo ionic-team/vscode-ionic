@@ -2,12 +2,10 @@
 
 - Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - (feat) Support flavors and schemes using the CLI
-- (feat) queue operations: eg build then run
 - (feat) combine Packages, Cordova and Capacitor Plugins into Dependencies
 
 ## Angular Generate
 
-- Use `ionic generate` to add page, component, service etc to an app
 - Switch to standalone components (one SCAM at a time then the base app module)
 
 ## Use Capacitor Assets
