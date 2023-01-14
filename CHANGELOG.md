@@ -5,6 +5,7 @@
 - Feature to create Angular components, services, classes, directives, pages
 - Tasks are now queued
 - Project structure improved
+- Live Reload setting only shows on iOS/Android projects
 
 ### Version 1.20.0
 

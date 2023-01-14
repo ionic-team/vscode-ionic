@@ -179,6 +179,12 @@ export class Project {
       case TipType.Capacitor:
         r.setIcon('capacitor');
         break;
+      case TipType.React:
+        r.setIcon('react');
+        break;
+      case TipType.Vue:
+        r.setIcon('vue');
+        break;
       case TipType.Angular:
         r.setIcon('angular');
         break;

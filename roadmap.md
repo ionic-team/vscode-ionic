@@ -1,5 +1,6 @@
 # Roadmap
 
+- Vue apps should launch browser on run for web
 - Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - (feat) Support flavors and schemes using the CLI
 - (feat) combine Packages, Cordova and Capacitor Plugins into Dependencies

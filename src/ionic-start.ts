@@ -17,7 +17,8 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
   for (const starter of projects) {
     if (type != starter.typeName) {
       type = starter.typeName;
-      project.setGroup(`New ${type} Project`, '', TipType.Ionic, false);
+
+      project.setGroup(`New ${type} Project`, '', getType(type), false);
     }
 
     project.add(
@@ -40,6 +41,19 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
     );
   }
   return project.groups;
+}
+
+function getType(framework: string): TipType {
+  switch (framework.toLowerCase()) {
+    case 'angular':
+      return TipType.Angular;
+    case 'vue':
+      return TipType.Vue;
+    case 'react':
+      return TipType.React;
+    default:
+      return TipType.Ionic;
+  }
 }
 
 function parseIonicStart(text: string): Array<any> {

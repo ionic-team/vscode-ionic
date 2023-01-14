@@ -295,7 +295,9 @@ export async function getRecommendations(
 
   project.setGroup(`Settings`, 'Settings', TipType.Settings, false);
   project.add(externalAddress());
-  project.add(liveReload());
+  if (exists('@capacitor/ios') || exists('@capacitor/android')) {
+    project.add(liveReload());
+  }
   project.add(useHttps(project));
   project.add(viewInEditor());
 
