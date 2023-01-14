@@ -58,6 +58,7 @@ export async function getRecommendations(
         { title: 'Serving', text: 'Development server running' },
       ])
       .canStop()
+      .willNotBlock()
       .canAnimate()
       .setTooltip('Run a development server and open using the default web browser');
     project.add(runWeb);
@@ -350,6 +351,7 @@ function debugOnWeb(project: Project): Tip {
       { title: 'Serving', text: 'Development server running' },
     ])
     .canStop()
+    .willNotBlock()
     .canAnimate()
     .setTooltip(`Debug using ${getDebugBrowserName()}. The browser can be changed in Settings.`);
 }

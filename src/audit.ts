@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 export async function audit(project: Project): Promise<void> {
   try {
     clearOutput();
-    showProgress('Auditing project dependencies...', async () => {
+    await showProgress('Auditing project dependencies...', async () => {
       const data = await getRunOutput('npm audit --json', project.projectFolder());
       const audit: Audit = JSON.parse(data);
       completeAudit(project, audit);

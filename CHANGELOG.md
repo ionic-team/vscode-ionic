@@ -2,7 +2,8 @@
 
 ### Version 1.21.0
 
-- Feature to create Angular components, services etc
+- Feature to create Angular components, services, classes, directives, pages
+- Tasks are now queued
 - Project structure improved
 
 ### Version 1.20.0

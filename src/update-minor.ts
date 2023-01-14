@@ -46,7 +46,7 @@ export async function updateMinorDependencies(project: Project, packages: object
     if (!result || result == 'Cancel') return;
 
     let updated = 0;
-    showProgress('Updating Dependencies', async () => {
+    await showProgress('Updating Dependencies', async () => {
       for (const update of updates) {
         const cmd = npmInstall(`${update}`);
         channel.appendLine(`> ${cmd}`);

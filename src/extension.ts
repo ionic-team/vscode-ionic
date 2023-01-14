@@ -26,7 +26,7 @@ import { selectExternalIPAddress } from './ionic-serve';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
-let runningActions = [];
+let runningActions: Array<Tip> = [];
 export let lastOperation: Tip;
 
 async function requestAppName(tip: Tip) {
@@ -92,7 +92,7 @@ function cancelRunning(tip: Tip): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 1000));
 }
 
-function finishCommand(tip: Tip) {
+export function finishCommand(tip: Tip) {
   runningOperations = runningOperations.filter((op: Tip) => {
     return !op.sameAs(tip);
   });
@@ -143,6 +143,38 @@ export function writeError(message: string) {
 
 export function markActionAsRunning(tip: Tip) {
   runningActions.push(tip);
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function queueEmpty(): boolean {
+  if (runningActions.length == 0) return true;
+  if (runningActions.length == 1 && runningActions[0].isNonBlocking()) return true;
+  return false;
+}
+
+export async function waitForOtherActions(message: string): Promise<boolean> {
+  let cancelled = false;
+  if (queueEmpty()) return false;
+  await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: `Task Queued: ${message}`,
+      cancellable: true,
+    },
+    async (progress, token: vscode.CancellationToken) => {
+      while (!queueEmpty() && !cancelled) {
+        await delay(500);
+
+        if (token.isCancellationRequested) {
+          cancelled = true;
+        }
+      }
+    }
+  );
+  return cancelled;
 }
 
 export function markActionAsCancelled(tip: Tip) {
@@ -445,6 +477,9 @@ function trackProjectChange() {
 }
 
 async function runAction(tip: Tip, ionicProvider: IonicTreeProvider, rootPath: string) {
+  if (await waitForOtherActions(tip.title)) {
+    return; // Canceled
+  }
   if (tip.stoppable) {
     markActionAsRunning(tip);
     ionicProvider.refresh();
@@ -490,6 +525,9 @@ async function fix(
   ionicProvider: IonicTreeProvider,
   context: vscode.ExtensionContext
 ): Promise<void> {
+  if (await waitForOtherActions(tip.title)) {
+    return; // Canceled
+  }
   tip.generateCommand();
   tip.generateTitle();
   if (tip.command) {
