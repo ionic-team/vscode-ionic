@@ -1,7 +1,7 @@
 import { CapacitorPlatform } from './capacitor-platform';
 import { ActionResult } from './command-name';
 import { Context } from './context-variables';
-import { isRunning } from './extension';
+import { finishCommand, isRunning, markActionAsRunning, waitForOtherActions } from './extension';
 
 export enum TipFeature {
   viewInEditor,
@@ -17,6 +17,7 @@ export class Tip {
   public cancelRequested: boolean;
   public animates: boolean;
   public stoppable: boolean;
+  public nonBlocking: boolean;
   public secondCommand: string;
   public secondTitle: string;
   public tooltip: string;
@@ -104,6 +105,16 @@ export class Tip {
       this.stoppable = true;
     }
     return this;
+  }
+
+  // Tasks that do not block will allow other tasks to run immediately instead of being queued.
+  willNotBlock() {
+    this.nonBlocking = true;
+    return this;
+  }
+
+  isNonBlocking() {
+    return this.nonBlocking;
   }
 
   contextIf(value: Context, running: boolean) {
@@ -197,7 +208,15 @@ export class Tip {
 
   async executeAction(): Promise<ActionResult | void> {
     if (this.onAction) {
-      return await this.onAction(...this.actionArgs);
+      if (await waitForOtherActions(this.title)) {
+        return;
+      }
+      try {
+        markActionAsRunning(this);
+        return await this.onAction(...this.actionArgs);
+      } finally {
+        finishCommand(this);
+      }
     }
   }
 

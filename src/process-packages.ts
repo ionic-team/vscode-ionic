@@ -16,6 +16,8 @@ import { analyzeSize } from './analyze-size';
 import { ionicExport } from './ionic-export';
 import { ionicState } from './ionic-tree-provider';
 import { audit } from './audit';
+import { angularGenerate } from './angular-generate';
+import { exists } from './analyzer';
 
 export interface PluginInformation {
   androidPermissions: Array<string>;
@@ -138,7 +140,7 @@ export function reviewPackages(packages: object, project: Project) {
     'Packages',
     `Your ${project.type} project relies on these packages. Consider packages which have not had updates in more than a year to be a candidate for replacement in favor of a project that is actively maintained.`,
     packages,
-    PackageType.Dependency
+    [PackageType.Dependency]
   );
 
   listPackages(
@@ -146,7 +148,7 @@ export function reviewPackages(packages: object, project: Project) {
     `Cordova Plugins`,
     `Your project relies on these Cordova plugins. Consider plugins which have not had updates in more than a year to be a candidate for replacement in favor of a plugin that is actively maintained.`,
     packages,
-    PackageType.CordovaPlugin,
+    [PackageType.CordovaPlugin],
     TipType.Cordova
   );
 
@@ -155,33 +157,9 @@ export function reviewPackages(packages: object, project: Project) {
     `Capacitor Plugins`,
     `Your project relies on these Capacitor plugins. Consider plugins which have not had updates in more than a year to be a candidate for replacement in favor of a plugin that is actively maintained.`,
     packages,
-    PackageType.CapacitorPlugin,
+    [PackageType.CapacitorPlugin],
     TipType.Capacitor
   );
-
-  if (project.isCapacitor) {
-    project.setGroup('Project', '', TipType.Ionic);
-    project.add(
-      new Tip('Check for Minor Updates', '', TipType.Dependency)
-        .setAction(updateMinorDependencies, project, packages)
-        .setTooltip('Find minor updates for project dependencies')
-    );
-    project.add(
-      new Tip('Security Audit', '', TipType.Files)
-        .setAction(audit, project)
-        .setTooltip('Analyze dependencies using npm audit for security vulnerabilities')
-    );
-    project.add(
-      new Tip('Statistics', '', TipType.Files)
-        .setAction(analyzeSize, project)
-        .setTooltip('Analyze the built project assets and Javascript bundles')
-    );
-    project.add(
-      new Tip('Export', '', TipType.Media)
-        .setAction(ionicExport, project.projectFolder(), ionicState.context)
-        .setTooltip('Export a markdown file with all project dependencies and plugins')
-    );
-  }
 }
 
 // List any plugins that use Cordova Hooks as potential issue
@@ -253,17 +231,23 @@ export function reviewPluginProperties(packages, project: Project) {
   }
 
   if (Object.keys(permissions).length > 0) {
-    project.setGroup(`Android Permissions`, 'The following Android permissions are used by plugins.', TipType.Android);
+    project.setSubGroup(
+      `Android Permissions`,
+      TipType.Android,
+      'The following Android permissions are used by plugins.'
+    );
     for (const permission of Object.keys(permissions)) {
-      project.note(permission, permissions[permission].join(', '));
+      project.add(new Tip(permission, permissions[permission].join(', ')));
     }
+    project.clearSubgroup();
   }
 
   if (Object.keys(features).length > 0) {
-    project.setGroup(`Android Features`, 'The following Android features are used by plugins.', TipType.Android);
+    project.setSubGroup(`Android Features`, TipType.Android, 'The following Android features are used by plugins.');
     for (const feature of Object.keys(features)) {
-      project.note(feature, features[feature].join(', '));
+      project.add(new Tip(feature, features[feature].join(', ')));
     }
+    project.clearSubgroup();
   }
 }
 
@@ -436,11 +420,11 @@ function listPackages(
   title: string,
   description: string,
   packages: object,
-  depType: string,
+  depTypes: Array<string>,
   tipType?: TipType
 ) {
   const count = Object.keys(packages).filter((library) => {
-    return packages[library].depType == depType;
+    return depTypes.includes(packages[library].depType);
   }).length;
   if (count == 0) return;
 
@@ -450,7 +434,7 @@ function listPackages(
 
   let lastScope: string;
   for (const library of Object.keys(packages).sort()) {
-    if (packages[library].depType == depType) {
+    if (depTypes.includes(packages[library].depType)) {
       let v = `${packages[library].version}`;
       let latest;
       if (v == 'null') v = PackageVersion.Unknown;
@@ -475,13 +459,14 @@ function listPackages(
         }
       }
       let libraryTitle = library;
+      const type = TipType.None;
       if (scope) {
         libraryTitle = library.substring(scope.length + 2);
       }
       if (v != packages[library].latest && packages[library].latest !== PackageVersion.Unknown) {
-        project.upgrade(library, libraryTitle, `${v} → ${packages[library].latest}`, v, packages[library].latest);
+        project.upgrade(library, libraryTitle, `${v} → ${packages[library].latest}`, v, packages[library].latest, type);
       } else {
-        project.package(library, libraryTitle, `${v}`);
+        project.package(library, libraryTitle, `${v}`, type);
       }
     }
   }

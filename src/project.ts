@@ -84,6 +84,19 @@ export class Project {
     }
   }
 
+  public setSubGroup(title: string, type: TipType, message?: string, contextValue?: string): Recommendation {
+    const tip = new Tip(title, undefined, undefined, undefined, undefined, 'Upgrade');
+    const r = new Recommendation(message, undefined, title, vscode.TreeItemCollapsibleState.Collapsed, undefined, tip);
+    r.children = [];
+    this.group.children.push(r);
+    this.subgroup = r;
+    if (contextValue) {
+      r.setContext(contextValue);
+    }
+    this.setIcon(type, r);
+    return r;
+  }
+
   public setGroup(
     title: string,
     message: string,
@@ -165,6 +178,15 @@ export class Project {
         break;
       case TipType.Capacitor:
         r.setIcon('capacitor');
+        break;
+      case TipType.React:
+        r.setIcon('react');
+        break;
+      case TipType.Vue:
+        r.setIcon('vue');
+        break;
+      case TipType.Angular:
+        r.setIcon('angular');
         break;
       case TipType.Ionic:
         r.setIcon('ionic');
@@ -417,7 +439,7 @@ export class Project {
     }
   }
 
-  public upgrade(name: string, title: string, message: string, fromVersion: string, toVersion: string) {
+  public upgrade(name: string, title: string, message: string, fromVersion: string, toVersion: string, type: TipType) {
     if (exists(name)) {
       let extra = '';
       if (name == '@capacitor/core') {
@@ -432,7 +454,7 @@ export class Project {
         new Tip(
           title,
           message,
-          undefined,
+          type,
           `Upgrade ${name} from ${fromVersion} to ${toVersion}`,
           npmInstall(`${name}@${toVersion}${extra}`),
           `Upgrade`,
@@ -448,13 +470,13 @@ export class Project {
     }
   }
 
-  public package(name: string, title: string, version: string) {
+  public package(name: string, title: string, version: string, type: TipType) {
     if (exists(name)) {
       this.add(
         new Tip(
           title,
           version,
-          undefined,
+          type,
           `Uninstall ${name}`,
           npmUninstall(name),
           `Uninstall`,

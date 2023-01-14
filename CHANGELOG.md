@@ -1,5 +1,13 @@
 ## Changelog
 
+### Version 1.21.0
+
+- Feature to create Angular components, services, classes, directives, pages
+- Tasks are now queued
+- Project structure improved
+- Live Reload setting only shows on iOS/Android projects
+- Fix for React and Vue projects to open browser when run on web
+
 ### Version 1.20.0
 
 - Feature to prepare release build (.ipa, .apk, .aab) using the cap build command

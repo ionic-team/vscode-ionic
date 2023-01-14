@@ -13,7 +13,7 @@ import { ionicBuild } from './ionic-build';
  */
 export async function analyzeSize(project: Project) {
   const dist = project.getDistFolder();
-  showProgress('Generating Project Statistics', async () => {
+  await showProgress('Generating Project Statistics', async () => {
     let previousValue;
     try {
       previousValue = enableSourceMaps(project);

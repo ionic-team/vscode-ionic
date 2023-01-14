@@ -25,9 +25,6 @@ export async function updateMinorDependencies(project: Project, packages: object
     const updates = [];
     for (const library of Object.keys(packages).sort()) {
       const dep: NpmOutdatedDependency = out[library];
-      if (dep && library == 'typescript') {
-        dep.wanted = '4.8.4';
-      }
       if (dep && packages[library].version !== dep.wanted) {
         channel.appendLine(`${library} ${packages[library].version} → ${dep.wanted}`);
         updates.push(`${library}@${dep.wanted}`);
@@ -46,7 +43,7 @@ export async function updateMinorDependencies(project: Project, packages: object
     if (!result || result == 'Cancel') return;
 
     let updated = 0;
-    showProgress('Updating Dependencies', async () => {
+    await showProgress('Updating Dependencies', async () => {
       for (const update of updates) {
         const cmd = npmInstall(`${update}`);
         channel.appendLine(`> ${cmd}`);

@@ -1,11 +1,12 @@
 # Roadmap
 
+- Vue apps should launch browser on run for web
 - Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - (feat) Support flavors and schemes using the CLI
+- (feat) combine Packages, Cordova and Capacitor Plugins into Dependencies
 
 ## Angular Generate
 
-- Use `ionic generate` to add page, component, service etc to an app
 - Switch to standalone components (one SCAM at a time then the base app module)
 
 ## Use Capacitor Assets
@@ -30,6 +31,7 @@
 
 ## Features
 
+- If you add a @capacitor/plugin then sync should be done as well
 - See `tslint.json` and angular 12+ then link to [blog](https://ionicframework.com/blog/eslint-for-ionic-angular/) for migration
 - Show git remote url somewhere (`git config --get remote.origin.url`)
 - Detect plugins/platforms folders in a capacitor project and recommend removal

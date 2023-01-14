@@ -20,11 +20,10 @@ export enum AssetType {
 }
 
 export function addSplashAndIconFeatures(project: Project) {
-  project.setGroup(
+  project.setSubGroup(
     `Splash Screen & Icon`,
-    'Allows setting of the Splash Screen and Icon. Clicking Rebuild will create assets for your iOS and Android native projects.',
     TipType.Media,
-    false,
+    'Allows setting of the Splash Screen and Icon. Clicking Rebuild will create assets for your iOS and Android native projects.',
     Context.rebuild
   ).tip = new Tip('Rebuild Assets', undefined).setAction(async () => {
     await runCordovaRes(project);
@@ -33,6 +32,7 @@ export function addSplashAndIconFeatures(project: Project) {
   project.add(createFeature('Icon', AssetType.icon, project));
   project.add(createFeature('Icon Foreground', AssetType.adaptiveForeground, project));
   project.add(createFeature('Icon Background', AssetType.adaptiveBackground, project));
+  project.clearSubgroup();
 }
 
 function getAssetTipType(folder: string, filename: AssetType): TipType {
