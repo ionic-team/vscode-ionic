@@ -2,6 +2,8 @@
 
 - Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - (feat) Support flavors and schemes using the CLI
+- (feat) queue operations: eg build then run
+- (feat) combine Packages, Cordova and Capacitor Plugins into Dependencies
 
 ## Angular Generate
 

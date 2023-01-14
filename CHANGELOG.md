@@ -3,6 +3,7 @@
 ### Version 1.21.0
 
 - Feature to create Angular components, services etc
+- Project structure improved
 
 ### Version 1.20.0
 

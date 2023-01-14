@@ -32,6 +32,11 @@ import { npmInstall, npmUninstall } from './node-commands';
 import { writeIonic } from './extension';
 import { capacitorBuild } from './capacitor-build';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
+import { updateMinorDependencies } from './update-minor';
+import { audit } from './audit';
+import { analyzeSize } from './analyze-size';
+import { ionicExport } from './ionic-export';
+import { angularGenerate } from './angular-generate';
 
 export async function getRecommendations(
   project: Project,
@@ -119,7 +124,23 @@ export async function getRecommendations(
       ];
     };
 
-    project.setGroup(`Capacitor`, 'Capacitor Features', TipType.Capacitor, true);
+    project.setGroup(`Project`, 'Capacitor Features', TipType.Capacitor, true);
+    if (project.isCapacitor) {
+      if (exists('@angular/core')) {
+        project.setSubGroup('New', TipType.Add);
+
+        ['Page', 'Component', 'Service', 'Module', 'Class', 'Directive'].forEach((item) => {
+          project.add(
+            new Tip(item, '', TipType.Angular)
+              .setAction(angularGenerate, project, item.toLowerCase())
+              .setTooltip(`Create a new Angular ${item.toLowerCase()}`)
+              .canRefreshAfter()
+          );
+        });
+        project.clearSubgroup();
+      }
+    }
+
     project.add(
       new Tip('Build', getConfigurationName(), TipType.Build, 'Build', undefined, 'Building', undefined)
         .setDynamicCommand(ionicBuild, project)
@@ -199,12 +220,36 @@ export async function getRecommendations(
       TipType.Capacitor,
       false
     );
-    await reviewCapacitorConfig(project, context);
-  }
 
-  if (project.isCapacitor) {
+    project.setSubGroup('Properties', TipType.Settings);
+    await reviewCapacitorConfig(project, context);
+    project.clearSubgroup();
+
     // Splash Screen and Icon Features
     addSplashAndIconFeatures(project);
+
+    reviewPluginProperties(packages, project);
+
+    project.add(
+      new Tip('Check for Minor Updates', '', TipType.Dependency)
+        .setAction(updateMinorDependencies, project, packages)
+        .setTooltip('Find minor updates for project dependencies')
+    );
+    project.add(
+      new Tip('Security Audit', '', TipType.Files)
+        .setAction(audit, project)
+        .setTooltip('Analyze dependencies using npm audit for security vulnerabilities')
+    );
+    project.add(
+      new Tip('Statistics', '', TipType.Files)
+        .setAction(analyzeSize, project)
+        .setTooltip('Analyze the built project assets and Javascript bundles')
+    );
+    project.add(
+      new Tip('Export', '', TipType.Media)
+        .setAction(ionicExport, project.projectFolder(), ionicState.context)
+        .setTooltip('Export a markdown file with all project dependencies and plugins')
+    );
   }
 
   project.setGroup(
@@ -246,9 +291,6 @@ export async function getRecommendations(
 
   // Package Upgrade Features
   reviewPackages(packages, project);
-
-  // Plugin Properties
-  reviewPluginProperties(packages, project);
 
   project.setGroup(`Settings`, 'Settings', TipType.Settings, false);
   project.add(externalAddress());

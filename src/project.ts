@@ -433,7 +433,7 @@ export class Project {
     }
   }
 
-  public upgrade(name: string, title: string, message: string, fromVersion: string, toVersion: string) {
+  public upgrade(name: string, title: string, message: string, fromVersion: string, toVersion: string, type: TipType) {
     if (exists(name)) {
       let extra = '';
       if (name == '@capacitor/core') {
@@ -448,7 +448,7 @@ export class Project {
         new Tip(
           title,
           message,
-          undefined,
+          type,
           `Upgrade ${name} from ${fromVersion} to ${toVersion}`,
           npmInstall(`${name}@${toVersion}${extra}`),
           `Upgrade`,
@@ -464,13 +464,13 @@ export class Project {
     }
   }
 
-  public package(name: string, title: string, version: string) {
+  public package(name: string, title: string, version: string, type: TipType) {
     if (exists(name)) {
       this.add(
         new Tip(
           title,
           version,
-          undefined,
+          type,
           `Uninstall ${name}`,
           npmUninstall(name),
           `Uninstall`,
