@@ -226,7 +226,10 @@ export async function run(
 }
 
 function handleUrl(url: string, features: Array<TipFeature>) {
-  if (features.includes(TipFeature.viewInEditor) && getSetting(WorkspaceSetting.previewInEditor)) {
+  if (features.includes(TipFeature.viewInEditor)) {
+    if (!getSetting(WorkspaceSetting.previewInEditor)) {
+      return;
+    }
     viewInEditor(url);
   } else {
     if (exists('@angular/core')) return;
