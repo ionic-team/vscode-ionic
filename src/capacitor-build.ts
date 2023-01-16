@@ -148,10 +148,10 @@ function capBuildCommand(
 }
 
 function capCLIBuild(platform: CapacitorPlatform, args: string, settings: KeyStoreSettings): string {
-  if (settings.keyAlias) args += ` --keystorealias='${settings.keyAlias}'`;
-  if (settings.keyPassword) args += ` --keystorealiaspass='${settings.keyPassword}'`;
-  if (settings.keyStorePassword) args += ` --keystorepass='${settings.keyStorePassword}'`;
-  if (settings.keyStorePath) args += ` --keystorepath='${settings.keyStorePath}'`;
+  if (settings.keyAlias) args += ` --keystorealias="${settings.keyAlias}"`;
+  if (settings.keyPassword) args += ` --keystorealiaspass="${settings.keyPassword}"`;
+  if (settings.keyStorePassword) args += ` --keystorepass="${settings.keyStorePassword}"`;
+  if (settings.keyStorePath) args += ` --keystorepath="${settings.keyStorePath}"`;
   return `npx cap build ${platform}${args}`;
 }
 

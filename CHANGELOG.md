@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.21.2
+
+- Fix for "prepare release" on Windows
+
 ### Version 1.21.1
 
 - Feature to create Angular components, services, classes, directives, pages
