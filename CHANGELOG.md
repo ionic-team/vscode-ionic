@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.21.3
+
+- Live Reload will now use an external IP Address by default when running Native
+- Upgrade internal @ionic/cli to 6.20.8
+
 ### Version 1.21.2
 
 - Fix for "prepare release" on Windows

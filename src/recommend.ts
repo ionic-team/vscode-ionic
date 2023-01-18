@@ -294,7 +294,6 @@ export async function getRecommendations(
   reviewPackages(packages, project);
 
   project.setGroup(`Settings`, 'Settings', TipType.Settings, false);
-  project.add(externalAddress());
   if (exists('@capacitor/ios') || exists('@capacitor/android')) {
     project.add(liveReload());
   }
@@ -382,17 +381,6 @@ function useHttps(project: Project): Tip {
     .canRefreshAfter();
 }
 
-function externalAddress(): Tip {
-  if (!exists('@angular/core')) return;
-  const externalIP = getSetting(WorkspaceSetting.externalAddress);
-  return new Tip('External Address', undefined, externalIP ? TipType.Check : TipType.Box, undefined)
-    .setTooltip(
-      'Using an external IP Address allows you to navigate to your application from other devices on the network.'
-    )
-    .setAction(toggleExternalAddress, externalIP)
-    .canRefreshAfter();
-}
-
 function viewInEditor(): Tip {
   const viewInEditor = getSetting(WorkspaceSetting.previewInEditor);
   return new Tip('View In Editor', undefined, viewInEditor ? TipType.Check : TipType.Box, undefined)
@@ -426,10 +414,6 @@ async function toggleHttps(current: boolean, project: Project) {
       await getRunOutput(npmUninstall('@jcesarmobile/ssl-skip'), project.folder);
     });
   }
-}
-
-async function toggleExternalAddress(current: boolean) {
-  await setSetting(WorkspaceSetting.externalAddress, !current);
 }
 
 async function toggleViewInEditor(current: boolean) {

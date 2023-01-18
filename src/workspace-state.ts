@@ -1,10 +1,15 @@
 import { ionicState } from './ionic-tree-provider';
+import * as vscode from 'vscode';
 
 export enum WorkspaceSetting {
   liveReload = 'liveReload',
-  externalAddress = 'externalAddress',
   httpsForWeb = 'httpsForWeb',
   previewInEditor = 'previewInEditor',
+}
+
+export enum ExtensionSetting {
+  internalAddress = 'internalAddress',
+  javaHome = 'javaHome',
 }
 
 export function getSetting(key: WorkspaceSetting): any {
@@ -13,4 +18,8 @@ export function getSetting(key: WorkspaceSetting): any {
 
 export async function setSetting(key: WorkspaceSetting, value: any): Promise<void> {
   await ionicState.context.workspaceState.update(key, value);
+}
+
+export function getExtSetting(key: ExtensionSetting): any {
+  return vscode.workspace.getConfiguration('ionic').get(key);
 }

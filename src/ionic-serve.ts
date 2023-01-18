@@ -10,7 +10,7 @@ import { MonoRepoType } from './monorepo';
 import { preflightNPMCheck } from './node-commands';
 import { Project } from './project';
 import { liveReloadSSL } from './live-reload';
-import { getSetting, WorkspaceSetting } from './workspace-state';
+import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
 
 /**
  * Create the ionic serve command
@@ -38,7 +38,7 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
   const preop = preflightNPMCheck(project);
   const httpsForWeb = getSetting(WorkspaceSetting.httpsForWeb);
   const previewInEditor = getSetting(WorkspaceSetting.previewInEditor);
-  const externalIP = getSetting(WorkspaceSetting.externalAddress);
+  const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
   const defaultPort = vscode.workspace.getConfiguration('ionic').get('defaultPort');
   let serveFlags = '';
   if (previewInEditor || dontOpenBrowser) {
@@ -77,7 +77,7 @@ function nxServe(project: Project): string {
 
 export async function selectExternalIPAddress(): Promise<string> {
   const liveReload = getSetting(WorkspaceSetting.liveReload);
-  const externalIP = getSetting(WorkspaceSetting.externalAddress);
+  const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
   if (!externalIP && !liveReload) {
     return;
   }

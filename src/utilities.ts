@@ -13,7 +13,7 @@ import { InternalCommand } from './command-name';
 import { exists } from './analyzer';
 import { ionicInit } from './ionic-init';
 import { request } from 'https';
-import { getSetting, WorkspaceSetting } from './workspace-state';
+import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
 
 export interface CancelObject {
   proc: child_process.ChildProcess;
@@ -34,7 +34,7 @@ export function estimateRunTime(command: string) {
 
 function runOptions(command: string, folder: string, shell?: string) {
   const env = { ...process.env };
-  const javaHome: string = vscode.workspace.getConfiguration('ionic').get('javaHome');
+  const javaHome: string = getExtSetting(ExtensionSetting.javaHome);
 
   // Cocoapods required lang set to en_US.UTF-8 (when capacitor sync or run ios is done)
   if (
