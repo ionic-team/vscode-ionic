@@ -2,7 +2,8 @@
 
 ### Version 1.21.4
 
-- Debugging for Android not works (was queuing)
+- Debugging for Android now works (was queuing)
+- Ionic CLI is no longer required for Live Reload to work (its built in)
 
 ### Version 1.21.3
 

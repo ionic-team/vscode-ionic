@@ -130,22 +130,17 @@ export function checkCapacitorRules(project: Project) {
     }
   }
 
-  if (exists('@ionic-enterprise/auth')) {
-    // TODO: Complete work
-    // checkAndroidManifest();
-  }
-
-  // Ionic CLI unlock live reload
-  const liveReload = getSetting(WorkspaceSetting.liveReload);
-  if (!exists('@ionic/cli') && isIonicBasedProject() && liveReload) {
-    project.recommendAdd(
-      '@ionic/cli',
-      '@ionic/cli',
-      'Add the Ionic CLI for Live Reload',
-      'The Ionic CLI adds the "Live Reload" feature to quickly refresh your application on a device after a code change.',
-      true
-    );
-  }
+  // Ionic CLI should not be required as a copy is installed with the extension
+  // const liveReload = getSetting(WorkspaceSetting.liveReload);
+  // if (!exists('@ionic/cli') && isIonicBasedProject() && liveReload) {
+  //   project.recommendAdd(
+  //     '@ionic/cli',
+  //     '@ionic/cli',
+  //     'Add the Ionic CLI for Live Reload',
+  //     'The Ionic CLI adds the "Live Reload" feature to quickly refresh your application on a device after a code change.',
+  //     true
+  //   );
+  // }
 
   if (exists('cordova-plugin-x-socialsharing')) {
     // TODO: Verify that Android Manifest contains

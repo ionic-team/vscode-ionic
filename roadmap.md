@@ -1,6 +1,5 @@
 # Roadmap
 
-- (fix) Live Reload should install Ionic CLI (if needed????)
 - Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - (feat) Support flavors and schemes using the CLI
 - (feat) combine Packages, Cordova and Capacitor Plugins into Dependencies
