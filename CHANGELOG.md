@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.21.4
+
+- Debugging for Android not works (was queuing)
+
 ### Version 1.21.3
 
 - Live Reload will now use an external IP Address by default when running Native

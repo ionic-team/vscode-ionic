@@ -1,6 +1,6 @@
 # Roadmap
 
-- Vue apps should launch browser on run for web
+- (fix) Live Reload should install Ionic CLI (if needed????)
 - Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - (feat) Support flavors and schemes using the CLI
 - (feat) combine Packages, Cordova and Capacitor Plugins into Dependencies
@@ -71,11 +71,6 @@
 - (bug) Bug capturing of inspection with telemetry reporting on exception
 - (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
 
-## Docs
-
-- (docs) Record video of previewing in editor
-- (docs) Video of splash screen and icon assets
-
 ## Support For NX
 
 - (bug) Package reconciliation (from root and project)
@@ -100,3 +95,66 @@ Add to angular.json:
               }
             ],
 ```
+
+## Docs
+
+These need supporting video and text instructions.
+
+### Projects
+
+- Create a new Project
+- Make an existing web app Native
+- Migrating from Cordova to Capacitor
+
+### Build and Run
+
+- Running for Web, Editor
+- Running in iOS / Android
+- Building and testing Web Apps
+- Building and testing Native Apps
+- Live Reload
+- Using SSL with Live Reload
+
+### Debugging
+
+- Debugging / Breakpoints in VS Code
+- Debugging using the Web View
+
+### Project Maintenance
+
+- Dependency Upgrades
+- One package
+- Minor Updates
+- Multiple packages
+- Security Vulnerabilities
+- Angular Upgrades
+
+### Features
+
+- Splashscreen and Icons
+- Native Settings: Versions, names and permissions
+- Running Scripts
+- Angular - Creating Components, Services, and More
+- Releasing to the Store
+- Improving Code Quality
+- Bundle and Asset Analysis
+- Exporting and reviewing Project
+- Recommendations
+
+### Monorepos
+
+- NX
+- NPM Workspaces
+- Yarn Workspaces
+- PNPM Workspaces
+- VS Code Workspaces
+- Lerna
+- Multiple Folders
+
+### TBA
+
+- Using Continuous Integration
+- Using App Flow
+- Creating Screenshots in different formats
+- Screenshot capture - Transformation to something pretty (text, rotation, background, device frame, position)
+- Automation

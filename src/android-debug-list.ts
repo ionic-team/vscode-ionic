@@ -32,7 +32,7 @@ export async function getAndroidWebViewList(
         undefined
       );
       r.setIcon('debug');
-      r.tip = new Tip(undefined, undefined, TipType.Run).setAction(debug, device, webview, wwwFolder);
+      r.tip = new Tip(undefined, undefined, TipType.Run).setAction(debug, device, webview, wwwFolder).doNotWait();
       r.command.arguments = [r];
       result.push(r);
     }

@@ -155,13 +155,14 @@ function queueEmpty(): boolean {
   return false;
 }
 
-export async function waitForOtherActions(message: string): Promise<boolean> {
+export async function waitForOtherActions(tip: Tip): Promise<boolean> {
   let cancelled = false;
   if (queueEmpty()) return false;
+  if (tip.willNotWait()) return false;
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: `Task Queued: ${message}`,
+      title: `Task Queued: ${tip.title}`,
       cancellable: true,
     },
     async (progress, token: vscode.CancellationToken) => {
@@ -477,7 +478,7 @@ function trackProjectChange() {
 }
 
 async function runAction(tip: Tip, ionicProvider: IonicTreeProvider, rootPath: string) {
-  if (await waitForOtherActions(tip.title)) {
+  if (await waitForOtherActions(tip)) {
     return; // Canceled
   }
   if (tip.stoppable) {
@@ -525,7 +526,7 @@ async function fix(
   ionicProvider: IonicTreeProvider,
   context: vscode.ExtensionContext
 ): Promise<void> {
-  if (await waitForOtherActions(tip.title)) {
+  if (await waitForOtherActions(tip)) {
     return; // Canceled
   }
   tip.generateCommand();

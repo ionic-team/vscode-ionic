@@ -26,6 +26,7 @@ export class Tip {
   public ignorable: boolean;
   public refresh: boolean; // Whether the tree provider is refresh after action is run
   public syncOnSuccess: CapacitorPlatform; // Which platform was synced
+  public dontWait: boolean; // Whether the task should wait if there are other tasks running
   public data?: any;
   public features: Array<TipFeature> = [];
   public relatedDependency: string;
@@ -136,6 +137,17 @@ export class Tip {
     return this;
   }
 
+  // This task will not wait for other tasks to complete
+  doNotWait() {
+    this.dontWait = true;
+    return this;
+  }
+
+  // Return whether this task will not wait for other tasks to complete
+  willNotWait(): boolean {
+    return this.dontWait;
+  }
+
   setSyncOnSuccess(platform: CapacitorPlatform) {
     this.syncOnSuccess = platform;
     return this;
@@ -208,7 +220,7 @@ export class Tip {
 
   async executeAction(): Promise<ActionResult | void> {
     if (this.onAction) {
-      if (await waitForOtherActions(this.title)) {
+      if (await waitForOtherActions(this)) {
         return;
       }
       try {
