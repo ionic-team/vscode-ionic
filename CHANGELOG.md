@@ -1,17 +1,12 @@
 ## Changelog
 
-### Version 1.21.4
+### Version 1.21.5
 
+- Support for folders that contain a space
 - Debugging for Android now works (was queuing)
 - Ionic CLI is no longer required for Live Reload to work (its built in)
-
-### Version 1.21.3
-
 - Live Reload will now use an external IP Address by default when running Native
 - Upgrade internal @ionic/cli to 6.20.8
-
-### Version 1.21.2
-
 - Fix for "prepare release" on Windows
 
 ### Version 1.21.1
