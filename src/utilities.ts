@@ -155,21 +155,21 @@ export async function run(
         if (viewEditor) {
           if (data.includes('Local:') && data.includes('http')) {
             serverUrl = getStringFrom(data, 'Local: ', '\n');
-            const url = serverUrl.trim();
+            const url = stripColors(serverUrl.trim());
             channel.appendLine(`[Ionic] Launching ${url}`);
             viewEditor = false;
             setTimeout(() => handleUrl(url, features), 500);
           } else if (data.includes('open your browser on')) {
             // Likely React
             serverUrl = getStringFrom(data, 'open your browser on ', ' **');
-            const url = serverUrl;
+            const url = stripColors(serverUrl.trim());
             channel.appendLine(`[Ionic] Launching ${url}`);
             viewEditor = false;
             setTimeout(() => handleUrl(url, features), 500);
           } else if (data.includes('- Local:   ')) {
             // Likely Vue
             serverUrl = getStringFrom(data, 'Local: ', '\n');
-            const url = serverUrl.trim();
+            const url = stripColors(serverUrl.trim());
             channel.appendLine(`[Ionic] Launching ${url}`);
             viewEditor = false;
             setTimeout(() => handleUrl(url, features), 500);
