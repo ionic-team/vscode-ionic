@@ -55,7 +55,7 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
     // For npm workspaces check package.json
     projects = getNpmWorkspaceProjects(project);
     project.repoType = MonoRepoType.npm;
-    if (ionicState.packageManager == PackageManager.yarn) {
+    if (project.packageManager == PackageManager.yarn) {
       project.repoType = MonoRepoType.yarn;
     }
     ionicState.projects = projects;

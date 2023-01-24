@@ -28,7 +28,7 @@ import { cmdCtrl, getRunOutput, showProgress } from './utilities';
 import { startLogServer } from './log-server';
 import { getConfigurationName } from './build-configuration';
 import { liveReloadSSL } from './live-reload';
-import { npmInstall, npmUninstall } from './node-commands';
+import { npmInstall, npmUninstall, PackageManager } from './node-commands';
 import { writeIonic } from './extension';
 import { capacitorBuild } from './capacitor-build';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
@@ -81,7 +81,7 @@ export async function getRecommendations(
         .requestDeviceSelection()
         .requestIPSelection()
         .setDynamicCommand(capacitorRun, project, CapacitorPlatform.android)
-        .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.android))
+        .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.android, project.packageManager))
         .setData(project.projectFolder())
         .setRunPoints(runPoints)
         .canStop()
@@ -99,7 +99,7 @@ export async function getRecommendations(
         .requestDeviceSelection()
         .requestIPSelection()
         .setDynamicCommand(capacitorRun, project, CapacitorPlatform.ios)
-        .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.ios))
+        .setSecondCommand('Getting Devices', capacitorDevicesCommand(CapacitorPlatform.ios, project.packageManager))
         .setData(project.projectFolder())
         .setRunPoints(runPoints)
         .canStop()
@@ -236,11 +236,13 @@ export async function getRecommendations(
         .setAction(updateMinorDependencies, project, packages)
         .setTooltip('Find minor updates for project dependencies')
     );
-    project.add(
-      new Tip('Security Audit', '', TipType.Files)
-        .setAction(audit, project)
-        .setTooltip('Analyze dependencies using npm audit for security vulnerabilities')
-    );
+    if (project.packageManager == PackageManager.npm) {
+      project.add(
+        new Tip('Security Audit', '', TipType.Files)
+          .setAction(audit, project)
+          .setTooltip('Analyze dependencies using npm audit for security vulnerabilities')
+      );
+    }
     project.add(
       new Tip('Statistics', '', TipType.Files)
         .setAction(analyzeSize, project)

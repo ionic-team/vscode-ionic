@@ -10,7 +10,7 @@ import { ionicBuild } from './ionic-build';
 import { ionicState } from './ionic-tree-provider';
 import { certPath, liveReloadSSL } from './live-reload';
 import { MonoRepoType } from './monorepo';
-import { preflightNPMCheck } from './node-commands';
+import { npx, PackageManager, preflightNPMCheck } from './node-commands';
 import { Project } from './project';
 import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
 
@@ -30,7 +30,7 @@ export function capacitorRun(project: Project, platform: CapacitorPlatform): str
     const channel = getOutputChannel();
     channel.appendLine('[Ionic] Rebuilding as you changed your project...');
     preop = ionicBuild(project) + ' && ';
-    preop += `npx cap copy ${platform} && `;
+    preop += `${npx(project.packageManager)} cap copy ${platform} && `;
     rebuilt = true;
   } else {
     preop = preflightNPMCheck(project);
@@ -56,9 +56,9 @@ export function capacitorRun(project: Project, platform: CapacitorPlatform): str
   }
 }
 
-export function capacitorDevicesCommand(platform: CapacitorPlatform): string {
+export function capacitorDevicesCommand(platform: CapacitorPlatform, packageManager: PackageManager): string {
   const ionic = useIonicCLI() ? 'ionic ' : '';
-  return `npx ${ionic}cap run ${platform} --list`;
+  return `${npx(packageManager)} ${ionic}cap run ${platform} --list`;
 }
 
 export function useIonicCLI(): boolean {
@@ -141,10 +141,14 @@ function capRun(
       ? InternalCommand.cwd
       : '';
 
-  return `${pre}npx ${ionic}cap run ${platform} --target=${InternalCommand.target} ${capRunFlags}`;
+  return `${pre}${npx(project.packageManager)} ${ionic}cap run ${platform} --target=${
+    InternalCommand.target
+  } ${capRunFlags}`;
 }
 
 function nxRun(project: Project, platform: CapacitorPlatform): string {
   // Note: This may change, see: https://github.com/nxtend-team/nxtend/issues/490
-  return `npx nx run ${project.monoRepo.name}:cap --cmd "run ${platform} --target=${InternalCommand.target}"`;
+  return `${npx(project.packageManager)} nx run ${project.monoRepo.name}:cap --cmd "run ${platform} --target=${
+    InternalCommand.target
+  }"`;
 }

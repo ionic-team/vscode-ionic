@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.22.0
+
+- Support for pnpm exec (instead of calling npx)
+- Security Audit is only available for npm based projects
+
 ### Version 1.21.6
 
 - Support for folders that contain a space

@@ -18,6 +18,7 @@ interface IonicState {
   skipAuth: boolean;
   projects: Array<MonoRepoProject>;
   repoType: MonoRepoType;
+  packageManager: PackageManager;
   workspace: string;
   context: vscode.ExtensionContext;
   shell?: string;
@@ -34,7 +35,6 @@ interface IonicState {
   remoteLogging: boolean; // Whether remote logging is enabled
   configuration: string; // Build configuration
   project: string; // Angular project name
-  packageManager: PackageManager;
   runIOS: Tip;
   runAndroid: Tip;
   runWeb: Tip;
@@ -47,13 +47,13 @@ export const ionicState: IonicState = {
   projects: [],
   projectsView: undefined,
   repoType: MonoRepoType.none,
+  packageManager: PackageManager.npm,
   workspace: undefined,
   outputIsFocused: false,
   channelFocus: true,
   syncDone: [],
   refreshDebugDevices: false,
   remoteLogging: false,
-  packageManager: PackageManager.npm,
   runIOS: undefined,
   runAndroid: undefined,
   runWeb: undefined,

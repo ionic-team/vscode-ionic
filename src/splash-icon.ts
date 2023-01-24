@@ -8,7 +8,7 @@ import { Tip, TipType } from './tip';
 import { Project } from './project';
 import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
-import { npmInstall } from './node-commands';
+import { npmInstall, npx } from './node-commands';
 import { Context } from './context-variables';
 import { join } from 'path';
 
@@ -170,11 +170,27 @@ async function runCordovaRes(project: Project) {
       await run(folder, npmInstall('cordova-res', '--save-dev'), channel, undefined, [], undefined, undefined);
     }
     if (ios) {
-      await run(folder, 'npx cordova-res ios --skip-config --copy', channel, undefined, [], undefined, undefined);
+      await run(
+        folder,
+        `${npx(project.packageManager)} cordova-res ios --skip-config --copy`,
+        channel,
+        undefined,
+        [],
+        undefined,
+        undefined
+      );
       addToGitIgnore(folder, 'resources/ios/**/*');
     }
     if (android) {
-      await run(folder, 'npx cordova-res android --skip-config --copy', channel, undefined, [], undefined, undefined);
+      await run(
+        folder,
+        `${npx(project.packageManager)} cordova-res android --skip-config --copy`,
+        channel,
+        undefined,
+        [],
+        undefined,
+        undefined
+      );
       addToGitIgnore(folder, 'resources/android/**/*');
     }
   });

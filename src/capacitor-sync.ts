@@ -2,7 +2,7 @@ import { Project } from './project';
 import { MonoRepoType } from './monorepo';
 import { exists, isGreaterOrEqual } from './analyzer';
 import { InternalCommand } from './command-name';
-import { preflightNPMCheck } from './node-commands';
+import { npx, PackageManager, preflightNPMCheck } from './node-commands';
 import { getConfigurationArgs } from './build-configuration';
 import { useIonicCLI } from './capacitor-run';
 
@@ -17,13 +17,17 @@ export function capacitorSync(project: Project): string {
   const ionicCLI = useIonicCLI();
   switch (project.repoType) {
     case MonoRepoType.none:
-      return preop + (ionicCLI ? ionicCLISync() : capCLISync());
+      return preop + (ionicCLI ? ionicCLISync(project.packageManager) : capCLISync(project.packageManager));
     case MonoRepoType.folder:
     case MonoRepoType.pnpm:
     case MonoRepoType.lerna:
     case MonoRepoType.yarn:
     case MonoRepoType.npm:
-      return InternalCommand.cwd + preop + (ionicCLI ? ionicCLISync() : capCLISync());
+      return (
+        InternalCommand.cwd +
+        preop +
+        (ionicCLI ? ionicCLISync(project.packageManager) : capCLISync(project.packageManager))
+      );
     case MonoRepoType.nx:
       return preop + nxSync(project);
     default:
@@ -31,17 +35,17 @@ export function capacitorSync(project: Project): string {
   }
 }
 
-function capCLISync(): string {
+function capCLISync(packageManager: PackageManager): string {
   if (isGreaterOrEqual('@capacitor/cli', '4.1.0')) {
-    return `npx cap sync --inline`;
+    return `${npx(packageManager)} cap sync --inline`;
   }
-  return `npx cap sync${getConfigurationArgs()}`;
+  return `${npx(packageManager)} cap sync${getConfigurationArgs()}`;
 }
 
-function ionicCLISync(): string {
-  return `npx ionic cap sync --inline${getConfigurationArgs()}`;
+function ionicCLISync(packageManager: PackageManager): string {
+  return `${npx(packageManager)} ionic cap sync --inline${getConfigurationArgs()}`;
 }
 
 function nxSync(project: Project): string {
-  return `npx nx sync ${project.monoRepo.name}${getConfigurationArgs()}`;
+  return `${npx(project.packageManager)} nx sync ${project.monoRepo.name}${getConfigurationArgs()}`;
 }

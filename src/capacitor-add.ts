@@ -3,6 +3,7 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { useIonicCLI } from './capacitor-run';
 import { InternalCommand } from './command-name';
 import { MonoRepoType } from './monorepo';
+import { npx } from './node-commands';
 import { Project } from './project';
 
 /**
@@ -15,13 +16,13 @@ export function capacitorAdd(project: Project, platform: CapacitorPlatform): str
   const ionic = useIonicCLI() ? 'ionic ' : '';
   switch (project.repoType) {
     case MonoRepoType.none:
-      return `npx ${ionic}cap add ${platform}`;
+      return `${npx(project.packageManager)} ${ionic}cap add ${platform}`;
     case MonoRepoType.npm:
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
     case MonoRepoType.folder:
     case MonoRepoType.pnpm:
-      return `${InternalCommand.cwd}npx ${ionic}cap add ${platform}`;
+      return `${InternalCommand.cwd}${npx(project.packageManager)} ${ionic}cap add ${platform}`;
     case MonoRepoType.nx:
       return nxAdd(project, platform);
     default:
@@ -30,5 +31,5 @@ export function capacitorAdd(project: Project, platform: CapacitorPlatform): str
 }
 
 function nxAdd(project: Project, platform: CapacitorPlatform): string {
-  return `npx nx run ${project.monoRepo.name}:add:${platform}`;
+  return `${npx(project.packageManager)} nx run ${project.monoRepo.name}:add:${platform}`;
 }

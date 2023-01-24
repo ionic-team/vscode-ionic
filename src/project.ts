@@ -35,6 +35,9 @@ export class Project {
   // Mono repo Type (eg NX)
   public repoType: MonoRepoType;
 
+  // Package Manager Type (eg npm, pnpm)
+  public packageManager: PackageManager;
+
   // Mono Repo Project selected
   public monoRepo: MonoRepoProject;
 
@@ -602,7 +605,9 @@ export async function inspectProject(
 
   const project: Project = new Project('My Project');
   project.folder = folder;
-  setPackageManager(folder);
+  project.packageManager = getPackageManager(folder);
+  ionicState.packageManager = project.packageManager;
+
   let packages = await load(folder, project, context);
   ionicState.view.title = project.name;
   project.type = project.isCapacitor ? 'Capacitor' : project.isCordova ? 'Cordova' : 'Other';
@@ -635,13 +640,13 @@ export async function inspectProject(
   return { project, packages };
 }
 
-function setPackageManager(folder: string) {
-  ionicState.packageManager = PackageManager.npm;
+function getPackageManager(folder: string): PackageManager {
   const yarnLock = path.join(folder, 'yarn.lock');
   const pnpmLock = path.join(folder, 'pnpm-lock.yaml');
   if (fs.existsSync(yarnLock)) {
-    ionicState.packageManager = PackageManager.yarn;
+    return PackageManager.yarn;
   } else if (fs.existsSync(pnpmLock)) {
-    ionicState.packageManager = PackageManager.pnpm;
+    return PackageManager.pnpm;
   }
+  return PackageManager.npm;
 }
