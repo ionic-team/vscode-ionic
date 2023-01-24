@@ -1,4 +1,4 @@
-import { getOutputChannel, writeIonic } from './extension';
+import { getOutputChannel, writeError, writeIonic } from './extension';
 import { Project } from './project';
 import { openUri, run, RunResults, showProgress } from './utilities';
 import * as vscode from 'vscode';
@@ -20,7 +20,11 @@ export async function analyzeSize(project: Project) {
       writeIonic('Building for production with Sourcemaps...');
       const cmd = ionicBuild(project, '--prod');
       const bumpSize = process.platform !== 'win32' ? 'export NODE_OPTIONS="--max-old-space-size=8192" && ' : '';
-      await run2(project, `${bumpSize}${cmd}`, undefined);
+      try {
+        await run2(project, `${bumpSize}${cmd}`, undefined);
+      } catch (err) {
+        writeError(err);
+      }
 
       writeIonic('Analyzing Sourcemaps...');
       const result: RunResults = { output: '', success: undefined };

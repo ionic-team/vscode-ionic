@@ -129,6 +129,15 @@ function pnpm(operation: PMOperation, name?: string): string {
   }
 }
 
+export function npx(packageManager: PackageManager): string {
+  switch (packageManager) {
+    case PackageManager.pnpm:
+      return 'pnpm exec';
+    default:
+      return 'npx';
+  }
+}
+
 export function npmUninstall(name: string): string {
   switch (ionicState.repoType) {
     case MonoRepoType.npm:

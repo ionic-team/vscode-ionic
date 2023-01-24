@@ -7,7 +7,7 @@ import { InternalCommand } from './command-name';
 import { ionicState } from './ionic-tree-provider';
 import { certPath } from './live-reload';
 import { MonoRepoType } from './monorepo';
-import { preflightNPMCheck } from './node-commands';
+import { npx, preflightNPMCheck } from './node-commands';
 import { Project } from './project';
 import { liveReloadSSL } from './live-reload';
 import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
@@ -68,11 +68,11 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
     serveFlags += ` --ssl-key='${certPath('key')}'`;
   }
 
-  return `${preop}npx ionic serve${serveFlags}`;
+  return `${preop}${npx(project.packageManager)} ionic serve${serveFlags}`;
 }
 
 function nxServe(project: Project): string {
-  return `npx nx serve ${project.monoRepo.name}`;
+  return `${npx(project.packageManager)} nx serve ${project.monoRepo.name}`;
 }
 
 export async function selectExternalIPAddress(): Promise<string> {

@@ -21,7 +21,7 @@ import { Tip, TipType } from './tip';
 import { asAppId } from './utilities';
 import { capacitorAdd } from './capacitor-add';
 import { CapacitorPlatform } from './capacitor-platform';
-import { npmInstall } from './node-commands';
+import { npmInstall, npx } from './node-commands';
 import { InternalCommand } from './command-name';
 import { MonoRepoType } from './monorepo';
 import { migrateCapacitor } from './capacitor-migrate';
@@ -184,7 +184,9 @@ export function capacitorRecommendations(project: Project): Tip[] {
           npmInstall('@capacitor/core@latest', '--save', '-E'),
           npmInstall('@capacitor/cli@latest', '-D', '-E'),
           npmInstall(`@capacitor/app @capacitor/core @capacitor/haptics @capacitor/keyboard @capacitor/status-bar`),
-          `${local}npx capacitor init "${project.name}" "${asAppId(project.name)}" --web-dir www`,
+          `${local}${npx(project.packageManager)} capacitor init "${project.name}" "${asAppId(
+            project.name
+          )}" --web-dir www`,
         ],
         'Add Capacitor',
         'Capacitor added to this project',
