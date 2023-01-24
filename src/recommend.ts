@@ -222,9 +222,7 @@ export async function getRecommendations(
       false
     );
 
-    project.setSubGroup('Properties', TipType.Settings);
     await reviewCapacitorConfig(project, context);
-    project.clearSubgroup();
 
     // Splash Screen and Icon Features
     addSplashAndIconFeatures(project);

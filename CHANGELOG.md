@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.22.1
+
+- Remove "properties" option when no iOS or Android project are present
+
 ### Version 1.22.0
 
 - Support for pnpm exec (instead of calling npx)

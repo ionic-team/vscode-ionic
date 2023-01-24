@@ -30,6 +30,8 @@ export async function reviewCapacitorConfig(project: Project, context: vscode.Ex
     return;
   }
 
+  project.setSubGroup('Properties', TipType.Settings);
+
   // Allow the user to set the bundle id
   if (state.androidBundleId == state.iosBundleId || !state.iosBundleId || !state.androidBundleId) {
     // Create a single Bundle Id the user can edit
@@ -96,6 +98,8 @@ export async function reviewCapacitorConfig(project: Project, context: vscode.Ex
     tip2.setAction(setBuild, state.iosBuild, project, NativePlatform.iOSOnly);
     project.add(tip2);
   }
+
+  project.clearSubgroup();
 }
 
 /**
