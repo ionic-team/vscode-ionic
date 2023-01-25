@@ -210,6 +210,14 @@
         }
       },
       {
+        "command": "ionic-official.selectAction",
+        "title": "Select an action",
+        "icon": {
+          "light": "resources/light/more.svg",
+          "dark": "resources/dark/more.svg"
+        }
+      },
+      {
         "command": "ionic-official.selectDevice",
         "title": "Select device to run",
         "icon": {
@@ -270,6 +278,10 @@
         },
         {
           "command": "ionic-official.buildConfig",
+          "when": "false"
+        },
+        {
+          "command": "ionic-official.selectAction",
           "when": "false"
         },
         {
@@ -339,6 +351,11 @@
         {
           "command": "ionic-official.buildConfig",
           "when": "view == ionic && viewItem == buildConfig",
+          "group": "inline"
+        },
+        {
+          "command": "ionic-official.selectAction",
+          "when": "view == ionic && viewItem == selectAction",
           "group": "inline"
         },
         {

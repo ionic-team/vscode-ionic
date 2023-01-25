@@ -23,6 +23,7 @@ import { AndroidDebugType } from './android-debug';
 import { CapacitorPlatform } from './capacitor-platform';
 import { kill } from './process-list';
 import { selectExternalIPAddress } from './ionic-serve';
+import { advancedActions } from './advanced-actions';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
@@ -368,6 +369,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
   vscode.commands.registerCommand(CommandName.RefreshDebug, async () => {
     ionicState.refreshDebugDevices = true;
+    ionicProvider.refresh();
+  });
+
+  vscode.commands.registerCommand(CommandName.SelectAction, async (r: Recommendation) => {
+    await advancedActions(r.getData());
     ionicProvider.refresh();
   });
 

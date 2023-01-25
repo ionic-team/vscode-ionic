@@ -1,7 +1,7 @@
 import { Project } from './project';
 import * as vscode from 'vscode';
 import { getRunOutput, getStringFrom, openUri } from './utilities';
-import { writeError, writeIonic } from './extension';
+import { getOutputChannel, writeError, writeIonic } from './extension';
 import { join } from 'path';
 import { existsSync } from 'fs';
 
@@ -16,6 +16,8 @@ export async function angularGenerate(project: Project, angularType: string): Pr
   // CREATE src/app/test2/test2.component.ts
   writeIonic(`Creating Angular ${angularType} named ${name}..`);
   const out = await getRunOutput(`npx ionic generate ${angularType} '${name}'`, project.projectFolder());
+  const channel = getOutputChannel();
+  channel.appendLine(out);
   const src = getStringFrom(out, 'CREATE ', '.ts');
   const path = join(project.projectFolder(), src + '.ts');
   if (!src || !existsSync(path)) {

@@ -3,6 +3,8 @@
 ### Version 1.22.1
 
 - Remove "properties" option when no iOS or Android project are present
+- Migrate to PNPM feature added
+- Reinstall node modules features added
 
 ### Version 1.22.0
 

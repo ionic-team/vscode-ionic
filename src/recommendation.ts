@@ -5,6 +5,7 @@ import { Tip } from './tip';
 export class Recommendation extends vscode.TreeItem {
   public children: Recommendation[];
   private iconName: string;
+  private data: any;
   public whenExpanded: () => Promise<Array<Recommendation>>;
 
   constructor(
@@ -30,7 +31,16 @@ export class Recommendation extends vscode.TreeItem {
     };
   }
 
-  // Animinated icons need to have an equivalent filename with -anim that contains animated svg
+  public setData(data: any): Recommendation {
+    this.data = data;
+    return this;
+  }
+
+  public getData(): any {
+    return this.data;
+  }
+
+  // Animated icons need to have an equivalent filename with -anim that contains animated svg
   public animate() {
     this.setIcon(this.iconName + '-anim');
   }

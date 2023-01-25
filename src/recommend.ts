@@ -125,7 +125,10 @@ export async function getRecommendations(
       ];
     };
 
-    project.setGroup(`Project`, 'Capacitor Features', TipType.Capacitor, true);
+    project
+      .setGroup('Project', 'Capacitor Features', TipType.Capacitor, true)
+      .setData(project)
+      .setContext(Context.selectAction);
     if (project.isCapacitor) {
       if (exists('@angular/core')) {
         project.setSubGroup('New', TipType.Add);

@@ -18,6 +18,7 @@ export enum CommandName {
   ProjectsRefresh = 'ionic-official.projectRefresh',
   ProjectSelect = 'ionic-official.projectSelect',
   BuildConfig = 'ionic-official.buildConfig',
+  SelectAction = 'ionic-official.selectAction',
   DebugMode = 'ionic-official.debugMode',
   RunMode = 'ionic-official.runMode',
   SelectDevice = 'ionic-official.selectDevice',
