@@ -232,7 +232,6 @@ function handleUrl(url: string, features: Array<TipFeature>) {
     }
     viewInEditor(url);
   } else {
-    if (exists('@angular/core')) return;
     debugBrowser(url);
   }
 }

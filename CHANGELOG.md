@@ -3,6 +3,7 @@
 ### Version 1.22.1
 
 - Remove "properties" option when no iOS or Android project are present
+- Fix for web debugging added (was failing to launch debugger in Angular projects)
 - Migrate to PNPM feature added
 - Reinstall node modules features added
 
