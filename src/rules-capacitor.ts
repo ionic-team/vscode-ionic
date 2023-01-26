@@ -63,6 +63,22 @@ export function checkCapacitorRules(project: Project) {
     'appsflyer-capacitor-plugin'
   );
 
+  project.recommendReplace(
+    '@ionic-enterprise/dialogs',
+    '@ionic-enterprise/dialogs',
+    `Replace with @capacitor/dialog due to official support`,
+    `The plugin @ionic-enterprise/dialogs should be replaced with @capacitor/dialog as it is an officially supported Capacitor plugin`,
+    '@capacitor/dialog'
+  );
+
+  project.recommendReplace(
+    '@ionic-enterprise/app-rate',
+    '@ionic-enterprise/app-rate',
+    `Replace with capacitor-rate-app due to Capacitor support`,
+    `The plugin @ionic-enterprise/app-rate should be replaced with capacitor-rate-app as designed to work with Capacitor`,
+    'capacitor-rate-app'
+  );
+
   if (exists('cordova-plugin-file-transfer') && !exists('cordova-plugin-whitelist')) {
     // Latest 1.7.1 of the file-transfer plugin requires whitelist in Capacitor projects. See: https://github.com/ionic-team/capacitor/issues/1199
     project.recommendAdd(
