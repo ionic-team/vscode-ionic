@@ -4,8 +4,6 @@
 - (feat) Support flavors and schemes using the CLI
 - (feat) combine Packages, Cordova and Capacitor Plugins into Dependencies
 
-- (feat) Convert to pnpm - delete node_modules, (maybe create pnpm-workspace.yaml), pnpm import, pnpm install
-
 ## Angular Generate
 
 - Switch to standalone components (one SCAM at a time then the base app module)

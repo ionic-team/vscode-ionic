@@ -62,23 +62,27 @@ export async function handleError(error: string, logs: Array<string>, folder: st
 
   const errors = extractErrors(error, logs, folder);
 
+  const retryOp = false; // Turning this off for now. It isn't working consistently
+
   if (errors.length == 0 && errorMessage) {
     vscode.window.showErrorMessage(errorMessage, 'Ok');
   } else {
     handleErrorLine(0, errors, folder);
     // When the user fixes the error and saves the file then re-run
-    if (onSave) {
-      onSave.dispose();
-    }
-    onSave = vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
-      if (document.fileName == currentErrorFilename) {
+    if (retryOp) {
+      if (onSave) {
         onSave.dispose();
-        const title = lastOperation.title;
-        const r = new Project('').asRecommendation(lastOperation);
-        vscode.commands.executeCommand(CommandName.Run, r);
-        showMessage(`Lets try to ${title} again...`, 3000);
       }
-    });
+      onSave = vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
+        if (document.fileName == currentErrorFilename) {
+          onSave.dispose();
+          const title = lastOperation.title;
+          const r = new Project('').asRecommendation(lastOperation);
+          vscode.commands.executeCommand(CommandName.Run, r);
+          showMessage(`Lets try to ${title} again...`, 3000);
+        }
+      });
+    }
   }
 }
 
