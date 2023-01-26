@@ -282,7 +282,9 @@ export async function getRecommendations(
 
   if (project.isCordova) {
     checkCordovaRules(project);
-    checkCapacitorMigrationRules(packages, project);
+    if (!project.isCapacitor) {
+      checkCapacitorMigrationRules(packages, project);
+    }
   } else if (project.isCapacitor) {
     checkCapacitorRules(project);
     checkIonicNativePackages(packages, project);
