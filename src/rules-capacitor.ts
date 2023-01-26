@@ -109,6 +109,12 @@ export function checkCapacitorRules(project: Project) {
     'https://capacitorjs.com/docs/apis/app#minimizeapp'
   );
 
+  project.recommendRemove(
+    'cordova-plugin-datepicker',
+    'cordova-plugin-datepicker',
+    'This plugin appears to have been abandoned in 2015. Consider using ion-datetime.'
+  );
+
   if (exists('cordova-plugin-file-transfer') && !exists('cordova-plugin-whitelist')) {
     // Latest 1.7.1 of the file-transfer plugin requires whitelist in Capacitor projects. See: https://github.com/ionic-team/capacitor/issues/1199
     project.recommendAdd(
