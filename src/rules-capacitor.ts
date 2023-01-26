@@ -101,6 +101,14 @@ export function checkCapacitorRules(project: Project) {
     'This plugin should no longer be required in projects.'
   );
 
+  project.recommendRemove(
+    'cordova-plugin-appminimize',
+    'cordova-plugin-appminimize',
+    'This plugin is not required and can be replaced with the minimizeApp method of @capacitor/app',
+    undefined,
+    'https://capacitorjs.com/docs/apis/app#minimizeapp'
+  );
+
   if (exists('cordova-plugin-file-transfer') && !exists('cordova-plugin-whitelist')) {
     // Latest 1.7.1 of the file-transfer plugin requires whitelist in Capacitor projects. See: https://github.com/ionic-team/capacitor/issues/1199
     project.recommendAdd(
