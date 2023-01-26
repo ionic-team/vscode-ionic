@@ -87,6 +87,14 @@ export function checkCapacitorRules(project: Project) {
     '@ionic/storage'
   );
 
+  project.recommendReplace(
+    'cordova-plugin-advanced-http',
+    'cordova-plugin-advanced-http',
+    `Replace with @capacitor/http due to official support`,
+    `The plugin cordova-plugin-advanced-http should be replaced with @capacitor/http. Capacitor now provides the equivalent native http functionality built in.`,
+    '@capacitor/core'
+  );
+
   project.recommendRemove(
     '@ionic-enterprise/promise',
     '@ionic-enterprise/promise',
