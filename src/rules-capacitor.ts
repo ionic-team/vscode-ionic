@@ -87,6 +87,12 @@ export function checkCapacitorRules(project: Project) {
     '@ionic/storage'
   );
 
+  project.recommendRemove(
+    '@ionic-enterprise/promise',
+    '@ionic-enterprise/promise',
+    'This plugin should no longer be required in projects.'
+  );
+
   if (exists('cordova-plugin-file-transfer') && !exists('cordova-plugin-whitelist')) {
     // Latest 1.7.1 of the file-transfer plugin requires whitelist in Capacitor projects. See: https://github.com/ionic-team/capacitor/issues/1199
     project.recommendAdd(
