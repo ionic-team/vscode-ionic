@@ -79,6 +79,14 @@ export function checkCapacitorRules(project: Project) {
     'capacitor-rate-app'
   );
 
+  project.recommendReplace(
+    '@ionic-enterprise/nativestorage',
+    '@ionic-enterprise/nativestorage',
+    `Replace with @ionic/storage due to support`,
+    `The plugin @ionic-enterprise/nativestorage should be replaced with @ionic/storage. Consider @ionic-enterprise/secure-storage if encryption is required`,
+    '@ionic/storage'
+  );
+
   if (exists('cordova-plugin-file-transfer') && !exists('cordova-plugin-whitelist')) {
     // Latest 1.7.1 of the file-transfer plugin requires whitelist in Capacitor projects. See: https://github.com/ionic-team/capacitor/issues/1199
     project.recommendAdd(

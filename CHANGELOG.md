@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.22.2
+
+- Add recommendations for replacement plugins related to @ionic-enterprise
+- Show Capacitor recommendations even if cordova remnants are in the project
+
 ### Version 1.22.1
 
 - Remove "properties" option when no iOS or Android project are present
