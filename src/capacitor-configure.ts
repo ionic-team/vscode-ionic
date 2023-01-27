@@ -30,7 +30,7 @@ export async function reviewCapacitorConfig(project: Project, context: vscode.Ex
     return;
   }
 
-  project.setSubGroup('Properties', TipType.Settings);
+  project.setSubGroup('Properties', TipType.Settings, undefined, undefined, true);
 
   // Allow the user to set the bundle id
   if (state.androidBundleId == state.iosBundleId || !state.iosBundleId || !state.androidBundleId) {

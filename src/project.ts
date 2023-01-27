@@ -87,9 +87,22 @@ export class Project {
     }
   }
 
-  public setSubGroup(title: string, type: TipType, message?: string, contextValue?: string): Recommendation {
+  public setSubGroup(
+    title: string,
+    type: TipType,
+    message?: string,
+    contextValue?: string,
+    expanded?: boolean
+  ): Recommendation {
     const tip = new Tip(title, undefined, undefined, undefined, undefined, 'Upgrade');
-    const r = new Recommendation(message, undefined, title, vscode.TreeItemCollapsibleState.Collapsed, undefined, tip);
+    const r = new Recommendation(
+      message,
+      undefined,
+      title,
+      expanded ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.Collapsed,
+      undefined,
+      tip
+    );
     r.children = [];
     this.group.children.push(r);
     this.subgroup = r;
