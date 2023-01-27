@@ -4,6 +4,7 @@
 
 - Add recommendations for replacement plugins related to @ionic-enterprise
 - Show Capacitor recommendations even if cordova remnants are in the project
+- Hide disconnected devices when running iOS/Android
 
 ### Version 1.22.1
 

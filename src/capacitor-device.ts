@@ -102,7 +102,11 @@ function parseDevice(line: string) {
     const name = line.substring(0, line.indexOf('  ')).trim();
     line = line.substring(line.indexOf('  ')).trim();
     const args = line.replace('  ', '|').split('|');
-    return { name: name + ' ' + replaceSDKLevel(args[0].trim()), target: args[1].trim() };
+    const target = args[1].trim();
+    if (target == '?') {
+      return undefined;
+    }
+    return { name: name + ' ' + replaceSDKLevel(args[0].trim()), target };
   } catch {
     return undefined;
   }
