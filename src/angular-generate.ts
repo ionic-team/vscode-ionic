@@ -15,15 +15,19 @@ export async function angularGenerate(project: Project, angularType: string): Pr
 
   // CREATE src/app/test2/test2.component.ts
   writeIonic(`Creating Angular ${angularType} named ${name}..`);
-  const out = await getRunOutput(`npx ionic generate ${angularType} '${name}'`, project.projectFolder());
-  const channel = getOutputChannel();
-  channel.appendLine(out);
-  const src = getStringFrom(out, 'CREATE ', '.ts');
-  const path = join(project.projectFolder(), src + '.ts');
-  if (!src || !existsSync(path)) {
-    writeError(`Failed to create Angular ${angularType} named ${name}`);
-  } else {
-    writeIonic(`Created Angular ${angularType} named ${name}`);
-    await openUri(path);
+  try {
+    const out = await getRunOutput(`npx ionic generate ${angularType} '${name}'`, project.projectFolder());
+    const channel = getOutputChannel();
+    channel.appendLine(out);
+    const src = getStringFrom(out, 'CREATE ', '.ts');
+    const path = join(project.projectFolder(), src + '.ts');
+    if (!src || !existsSync(path)) {
+      writeError(`Failed to create Angular ${angularType} named ${name}`);
+    } else {
+      writeIonic(`Created Angular ${angularType} named ${name}`);
+      await openUri(path);
+    }
+  } catch (err) {
+    writeError(`Unable to generate Angular ${angularType} named ${name}: ${err}`);
   }
 }

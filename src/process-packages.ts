@@ -11,13 +11,7 @@ import { NpmDependency, NpmOutdatedDependency, NpmPackage, PackageType, PackageV
 import { listCommand, outdatedCommand } from './node-commands';
 import { CapProjectCache, PackageCacheList, PackageCacheModified, PackageCacheOutdated } from './context-variables';
 import { join } from 'path';
-import { updateMinorDependencies } from './update-minor';
-import { analyzeSize } from './analyze-size';
-import { ionicExport } from './ionic-export';
 import { ionicState } from './ionic-tree-provider';
-import { audit } from './audit';
-import { angularGenerate } from './angular-generate';
-import { exists } from './analyzer';
 
 export interface PluginInformation {
   androidPermissions: Array<string>;
@@ -497,6 +491,9 @@ function processDependencies(allDependencies: object, outdated: object, devDepen
       isDevDependency: isDev,
       depType: PackageType.Dependency,
     };
+
+    // Set to version found in package lock
+    allDependencies[library] = version;
   }
   return packages;
 }

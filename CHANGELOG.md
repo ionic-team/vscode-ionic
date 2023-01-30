@@ -3,6 +3,8 @@
 ### Version 1.22.3
 
 - Handle angular.json files that have comments
+- Use package-lock.json version for recommendations
+- Additional error logging for new Angular items
 
 ### Version 1.22.2
 

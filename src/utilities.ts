@@ -14,6 +14,7 @@ import { exists } from './analyzer';
 import { ionicInit } from './ionic-init';
 import { request } from 'https';
 import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
+import { writeError } from './extension';
 
 export interface CancelObject {
   proc: child_process.ChildProcess;
@@ -311,7 +312,7 @@ export async function getRunOutput(command: string, folder: string, shell?: stri
           resolve(out);
         } else {
           if (stderror) {
-            console.error(stderror);
+            writeError(stderror);
             reject(stderror);
           } else {
             // This is to fix a bug in npm outdated where it returns an exit code when it succeeds
