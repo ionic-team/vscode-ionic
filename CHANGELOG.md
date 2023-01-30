@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.22.3
+
+- Handle angular.json files that have comments
+
 ### Version 1.22.2
 
 - Add recommendations for replacement plugins related to @ionic-enterprise

@@ -19,7 +19,7 @@ export function checkAngularJson(project: Project) {
   try {
     const filename = path.join(project.folder, 'angular.json');
     if (fs.existsSync(filename)) {
-      const angular = JSON.parse(fs.readFileSync(filename, 'utf8'));
+      const angular = parseAngularJSON(filename);
       for (const projectName of Object.keys(angular.projects)) {
         defaultConfiguration = angular.projects[projectName].architect?.build?.defaultConfiguration;
         if (!ionicState.configuration && defaultConfiguration) {
@@ -40,6 +40,29 @@ export function checkAngularJson(project: Project) {
     }
   } catch (e) {
     writeError(e);
+  }
+}
+
+function parseAngularJSON(filename: string): any {
+  try {
+    return JSON.parse(fs.readFileSync(filename, 'utf8'));
+  } catch (err) {
+    // Angular json may have comments
+    try {
+      const txt = fs.readFileSync(filename, 'utf8');
+      const lines = txt.split('\n');
+      let tmp = '';
+      for (const line of lines) {
+        if (line && line.trim().startsWith('//')) {
+          // Ignore comments
+        } else {
+          tmp += line;
+        }
+      }
+      return JSON.parse(tmp);
+    } catch (err) {
+      writeError(`Unable to parse angular.json: ${err}`);
+    }
   }
 }
 
