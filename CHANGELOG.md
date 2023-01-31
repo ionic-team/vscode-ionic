@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.22.4
+
+- cordova-plugin-contacts as a deprecated plugin
+
 ### Version 1.22.3
 
 - Handle angular.json files that have comments

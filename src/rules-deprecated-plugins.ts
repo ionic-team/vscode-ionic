@@ -36,6 +36,8 @@ export function checkDeprecatedPlugins(project: Project) {
     'https://devblogs.microsoft.com/appcenter/announcing-apache-cordova-retirement'
   );
 
+  project.deprecatedPlugin('cordova-plugin-contacts', 'Consider migration to @capacitor-community/contacts');
+
   project.deprecatedPlugin(
     '@ionic-enterprise/offline-storage',
     'Replace this plugin with @ionic-enterprise/secure-storage'
