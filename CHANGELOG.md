@@ -3,6 +3,7 @@
 ### Version 1.22.4
 
 - cordova-plugin-contacts as a deprecated plugin
+- Handle Angular item creation with names that have spaces
 
 ### Version 1.22.3
 
