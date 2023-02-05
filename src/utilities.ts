@@ -14,7 +14,7 @@ import { exists } from './analyzer';
 import { ionicInit } from './ionic-init';
 import { request } from 'https';
 import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
-import { writeError } from './extension';
+import { writeError, writeIonic } from './extension';
 
 export interface CancelObject {
   proc: child_process.ChildProcess;
@@ -91,10 +91,24 @@ export async function run(
   }
   command = qualifyCommand(command);
 
-  let viewEditor =
-    features.includes(TipFeature.debugOnWeb) ||
-    (features.includes(TipFeature.viewInEditor) && getSetting(WorkspaceSetting.previewInEditor));
-  let viewQR = features.includes(TipFeature.capViewQR) && getSetting(WorkspaceSetting.previewQR);
+  let findLocalUrl = features.includes(TipFeature.debugOnWeb) || features.includes(TipFeature.welcome);
+  let findExternalUrl = features.includes(TipFeature.welcome);
+  let localUrl: string;
+  let externalUrl: string;
+  let timeout;
+
+  function launchUrl() {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(() => {
+      if (features.includes(TipFeature.debugOnWeb)) {
+        debugBrowser(localUrl, true);
+        return;
+      }
+      viewAsQR(localUrl, externalUrl);
+    }, 500);
+  }
 
   let logs: Array<string> = [];
   return new Promise((resolve, reject) => {
@@ -154,45 +168,26 @@ export async function run(
         if (output) {
           output.output += data;
         }
-        const loglines = data.split('\n');
-        logs = logs.concat(loglines);
-        if (viewEditor) {
-          if (data.includes('Local:') && data.includes('http')) {
-            serverUrl = getStringFrom(data, 'Local: ', '\n');
-            const url = stripColors(serverUrl.trim());
-            channel.appendLine(`[Ionic] Launching ${url}`);
-            viewEditor = false;
-            setTimeout(() => handleUrl(url, features), 500);
-          } else if (data.includes('open your browser on')) {
-            // Likely React
-            serverUrl = getStringFrom(data, 'open your browser on ', ' **');
-            const url = stripColors(serverUrl.trim());
-            channel.appendLine(`[Ionic] Launching ${url}`);
-            viewEditor = false;
-            setTimeout(() => handleUrl(url, features), 500);
-          } else if (data.includes('- Local:   ')) {
-            // Likely Vue
-            serverUrl = getStringFrom(data, 'Local: ', '\n');
-            const url = stripColors(serverUrl.trim());
-            channel.appendLine(`[Ionic] Launching ${url}`);
-            viewEditor = false;
-            setTimeout(() => handleUrl(url, features), 500);
-          } else if (data.includes('> Local: ')) {
-            // Likely vite
-            serverUrl = stripColors(getStringFrom(data, 'Local: ', '\n'));
-            const url = stripColors(serverUrl.trim());
-            channel.appendLine(`[Ionic] Launching ${url}`);
-            viewEditor = false;
-            setTimeout(() => handleUrl(url, features), 500);
+        const logLines = data.split('\n');
+        logs = logs.concat(logLines);
+        if (findLocalUrl) {
+          if (data.includes('http')) {
+            const url = checkForUrls(data, ['Local:', 'On Your Network:', 'open your browser on ']);
+            if (url) {
+              findLocalUrl = false;
+              localUrl = url;
+              launchUrl();
+            }
           }
         }
-        if (viewQR) {
-          if (data.includes('External:') && data.includes('http')) {
-            serverUrl = getStringFrom(data, 'External: ', '\n');
-            const url = stripColors(serverUrl.trim());
-            channel.appendLine(`[Ionic] Previewing ${url}`);
-            viewQR = false;
-            setTimeout(() => handleUrl(url, features), 500);
+        if (findExternalUrl) {
+          if (data.includes('http')) {
+            const url = checkForUrls(data, ['External:', 'On Your Network:']);
+            if (url) {
+              findExternalUrl = false;
+              externalUrl = url;
+              launchUrl();
+            }
           }
         }
 
@@ -208,13 +203,13 @@ export async function run(
           }
         }
 
-        for (const logline of loglines) {
-          if (logline.startsWith('[capacitor]')) {
+        for (const logLine of logLines) {
+          if (logLine.startsWith('[capacitor]')) {
             if (!supressInfo) {
-              channel.appendLine(logline.replace('[capacitor]', ''));
+              channel.appendLine(logLine.replace('[capacitor]', ''));
             }
-          } else if (logline && !supressInfo) {
-            const nocolor = logline.replace(
+          } else if (logLine && !supressInfo) {
+            const nocolor = logLine.replace(
               /[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
               ''
             );
@@ -238,23 +233,20 @@ export async function run(
   });
 }
 
-function handleUrl(url: string, features: Array<TipFeature>) {
-  if (features.includes(TipFeature.capViewQR)) {
-    if (getSetting(WorkspaceSetting.previewQR)) {
-      viewAsQR(url);
-      return;
+function checkForUrls(data: string, list: Array<string>): string {
+  for (const text of list) {
+    const url = checkForUrl(data, text);
+    if (url) {
+      return url;
     }
   }
+}
 
-  if (features.includes(TipFeature.viewInEditor)) {
-    if (!getSetting(WorkspaceSetting.previewInEditor)) {
-      return;
-    }
-    viewInEditor(url);
-  }
-
-  if (features.includes(TipFeature.debugOnWeb)) {
-    debugBrowser(url, true);
+function checkForUrl(data: string, text: string): string {
+  if (data.includes(text) && data.includes('http')) {
+    serverUrl = getStringFrom(data, text, '\n');
+    const url = stripColors(serverUrl.trim());
+    return url;
   }
 }
 

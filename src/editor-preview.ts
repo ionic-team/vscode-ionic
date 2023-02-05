@@ -45,11 +45,16 @@ export function viewInEditor(url: string, active?: boolean) {
   });
 }
 
-export function viewAsQR(url: string) {
+export function closeWelcomePanel() {
   // If the panel already exists close and reopen
   if (qrPanel) {
     qrPanel.dispose();
   }
+}
+
+export function viewAsQR(localUrl: string, externalUrl: string) {
+  // If the panel already exists close and reopen
+  closeWelcomePanel();
 
   const panel = vscode.window.createWebviewPanel('viewApp', 'Ionic', vscode.ViewColumn.Active, {
     enableScripts: true,
@@ -57,18 +62,18 @@ export function viewAsQR(url: string) {
 
   const onDiskPath = vscode.Uri.file(join(ionicState.context.extensionPath, 'resources', 'qrious.min.js'));
   const qrSrc = panel.webview.asWebviewUri(onDiskPath);
-  panel.webview.html = getWebviewQR(url, qrSrc);
+  panel.webview.html = getWebviewQR(localUrl, externalUrl, qrSrc);
 
   panel.webview.onDidReceiveMessage(async (message) => {
     switch (message) {
       case 'editor':
-        viewInEditor(url, true);
+        viewInEditor(localUrl, true);
         break;
       case 'debug':
-        debugBrowser(url, false);
+        debugBrowser(localUrl, false);
         break;
       case 'browser':
-        openUri(url);
+        openUri(localUrl);
         break;
       case 'stop':
         stop(panel);
@@ -128,8 +133,8 @@ async function selectMockDevice(): Promise<device> {
   return devices.find((device) => selected.startsWith(device.name));
 }
 
-function getWebviewQR(url: string, qrSrc: vscode.Uri): string {
-  const shortUrl = url.replace('https://', '').replace('http://', '');
+function getWebviewQR(localUrl: string, externalUrl: string, qrSrc: vscode.Uri): string {
+  const shortUrl = externalUrl.replace('https://', '').replace('http://', '');
   return `
   <!DOCTYPE html>
   <html>
@@ -178,7 +183,7 @@ function getWebviewQR(url: string, qrSrc: vscode.Uri): string {
       foreground: '#888',
       element: document.getElementById('qr'),
       size: 150,
-      value: '${url}'
+      value: '${externalUrl}'
     });
     </script>
   </body>
@@ -201,8 +206,7 @@ function getWebviewContent(url: string): string {
 	window.addEventListener('message', event => {
 		const device = event.data;		
 		let newurl = baseUrl;
-		if (device.type == 'ios') { newurl += '?ionic:mode=ios'; }		
-		console.log(newurl);
+		if (device.type == 'ios') { newurl += '?ionic:mode=ios'; }
 		document.getElementById('frame').src = newurl;
 		document.getElementById('devFrame').style.width = device.width + 'px';
 		document.getElementById('devFrame').style.height = (device.height + 50) + 'px';

@@ -8,7 +8,7 @@ import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './project';
-import { Command, Tip, TipType } from './tip';
+import { Command, Tip, TipFeature, TipType } from './tip';
 import { CancelObject, run, estimateRunTime, channelShow, openUri } from './utilities';
 import { ignore } from './ignore';
 import { ActionResult, CommandName, InternalCommand } from './command-name';
@@ -24,6 +24,7 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { kill } from './process-list';
 import { selectExternalIPAddress } from './ionic-serve';
 import { advancedActions } from './advanced-actions';
+import { closeWelcomePanel } from './editor-preview';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
@@ -239,6 +240,9 @@ export async function fixIssue(
         if (token.isCancellationRequested || tip.cancelRequested) {
           tip.cancelRequested = false;
           channel.appendLine(`[Ionic] Stopped "${tip.title}"`);
+          if (tip.features.includes(TipFeature.welcome)) {
+            closeWelcomePanel();
+          }
           channelShow(channel);
           clearInterval(interval);
           finishCommand(tip);

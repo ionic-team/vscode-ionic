@@ -52,7 +52,7 @@ export async function getRecommendations(
     const runWeb = new Tip('Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`)
       .setDynamicCommand(ionicServe, project, false)
       .requestIPSelection()
-      .setFeatures([TipFeature.viewInEditor, TipFeature.capViewQR])
+      .setFeatures([TipFeature.welcome])
       .setRunPoints([
         { title: 'Building...', text: 'Generating browser application bundles' },
         { title: 'Serving', text: 'Development server running' },
@@ -305,8 +305,6 @@ export async function getRecommendations(
     project.add(liveReload());
   }
   project.add(useHttps(project));
-  project.add(viewInEditor());
-  project.add(viewAsQR());
 
   // REMOTE LOGGING ENABLED ################
   //project.add(remoteLogging(project));
@@ -389,22 +387,6 @@ function useHttps(project: Project): Tip {
     .canRefreshAfter();
 }
 
-function viewInEditor(): Tip {
-  const viewInEditor = getSetting(WorkspaceSetting.previewInEditor);
-  return new Tip('View In Editor', undefined, viewInEditor ? TipType.Check : TipType.Box, undefined)
-    .setTooltip('Whether the app will be previewed in VS Code rather than a web browser')
-    .setAction(toggleViewInEditor, viewInEditor)
-    .canRefreshAfter();
-}
-
-function viewAsQR(): Tip {
-  const viewAsQR = getSetting(WorkspaceSetting.previewQR);
-  return new Tip('View as QR Code', undefined, viewAsQR ? TipType.Check : TipType.Box, undefined)
-    .setTooltip('Whether the app will be previewed as a QR Code that can be opened with the Cap View App')
-    .setAction(toggleViewQR, viewAsQR)
-    .canRefreshAfter();
-}
-
 function toggleRemoteLogging(project: Project, current: boolean): Promise<void> {
   if (startLogServer(project.folder)) {
     ionicState.remoteLogging = !current;
@@ -430,12 +412,4 @@ async function toggleHttps(current: boolean, project: Project) {
       await getRunOutput(npmUninstall('@jcesarmobile/ssl-skip'), project.folder);
     });
   }
-}
-
-async function toggleViewInEditor(current: boolean) {
-  await setSetting(WorkspaceSetting.previewInEditor, !current);
-}
-
-async function toggleViewQR(current: boolean) {
-  await setSetting(WorkspaceSetting.previewQR, !current);
 }

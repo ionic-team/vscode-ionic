@@ -4,9 +4,8 @@ import { Context } from './context-variables';
 import { finishCommand, isRunning, markActionAsRunning, waitForOtherActions } from './extension';
 
 export enum TipFeature {
-  viewInEditor,
-  capViewQR,
   debugOnWeb,
+  welcome,
 }
 
 export class Tip {

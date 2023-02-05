@@ -37,8 +37,8 @@ export function ionicServe(project: Project, dontOpenBrowser: boolean): string {
 function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
   const preop = preflightNPMCheck(project);
   const httpsForWeb = getSetting(WorkspaceSetting.httpsForWeb);
-  const previewInEditor = getSetting(WorkspaceSetting.previewInEditor);
-  const previewQR = getSetting(WorkspaceSetting.previewQR);
+  const previewInEditor = false;
+  const previewQR = true;
   const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
   const defaultPort = vscode.workspace.getConfiguration('ionic').get('defaultPort');
   let serveFlags = '';
