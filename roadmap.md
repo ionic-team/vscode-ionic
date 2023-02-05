@@ -4,6 +4,15 @@
 - (feat) Support flavors and schemes using the CLI
 - (feat) combine Packages, Cordova and Capacitor Plugins into Dependencies
 
+## QR Preview
+
+- Button on Toolbar for Build
+- Button on Toolbar for Run Web, Run iOS, Run Android
+- Option to hide logs that arent errors
+- Click QR Code to display "Use the 'Capacitor View' App to open this application
+- Use this to add QR Code / Webview in side panel:
+  https://stackoverflow.com/questions/67150547/vs-code-extension-how-to-add-a-webviewpanel-to-the-sidebar
+
 ## Angular Generate
 
 - Switch to standalone components (one SCAM at a time then the base app module)

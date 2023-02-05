@@ -178,6 +178,7 @@ export function remotePackages(): Array<string> {
 
 export function deprecatedPackages(packages: any): Array<any> {
   const result = [];
+  if (!packages) return result;
   for (const library of Object.keys(packages)) {
     if (packages[library].deprecated) {
       result.push({ name: library, message: packages[library].deprecated });

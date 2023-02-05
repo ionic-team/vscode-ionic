@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as vscode from 'vscode';
 
 import { RunPoint, TipFeature } from './tip';
-import { debugBrowser, viewInEditor } from './editor-preview';
+import { debugBrowser, viewAsQR, viewInEditor } from './editor-preview';
 import { handleError } from './error-handler';
 import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { getMonoRepoFolder, getPackageJSONFilename } from './monorepo';
@@ -91,7 +91,10 @@ export async function run(
   }
   command = qualifyCommand(command);
 
-  let viewEditor = features.includes(TipFeature.debugOnWeb) || features.includes(TipFeature.viewInEditor);
+  let viewEditor =
+    features.includes(TipFeature.debugOnWeb) ||
+    (features.includes(TipFeature.viewInEditor) && getSetting(WorkspaceSetting.previewInEditor));
+  let viewQR = features.includes(TipFeature.capViewQR) && getSetting(WorkspaceSetting.previewQR);
 
   let logs: Array<string> = [];
   return new Promise((resolve, reject) => {
@@ -183,6 +186,15 @@ export async function run(
             setTimeout(() => handleUrl(url, features), 500);
           }
         }
+        if (viewQR) {
+          if (data.includes('External:') && data.includes('http')) {
+            serverUrl = getStringFrom(data, 'External: ', '\n');
+            const url = stripColors(serverUrl.trim());
+            channel.appendLine(`[Ionic] Previewing ${url}`);
+            viewQR = false;
+            setTimeout(() => handleUrl(url, features), 500);
+          }
+        }
 
         // Based on found text logged change the progress message in the status bar
         if (runPoints) {
@@ -227,13 +239,22 @@ export async function run(
 }
 
 function handleUrl(url: string, features: Array<TipFeature>) {
+  if (features.includes(TipFeature.capViewQR)) {
+    if (getSetting(WorkspaceSetting.previewQR)) {
+      viewAsQR(url);
+      return;
+    }
+  }
+
   if (features.includes(TipFeature.viewInEditor)) {
     if (!getSetting(WorkspaceSetting.previewInEditor)) {
       return;
     }
     viewInEditor(url);
-  } else {
-    debugBrowser(url);
+  }
+
+  if (features.includes(TipFeature.debugOnWeb)) {
+    debugBrowser(url, true);
   }
 }
 
@@ -269,11 +290,8 @@ function qualifyCommand(command: string): string {
 }
 
 export async function openUri(uri: string): Promise<void> {
-  if (uri?.includes('//')) {
-    await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(uri));
-  } else {
-    await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(uri));
-  }
+  const ob = uri?.includes('//') ? vscode.Uri.parse(uri) : vscode.Uri.file(uri);
+  await vscode.commands.executeCommand('vscode.open', ob);
 }
 
 export function debugSkipFiles(): string {
@@ -354,6 +372,9 @@ export async function runWithProgress(
 
 export function getPackageJSON(folder: string): PackageFile {
   const filename = getPackageJSONFilename(folder);
+  if (!fs.existsSync(filename)) {
+    return { name: undefined, displayName: undefined, description: undefined, version: undefined, scripts: {} };
+  }
   return JSON.parse(fs.readFileSync(filename, 'utf8'));
 }
 

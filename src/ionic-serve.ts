@@ -38,10 +38,11 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
   const preop = preflightNPMCheck(project);
   const httpsForWeb = getSetting(WorkspaceSetting.httpsForWeb);
   const previewInEditor = getSetting(WorkspaceSetting.previewInEditor);
+  const previewQR = getSetting(WorkspaceSetting.previewQR);
   const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
   const defaultPort = vscode.workspace.getConfiguration('ionic').get('defaultPort');
   let serveFlags = '';
-  if (previewInEditor || dontOpenBrowser) {
+  if (previewInEditor || previewQR || dontOpenBrowser) {
     serveFlags += ' --no-open';
   }
 

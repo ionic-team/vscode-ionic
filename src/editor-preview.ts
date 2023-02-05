@@ -1,8 +1,8 @@
+import { join } from 'path';
 import * as vscode from 'vscode';
 import { cancelLastOperation } from './extension';
 import { ionicState } from './ionic-tree-provider';
-import { debugSkipFiles } from './utilities';
-import { getSetting, WorkspaceSetting } from './workspace-state';
+import { debugSkipFiles, openUri } from './utilities';
 
 interface device {
   name: string;
@@ -10,6 +10,8 @@ interface device {
   height: number;
   type: string;
 }
+
+let qrPanel: vscode.WebviewPanel;
 
 const devices: Array<device> = [
   { name: 'iPhone SE', width: 375, height: 667, type: 'ios' },
@@ -24,10 +26,15 @@ const devices: Array<device> = [
   { name: 'Samsung Galaxy Tab S4', width: 712, height: 1138, type: 'android' },
 ];
 
-export function viewInEditor(url: string) {
-  const panel = vscode.window.createWebviewPanel('viewApp', 'Preview', vscode.ViewColumn.Beside, {
-    enableScripts: true,
-  });
+export function viewInEditor(url: string, active?: boolean) {
+  const panel = vscode.window.createWebviewPanel(
+    'viewApp',
+    'Preview',
+    active ? vscode.ViewColumn.Active : vscode.ViewColumn.Beside,
+    {
+      enableScripts: true,
+    }
+  );
 
   panel.webview.html = getWebviewContent(url);
 
@@ -38,6 +45,46 @@ export function viewInEditor(url: string) {
   });
 }
 
+export function viewAsQR(url: string) {
+  // If the panel already exists close and reopen
+  if (qrPanel) {
+    qrPanel.dispose();
+  }
+
+  const panel = vscode.window.createWebviewPanel('viewApp', 'Ionic', vscode.ViewColumn.Active, {
+    enableScripts: true,
+  });
+
+  const onDiskPath = vscode.Uri.file(join(ionicState.context.extensionPath, 'resources', 'qrious.min.js'));
+  const qrSrc = panel.webview.asWebviewUri(onDiskPath);
+  panel.webview.html = getWebviewQR(url, qrSrc);
+
+  panel.webview.onDidReceiveMessage(async (message) => {
+    switch (message) {
+      case 'editor':
+        viewInEditor(url, true);
+        break;
+      case 'debug':
+        debugBrowser(url, false);
+        break;
+      case 'browser':
+        openUri(url);
+        break;
+      case 'stop':
+        stop(panel);
+        break;
+      default:
+        vscode.window.showInformationMessage(message);
+    }
+  });
+  qrPanel = panel;
+}
+
+async function stop(panel: vscode.WebviewPanel) {
+  await cancelLastOperation();
+  panel.dispose();
+}
+
 export function getDebugBrowserName(): string {
   const browser = vscode.workspace.getConfiguration('ionic').get('browser') as string;
   if (browser == 'pwa-msedge') return 'Microsoft Edge';
@@ -45,7 +92,7 @@ export function getDebugBrowserName(): string {
   return browser;
 }
 
-export async function debugBrowser(url: string) {
+export async function debugBrowser(url: string, stopWebServerAfter: boolean) {
   try {
     const browserType: string = vscode.workspace.getConfiguration('ionic').get('browser');
     const launchConfig: vscode.DebugConfiguration = {
@@ -58,10 +105,12 @@ export async function debugBrowser(url: string) {
     };
 
     vscode.debug.onDidTerminateDebugSession(async (e) => {
-      // This stops the dev server
-      await cancelLastOperation();
-      // Switch back to Ionic View
-      ionicState.view.reveal(undefined, { focus: true });
+      if (stopWebServerAfter) {
+        // This stops the dev server
+        await cancelLastOperation();
+        // Switch back to Ionic View
+        ionicState.view.reveal(undefined, { focus: true });
+      }
     });
 
     await vscode.debug.startDebugging(undefined, launchConfig);
@@ -75,7 +124,66 @@ async function selectMockDevice(): Promise<device> {
     devices.map((device) => `${device.name} (${device.width} x ${device.height})`),
     { placeHolder: 'Select Emulated Device' }
   );
+  if (!selected) return;
   return devices.find((device) => selected.startsWith(device.name));
+}
+
+function getWebviewQR(url: string, qrSrc: vscode.Uri): string {
+  const shortUrl = url.replace('https://', '').replace('http://', '');
+  return `
+  <!DOCTYPE html>
+  <html>
+  <script src="${qrSrc}"></script>
+  <script>
+    const vscode = acquireVsCodeApi();
+    function action(msg) {
+	    vscode.postMessage(msg);
+	  }
+  </script>
+  <style>
+  .container {
+    width: 100%;
+    padding: 50px;
+    display: flex;
+    flex-direction: row;
+  }
+  .row {
+    min-width: 280px;
+    width: 280px;
+    margin-right: 20px;
+  }
+  a {
+    cursor: pointer;
+  }
+  </style>
+  <body>
+    <div class="container">
+       <div class="row">
+          <h2>Start</h2>
+          <a onclick="action('browser')"><p>Open in Browser</p></a>
+          <a onclick="action('editor')"><p>Open in Editor</p></a>
+          <a onclick="action('debug')"><p>Debug in Browser</p></a>
+          <a onclick="action('stop')"><p>Stop Web Server</p></a>
+       </div>
+       <div class="row">
+          <h2>Preview</h2>
+          <p>Scan this QR Code in the Capacitor Preview app or the Camera app of your phone.</p>
+          <canvas id="qr"></canvas>
+          <p>${shortUrl}</p>
+       </div>
+    </div>
+    <script>
+    const qr = new QRious({
+      background: 'transparent',
+      foreground: '#888',
+      element: document.getElementById('qr'),
+      size: 150,
+      value: '${url}'
+    });
+    </script>
+  </body>
+  </html>
+  `;
 }
 
 function getWebviewContent(url: string): string {

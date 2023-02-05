@@ -5,6 +5,7 @@ import { finishCommand, isRunning, markActionAsRunning, waitForOtherActions } fr
 
 export enum TipFeature {
   viewInEditor,
+  capViewQR,
   debugOnWeb,
 }
 

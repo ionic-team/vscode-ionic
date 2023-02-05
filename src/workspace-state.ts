@@ -5,6 +5,7 @@ export enum WorkspaceSetting {
   liveReload = 'liveReload',
   httpsForWeb = 'httpsForWeb',
   previewInEditor = 'previewInEditor',
+  previewQR = 'previewQR',
 }
 
 export enum ExtensionSetting {

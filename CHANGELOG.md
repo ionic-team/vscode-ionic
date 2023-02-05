@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.23.0
+
+- Applications can be viewed in the Capacitor Preview App
+- Fix for non-Ionic folder based workspaces
+
 ### Version 1.22.4
 
 - cordova-plugin-contacts as a deprecated plugin
