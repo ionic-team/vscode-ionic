@@ -67,7 +67,7 @@ export function viewAsQR(localUrl: string, externalUrl: string) {
   panel.webview.onDidReceiveMessage(async (message) => {
     switch (message) {
       case 'editor':
-        viewInEditor(localUrl, true);
+        viewInEditor(localUrl, false);
         break;
       case 'debug':
         debugBrowser(localUrl, false);
