@@ -42,6 +42,7 @@ function processConfigXML(folder: string) {
         config.preferences[pref['@_name']] = pref['@_value'];
       }
     }
+    if (!widget.platform) return config;
     for (const platform of widget.platform) {
       if (platform['@_name'] == 'android' && platform.preference) {
         for (const pref of platform.preference) {
