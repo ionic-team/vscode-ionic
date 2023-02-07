@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as vscode from 'vscode';
 
 import {
   checkConsistentVersions,
@@ -53,7 +52,7 @@ export function checkCapacitorRules(project: Project) {
     );
   }
 
-  // cordova-plugin-appsflyer-sdk doesnt build with Capacitor. Use appsflyer-capacitor-plugin instead
+  // cordova-plugin-appsflyer-sdk doesn't build with Capacitor. Use appsflyer-capacitor-plugin instead
   // see https://github.com/AppsFlyerSDK/appsflyer-cordova-plugin#------%EF%B8%8F-note-for-capacitor-users--%EF%B8%8F------
   project.recommendReplace(
     'cordova-plugin-appsflyer-sdk',

@@ -52,6 +52,7 @@ export async function getRecommendations(
     const runWeb = new Tip('Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`)
       .setDynamicCommand(ionicServe, project, false)
       .requestIPSelection()
+      .setContextValue(Context.webConfig)
       .setFeatures([TipFeature.welcome])
       .setRunPoints([
         { title: 'Building...', text: 'Generating browser application bundles' },

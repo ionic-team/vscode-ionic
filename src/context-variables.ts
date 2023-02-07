@@ -31,6 +31,9 @@ export enum Context {
   // Build configuration
   buildConfig = 'buildConfig',
 
+  // Web configuration
+  webConfig = 'webConfig',
+
   // Select Action
   selectAction = 'selectAction',
 

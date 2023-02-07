@@ -4,6 +4,7 @@
 
 - Applications can be viewed in the Capacitor Preview App
 - Fix for non-Ionic folder based workspaces
+- Handle config.xml with no platforms
 
 ### Version 1.22.4
 

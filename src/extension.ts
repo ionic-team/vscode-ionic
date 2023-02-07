@@ -15,6 +15,7 @@ import { ActionResult, CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
 import { IonicProjectsreeProvider } from './ionic-projects-provider';
 import { buildConfiguration } from './build-configuration';
+import { webConfiguration } from './web-configuration';
 import { selectDevice } from './capacitor-device';
 import { getLocalFolder } from './monorepo';
 import { androidDebugUnforward } from './android-debug-bridge';
@@ -379,6 +380,10 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(CommandName.SelectAction, async (r: Recommendation) => {
     await advancedActions(r.getData());
     ionicProvider.refresh();
+  });
+
+  vscode.commands.registerCommand(CommandName.WebConfig, async (r: Recommendation) => {
+    webConfiguration(r.tip.actionArg(0));
   });
 
   vscode.commands.registerCommand(CommandName.BuildConfig, async (r: Recommendation) => {

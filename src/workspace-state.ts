@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 export enum WorkspaceSetting {
   liveReload = 'liveReload',
   httpsForWeb = 'httpsForWeb',
+  webAction = 'webAction',
 }
 
 export enum ExtensionSetting {

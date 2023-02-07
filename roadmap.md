@@ -1,8 +1,17 @@
 # Roadmap
 
-- Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
+x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
+
 - (feat) Support flavors and schemes using the CLI
 - (feat) combine Packages, Cordova and Capacitor Plugins into Dependencies
+
+## View Style
+
+- Run iOS, Android - Show lists of devices and option to run as live reload
+- Splash, Icon, Settings - Named Configuration allow visuals
+- Plugins - Allow checkboxes for functionality with groups Official, Community
+- Support - Link for feedback, framework, each of the components
+- Angular - New components, Show existing pages, components, and settings files
 
 ## QR Preview
 

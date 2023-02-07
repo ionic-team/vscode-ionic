@@ -13,8 +13,9 @@ import { InternalCommand } from './command-name';
 import { exists } from './analyzer';
 import { ionicInit } from './ionic-init';
 import { request } from 'https';
-import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
-import { writeError, writeIonic } from './extension';
+import { ExtensionSetting, getExtSetting } from './workspace-state';
+import { writeError } from './extension';
+import { getWebConfiguration, WebConfigSetting } from './web-configuration';
 
 export interface CancelObject {
   proc: child_process.ChildProcess;
@@ -106,7 +107,15 @@ export async function run(
         debugBrowser(localUrl, true);
         return;
       }
-      viewAsQR(localUrl, externalUrl);
+      const webConfig: WebConfigSetting = getWebConfiguration();
+      switch (webConfig) {
+        case WebConfigSetting.editor:
+          viewInEditor(localUrl);
+          break;
+        case WebConfigSetting.welcome:
+          viewAsQR(localUrl, externalUrl);
+          break;
+      }
     }, 500);
   }
 
