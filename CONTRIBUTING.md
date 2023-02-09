@@ -29,3 +29,12 @@ Run
 
 - `vsce package`
 - A packaged with name `Ionic-0.0.1.vsix` will be created which can be installed or published to the marketplace.
+
+# Publish Prerelease
+
+You need a personal access token (see [here](https://code.visualstudio.com/api/working-with-extensions/publishing-extension#get-a-personal-access-token)).
+
+Run
+
+- `vsce login Ionic` (make sure the I is capitalized)
+- `vsce publish --pre-release`
