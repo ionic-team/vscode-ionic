@@ -4,6 +4,9 @@ x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 
 - (feat) Support flavors and schemes using the CLI
 - (feat) combine Packages, Cordova and Capacitor Plugins into Dependencies
+- (fix) If upgrading/changing a package then make sure dev server is stopped
+- (fix) For a regular Angular project that is in a subfolder it reports not finding www folder when running npx cap copy. But dist exists and the extension can correct that in capacitor.config.ts. The dist folder may be separated by app too so dist/my-app may be where the index.html is located
+- (fix) When running on web for regular Angular app it doesn't launch the browser
 
 ## View Style
 
