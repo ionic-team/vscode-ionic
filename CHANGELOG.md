@@ -1,10 +1,11 @@
 ## Changelog
 
-### Version 1.23.0
+### Version 1.23.2
 
 - Applications can be viewed in the Capacitor Preview App
 - Fix for non-Ionic folder based workspaces
 - Handle config.xml with no platforms
+- Add rule to handle cases where ionic-angular and @ionic/angular are installed
 
 ### Version 1.22.4
 

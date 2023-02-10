@@ -84,11 +84,19 @@ export function checkPackages(project: Project) {
 
   // Ionic 3+
   if (exists('ionic-angular')) {
-    project.note(
-      '@ionic/angular',
-      'Your Ionic project should be migrated to @ionic/angular version 5 or higher',
-      'https://ionicframework.com/docs/reference/migration#migrating-from-ionic-3-0-to-ionic-4-0'
-    );
+    if (exists('@ionic/angular')) {
+      project.recommendRemove(
+        'ionic-angular',
+        'ionic-angular',
+        'Your project has 2 versions of Ionic Angular installed (ionic-angular and @ionic/angular). You should remove ionic-angular'
+      );
+    } else {
+      project.note(
+        '@ionic/angular',
+        'Your Ionic project should be migrated to @ionic/angular version 5 or higher',
+        'https://ionicframework.com/docs/reference/migration#migrating-from-ionic-3-0-to-ionic-4-0'
+      );
+    }
   }
 
   // Angular 10 is in LTS until December 2021
