@@ -78,7 +78,7 @@ export function checkPackages(project: Project) {
     project.recommendRemove(
       'cordova-plugin-file-opener2',
       'cordova-plugin-file-opener2',
-      'Your project uses cordova-plugin-file-opener2 which will be rejected from the Play Store due to use of REQUEST_INSTALL_PACKAGES permission.'
+      'Your project uses cordova-plugin-file-opener2 which will be rejected from the Play Store due to use of REQUEST_INSTALL_PACKAGES permission. Upgrade to version 4+'
     );
   }
 
