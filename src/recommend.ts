@@ -25,7 +25,7 @@ import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
 import { checkIonicNativePackages } from './rules-ionic-native';
 import { cmdCtrl, getRunOutput, showProgress } from './utilities';
-import { startLogServer } from './log-server';
+import { startStopLogServer } from './log-server';
 import { getConfigurationName } from './build-configuration';
 import { liveReloadSSL } from './live-reload';
 import { npmInstall, npmUninstall, PackageManager } from './node-commands';
@@ -307,8 +307,7 @@ export async function getRecommendations(
   }
   project.add(useHttps(project));
 
-  // REMOTE LOGGING ENABLED ################
-  //project.add(remoteLogging(project));
+  project.add(remoteLogging(project));
 
   project.add(new Tip('Advanced', '', TipType.Settings));
 
@@ -367,8 +366,7 @@ function debugOnWeb(project: Project): Tip {
 function remoteLogging(project: Project): Tip {
   return new Tip('Remote Logging', undefined, ionicState.remoteLogging ? TipType.Check : TipType.Box, undefined)
     .setTooltip('Captures console logs from the device and displays in the output window')
-    .setAction(toggleRemoteLogging, project, ionicState.remoteLogging)
-    .canRefreshAfter();
+    .setAction(toggleRemoteLogging, project, ionicState.remoteLogging);
 }
 
 function liveReload(): Tip {
@@ -388,11 +386,11 @@ function useHttps(project: Project): Tip {
     .canRefreshAfter();
 }
 
-function toggleRemoteLogging(project: Project, current: boolean): Promise<void> {
-  if (startLogServer(project.folder)) {
+async function toggleRemoteLogging(project: Project, current: boolean): Promise<void> {
+  if (await startStopLogServer(project.folder)) {
     ionicState.remoteLogging = !current;
   }
-  return;
+  return Promise.resolve();
 }
 
 async function toggleLiveReload(current: boolean) {

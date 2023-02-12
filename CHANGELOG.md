@@ -1,11 +1,13 @@
 ## Changelog
 
-### Version 1.23.2
+### Version 1.23.3
 
 - Applications can be viewed in the Capacitor Preview App
+- Remote Logging
 - Fix for non-Ionic folder based workspaces
 - Handle config.xml with no platforms
 - Add rule to handle cases where ionic-angular and @ionic/angular are installed
+- Update rule on cordova-plugin-file-opener2
 
 ### Version 1.22.4
 

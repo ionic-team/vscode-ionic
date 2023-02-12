@@ -10,6 +10,8 @@ This extension for Visual Studio Code features:
   `androidmanifest.xml`
 - [Minor Updates](#upgrading-packages) - Identifies minor dependency updates for one step upgrading
 - [Security Vulnerabilities](#upgrading-packages) - Identifies security vulnerabilities in dependencies using npm audit
+- [Remote Logging](#remote-logging) - Console logs from your app are sent to the VS Code output window
+- [Capacitor Preview](#capacitor-preview) - Preview your web application in Capacitor
 - [Configuration Issues](#upgrading-packages) - Recommends changes to `config.xml` and `androidmanifest.xml`
 - [Integrate Capacitor](#adding-capacitor) into web projects
 - [Run Scripts](#upgrading-packages) from `package.json`
@@ -120,6 +122,18 @@ Detects errors in `swift`, `java`, `typescript`, `eslint`, `jasmine` and `jest` 
 - Opens the place in code where the error occurs
 - Allows navigation to `next` and `previous` errors
 - Re-runs the operation when you correct the problem and save the file
+
+## Remote Logging
+
+Remote logging will Console logs from your app to the VS Code output window. You can turn this option on in `Settings`.
+
+Note: The remote logging service runs using `http`, so for Android device you will need to update your `capacitor.config.ts` to enable clear text transports: `server: { cleartext: true }`.
+
+## Capacitor Preview
+
+If you click `Run` > `Web` you will notice a QR Code. This can be scanned with the Capacitor Preview mobile application which will launch and run your application. You now have a running application on your mobile device that will reload if you make a code change and save ("Live Reload").
+
+Note: The Capacitor Preview application has a limited set of plugins which will work with your application.
 
 ## Nx Support
 

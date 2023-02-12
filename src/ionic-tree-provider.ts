@@ -33,6 +33,7 @@ interface IonicState {
   channelFocus: boolean; // Whether to focus the output window
   refreshDebugDevices: boolean; // Should we refresh the list of debuggable devices
   remoteLogging: boolean; // Whether remote logging is enabled
+  hasNodeModules: boolean; // Whether node modules are installed
   configuration: string; // Build configuration
   project: string; // Angular project name
   runIOS: Tip;
@@ -51,6 +52,7 @@ export const ionicState: IonicState = {
   workspace: undefined,
   outputIsFocused: false,
   channelFocus: true,
+  hasNodeModules: undefined,
   syncDone: [],
   refreshDebugDevices: false,
   remoteLogging: false,

@@ -102,19 +102,6 @@ x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 ## Remote Logging Issues
 
 - Need this in capacitor config to allow Remote Logging to work: server: { cleartext: true }
-- Add for React and Vue
-
-Angular process:
-Instead of writing into index.html
-Add to angular.json:
-
-```json
-            "scripts": [
-              {
-                "input": "stuff/script.js"
-              }
-            ],
-```
 
 ## Docs
 

@@ -11,6 +11,7 @@ import {
   warnMinVersion,
 } from './analyzer';
 import { npmInstallAll } from './node-commands';
+import { ionicState } from './ionic-tree-provider';
 
 /**
  * General Rules for packages like momentjs, jquery, etc
@@ -18,7 +19,9 @@ import { npmInstallAll } from './node-commands';
  */
 export function checkPackages(project: Project) {
   const nmf = project.getNodeModulesFolder();
+  ionicState.hasNodeModules = true;
   if (!fs.existsSync(nmf)) {
+    ionicState.hasNodeModules = false;
     project.add(
       new Tip(
         'Install Node Modules',

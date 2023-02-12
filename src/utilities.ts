@@ -484,14 +484,14 @@ export async function showMessage(message: string, ms: number) {
 }
 
 export async function showProgress(message: string, func: () => Promise<any>) {
-  await vscode.window.withProgress(
+  return await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
       title: `${message}`,
       cancellable: false,
     },
     async (progress, token) => {
-      await func();
+      return await func();
     }
   );
 }

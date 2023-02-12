@@ -26,7 +26,7 @@ import { MonoRepoType } from './monorepo';
 import { migrateCapacitor } from './capacitor-migrate';
 import { checkAngularJson } from './rules-angular-json';
 import { checkBrowsersList } from './rules-browserslist';
-import { getSetting, WorkspaceSetting } from './workspace-state';
+import { ionicState } from './ionic-tree-provider';
 
 /**
  * Check rules for Capacitor projects
@@ -171,7 +171,7 @@ export function checkCapacitorRules(project: Project) {
 
   // Migration for 3.x, 4.0.0-beta, 4.0.0 to Capacitor 4.0.1+
   if (isLess('@capacitor/core', '4.0.1') || startsWith('@capacitor/core', '4.0.0')) {
-    if (isGreaterOrEqual('@capacitor/core', '3.0.0')) {
+    if (ionicState.hasNodeModules && isGreaterOrEqual('@capacitor/core', '3.0.0')) {
       // Recommend migration from 3 to 4
       project.tip(
         new Tip('Migrate to Capacitor 4', '', TipType.Idea)
@@ -246,7 +246,7 @@ export function capacitorRecommendations(project: Project): Tip[] {
       ).showProgressDialog()
     );
   } else {
-    if (!project.hasCapacitorProject(CapacitorPlatform.android)) {
+    if (!project.hasCapacitorProject(CapacitorPlatform.android) && ionicState.hasNodeModules) {
       tips.push(
         new Tip(
           'Add Android Project',
@@ -264,7 +264,7 @@ export function capacitorRecommendations(project: Project): Tip[] {
       );
     }
 
-    if (!project.hasCapacitorProject(CapacitorPlatform.ios)) {
+    if (!project.hasCapacitorProject(CapacitorPlatform.ios) && ionicState.hasNodeModules) {
       tips.push(
         new Tip(
           'Add iOS Project',
