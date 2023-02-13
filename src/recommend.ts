@@ -29,7 +29,7 @@ import { startStopLogServer } from './log-server';
 import { getConfigurationName } from './build-configuration';
 import { liveReloadSSL } from './live-reload';
 import { npmInstall, npmUninstall, PackageManager } from './node-commands';
-import { writeIonic } from './extension';
+import { cancelLastOperation, writeIonic } from './extension';
 import { capacitorBuild } from './capacitor-build';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 import { updateMinorDependencies } from './update-minor';
@@ -390,6 +390,7 @@ async function toggleRemoteLogging(project: Project, current: boolean): Promise<
   if (await startStopLogServer(project.folder)) {
     ionicState.remoteLogging = !current;
   }
+  await cancelLastOperation();
   return Promise.resolve();
 }
 
@@ -411,4 +412,5 @@ async function toggleHttps(current: boolean, project: Project) {
       await getRunOutput(npmUninstall('@jcesarmobile/ssl-skip'), project.folder);
     });
   }
+  await cancelLastOperation();
 }
