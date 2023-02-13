@@ -447,8 +447,11 @@ export async function activate(context: vscode.ExtensionContext) {
     ionicProvider.selectProject(project);
   });
 
-  vscode.commands.registerCommand(CommandName.Idea, async (r: Recommendation) => {
-    await fix(r.tip, rootPath, ionicProvider, context);
+  vscode.commands.registerCommand(CommandName.Idea, async (t: Tip | Recommendation) => {
+    if (!t) return;
+    // If the user clicks the light bulb it is a Tip, if they click the item it is a recommendation
+    const tip: Tip = (t as Recommendation).tip ? (t as Recommendation).tip : (t as Tip);
+    await fix(tip, rootPath, ionicProvider, context);
   });
 
   vscode.commands.registerCommand(CommandName.Run, async (r: Recommendation) => {
