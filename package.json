@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.23.4",
+  "version": "1.23.5",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -25,7 +25,7 @@
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "npm run build && cp ionic-1.23.0.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
+    "package": "npm run build && cp ionic-1.23.5.vsix site/ionic.vsix && cd site && netlify deploy --prod --dir .",
     "lint": "npm run eslint && npm run prettier -- --check",
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write",
     "prettier": "prettier \"**/*.ts\"",

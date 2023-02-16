@@ -1,6 +1,6 @@
 ## Changelog
 
-### Version 1.23.4
+### Version 1.23.5
 
 - Applications can be viewed in the Capacitor Preview App
 - Remote Logging
@@ -8,6 +8,7 @@
 - Handle config.xml with no platforms
 - Add rule to handle cases where ionic-angular and @ionic/angular are installed
 - Update rule on cordova-plugin-file-opener2
+- Fix for Nuxt support
 - Fix if Use HTTPS is used make sure dev server is stopped
 
 ### Version 1.22.4
