@@ -8,7 +8,8 @@
 - Handle config.xml with no platforms
 - Add rule to handle cases where ionic-angular and @ionic/angular are installed
 - Update rule on cordova-plugin-file-opener2
-- Fix for Nuxt support
+- Add Nuxt support (detection of dev web server, run and build)
+- Add AnalogJs support
 - Fix if Use HTTPS is used make sure dev server is stopped
 
 ### Version 1.22.4

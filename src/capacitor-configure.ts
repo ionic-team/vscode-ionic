@@ -127,6 +127,9 @@ export function getCapacitorConfigWebDir(folder: string): string {
       result = 'build';
     }
   }
+  if (!result) {
+    result = 'www'; // Assume www folder
+  }
   return path.join(folder, result);
 }
 

@@ -191,7 +191,13 @@ export async function run(
         logs = logs.concat(logLines);
         if (findLocalUrl) {
           if (data.includes('http')) {
-            const url = checkForUrls(data, ['Local:', 'On Your Network:', 'open your browser on ', '> Local:']);
+            const url = checkForUrls(data, [
+              'Local:',
+              'On Your Network:',
+              'open your browser on ',
+              '> Local:', // Nuxt
+              '➜  Local:', // AnalogJs
+            ]);
             if (url) {
               findLocalUrl = false;
               localUrl = url;
@@ -201,7 +207,12 @@ export async function run(
         }
         if (findExternalUrl) {
           if (data.includes('http')) {
-            const url = checkForUrls(data, ['External:', 'On Your Network:', '> Network:']);
+            const url = checkForUrls(data, [
+              'External:',
+              'On Your Network:',
+              '> Network:', // Nuxt
+              '➜  Network:', // AnalogJs
+            ]);
             if (url) {
               findExternalUrl = false;
               externalUrl = url;
