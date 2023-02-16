@@ -1,11 +1,12 @@
 ## Changelog
 
-### Version 1.23.5
+### Version 1.23.6
 
 - Applications can be viewed in the Capacitor Preview App
 - Remote Logging
 - Fix for non-Ionic folder based workspaces
 - Handle config.xml with no platforms
+- Add option to switch to ESBuild for Angular (Click Project > ...)
 - Add rule to handle cases where ionic-angular and @ionic/angular are installed
 - Update rule on cordova-plugin-file-opener2
 - Add Nuxt support (detection of dev web server, run and build)
