@@ -16,7 +16,9 @@ export async function ionicInit(folder: string): Promise<boolean> {
   try {
     const filename = path.join(folder, 'package.json');
     const packageFile = JSON.parse(fs.readFileSync(filename, 'utf8'));
+    verifyValidPackageJson(filename, packageFile);
     const name = packageFile.name;
+
     const cfg = path.join(folder, 'ionic.config.json');
     if (!fs.existsSync(cfg)) {
       const result = await getRunOutput(`npx ionic init "${name}" --type=custom`, folder);
@@ -42,6 +44,22 @@ export async function ionicInit(folder: string): Promise<boolean> {
   } catch (err) {
     channel.appendLine('[Ionic] Unable to create Ionic project:' + err);
     return false;
+  }
+}
+
+/**
+ * This will force package.json to have a name and version. Without this Ionic CLI will call the package.json malformed
+ * @param  {string} filename
+ * @param  {any} packages
+ */
+function verifyValidPackageJson(filename: string, packages: any) {
+  if (!packages.name) {
+    packages.name = 'my-app';
+    fs.writeFileSync(filename, JSON.stringify(packages, null, 2));
+  }
+  if (!packages.version) {
+    packages.version = '0.0.0';
+    fs.writeFileSync(filename, JSON.stringify(packages, null, 2));
   }
 }
 

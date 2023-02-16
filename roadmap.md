@@ -4,9 +4,21 @@ x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 
 - (feat) Support flavors and schemes using the CLI
 - (feat) combine Packages, Cordova and Capacitor Plugins into Dependencies
+- (fix) On a Stencil project selecting run in editor doesnt seem to work
 - (fix) If upgrading/changing a package then make sure dev server is stopped
 - (fix) For a regular Angular project that is in a subfolder it reports not finding www folder when running npx cap copy. But dist exists and the extension can correct that in capacitor.config.ts. The dist folder may be separated by app too so dist/my-app may be where the index.html is located
 - (fix) When running on web for regular Angular app it doesn't launch the browser
+
+## Nuxt
+
+- if `nuxt` as a package then use `npm run build` for building, `npm run dev` for run > web, there is a project in `Sample Code\nuxt3` to test with and found out the dist folder.
+
+## Ditch Ionic CLI
+
+- Check `package.json` for missing `name` and `version` and set if needed
+- Avoid `ionic init` and instead guess best npm run script based on `package.json` having React,Vue,Nuxt etc.
+- Guess `dist` folder based on `package.json`
+- Guess IP Address, Port based on logged output
 
 ## View Style
 
