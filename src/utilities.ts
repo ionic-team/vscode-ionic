@@ -23,7 +23,6 @@ export interface CancelObject {
 }
 
 const opTiming = {};
-let serverUrl = undefined;
 
 export function estimateRunTime(command: string) {
   const idx = command.replace(InternalCommand.cwd, '');
@@ -96,27 +95,38 @@ export async function run(
   let findExternalUrl = features.includes(TipFeature.welcome);
   let localUrl: string;
   let externalUrl: string;
-  let timeout;
+  let launched = false;
 
-  function launchUrl() {
-    if (timeout) {
-      clearTimeout(timeout);
+  async function launchUrl(): Promise<void> {
+    if (localUrl && externalUrl) {
+      launched = true;
+      launch(localUrl, externalUrl);
+    } else if (!externalUrl) {
+      await delay(500);
+      if (!launched) {
+        launched = true;
+        launch(localUrl, externalUrl);
+      }
     }
-    timeout = setTimeout(() => {
-      if (features.includes(TipFeature.debugOnWeb)) {
-        debugBrowser(localUrl, true);
-        return;
-      }
-      const webConfig: WebConfigSetting = getWebConfiguration();
-      switch (webConfig) {
-        case WebConfigSetting.editor:
-          viewInEditor(localUrl);
-          break;
-        case WebConfigSetting.welcome:
-          viewAsQR(localUrl, externalUrl);
-          break;
-      }
-    }, 500);
+  }
+
+  function launch(localUrl: string, externalUrl: string) {
+    if (features.includes(TipFeature.debugOnWeb)) {
+      debugBrowser(localUrl, true);
+      return;
+    }
+    switch (getWebConfiguration()) {
+      case WebConfigSetting.editor:
+        viewInEditor(localUrl);
+        break;
+      case WebConfigSetting.welcome:
+        viewAsQR(localUrl, externalUrl);
+        break;
+    }
+  }
+
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   let logs: Array<string> = [];
@@ -181,7 +191,7 @@ export async function run(
         logs = logs.concat(logLines);
         if (findLocalUrl) {
           if (data.includes('http')) {
-            const url = checkForUrls(data, ['Local:', 'On Your Network:', 'open your browser on ']);
+            const url = checkForUrls(data, ['Local:', 'On Your Network:', 'open your browser on ', '> Local:']);
             if (url) {
               findLocalUrl = false;
               localUrl = url;
@@ -191,7 +201,7 @@ export async function run(
         }
         if (findExternalUrl) {
           if (data.includes('http')) {
-            const url = checkForUrls(data, ['External:', 'On Your Network:']);
+            const url = checkForUrls(data, ['External:', 'On Your Network:', '> Network:']);
             if (url) {
               findExternalUrl = false;
               externalUrl = url;
@@ -243,18 +253,27 @@ export async function run(
 }
 
 function checkForUrls(data: string, list: Array<string>): string {
-  for (const text of list) {
-    const url = checkForUrl(data, text);
-    if (url) {
-      return url;
+  const colorLess = stripColors(data);
+  const lines = colorLess.split('\n');
+  for (const line of lines) {
+    for (const text of list) {
+      const url = checkForUrl(line, text);
+      if (url) {
+        return url;
+      }
     }
   }
 }
 
 function checkForUrl(data: string, text: string): string {
   if (data.includes(text) && data.includes('http')) {
-    serverUrl = getStringFrom(data, text, '\n');
-    const url = stripColors(serverUrl.trim());
+    let url = getStringFrom(data, text, '\n').trim();
+    if (url && url.endsWith('/')) {
+      url = url.slice(0, -1);
+    }
+    if (url && url.startsWith('http://[')) {
+      return undefined; // IPV6 is not supported (nuxt/vite projects emit this)
+    }
     return url;
   }
 }
@@ -385,7 +404,9 @@ export function getStringFrom(data: string, start: string, end: string): string 
     return undefined;
   }
   const idx = foundIdx + start.length;
-  return data.substring(idx, data.indexOf(end, idx));
+  const edx = data.indexOf(end, idx);
+  if (edx == -1) return data.substring(idx);
+  return data.substring(idx, edx);
 }
 
 export function cmdCtrl(): string {

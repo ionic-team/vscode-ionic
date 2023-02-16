@@ -134,8 +134,9 @@ async function selectMockDevice(): Promise<device> {
 }
 
 function getWebviewQR(localUrl: string, externalUrl: string, qrSrc: vscode.Uri): string {
-  const shortUrl = externalUrl.replace('https://', '').replace('http://', '');
-  return `
+  const shortUrl = externalUrl?.replace('https://', '').replace('http://', '');
+  return (
+    `
   <!DOCTYPE html>
   <html>
   <script src="${qrSrc}"></script>
@@ -169,14 +170,16 @@ function getWebviewQR(localUrl: string, externalUrl: string, qrSrc: vscode.Uri):
           <a onclick="action('editor')"><p>Open in Editor</p></a>
           <a onclick="action('debug')"><p>Debug in Browser</p></a>
           <a onclick="action('stop')"><p>Stop Web Server</p></a>
-       </div>
-       <div class="row">
+       </div>` +
+    (externalUrl
+      ? `<div class="row">
           <h2>Preview</h2>
           <p>Scan this QR Code in the Capacitor Preview app or the Camera app of your phone.</p>
           <canvas id="qr"></canvas>
           <p>${shortUrl}</p>
-       </div>
-    </div>
+       </div>`
+      : '') +
+    `</div>    
     <script>
     const qr = new QRious({
       background: 'transparent',
@@ -188,7 +191,8 @@ function getWebviewQR(localUrl: string, externalUrl: string, qrSrc: vscode.Uri):
     </script>
   </body>
   </html>
-  `;
+  `
+  );
 }
 
 function getWebviewContent(url: string): string {
