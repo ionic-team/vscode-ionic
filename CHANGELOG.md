@@ -2,7 +2,6 @@
 
 ### Version 1.23.6
 
-- Applications can be viewed in the Capacitor Preview App
 - Remote Logging
 - Fix for non-Ionic folder based workspaces
 - Handle config.xml with no platforms
