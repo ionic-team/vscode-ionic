@@ -284,7 +284,10 @@ export async function fixIssue(
                 tip.features,
                 tip.runPoints,
                 progress,
-                ionicProvider
+                ionicProvider,
+                undefined,
+                undefined,
+                tip.data
               );
             } catch (err) {
               retry = false;

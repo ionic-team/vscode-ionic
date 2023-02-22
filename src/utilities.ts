@@ -16,6 +16,7 @@ import { request } from 'https';
 import { ExtensionSetting, getExtSetting } from './workspace-state';
 import { writeError } from './extension';
 import { getWebConfiguration, WebConfigSetting } from './web-configuration';
+import { Publisher } from './discovery';
 
 export interface CancelObject {
   proc: child_process.ChildProcess;
@@ -74,7 +75,8 @@ export async function run(
   progress: any,
   ionicProvider?: IonicTreeProvider,
   output?: RunResults,
-  supressInfo?: boolean
+  supressInfo?: boolean,
+  auxData?: string
 ): Promise<boolean> {
   if (command == InternalCommand.removeCordova) {
     return await removeCordovaFromPackageJSON(folder);
@@ -119,10 +121,19 @@ export async function run(
       case WebConfigSetting.editor:
         viewInEditor(localUrl);
         break;
-      case WebConfigSetting.welcome:
+      case WebConfigSetting.welcome: {
         viewAsQR(localUrl, externalUrl);
+        const p: Publisher = new Publisher('devapp', auxData, portFrom(externalUrl));
+        p.start();
         break;
+      }
     }
+  }
+
+  function portFrom(externalUrl: string): number {
+    const tmp = externalUrl.split(':');
+    if (tmp.length < 3) return 8100;
+    return parseInt(tmp[2]);
   }
 
   function delay(ms: number) {

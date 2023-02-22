@@ -52,6 +52,7 @@ export async function getRecommendations(
     const runWeb = new Tip('Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`)
       .setDynamicCommand(ionicServe, project, false)
       .requestIPSelection()
+      .setData(project.name)
       .setContextValue(Context.webConfig)
       .setFeatures([TipFeature.welcome])
       .setRunPoints([

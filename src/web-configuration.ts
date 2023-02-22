@@ -13,14 +13,15 @@ export function getWebConfiguration(): WebConfigSetting {
   if (setting) {
     return setting;
   } else {
-    return WebConfigSetting.welcome;
+    return WebConfigSetting.browser;
+    // return WebConfigSetting.welcome; Welcome page is only applicable with Capacitor Preview App
   }
 }
 
 export async function webConfiguration(project: Project): Promise<string | undefined> {
   const setting = getSetting(WorkspaceSetting.webAction);
   const configs = [
-    check(WebConfigSetting.welcome, setting),
+    //check(WebConfigSetting.welcome, setting),
     check(WebConfigSetting.browser, setting),
     check(WebConfigSetting.editor, setting),
   ];
