@@ -43,6 +43,25 @@ export function checkAngularJson(project: Project) {
   }
 }
 
+export function readAngularJson(project: Project): any {
+  try {
+    const filename = path.join(project.folder, 'angular.json');
+    if (fs.existsSync(filename)) {
+      return parseAngularJSON(filename);
+    }
+    return undefined;
+  } catch (error) {
+    return undefined;
+  }
+}
+
+export function writeAngularJson(project: Project, angular: any): void {
+  const filename = path.join(project.folder, 'angular.json');
+  if (fs.existsSync(filename)) {
+    fs.writeFileSync(filename, JSON.stringify(angular, null, 2));
+  }
+}
+
 function parseAngularJSON(filename: string): any {
   try {
     return JSON.parse(fs.readFileSync(filename, 'utf8'));

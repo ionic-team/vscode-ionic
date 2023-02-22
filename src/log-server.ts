@@ -1,26 +1,26 @@
 import * as http from 'http';
 import * as os from 'os';
-import * as fs from 'fs';
-import * as path from 'path';
 import { getOutputChannel } from './extension';
 import { ionicState } from './ionic-tree-provider';
-import { replaceStringIn, setStringIn } from './utilities';
 import { OutputChannel } from 'vscode';
+import { injectScript, removeScript } from './log-server-scripts';
+import { extname, join } from 'path';
+import { readFile } from 'fs';
 
 let logServer: http.Server;
 
-export function startLogServer(folder: string): boolean {
+export async function startStopLogServer(folder: string): Promise<boolean> {
   const channel = getOutputChannel();
   if (logServer) {
     logServer.close();
-    removeInjectedScript(folder);
+    removeScript(folder);
     logServer = undefined;
     channel.appendLine(`[Ionic] Remote logging stopped.`);
-    return;
+    return true;
   }
 
   const port = 8942;
-  const basePath = path.join(ionicState.context.extensionPath, 'log-client');
+  const basePath = join(ionicState.context.extensionPath, 'log-client');
   logServer = http
     .createServer((request, response) => {
       let body = '';
@@ -57,13 +57,12 @@ export function startLogServer(folder: string): boolean {
       }
 
       const name = request.url.includes('?') ? request.url.split('?')[0] : request.url;
-      const filePath = path.join(basePath, name);
-      const extname = path.extname(filePath);
-      const contentType = getMimeType(extname);
-      fs.readFile(filePath, (error, content) => {
+      const filePath = join(basePath, name);
+      const contentType = getMimeType(extname(filePath));
+      readFile(filePath, (error, content) => {
         if (error) {
           if (error.code == 'ENOENT') {
-            fs.readFile('./404.html', function (error, content) {
+            readFile('./404.html', function (error, content) {
               response.writeHead(200, { 'Content-Type': contentType });
               response.end(content, 'utf-8');
             });
@@ -81,12 +80,10 @@ export function startLogServer(folder: string): boolean {
     .listen(port);
 
   const addressInfo = getAddress();
-
-  removeInjectedScript(folder);
-  if (injectInIndexHtml(folder, addressInfo, port)) {
-    channel.appendLine(`[Ionic] Remote logging service has started at http://${addressInfo}:${port}`);
-  } else {
-    channel.appendLine(`[error] Unable to start remote logging.`);
+  channel.appendLine(`[Ionic] Remote logging service has started at http://${addressInfo}:${port}`);
+  removeScript(folder);
+  if (!(await injectScript(folder, addressInfo, port))) {
+    channel.appendLine(`[error] Unable to start remote logging (index.html or equivalent cannot be found).`);
     channel.show();
     return false;
   }
@@ -137,49 +134,8 @@ function writeDevices(body: string, channel: OutputChannel) {
   }
 }
 
-function injectInIndexHtml(folder: string, address: string, port: number): boolean {
-  //return true;
-  const indexHtml = path.join(folder, 'src', 'index.html');
-  if (!fs.existsSync(indexHtml)) {
-    return false;
-  }
-  let txt = fs.readFileSync(indexHtml, 'utf8');
-
-  if (!txt.includes('</head>')) {
-    return false;
-  }
-  txt = setStringIn(
-    txt,
-    '<head>',
-    '',
-    `${commentStart()}<script src="http://${address}:${port}/ionic-logger.js?${Math.random()}"></script>${commentEnd()}`
-  );
-  fs.writeFileSync(indexHtml, txt);
-  return true;
-}
-
-function commentStart(): string {
-  return '\r\n<!-- Ionic Extension Remote Logging -->';
-}
-
-function commentEnd(): string {
-  return '<!--  End Ionic Extension -->\r\n';
-}
-
-function removeInjectedScript(folder: string): boolean {
-  //return true;
-  const indexHtml = path.join(folder, 'src', 'index.html');
-  if (!fs.existsSync(indexHtml)) {
-    return false;
-  }
-  let txt = fs.readFileSync(indexHtml, 'utf8');
-  txt = replaceStringIn(txt, commentStart(), commentEnd(), '');
-  fs.writeFileSync(indexHtml, txt);
-  return true;
-}
-
-function getMimeType(extname: string): string {
-  switch (extname) {
+function getMimeType(ext: string): string {
+  switch (ext) {
     case '.js':
       return 'text/javascript';
     case '.css':

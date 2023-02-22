@@ -318,8 +318,6 @@ export class Project {
   }
 
   public addSubGroup(title: string, latestVersion: string) {
-    let command: vscode.Command = undefined;
-
     let tip: Tip = undefined;
     if (title == 'angular') {
       // Option to upgrade with:
@@ -329,10 +327,10 @@ export class Project {
       tip = new Tip('Upgrade All Packages', undefined, TipType.Run, undefined, undefined, 'Upgrade');
     }
 
-    command = {
+    const command: vscode.Command = {
       command: CommandName.Idea,
       title: tip.title,
-      arguments: [],
+      arguments: [tip],
     };
 
     const r = new Recommendation(
@@ -379,7 +377,7 @@ export class Project {
     let title = '';
     const addCmd = addCommand();
     for (const child of r.children) {
-      if ((child.tip.command as string).includes(addCmd)) {
+      if (child.tip && (child.tip.command as string).includes(addCmd)) {
         if (title != '') {
           title += ', ';
         }

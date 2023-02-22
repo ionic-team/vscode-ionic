@@ -2,7 +2,6 @@ import { existsSync } from 'fs';
 import { networkInterfaces } from 'os';
 import * as vscode from 'vscode';
 import { getConfigurationArgs } from './build-configuration';
-
 import { InternalCommand } from './command-name';
 import { ionicState } from './ionic-tree-provider';
 import { certPath } from './live-reload';
@@ -11,6 +10,7 @@ import { npx, preflightNPMCheck } from './node-commands';
 import { Project } from './project';
 import { liveReloadSSL } from './live-reload';
 import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
+import { getWebConfiguration, WebConfigSetting } from './web-configuration';
 
 /**
  * Create the ionic serve command
@@ -37,11 +37,11 @@ export function ionicServe(project: Project, dontOpenBrowser: boolean): string {
 function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
   const preop = preflightNPMCheck(project);
   const httpsForWeb = getSetting(WorkspaceSetting.httpsForWeb);
-  const previewInEditor = getSetting(WorkspaceSetting.previewInEditor);
+  const webConfig: WebConfigSetting = getWebConfiguration();
   const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
   const defaultPort = vscode.workspace.getConfiguration('ionic').get('defaultPort');
   let serveFlags = '';
-  if (previewInEditor || dontOpenBrowser) {
+  if (webConfig == WebConfigSetting.editor || webConfig == WebConfigSetting.welcome || dontOpenBrowser) {
     serveFlags += ' --no-open';
   }
 

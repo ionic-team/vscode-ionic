@@ -1,8 +1,41 @@
 # Roadmap
 
-- Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
+x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
+
 - (feat) Support flavors and schemes using the CLI
 - (feat) combine Packages, Cordova and Capacitor Plugins into Dependencies
+- (fix) On a Stencil project selecting run in editor doesnt seem to work
+- (fix) If upgrading/changing a package then make sure dev server is stopped
+- (fix) For a regular Angular project that is in a subfolder it reports not finding www folder when running npx cap copy. But dist exists and the extension can correct that in capacitor.config.ts. The dist folder may be separated by app too so dist/my-app may be where the index.html is located
+- (fix) When running on web for regular Angular app it doesn't launch the browser
+
+## Nuxt
+
+- if `nuxt` as a package then use `npm run build` for building, `npm run dev` for run > web, there is a project in `Sample Code\nuxt3` to test with and found out the dist folder.
+
+## Ditch Ionic CLI
+
+- Check `package.json` for missing `name` and `version` and set if needed
+- Avoid `ionic init` and instead guess best npm run script based on `package.json` having React,Vue,Nuxt etc.
+- Guess `dist` folder based on `package.json`
+- Guess IP Address, Port based on logged output
+
+## View Style
+
+- Run iOS, Android - Show lists of devices and option to run as live reload
+- Splash, Icon, Settings - Named Configuration allow visuals
+- Plugins - Allow checkboxes for functionality with groups Official, Community
+- Support - Link for feedback, framework, each of the components
+- Angular - New components, Show existing pages, components, and settings files
+
+## QR Preview
+
+- Button on Toolbar for Build
+- Button on Toolbar for Run Web, Run iOS, Run Android
+- Option to hide logs that arent errors
+- Click QR Code to display "Use the 'Capacitor View' App to open this application
+- Use this to add QR Code / Webview in side panel:
+  https://stackoverflow.com/questions/67150547/vs-code-extension-how-to-add-a-webviewpanel-to-the-sidebar
 
 ## Angular Generate
 
@@ -81,19 +114,6 @@
 ## Remote Logging Issues
 
 - Need this in capacitor config to allow Remote Logging to work: server: { cleartext: true }
-- Add for React and Vue
-
-Angular process:
-Instead of writing into index.html
-Add to angular.json:
-
-```json
-            "scripts": [
-              {
-                "input": "stuff/script.js"
-              }
-            ],
-```
 
 ## Docs
 

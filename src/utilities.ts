@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import * as vscode from 'vscode';
 
 import { RunPoint, TipFeature } from './tip';
-import { debugBrowser, viewInEditor } from './editor-preview';
+import { debugBrowser, viewAsQR, viewInEditor } from './editor-preview';
 import { handleError } from './error-handler';
 import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { getMonoRepoFolder, getPackageJSONFilename } from './monorepo';
@@ -13,8 +13,10 @@ import { InternalCommand } from './command-name';
 import { exists } from './analyzer';
 import { ionicInit } from './ionic-init';
 import { request } from 'https';
-import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
+import { ExtensionSetting, getExtSetting } from './workspace-state';
 import { writeError } from './extension';
+import { getWebConfiguration, WebConfigSetting } from './web-configuration';
+import { Publisher } from './discovery';
 
 export interface CancelObject {
   proc: child_process.ChildProcess;
@@ -22,7 +24,6 @@ export interface CancelObject {
 }
 
 const opTiming = {};
-let serverUrl = undefined;
 
 export function estimateRunTime(command: string) {
   const idx = command.replace(InternalCommand.cwd, '');
@@ -74,7 +75,8 @@ export async function run(
   progress: any,
   ionicProvider?: IonicTreeProvider,
   output?: RunResults,
-  supressInfo?: boolean
+  supressInfo?: boolean,
+  auxData?: string
 ): Promise<boolean> {
   if (command == InternalCommand.removeCordova) {
     return await removeCordovaFromPackageJSON(folder);
@@ -91,7 +93,52 @@ export async function run(
   }
   command = qualifyCommand(command);
 
-  let viewEditor = features.includes(TipFeature.debugOnWeb) || features.includes(TipFeature.viewInEditor);
+  let findLocalUrl = features.includes(TipFeature.debugOnWeb) || features.includes(TipFeature.welcome);
+  let findExternalUrl = features.includes(TipFeature.welcome);
+  let localUrl: string;
+  let externalUrl: string;
+  let launched = false;
+
+  async function launchUrl(): Promise<void> {
+    if (localUrl && externalUrl) {
+      launched = true;
+      launch(localUrl, externalUrl);
+    } else if (!externalUrl) {
+      await delay(500);
+      if (!launched) {
+        launched = true;
+        launch(localUrl, externalUrl);
+      }
+    }
+  }
+
+  function launch(localUrl: string, externalUrl: string) {
+    if (features.includes(TipFeature.debugOnWeb)) {
+      debugBrowser(localUrl, true);
+      return;
+    }
+    switch (getWebConfiguration()) {
+      case WebConfigSetting.editor:
+        viewInEditor(localUrl);
+        break;
+      case WebConfigSetting.welcome: {
+        viewAsQR(localUrl, externalUrl);
+        const p: Publisher = new Publisher('devapp', auxData, portFrom(externalUrl));
+        p.start();
+        break;
+      }
+    }
+  }
+
+  function portFrom(externalUrl: string): number {
+    const tmp = externalUrl.split(':');
+    if (tmp.length < 3) return 8100;
+    return parseInt(tmp[2]);
+  }
+
+  function delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
 
   let logs: Array<string> = [];
   return new Promise((resolve, reject) => {
@@ -151,36 +198,37 @@ export async function run(
         if (output) {
           output.output += data;
         }
-        const loglines = data.split('\n');
-        logs = logs.concat(loglines);
-        if (viewEditor) {
-          if (data.includes('Local:') && data.includes('http')) {
-            serverUrl = getStringFrom(data, 'Local: ', '\n');
-            const url = stripColors(serverUrl.trim());
-            channel.appendLine(`[Ionic] Launching ${url}`);
-            viewEditor = false;
-            setTimeout(() => handleUrl(url, features), 500);
-          } else if (data.includes('open your browser on')) {
-            // Likely React
-            serverUrl = getStringFrom(data, 'open your browser on ', ' **');
-            const url = stripColors(serverUrl.trim());
-            channel.appendLine(`[Ionic] Launching ${url}`);
-            viewEditor = false;
-            setTimeout(() => handleUrl(url, features), 500);
-          } else if (data.includes('- Local:   ')) {
-            // Likely Vue
-            serverUrl = getStringFrom(data, 'Local: ', '\n');
-            const url = stripColors(serverUrl.trim());
-            channel.appendLine(`[Ionic] Launching ${url}`);
-            viewEditor = false;
-            setTimeout(() => handleUrl(url, features), 500);
-          } else if (data.includes('> Local: ')) {
-            // Likely vite
-            serverUrl = stripColors(getStringFrom(data, 'Local: ', '\n'));
-            const url = stripColors(serverUrl.trim());
-            channel.appendLine(`[Ionic] Launching ${url}`);
-            viewEditor = false;
-            setTimeout(() => handleUrl(url, features), 500);
+        const logLines = data.split('\n');
+        logs = logs.concat(logLines);
+        if (findLocalUrl) {
+          if (data.includes('http')) {
+            const url = checkForUrls(data, [
+              'Local:',
+              'On Your Network:',
+              'open your browser on ',
+              '> Local:', // Nuxt
+              '➜  Local:', // AnalogJs
+            ]);
+            if (url) {
+              findLocalUrl = false;
+              localUrl = url;
+              launchUrl();
+            }
+          }
+        }
+        if (findExternalUrl) {
+          if (data.includes('http')) {
+            const url = checkForUrls(data, [
+              'External:',
+              'On Your Network:',
+              '> Network:', // Nuxt
+              '➜  Network:', // AnalogJs
+            ]);
+            if (url) {
+              findExternalUrl = false;
+              externalUrl = url;
+              launchUrl();
+            }
           }
         }
 
@@ -196,13 +244,13 @@ export async function run(
           }
         }
 
-        for (const logline of loglines) {
-          if (logline.startsWith('[capacitor]')) {
+        for (const logLine of logLines) {
+          if (logLine.startsWith('[capacitor]')) {
             if (!supressInfo) {
-              channel.appendLine(logline.replace('[capacitor]', ''));
+              channel.appendLine(logLine.replace('[capacitor]', ''));
             }
-          } else if (logline && !supressInfo) {
-            const nocolor = logline.replace(
+          } else if (logLine && !supressInfo) {
+            const nocolor = logLine.replace(
               /[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
               ''
             );
@@ -226,14 +274,29 @@ export async function run(
   });
 }
 
-function handleUrl(url: string, features: Array<TipFeature>) {
-  if (features.includes(TipFeature.viewInEditor)) {
-    if (!getSetting(WorkspaceSetting.previewInEditor)) {
-      return;
+function checkForUrls(data: string, list: Array<string>): string {
+  const colorLess = stripColors(data);
+  const lines = colorLess.split('\n');
+  for (const line of lines) {
+    for (const text of list) {
+      const url = checkForUrl(line, text);
+      if (url) {
+        return url;
+      }
     }
-    viewInEditor(url);
-  } else {
-    debugBrowser(url);
+  }
+}
+
+function checkForUrl(data: string, text: string): string {
+  if (data.includes(text) && data.includes('http')) {
+    let url = getStringFrom(data, text, '\n').trim();
+    if (url && url.endsWith('/')) {
+      url = url.slice(0, -1);
+    }
+    if (url && url.startsWith('http://[')) {
+      return undefined; // IPV6 is not supported (nuxt/vite projects emit this)
+    }
+    return url;
   }
 }
 
@@ -269,11 +332,8 @@ function qualifyCommand(command: string): string {
 }
 
 export async function openUri(uri: string): Promise<void> {
-  if (uri?.includes('//')) {
-    await vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(uri));
-  } else {
-    await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(uri));
-  }
+  const ob = uri?.includes('//') ? vscode.Uri.parse(uri) : vscode.Uri.file(uri);
+  await vscode.commands.executeCommand('vscode.open', ob);
 }
 
 export function debugSkipFiles(): string {
@@ -354,6 +414,9 @@ export async function runWithProgress(
 
 export function getPackageJSON(folder: string): PackageFile {
   const filename = getPackageJSONFilename(folder);
+  if (!fs.existsSync(filename)) {
+    return { name: undefined, displayName: undefined, description: undefined, version: undefined, scripts: {} };
+  }
   return JSON.parse(fs.readFileSync(filename, 'utf8'));
 }
 
@@ -363,7 +426,9 @@ export function getStringFrom(data: string, start: string, end: string): string 
     return undefined;
   }
   const idx = foundIdx + start.length;
-  return data.substring(idx, data.indexOf(end, idx));
+  const edx = data.indexOf(end, idx);
+  if (edx == -1) return data.substring(idx);
+  return data.substring(idx, edx);
 }
 
 export function cmdCtrl(): string {
@@ -462,14 +527,14 @@ export async function showMessage(message: string, ms: number) {
 }
 
 export async function showProgress(message: string, func: () => Promise<any>) {
-  await vscode.window.withProgress(
+  return await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
       title: `${message}`,
       cancellable: false,
     },
     async (progress, token) => {
-      await func();
+      return await func();
     }
   );
 }

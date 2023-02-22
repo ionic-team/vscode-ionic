@@ -25,11 +25,11 @@ import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
 import { checkIonicNativePackages } from './rules-ionic-native';
 import { cmdCtrl, getRunOutput, showProgress } from './utilities';
-import { startLogServer } from './log-server';
+import { startStopLogServer } from './log-server';
 import { getConfigurationName } from './build-configuration';
 import { liveReloadSSL } from './live-reload';
 import { npmInstall, npmUninstall, PackageManager } from './node-commands';
-import { writeIonic } from './extension';
+import { cancelLastOperation, writeIonic } from './extension';
 import { capacitorBuild } from './capacitor-build';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 import { updateMinorDependencies } from './update-minor';
@@ -52,7 +52,9 @@ export async function getRecommendations(
     const runWeb = new Tip('Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`)
       .setDynamicCommand(ionicServe, project, false)
       .requestIPSelection()
-      .setFeatures([TipFeature.viewInEditor])
+      .setData(project.name)
+      .setContextValue(Context.webConfig)
+      .setFeatures([TipFeature.welcome])
       .setRunPoints([
         { title: 'Building...', text: 'Generating browser application bundles' },
         { title: 'Serving', text: 'Development server running' },
@@ -301,14 +303,14 @@ export async function getRecommendations(
   reviewPackages(packages, project);
 
   project.setGroup(`Settings`, 'Settings', TipType.Settings, false);
-  if (exists('@capacitor/ios') || exists('@capacitor/android')) {
-    project.add(liveReload());
-  }
-  project.add(useHttps(project));
-  project.add(viewInEditor());
+  if (project.isCapacitor) {
+    if (exists('@capacitor/ios') || exists('@capacitor/android')) {
+      project.add(liveReload());
+    }
+    project.add(useHttps(project));
 
-  // REMOTE LOGGING ENABLED ################
-  //project.add(remoteLogging(project));
+    project.add(remoteLogging(project));
+  }
 
   project.add(new Tip('Advanced', '', TipType.Settings));
 
@@ -367,8 +369,7 @@ function debugOnWeb(project: Project): Tip {
 function remoteLogging(project: Project): Tip {
   return new Tip('Remote Logging', undefined, ionicState.remoteLogging ? TipType.Check : TipType.Box, undefined)
     .setTooltip('Captures console logs from the device and displays in the output window')
-    .setAction(toggleRemoteLogging, project, ionicState.remoteLogging)
-    .canRefreshAfter();
+    .setAction(toggleRemoteLogging, project, ionicState.remoteLogging);
 }
 
 function liveReload(): Tip {
@@ -388,19 +389,12 @@ function useHttps(project: Project): Tip {
     .canRefreshAfter();
 }
 
-function viewInEditor(): Tip {
-  const viewInEditor = getSetting(WorkspaceSetting.previewInEditor);
-  return new Tip('View In Editor', undefined, viewInEditor ? TipType.Check : TipType.Box, undefined)
-    .setTooltip('Whether the app will be previewed in VS Code rather than a web browser')
-    .setAction(toggleViewInEditor, viewInEditor)
-    .canRefreshAfter();
-}
-
-function toggleRemoteLogging(project: Project, current: boolean): Promise<void> {
-  if (startLogServer(project.folder)) {
+async function toggleRemoteLogging(project: Project, current: boolean): Promise<void> {
+  if (await startStopLogServer(project.folder)) {
     ionicState.remoteLogging = !current;
   }
-  return;
+  await cancelLastOperation();
+  return Promise.resolve();
 }
 
 async function toggleLiveReload(current: boolean) {
@@ -421,8 +415,5 @@ async function toggleHttps(current: boolean, project: Project) {
       await getRunOutput(npmUninstall('@jcesarmobile/ssl-skip'), project.folder);
     });
   }
-}
-
-async function toggleViewInEditor(current: boolean) {
-  await setSetting(WorkspaceSetting.previewInEditor, !current);
+  await cancelLastOperation();
 }

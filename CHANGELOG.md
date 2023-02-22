@@ -1,5 +1,17 @@
 ## Changelog
 
+### Version 1.23.6
+
+- Remote Logging
+- Fix for non-Ionic folder based workspaces
+- Handle config.xml with no platforms
+- Add option to switch to ESBuild for Angular (Click Project > ...)
+- Add rule to handle cases where ionic-angular and @ionic/angular are installed
+- Update rule on cordova-plugin-file-opener2
+- Add Nuxt support (detection of dev web server, run and build)
+- Add AnalogJs support
+- Fix if Use HTTPS is used make sure dev server is stopped
+
 ### Version 1.22.4
 
 - cordova-plugin-contacts as a deprecated plugin

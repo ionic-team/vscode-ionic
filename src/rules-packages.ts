@@ -11,6 +11,7 @@ import {
   warnMinVersion,
 } from './analyzer';
 import { npmInstallAll } from './node-commands';
+import { ionicState } from './ionic-tree-provider';
 
 /**
  * General Rules for packages like momentjs, jquery, etc
@@ -18,7 +19,9 @@ import { npmInstallAll } from './node-commands';
  */
 export function checkPackages(project: Project) {
   const nmf = project.getNodeModulesFolder();
+  ionicState.hasNodeModules = true;
   if (!fs.existsSync(nmf)) {
+    ionicState.hasNodeModules = false;
     project.add(
       new Tip(
         'Install Node Modules',
@@ -78,17 +81,25 @@ export function checkPackages(project: Project) {
     project.recommendRemove(
       'cordova-plugin-file-opener2',
       'cordova-plugin-file-opener2',
-      'Your project uses cordova-plugin-file-opener2 which will be rejected from the Play Store due to use of REQUEST_INSTALL_PACKAGES permission.'
+      'Your project uses cordova-plugin-file-opener2 which will be rejected from the Play Store due to use of REQUEST_INSTALL_PACKAGES permission. Upgrade to version 4+'
     );
   }
 
   // Ionic 3+
   if (exists('ionic-angular')) {
-    project.note(
-      '@ionic/angular',
-      'Your Ionic project should be migrated to @ionic/angular version 5 or higher',
-      'https://ionicframework.com/docs/reference/migration#migrating-from-ionic-3-0-to-ionic-4-0'
-    );
+    if (exists('@ionic/angular')) {
+      project.recommendRemove(
+        'ionic-angular',
+        'ionic-angular',
+        'Your project has 2 versions of Ionic Angular installed (ionic-angular and @ionic/angular). You should remove ionic-angular'
+      );
+    } else {
+      project.note(
+        '@ionic/angular',
+        'Your Ionic project should be migrated to @ionic/angular version 5 or higher',
+        'https://ionicframework.com/docs/reference/migration#migrating-from-ionic-3-0-to-ionic-4-0'
+      );
+    }
   }
 
   // Angular 10 is in LTS until December 2021

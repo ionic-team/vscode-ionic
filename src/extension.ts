@@ -8,13 +8,14 @@ import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './project';
-import { Command, Tip, TipType } from './tip';
+import { Command, Tip, TipFeature, TipType } from './tip';
 import { CancelObject, run, estimateRunTime, channelShow, openUri } from './utilities';
 import { ignore } from './ignore';
 import { ActionResult, CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
 import { IonicProjectsreeProvider } from './ionic-projects-provider';
 import { buildConfiguration } from './build-configuration';
+import { webConfiguration } from './web-configuration';
 import { selectDevice } from './capacitor-device';
 import { getLocalFolder } from './monorepo';
 import { androidDebugUnforward } from './android-debug-bridge';
@@ -24,6 +25,7 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { kill } from './process-list';
 import { selectExternalIPAddress } from './ionic-serve';
 import { advancedActions } from './advanced-actions';
+import { closeWelcomePanel } from './editor-preview';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
@@ -239,6 +241,9 @@ export async function fixIssue(
         if (token.isCancellationRequested || tip.cancelRequested) {
           tip.cancelRequested = false;
           channel.appendLine(`[Ionic] Stopped "${tip.title}"`);
+          if (tip.features.includes(TipFeature.welcome)) {
+            closeWelcomePanel();
+          }
           channelShow(channel);
           clearInterval(interval);
           finishCommand(tip);
@@ -279,7 +284,10 @@ export async function fixIssue(
                 tip.features,
                 tip.runPoints,
                 progress,
-                ionicProvider
+                ionicProvider,
+                undefined,
+                undefined,
+                tip.data
               );
             } catch (err) {
               retry = false;
@@ -377,6 +385,10 @@ export async function activate(context: vscode.ExtensionContext) {
     ionicProvider.refresh();
   });
 
+  vscode.commands.registerCommand(CommandName.WebConfig, async (r: Recommendation) => {
+    webConfiguration(r.tip.actionArg(0));
+  });
+
   vscode.commands.registerCommand(CommandName.BuildConfig, async (r: Recommendation) => {
     const config = await buildConfiguration(context.extensionPath, context, r.tip.actionArg(0));
     if (!config) return;
@@ -438,8 +450,11 @@ export async function activate(context: vscode.ExtensionContext) {
     ionicProvider.selectProject(project);
   });
 
-  vscode.commands.registerCommand(CommandName.Idea, async (r: Recommendation) => {
-    await fix(r.tip, rootPath, ionicProvider, context);
+  vscode.commands.registerCommand(CommandName.Idea, async (t: Tip | Recommendation) => {
+    if (!t) return;
+    // If the user clicks the light bulb it is a Tip, if they click the item it is a recommendation
+    const tip: Tip = (t as Recommendation).tip ? (t as Recommendation).tip : (t as Tip);
+    await fix(tip, rootPath, ionicProvider, context);
   });
 
   vscode.commands.registerCommand(CommandName.Run, async (r: Recommendation) => {

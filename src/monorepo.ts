@@ -21,6 +21,12 @@ export interface MonoRepoProject {
   isIonic?: boolean; // Does it looks like an ionic project using @ionic/vue etc
 }
 
+export interface MonoFolder {
+  name: string;
+  packageJson: string;
+  path: string;
+}
+
 export enum MonoRepoType {
   none,
   nx,
@@ -123,7 +129,7 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
  * @param  {string} rootFolder
  * @returns boolean
  */
-export function isFolderBasedMonoRepo(rootFolder: string): Array<any> {
+export function isFolderBasedMonoRepo(rootFolder: string): Array<MonoFolder> {
   if (vscode.workspace.workspaceFolders.length > 1) {
     return vsCodeWorkSpaces();
   }
@@ -141,7 +147,7 @@ export function isFolderBasedMonoRepo(rootFolder: string): Array<any> {
   return result;
 }
 
-function vsCodeWorkSpaces(): Array<any> {
+function vsCodeWorkSpaces(): Array<MonoFolder> {
   const result = [];
   for (const workspace of vscode.workspace.workspaceFolders) {
     const packageJson = path.join(workspace.uri.path, 'package.json');
@@ -196,9 +202,9 @@ function getFolderBasedProjects(prj: Project): Array<MonoRepoProject> {
       //
     }
   }
-  if (!hasIonicBasedProjects) {
-    return [];
-  }
+  // if (!hasIonicBasedProjects) {
+  //   return [];
+  // }
   result = result.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
   return result;
 }

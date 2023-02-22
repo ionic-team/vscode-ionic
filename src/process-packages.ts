@@ -127,7 +127,7 @@ function getListData(list: string): NpmPackage {
 }
 
 export function reviewPackages(packages: object, project: Project) {
-  if (Object.keys(packages).length == 0) return;
+  if (!packages || Object.keys(packages).length == 0) return;
 
   listPackages(
     project,
