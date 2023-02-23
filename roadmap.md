@@ -3,6 +3,9 @@
 x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 
 - (feat) Support flavors and schemes using the CLI
+- (feat) Preview in Editor - Show Device Name with Check mark
+- (feat) Select Run > Web - Show checkmark next to Editor/Web
+- (feat) Run > Web - Change label to Run > Editor
 - (feat) combine Packages, Cordova and Capacitor Plugins into Dependencies
 - (fix) On a Stencil project selecting run in editor doesnt seem to work
 - (fix) If upgrading/changing a package then make sure dev server is stopped
