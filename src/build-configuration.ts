@@ -14,11 +14,19 @@ export function getConfigurationName(): string {
   }
 }
 
-export function getConfigurationArgs(): string {
-  if (!ionicState.configuration || ionicState.configuration == 'default') {
+export function getConfigurationArgs(isDebugging?: boolean): string {
+  let config = ionicState.configuration;
+  if (isDebugging) {
+    // If we are debugging and its an Angular project without a selected build config
+    // then choose "development" so that source maps work
+    if (config == 'production') {
+      config = 'development'; // Assume we have this configuration
+    }
+  }
+  if (!config || config == 'default') {
     return '';
   } else {
-    return ` --configuration=${ionicState.configuration}`;
+    return ` --configuration=${config}`;
   }
 }
 

@@ -19,7 +19,7 @@ interface IonicState {
   projects: Array<MonoRepoProject>;
   repoType: MonoRepoType;
   packageManager: PackageManager;
-  workspace: string;
+  workspace: string; // Monorepo workspace name
   context: vscode.ExtensionContext;
   shell?: string;
   projectsView: vscode.TreeView<any>;
@@ -36,6 +36,7 @@ interface IonicState {
   hasNodeModules: boolean; // Whether node modules are installed
   configuration: string; // Build configuration
   project: string; // Angular project name
+  nvm: string; // If .nvmrc is used will contain its contents
   runIOS: Tip;
   runAndroid: Tip;
   runWeb: Tip;
@@ -59,6 +60,7 @@ export const ionicState: IonicState = {
   runIOS: undefined,
   runAndroid: undefined,
   runWeb: undefined,
+  nvm: undefined,
   lastRun: undefined,
   configuration: undefined,
   project: undefined,

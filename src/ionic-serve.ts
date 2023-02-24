@@ -56,7 +56,7 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
     serveFlags += ` --project=${ionicState.project}`;
   }
 
-  serveFlags += getConfigurationArgs();
+  serveFlags += getConfigurationArgs(dontOpenBrowser);
 
   if (httpsForWeb) {
     serveFlags += ' --ssl';

@@ -1,7 +1,3 @@
-import * as child_process from 'child_process';
-import * as process from 'process';
-import * as path from 'path';
-import * as fs from 'fs';
 import * as vscode from 'vscode';
 
 import { RunPoint, TipFeature } from './tip';
@@ -14,12 +10,15 @@ import { exists } from './analyzer';
 import { ionicInit } from './ionic-init';
 import { request } from 'https';
 import { ExtensionSetting, getExtSetting } from './workspace-state';
-import { writeError } from './extension';
+import { writeError, writeIonic } from './extension';
 import { getWebConfiguration, WebConfigSetting } from './web-configuration';
 import { Publisher } from './discovery';
+import { join } from 'path';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { ChildProcess, exec, ExecException } from 'child_process';
 
 export interface CancelObject {
-  proc: child_process.ChildProcess;
+  proc: ChildProcess;
   cancelled: boolean;
 }
 
@@ -52,7 +51,7 @@ function runOptions(command: string, folder: string, shell?: string) {
     env.JAVA_HOME = javaHome;
   } else if (!env.JAVA_HOME && process.platform !== 'win32') {
     const jhome = '/Applications/Android Studio.app/Contents/jre/Contents/Home';
-    if (fs.existsSync(jhome)) {
+    if (existsSync(jhome)) {
       env.JAVA_HOME = jhome;
     }
   }
@@ -91,7 +90,7 @@ export async function run(
     // Change the work directory for monorepos as folder is the root folder
     folder = getMonoRepoFolder(ionicState.workspace);
   }
-  command = qualifyCommand(command);
+  command = qualifyCommand(command, folder);
 
   let findLocalUrl = features.includes(TipFeature.debugOnWeb) || features.includes(TipFeature.welcome);
   let findExternalUrl = features.includes(TipFeature.welcome);
@@ -150,10 +149,10 @@ export async function run(
       }
     }, 500);
 
-    const proc = child_process.exec(
+    const proc = exec(
       command,
       runOptions(command, folder),
-      async (error: child_process.ExecException, stdout: string, stderror: string) => {
+      async (error: ExecException, stdout: string, stderror: string) => {
         let retry = false;
         if (error) {
           console.error(error);
@@ -319,13 +318,26 @@ export function replaceAll(str: string, find: string, replace: string): string {
 }
 
 // This will use the local @ionic/cli from the extension if one is not installed locally
-function qualifyCommand(command: string): string {
+function qualifyCommand(command: string, folder: string): string {
   if (command.startsWith('npx ionic')) {
     if (!exists('@ionic/cli')) {
-      const cli = path.join(ionicState.context.extensionPath, 'node_modules/@ionic/cli/bin');
-      if (fs.existsSync(cli)) {
-        command = command.replace('npx ionic', 'node "' + path.join(cli, 'ionic') + '"');
+      const cli = join(ionicState.context.extensionPath, 'node_modules/@ionic/cli/bin');
+      if (existsSync(cli)) {
+        command = command.replace('npx ionic', 'node "' + join(cli, 'ionic') + '"');
       }
+    }
+  }
+  if (process.env.NVM_DIR) {
+    if (!ionicState.nvm) {
+      const nvmrc = join(folder, '.nvmrc');
+      if (existsSync(nvmrc)) {
+        const txt = readFileSync(nvmrc, 'utf-8');
+        ionicState.nvm = `source ${process.env.NVM_DIR}/nvm.sh && nvm use`;
+        writeIonic(`Detected nvm (${txt}) for this project.`);
+      }
+    }
+    if (ionicState.nvm) {
+      return `${ionicState.nvm} && ${command}`;
     }
   }
   return command;
@@ -360,27 +372,23 @@ export function debugSkipFiles(): string {
 export async function getRunOutput(command: string, folder: string, shell?: string): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';
-    command = qualifyCommand(command);
-    child_process.exec(
-      command,
-      runOptions(command, folder, shell),
-      (error: child_process.ExecException, stdout: string, stderror: string) => {
-        if (stdout) {
-          out += stdout;
-        }
-        if (!error) {
-          resolve(out);
+    command = qualifyCommand(command, folder);
+    exec(command, runOptions(command, folder, shell), (error: ExecException, stdout: string, stderror: string) => {
+      if (stdout) {
+        out += stdout;
+      }
+      if (!error) {
+        resolve(out);
+      } else {
+        if (stderror) {
+          writeError(stderror);
+          reject(stderror);
         } else {
-          if (stderror) {
-            writeError(stderror);
-            reject(stderror);
-          } else {
-            // This is to fix a bug in npm outdated where it returns an exit code when it succeeds
-            resolve(out);
-          }
+          // This is to fix a bug in npm outdated where it returns an exit code when it succeeds
+          resolve(out);
         }
       }
-    );
+    });
   });
 }
 
@@ -414,10 +422,10 @@ export async function runWithProgress(
 
 export function getPackageJSON(folder: string): PackageFile {
   const filename = getPackageJSONFilename(folder);
-  if (!fs.existsSync(filename)) {
+  if (!existsSync(filename)) {
     return { name: undefined, displayName: undefined, description: undefined, version: undefined, scripts: {} };
   }
-  return JSON.parse(fs.readFileSync(filename, 'utf8'));
+  return JSON.parse(readFileSync(filename, 'utf8'));
 }
 
 export function getStringFrom(data: string, start: string, end: string): string {
@@ -581,20 +589,20 @@ function timeout(ms: number) {
 function removeCordovaFromPackageJSON(folder: string): Promise<boolean> {
   return new Promise((resolve, reject) => {
     try {
-      const filename = path.join(folder, 'package.json');
-      const packageFile = JSON.parse(fs.readFileSync(filename, 'utf8'));
+      const filename = join(folder, 'package.json');
+      const packageFile = JSON.parse(readFileSync(filename, 'utf8'));
       packageFile.cordova = undefined;
-      fs.writeFileSync(filename, JSON.stringify(packageFile, undefined, 2));
+      writeFileSync(filename, JSON.stringify(packageFile, undefined, 2));
 
       // Also replace cordova in ionic.config.json
-      const ifilename = path.join(folder, 'ionic.config.json');
-      if (fs.existsSync(ifilename)) {
-        const ionicConfig = JSON.parse(fs.readFileSync(ifilename, 'utf8'));
+      const ifilename = join(folder, 'ionic.config.json');
+      if (existsSync(ifilename)) {
+        const ionicConfig = JSON.parse(readFileSync(ifilename, 'utf8'));
         if (ionicConfig.integrations.cordova) {
           delete ionicConfig.integrations.cordova;
           ionicConfig.integrations.capacitor = new Object();
         }
-        fs.writeFileSync(ifilename, JSON.stringify(ionicConfig, undefined, 2));
+        writeFileSync(ifilename, JSON.stringify(ionicConfig, undefined, 2));
       }
       resolve(false);
     } catch (err) {
