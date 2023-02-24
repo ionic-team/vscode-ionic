@@ -3,7 +3,7 @@
 ### Version 1.24.0
 
 - Angular projects default is "production". Switch to "development" when attempting to debug.
-- Support for project that use .nvmrc (will switch node version when running commands)
+- Support for projects that use .nvmrc (will switch node version when running commands)
 
 ### Version 1.23.6
 

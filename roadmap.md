@@ -2,6 +2,7 @@
 
 x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 
+- (feat) new projects name should use the name of the folder
 - (feat) Support flavors and schemes using the CLI
 - (feat) Preview in Editor - Show Device Name with Check mark
 - (feat) Select Run > Web - Show checkmark next to Editor/Web
