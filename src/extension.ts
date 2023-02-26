@@ -9,7 +9,7 @@ import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './project';
 import { Command, Tip, TipFeature, TipType } from './tip';
-import { CancelObject, run, estimateRunTime, channelShow, openUri } from './utilities';
+import { CancelObject, run, estimateRunTime, channelShow, openUri, stopPublishing } from './utilities';
 import { ignore } from './ignore';
 import { ActionResult, CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
@@ -91,6 +91,9 @@ function cancelRunning(tip: Tip): Promise<void> {
   if (found) {
     found.cancelRequested = true;
     console.log('Found task to cancel...');
+    if (tip.description == 'Serve') {
+      stopPublishing();
+    }
   }
   return new Promise((resolve) => setTimeout(resolve, 1000));
 }

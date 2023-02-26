@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.25.0
+
+- Fix logging color for warnings
+
 ### Version 1.24.0
 
 - Angular projects default is "production". Switch to "development" when attempting to debug.

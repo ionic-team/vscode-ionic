@@ -23,6 +23,7 @@ export interface CancelObject {
 }
 
 const opTiming = {};
+let pub: Publisher;
 
 export function estimateRunTime(command: string) {
   const idx = command.replace(InternalCommand.cwd, '');
@@ -64,6 +65,11 @@ export interface RunResults {
   success: boolean;
 }
 
+export function stopPublishing() {
+  if (pub) {
+    pub.stop();
+  }
+}
 export async function run(
   folder: string,
   command: string,
@@ -112,6 +118,16 @@ export async function run(
   }
 
   function launch(localUrl: string, externalUrl: string) {
+    if (externalUrl) {
+      if (pub) {
+        pub.stop();
+      } else {
+        pub = new Publisher('devapp', auxData, portFrom(externalUrl));
+      }
+      pub.start().then(() => {
+        writeIonic(`App is available at ${externalUrl}`);
+      });
+    }
     if (features.includes(TipFeature.debugOnWeb)) {
       debugBrowser(localUrl, true);
       return;
@@ -122,8 +138,7 @@ export async function run(
         break;
       case WebConfigSetting.welcome: {
         viewAsQR(localUrl, externalUrl);
-        const p: Publisher = new Publisher('devapp', auxData, portFrom(externalUrl));
-        p.start();
+
         break;
       }
     }
