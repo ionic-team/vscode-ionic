@@ -2,6 +2,7 @@
 
 ### Version 1.25.0
 
+- Replacement plugin recommendation can be ignored
 - Fix logging color for warnings
 
 ### Version 1.24.0

@@ -402,7 +402,9 @@ export class Project {
           `${npmInstall(replacement)} && ${npmUninstall(name)}`,
           'Replace',
           `Replaced ${name} with ${replacement}`
-        ).setRelatedDependency(name)
+        )
+          .setRelatedDependency(name)
+          .canIgnore()
       );
     }
   }
