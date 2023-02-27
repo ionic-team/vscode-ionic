@@ -115,7 +115,9 @@ function startCommand(tip: Tip, cmd: string, ionicProvider: IonicTreeProvider) {
     let command = cmd;
     if (command?.includes(InternalCommand.cwd)) {
       command = command.replace(InternalCommand.cwd, '');
-      channel.appendLine(`> Workspace: ${ionicState.workspace}`);
+      if (ionicState.workspace) {
+        channel.appendLine(`> Workspace: ${ionicState.workspace}`);
+      }
     }
     channel.appendLine(`> ${command}`);
     channelShow(channel);

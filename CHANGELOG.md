@@ -3,6 +3,7 @@
 ### Version 1.25.0
 
 - Replacement plugin recommendation can be ignored
+- Support for pnpm projects using NX
 - Fix logging color for warnings
 
 ### Version 1.24.0

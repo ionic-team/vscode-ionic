@@ -158,8 +158,11 @@ function vsCodeWorkSpaces(): Array<MonoFolder> {
   return result;
 }
 
-export function getMonoRepoFolder(name: string): string {
+export function getMonoRepoFolder(name: string, defaultFolder: string): string {
   const found: MonoRepoProject = ionicState.projects.find((repo) => repo.name == name);
+  if (!found) {
+    return defaultFolder;
+  }
   return found?.folder;
 }
 
@@ -173,7 +176,7 @@ export function getLocalFolder(rootFolder: string): string {
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
     case MonoRepoType.folder:
-      return getMonoRepoFolder(ionicState.workspace);
+      return getMonoRepoFolder(ionicState.workspace, rootFolder);
   }
   return rootFolder;
 }

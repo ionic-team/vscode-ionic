@@ -94,7 +94,7 @@ export async function run(
   if (command.includes(InternalCommand.cwd)) {
     command = replaceAll(command, InternalCommand.cwd, '');
     // Change the work directory for monorepos as folder is the root folder
-    folder = getMonoRepoFolder(ionicState.workspace);
+    folder = getMonoRepoFolder(ionicState.workspace, folder);
   }
   command = qualifyCommand(command, folder);
 

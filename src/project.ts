@@ -81,7 +81,7 @@ export class Project {
       case MonoRepoType.lerna:
       case MonoRepoType.pnpm:
       case MonoRepoType.folder:
-        return this.monoRepo.folder;
+        return this.monoRepo ? this.monoRepo.folder : this.folder;
       default:
         return path.join(this.folder, this.monoRepo.folder);
     }
