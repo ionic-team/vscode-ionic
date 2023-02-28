@@ -8,7 +8,15 @@ import { getPackageJSON, PackageFile } from './utilities';
 export function addScripts(project: Project) {
   project.setGroup(`Scripts`, `Any scripts from your package.json will appear here`, TipType.Files, false);
 
-  const packages: PackageFile = getPackageJSON(project.projectFolder());
+  addScriptsFrom(getPackageJSON(project.projectFolder()), project);
+
+  if (project.repoType == MonoRepoType.nx) {
+    addScriptsFrom(getPackageJSON(project.folder), project);
+    addNXScripts(['build', 'test', 'lint', 'e2e'], project);
+  }
+}
+
+function addScriptsFrom(packages: PackageFile, project: Project) {
   if (packages.scripts) {
     for (const script of Object.keys(packages.scripts)) {
       project.add(
@@ -18,10 +26,6 @@ export function addScripts(project: Project) {
           .setTooltip(`Runs 'npm run ${script}' found in package.json`)
       );
     }
-  }
-
-  if (project.repoType == MonoRepoType.nx) {
-    addNXScripts(['build', 'test', 'lint', 'e2e'], project);
   }
 }
 
@@ -33,7 +37,7 @@ function addNXScripts(names: Array<string>, project: Project) {
         '',
         TipType.Run,
         '',
-        `nx run ${project.monoRepo.name}:${name}`,
+        `npx nx run ${project.monoRepo.name}:${name}`,
         `Running ${name}`,
         `Ran ${name}`
       )
