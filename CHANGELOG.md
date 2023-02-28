@@ -5,6 +5,7 @@
 - Replacement plugin recommendation can be ignored
 - Support for pnpm projects using NX
 - Fix logging color for warnings
+- Nexus
 
 ### Version 1.24.0
 
