@@ -81,7 +81,7 @@ export class Project {
       case MonoRepoType.lerna:
       case MonoRepoType.pnpm:
       case MonoRepoType.folder:
-        return this.monoRepo.folder;
+        return this.monoRepo ? this.monoRepo.folder : this.folder;
       default:
         return path.join(this.folder, this.monoRepo.folder);
     }
@@ -402,7 +402,9 @@ export class Project {
           `${npmInstall(replacement)} && ${npmUninstall(name)}`,
           'Replace',
           `Replaced ${name} with ${replacement}`
-        ).setRelatedDependency(name)
+        )
+          .setRelatedDependency(name)
+          .canIgnore()
       );
     }
   }
