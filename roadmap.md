@@ -77,7 +77,6 @@ x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - (feat) info.plist editing
 - (feat) Tool to capture plugins, cap community and paid plugins, evaluate (rank on archived, stars etc) and capture in json. Then use as part of an option to install known good plugins
 - (feat) Twitter to RSS feed - pull news into plugin ??
-- (2) For mono-repos include root package.json scripts
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
 - (32) Debugging for iOS
 - (2) If you sync but the build didnt work then show suitable error (or trigger build)

@@ -114,7 +114,7 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
       ].includes(project.repoType);
 
       // Is the node_modules folder kept only at the root of the mono repo
-      project.monoRepo.nodeModulesAtRoot = [MonoRepoType.npm].includes(project.repoType);
+      project.monoRepo.nodeModulesAtRoot = [MonoRepoType.npm, MonoRepoType.nx].includes(project.repoType);
 
       vscode.commands.executeCommand(CommandName.ProjectsRefresh, project.monoRepo.name);
     }

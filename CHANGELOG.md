@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.26.0
+
+- Fix detection of node modules with NX repos
+- Add scripts from the base package.json of NX repos
+
 ### Version 1.25.0
 
 - Replacement plugin recommendation can be ignored

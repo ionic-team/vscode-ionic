@@ -174,7 +174,7 @@ function getWebviewQR(localUrl: string, externalUrl: string, qrSrc: vscode.Uri):
     (externalUrl
       ? `<div class="row">
           <h2>Preview</h2>
-          <p>Scan this QR Code in the Capacitor Preview app or the Camera app of your phone.</p>
+          <p>Scan this QR Code in the <a href="https://nexusconcepts.com/link">Nexus Browser</a> app or the Camera app of your phone.</p>
           <canvas id="qr"></canvas>
           <p>${shortUrl}</p>
        </div>`
