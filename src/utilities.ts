@@ -125,7 +125,7 @@ export async function run(
         pub = new Publisher('devapp', auxData, portFrom(externalUrl));
       }
       pub.start().then(() => {
-        writeIonic(`App is available at ${externalUrl}`);
+        writeIonic(`View this app at https://nexusconcepts.com/capacitor`); // (${externalUrl})
       });
     }
     if (features.includes(TipFeature.debugOnWeb)) {
