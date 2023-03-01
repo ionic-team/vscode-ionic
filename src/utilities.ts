@@ -43,7 +43,8 @@ function runOptions(command: string, folder: string, shell?: string) {
     command.includes('sync') ||
     command.includes('capacitor init') ||
     command.includes('cap run ios') ||
-    command.includes('cap add')
+    command.includes('cap add') ||
+    command.includes('npm run')
   ) {
     env.LANG = 'en_US.UTF-8';
   }
