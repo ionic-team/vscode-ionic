@@ -24,6 +24,8 @@ export enum CommandName {
   RunMode = 'ionic-official.runMode',
   SelectDevice = 'ionic-official.selectDevice',
   RunIOS = 'ionic-official.run',
+  ViewDevServer = 'ionic-official.viewDevServer', // View the dev server window
+  hideDevServer = 'ionic-official.hideDevServer', // Hide the dev server window
 }
 
 export enum InternalCommand {

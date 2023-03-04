@@ -62,22 +62,22 @@
     ],
     "viewsWelcome": [
       {
-        "view": "ionic",
+        "view": "ionic-tree",
         "contents": "Please wait while inspecting project...",
         "when": "inspectedProject == false && isAnonymous == false && noProjectFound == false"
       },
       {
-        "view": "ionic",
+        "view": "ionic-tree",
         "contents": "To get started with Ionic open an [empty folder](command:vscode.openFolder) or your projects folder.",
         "when": "noProjectFound == true"
       },
       {
-        "view": "ionic",
+        "view": "ionic-tree",
         "contents": "A free Ionic account is required to unlock all extension features or [Skip for Now](command:ionic-official.skipLogin).\n[Login](command:ionic-official.login)\n[Sign Up](command:ionic-official.signUp)\n",
         "when": "isAnonymous == true && isLoggingIn == false"
       },
       {
-        "view": "ionic",
+        "view": "ionic-tree",
         "contents": "Complete the login in the web browser. This view will change as soon as you login.",
         "when": "isAnonymous == true && isLoggingIn == true"
       }
@@ -94,13 +94,18 @@
     "views": {
       "ionic-recommendation": [
         {
-          "id": "ionic",
+          "id": "ionic-tree",
           "name": "Ionic",
-          "icon": "media/ionic.svg",
           "contextualTitle": "Ionic"
         },
         {
-          "id": "ionic-projects",
+          "id": "ionic-devserver",
+          "type": "webview",
+          "name": "Preview",
+          "when": "isDevServing == true"
+        },
+        {
+          "id": "ionic-zprojects",
           "name": "Projects",
           "when": "isMonoRepo == true"
         }
@@ -320,64 +325,64 @@
       "view/title": [
         {
           "command": "ionic-official.refresh",
-          "when": "view == ionic",
+          "when": "view == ionic-tree",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
           "command": "ionic-official.add",
-          "when": "view == ionic && viewItem == packages",
+          "when": "view == ionic-tree && viewItem == packages",
           "group": "inline"
         },
         {
           "command": "ionic-official.lightbulb",
-          "when": "view == ionic && viewItem == lightbulb",
+          "when": "view == ionic-tree && viewItem == lightbulb",
           "group": "inline"
         },
         {
           "command": "ionic-official.stop",
-          "when": "view == ionic && viewItem == stop",
+          "when": "view == ionic-tree && viewItem == stop",
           "group": "inline"
         },
         {
           "command": "ionic-official.open",
-          "when": "view == ionic && viewItem == asset",
+          "when": "view == ionic-tree && viewItem == asset",
           "group": "inline"
         },
         {
           "command": "ionic-official.rebuild",
-          "when": "view == ionic && viewItem == rebuild",
+          "when": "view == ionic-tree && viewItem == rebuild",
           "group": "inline"
         },
         {
           "command": "ionic-official.refreshDebug",
-          "when": "view == ionic && viewItem == refreshDebug",
+          "when": "view == ionic-tree && viewItem == refreshDebug",
           "group": "inline"
         },
         {
           "command": "ionic-official.upgrade",
-          "when": "view == ionic && viewItem == upgrade",
+          "when": "view == ionic-tree && viewItem == upgrade",
           "group": "inline"
         },
         {
           "command": "ionic-official.buildConfig",
-          "when": "view == ionic && viewItem == buildConfig",
+          "when": "view == ionic-tree && viewItem == buildConfig",
           "group": "inline"
         },
         {
           "command": "ionic-official.webConfig",
-          "when": "view == ionic && viewItem == webConfig",
+          "when": "view == ionic-tree && viewItem == webConfig",
           "group": "inline"
         },
         {
           "command": "ionic-official.selectAction",
-          "when": "view == ionic && viewItem == selectAction",
+          "when": "view == ionic-tree && viewItem == selectAction",
           "group": "inline"
         },
         {
           "command": "ionic-official.selectDevice",
-          "when": "view == ionic && viewItem == selectDevice",
+          "when": "view == ionic-tree && viewItem == selectDevice",
           "group": "inline"
         }
       ]

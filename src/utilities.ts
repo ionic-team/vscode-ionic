@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { RunPoint, TipFeature } from './tip';
-import { debugBrowser, viewAsQR, viewInEditor } from './editor-preview';
+import { debugBrowser, qrView, viewInEditor } from './editor-preview';
 import { handleError } from './error-handler';
 import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { getMonoRepoFolder, getPackageJSONFilename } from './monorepo';
@@ -119,6 +119,7 @@ export async function run(
   }
 
   function launch(localUrl: string, externalUrl: string) {
+    const config: WebConfigSetting = getWebConfiguration();
     if (externalUrl) {
       if (pub) {
         pub.stop();
@@ -126,20 +127,24 @@ export async function run(
         pub = new Publisher('devapp', auxData, portFrom(externalUrl));
       }
       pub.start().then(() => {
-        writeIonic(`View this app at https://nexusconcepts.com/capacitor`); // (${externalUrl})
+        if (config == WebConfigSetting.welcome) {
+          qrView(externalUrl);
+        }
       });
     }
     if (features.includes(TipFeature.debugOnWeb)) {
       debugBrowser(localUrl, true);
       return;
     }
-    switch (getWebConfiguration()) {
+    switch (config) {
       case WebConfigSetting.editor:
         viewInEditor(localUrl);
         break;
-      case WebConfigSetting.welcome: {
-        viewAsQR(localUrl, externalUrl);
-
+      case WebConfigSetting.browser:
+        break;
+      default: {
+        //qrView(externalUrl);
+        //viewAsQR(localUrl, externalUrl);
         break;
       }
     }

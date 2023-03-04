@@ -2,6 +2,10 @@
 
 x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 
+- (feat) If its not a Cap app then auto expand Scripts
+- (feat) Dark/Light mode (add 'dark' to class of body)
+- (feat) Rotate device
+
 - (feat) new projects name should use the name of the folder
 - (feat) Support flavors and schemes using the CLI
 - (feat) Preview in Editor - Show Device Name with Check mark
@@ -111,3 +115,30 @@ x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - (feat) Detect missing @nxtend/ionic-angular or @nxtend/ionic-react. Option to add
 - (feat) Detect missing @nxtend/capacitor. Option to add
 - Starters for NX?
+
+## Dependency Errors
+
+From what I see in Discord and many ZD tickets, errors like this completely stump people on a daily basis:
+
+```shell
+npm i @capacitor-community/sqlite@3.3.3-2
+npm ERR! code ERESOLVE
+npm ERR! ERESOLVE unable to resolve dependency tree
+npm ERR!
+npm ERR! While resolving: ___-_____@0.0.1
+npm ERR! Found: @capacitor/core@4.6.3
+npm ERR! node_modules/@capacitor/core
+npm ERR!   @capacitor/core@"4.6.3" from the root project
+npm ERR!
+npm ERR! Could not resolve dependency:
+npm ERR! peer @capacitor/core@"^3.3.3" from @capacitor-community/sqlite@3.3.3-2
+npm ERR! node_modules/@capacitor-community/sqlite
+npm ERR!   @capacitor-community/sqlite@"3.3.3-2" from the root project
+npm ERR!
+npm ERR! Fix the upstream dependency conflict, or retry
+npm ERR! this command with --force, or --legacy-peer-deps
+npm ERR! to accept an incorrect (and potentially broken) dependency resolution.
+```
+
+Where the error could read:
+`v3.3.3-2 of @capacitor-community/sqlite does not work with your project because you are using v4 of @capacitor/core (it only supports v3). Find a version of @capacitor-community/sqlite that works with @capacitor/core v4 or file an issue.`
