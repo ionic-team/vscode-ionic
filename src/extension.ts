@@ -20,12 +20,12 @@ import { selectDevice } from './capacitor-device';
 import { getLocalFolder } from './monorepo';
 import { androidDebugUnforward } from './android-debug-bridge';
 import { AndroidDebugProvider } from './android-debug-provider';
+import { IonicDevServerProvider } from './ionic-devserver-provider';
 import { AndroidDebugType } from './android-debug';
 import { CapacitorPlatform } from './capacitor-platform';
 import { kill } from './process-list';
 import { selectExternalIPAddress } from './ionic-serve';
 import { advancedActions } from './advanced-actions';
-import { closeWelcomePanel } from './editor-preview';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
@@ -247,7 +247,7 @@ export async function fixIssue(
           tip.cancelRequested = false;
           channel.appendLine(`[Ionic] Stopped "${tip.title}"`);
           if (tip.features.includes(TipFeature.welcome)) {
-            closeWelcomePanel();
+            vscode.commands.executeCommand(CommandName.hideDevServer);
           }
           channelShow(channel);
           clearInterval(interval);
@@ -330,12 +330,26 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
       ? vscode.workspace.workspaceFolders[0].uri.fsPath
       : undefined;
+
+  // Ionic Tree View
   const ionicProvider = new IonicTreeProvider(rootPath, context);
+  const view = vscode.window.createTreeView('ionic-tree', { treeDataProvider: ionicProvider });
+
+  // Project List Panel
   const ionicProjectsProvider = new IonicProjectsreeProvider(rootPath, context);
-  const projectsView = vscode.window.createTreeView('ionic-projects', { treeDataProvider: ionicProjectsProvider });
-  ionicState.projectsView = projectsView;
-  const view = vscode.window.createTreeView('ionic', { treeDataProvider: ionicProvider });
+  const projectsView = vscode.window.createTreeView('ionic-zprojects', { treeDataProvider: ionicProjectsProvider });
+
+  // Dev Server Running Panel
+  const ionicDevServerProvider = new IonicDevServerProvider(rootPath, context);
+
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider('ionic-devserver', ionicDevServerProvider, {
+      webviewOptions: { retainContextWhenHidden: false },
+    })
+  );
+
   ionicState.view = view;
+  ionicState.projectsView = projectsView;
   ionicState.context = context;
 
   ionicState.shell = context.workspaceState.get(Context.shell);
