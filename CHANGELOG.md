@@ -1,6 +1,6 @@
 ## Changelog
 
-### Version 1.27.0
+### Version 1.27.1
 
 - Preview apps with Nexus Browser
 
