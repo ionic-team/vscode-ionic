@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.27.1
+
+- Preview apps with Nexus Browser
+
 ### Version 1.26.0
 
 - Fix detection of node modules with NX repos

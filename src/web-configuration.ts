@@ -3,7 +3,7 @@ import { Project } from './project';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 
 export enum WebConfigSetting {
-  welcome = 'Show Development Server Page',
+  welcome = 'Show Preview',
   browser = 'Open Web Browser',
   editor = 'Open App in Editor',
 }
@@ -13,15 +13,14 @@ export function getWebConfiguration(): WebConfigSetting {
   if (setting) {
     return setting;
   } else {
-    return WebConfigSetting.browser;
-    // return WebConfigSetting.welcome; Welcome page is only applicable with Capacitor Preview App
+    return WebConfigSetting.welcome;
   }
 }
 
 export async function webConfiguration(project: Project): Promise<string | undefined> {
   const setting = getSetting(WorkspaceSetting.webAction);
   const configs = [
-    //check(WebConfigSetting.welcome, setting),
+    check(WebConfigSetting.welcome, setting),
     check(WebConfigSetting.browser, setting),
     check(WebConfigSetting.editor, setting),
   ];

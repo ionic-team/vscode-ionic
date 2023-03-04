@@ -19,6 +19,9 @@ export enum Context {
   // The panel for monorepo projects
   isMonoRepo = 'isMonoRepo',
 
+  // The panel for the running dev server
+  isDevServing = 'isDevServing',
+
   // A scope that can be upgraded
   upgrade = 'upgrade',
 
