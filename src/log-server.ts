@@ -112,10 +112,10 @@ function writeLog(body: string, channel: OutputChannel) {
     } else {
       channel.appendLine(`[${level}] ${message}`);
     }
+    channel.show(true);
   }
   try {
     const lines = JSON.parse(body);
-    console.log(lines);
     if (!Array.isArray(lines)) {
       write(lines.level, lines.message);
     } else {
