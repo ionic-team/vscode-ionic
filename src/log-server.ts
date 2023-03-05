@@ -10,6 +10,9 @@ import { readFile } from 'fs';
 let logServer: http.Server;
 
 export async function startStopLogServer(folder: string): Promise<boolean> {
+  if (logServer && !folder) {
+    return; // We've already started the log server
+  }
   const channel = getOutputChannel();
   if (logServer) {
     logServer.close();

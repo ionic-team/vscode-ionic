@@ -6,6 +6,9 @@ import { npmInstall } from './node-commands';
 import { getRunOutput, showProgress } from './utilities';
 
 export async function injectScript(folder: string, address: string, port: number): Promise<boolean> {
+  if (!folder) {
+    return true;
+  }
   return await showProgress('Enabling Remote Logging', async () => {
     if (!exists('@ionic/remote-log')) {
       writeIonic('Installing @ionic/remote-log');
@@ -21,6 +24,7 @@ export async function injectScript(folder: string, address: string, port: number
 }
 
 export function removeScript(folder: string): boolean {
+  if (!folder) return;
   if (hasMainTSFile(folder)) {
     return rejectRemoteLog(mainTsFile(folder));
   } else if (hasIndexTsxFile(folder)) {

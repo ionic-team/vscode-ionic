@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.28
+
+- Remote logging enabled without requiring code changes
+
 ### Version 1.27.1
 
 - Preview apps with Nexus Browser

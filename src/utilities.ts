@@ -16,6 +16,7 @@ import { Publisher } from './discovery';
 import { join } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { ChildProcess, exec, ExecException } from 'child_process';
+import { startStopLogServer } from './log-server';
 
 export interface CancelObject {
   proc: ChildProcess;
@@ -132,6 +133,10 @@ export async function run(
         }
       });
     }
+
+    // Make sure remote logger service is running
+    startStopLogServer(undefined);
+
     if (features.includes(TipFeature.debugOnWeb)) {
       debugBrowser(localUrl, true);
       return;
