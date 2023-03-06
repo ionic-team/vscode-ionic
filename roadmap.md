@@ -2,8 +2,6 @@
 
 x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 
-- (feat) New apps - instead of my-app use the name of the folder
-- (feat) Option to run without opening browser
 - (feat) Open in Editor as web site
 - (feat) If its not a Cap app then auto expand Scripts
 - (feat) Dark/Light mode (add 'dark' to class of body)
