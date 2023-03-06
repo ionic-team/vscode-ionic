@@ -76,7 +76,7 @@ This extension for Visual Studio Code features:
 - Migrate a Cordova project to Capacitor
 - Incompatible plugins are flagged
 - Equivalent Capacitor plugins are identified and replaced
-- Unrequired plugins are removed
+- Plugins that are not required are removed
 - [Video of migration to Capacitor](https://vs-ionic.netlify.app/videos/cap-migration.gif)
 
 ## Native Project Settings
@@ -172,7 +172,7 @@ The feature (`Settings` > `Use HTTPS`) will create a certificate and serve your 
 ## Debugging for Web
 
 For debugging (adding breakpoints, inspecting variables and seeing console logging) use the options under the `Debug` folder.
-Debugging for web will launch a seperate web browser instance that is debuggable (Google Chrome by Default). You can also choose Microsoft Edge from the `settings` option.
+Debugging for web will launch a separate web browser instance that is debuggable (Google Chrome by Default). You can also choose Microsoft Edge from the `settings` option.
 
 ## Debugging for Android
 

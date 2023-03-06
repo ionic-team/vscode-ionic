@@ -3,9 +3,10 @@ import { Project } from './project';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 
 export enum WebConfigSetting {
-  welcome = 'Show Preview',
-  browser = 'Open Web Browser',
-  editor = 'Open App in Editor',
+  welcome = 'Show preview and open web browser',
+  welcomeNoBrowser = 'Show preview without opening browser',
+  browser = 'Open web browser',
+  editor = 'Open app in editor',
 }
 
 export function getWebConfiguration(): WebConfigSetting {
@@ -21,6 +22,7 @@ export async function webConfiguration(project: Project): Promise<string | undef
   const setting = getSetting(WorkspaceSetting.webAction);
   const configs = [
     check(WebConfigSetting.welcome, setting),
+    check(WebConfigSetting.welcomeNoBrowser, setting),
     check(WebConfigSetting.browser, setting),
     check(WebConfigSetting.editor, setting),
   ];

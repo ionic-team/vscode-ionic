@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { RunPoint, TipFeature } from './tip';
-import { debugBrowser, qrView, viewInEditor } from './editor-preview';
+import { debugBrowser, viewInEditor } from './editor-preview';
 import { handleError } from './error-handler';
 import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { getMonoRepoFolder, getPackageJSONFilename } from './monorepo';
@@ -17,6 +17,7 @@ import { join } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { ChildProcess, exec, ExecException } from 'child_process';
 import { startStopLogServer } from './log-server';
+import { qrView } from './nexus-browser';
 
 export interface CancelObject {
   proc: ChildProcess;
@@ -128,7 +129,7 @@ export async function run(
         pub = new Publisher('devapp', auxData, portFrom(externalUrl));
       }
       pub.start().then(() => {
-        if (config == WebConfigSetting.welcome) {
+        if (config == WebConfigSetting.welcome || config == WebConfigSetting.welcomeNoBrowser) {
           qrView(externalUrl);
         }
       });

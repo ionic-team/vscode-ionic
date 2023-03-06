@@ -5,11 +5,10 @@ import {
   WebviewViewProvider,
   WebviewViewResolveContext,
 } from 'vscode';
-import { qrWebView } from './editor-preview';
 
 import { commands } from 'vscode';
 import { CommandName } from './command-name';
-import { writeIonic } from './extension';
+import { qrWebView } from './nexus-browser';
 
 export class IonicDevServerProvider implements WebviewViewProvider {
   registered = false;

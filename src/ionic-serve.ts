@@ -41,7 +41,7 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
   const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
   const defaultPort = vscode.workspace.getConfiguration('ionic').get('defaultPort');
   let serveFlags = '';
-  if (webConfig == WebConfigSetting.editor || dontOpenBrowser) {
+  if (webConfig == WebConfigSetting.editor || webConfig == WebConfigSetting.welcomeNoBrowser || dontOpenBrowser) {
     serveFlags += ' --no-open';
   }
 

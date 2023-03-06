@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 export enum WorkspaceSetting {
   liveReload = 'liveReload',
   httpsForWeb = 'httpsForWeb',
+  pluginDrift = 'pluginDrift', // Whether the user has been shown the plugin drift compared to NexusBrowser app
   webAction = 'webAction',
 }
 
