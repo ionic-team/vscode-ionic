@@ -3,6 +3,7 @@
 ### Version 1.28
 
 - Remote logging enabled without requiring code changes
+- If its not a Capacitor or Cordova app then expand Scripts
 
 ### Version 1.27.1
 

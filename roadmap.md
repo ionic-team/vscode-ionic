@@ -3,11 +3,8 @@
 x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 
 - (feat) Open in Editor as web site
-- (feat) If its not a Cap app then auto expand Scripts
 - (feat) Dark/Light mode (add 'dark' to class of body)
 - (feat) Rotate device
-
-- (feat) new projects name should use the name of the folder
 - (feat) Support flavors and schemes using the CLI
 - (feat) Preview in Editor - Show Device Name with Check mark
 - (feat) Editor preview - option to rotate
