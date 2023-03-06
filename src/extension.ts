@@ -167,6 +167,11 @@ export function writeError(message: string) {
   channel.appendLine(`[Error] ${message}`);
 }
 
+export function writeWarning(message: string) {
+  const channel = getOutputChannel();
+  channel.appendLine(`[Warning] ${message}`);
+}
+
 export function markActionAsRunning(tip: Tip) {
   runningActions.push(tip);
 }

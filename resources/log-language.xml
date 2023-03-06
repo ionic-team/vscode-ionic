@@ -71,7 +71,7 @@
             <dict>
                 <!-- Command line -->
                 <key>match</key>
-                <string>^(npm WARN|WARNING:|Warning:).*</string>
+                <string>^(npm WARN|WARNING:|Warning:|\[Warning\]).*</string>
                 <key>name</key>
                 <string>entity.name.function</string>
             </dict>	 	

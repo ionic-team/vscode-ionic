@@ -6,7 +6,7 @@ import { ionicState } from './ionic-tree-provider';
 import { join } from 'path';
 import { debugBrowser, viewInEditor } from './editor-preview';
 import { httpRequest, openUri } from './utilities';
-import { getOutputChannel, writeError, writeIonic } from './extension';
+import { getOutputChannel, writeError, writeIonic, writeWarning } from './extension';
 import { inspectProject, ProjectSummary } from './project';
 import { PackageInfo } from './package-info';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
@@ -65,6 +65,7 @@ export async function troubleshootPlugins() {
     }
     let problems = 0;
     let problem = '';
+    const pluginList = [];
     const channel = getOutputChannel();
 
     const summary: ProjectSummary = await inspectProject(ionicState.rootFolder, ionicState.context, undefined);
@@ -79,7 +80,7 @@ export async function troubleshootPlugins() {
               );
             }
           } else if (!unimportant.includes(library)) {
-            writeError(`Nexus Browser does not have the plugin ${library}`);
+            pluginList.push(library);
             problem = library;
             problems++;
           }
@@ -92,6 +93,11 @@ export async function troubleshootPlugins() {
         'Dismiss'
       );
     } else if (problems > 0) {
+      writeWarning(
+        `Nexus Browser does not have the following plugins: ${pluginList.join(
+          ', '
+        )}. You can suggest adding one of these plugins here: https://github.com/ionic-team/vscode-extension/issues/91`
+      );
       vscode.window.showWarningMessage(
         `Your project has ${problems} plugins that are not in the Nexus Browser app, so you may have issues related to functionality that relies on those plugins.`,
         'Dismiss'

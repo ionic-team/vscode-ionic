@@ -10,7 +10,6 @@ x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - (feat) Editor preview - option to rotate
 - (feat) Editor preview - dark / light mode switch
 - (fix) Remote logging for android turn on clearText
-- (feat) Select Run > Web - Show checkmark next to Editor/Web
 - (feat) Run > Web - Change label to Run > Editor
 - (fix) On a Stencil project selecting run in editor doesn't seem to work
 - (fix) If upgrading/changing a package then make sure dev server is stopped
