@@ -37,6 +37,7 @@ import { audit } from './audit';
 import { analyzeSize } from './analyze-size';
 import { ionicExport } from './ionic-export';
 import { angularGenerate } from './angular-generate';
+import { LoggingSettings } from './log-settings';
 
 export async function getRecommendations(
   project: Project,
@@ -310,6 +311,11 @@ export async function getRecommendations(
     project.add(useHttps(project));
 
     //project.add(remoteLogging(project));
+    project.add(
+      new Tip('Logging', undefined, TipType.Settings, undefined)
+        .setTooltip('Settings for logging displayed in the output window')
+        .setAction(LoggingSettings, project)
+    );
   }
 
   project.add(new Tip('Advanced', '', TipType.Settings));
