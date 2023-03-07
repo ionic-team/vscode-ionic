@@ -29,7 +29,7 @@ export async function analyzeSize(project: Project) {
       writeIonic('Analyzing Sourcemaps...');
       const result: RunResults = { output: '', success: undefined };
       try {
-        await run2(project, `npx source-map-explorer ${dist}/**/*.js --json --exclude-source-map`, result);
+        await run2(project, `npx source-map-explorer "${dist}/**/*.js" --json --exclude-source-map`, result);
       } catch (err) {
         vscode.window.showErrorMessage('Unable to analyze source maps: ' + err, 'OK');
       }
