@@ -289,7 +289,8 @@ export async function run(
 
     proc.stderr.on('data', (data) => {
       if (!supressInfo) {
-        channel.append(data);
+        const nocolor = data.replace(/[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+        channel.append(nocolor);
       }
       focusOutput(channel);
     });
