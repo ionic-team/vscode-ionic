@@ -6,6 +6,7 @@ import { OutputChannel } from 'vscode';
 import { injectScript, removeScript } from './log-server-scripts';
 import { extname, join } from 'path';
 import { readFile } from 'fs';
+import { replaceAll } from './utilities';
 
 let logServer: http.Server;
 
@@ -110,7 +111,7 @@ function writeLog(body: string, channel: OutputChannel) {
     if (typeof message === 'object') {
       channel.appendLine(`[${level}] ${JSON.stringify(message)}`);
     } else {
-      channel.appendLine(`[${level}] ${message}`);
+      channel.appendLine(`[${level}] ${replaceAll(message, '\n', '')}`);
     }
     channel.show(true);
   }
