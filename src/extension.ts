@@ -9,7 +9,7 @@ import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage } from './project';
 import { Command, Tip, TipFeature, TipType } from './tip';
-import { CancelObject, run, estimateRunTime, channelShow, openUri, stopPublishing } from './utilities';
+import { CancelObject, run, estimateRunTime, channelShow, openUri, stopPublishing, replaceAll } from './utilities';
 import { ignore } from './ignore';
 import { ActionResult, CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
@@ -32,11 +32,12 @@ let runningOperations = [];
 let runningActions: Array<Tip> = [];
 export let lastOperation: Tip;
 
-async function requestAppName(tip: Tip) {
+async function requestAppName(tip: Tip, path: string) {
+  const suggestion = suggestName(path);
   let name = await vscode.window.showInputBox({
     title: 'Internal name of the application',
-    placeHolder: 'my-app',
-    value: 'my-app',
+    placeHolder: suggestion,
+    value: suggestion,
     validateInput: (value: string) => {
       const regexp = /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/;
       if (!regexp.test(value)) {
@@ -63,6 +64,23 @@ async function requestAppName(tip: Tip) {
   } else {
     return undefined;
   }
+}
+
+function suggestName(path: string): string {
+  let name = 'my-app';
+  try {
+    let tmp = path.split('/');
+    if (tmp.length == 0) {
+      tmp = path.split('\\');
+    }
+    if (tmp.length > 0) {
+      name = tmp[tmp.length - 1];
+      name = replaceAll(name, ' ', '-').toLowerCase().trim();
+    }
+  } catch {
+    name = 'my-app';
+  }
+  return name;
 }
 
 export function isRunning(tip: Tip) {
@@ -147,6 +165,11 @@ export function writeIonic(message: string) {
 export function writeError(message: string) {
   const channel = getOutputChannel();
   channel.appendLine(`[Error] ${message}`);
+}
+
+export function writeWarning(message: string) {
+  const channel = getOutputChannel();
+  channel.appendLine(`[Warning] ${message}`);
 }
 
 export function markActionAsRunning(tip: Tip) {
@@ -530,7 +553,7 @@ async function runAction(tip: Tip, ionicProvider: IonicTreeProvider, rootPath: s
   if (tip.command) {
     let command = tip.command;
     if (tip.doRequestAppName) {
-      command = await requestAppName(tip);
+      command = await requestAppName(tip, rootPath);
     }
     if (tip.doIpSelection) {
       const host = await selectExternalIPAddress();

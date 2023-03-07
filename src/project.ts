@@ -17,7 +17,6 @@ import { checkForMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
 import { CapacitorPlatform } from './capacitor-platform';
 import { addCommand, npmInstall, npmUninstall, PackageManager } from './node-commands';
 import { getCapacitorConfigWebDir } from './capacitor-configure';
-import { ionicExport } from './ionic-export';
 
 export class Project {
   name: string;
@@ -571,11 +570,6 @@ export async function installPackage(extensionPath: string, folder: string) {
   const selected = await vscode.window.showInputBox({ placeHolder: 'Enter package name to install' });
   if (!selected) return;
 
-  if (selected == 'export') {
-    ionicExport(folder, ionicState.context);
-    return;
-  }
-
   await fixIssue(
     npmInstall(selected),
     folder,
@@ -620,6 +614,7 @@ export async function inspectProject(
   project.folder = folder;
   project.packageManager = getPackageManager(folder);
   ionicState.packageManager = project.packageManager;
+  ionicState.rootFolder = folder;
 
   let packages = await load(folder, project, context);
   ionicState.view.title = project.name;
@@ -649,7 +644,7 @@ export async function inspectProject(
 
   vscode.commands.executeCommand(VSCommand.setContext, Context.inspectedProject, true);
 
-  //console.log(`Analysed Project in ${Date.now() - startedOp}ms`);
+  //console.log(`Analyzed Project in ${Date.now() - startedOp}ms`);
   return { project, packages };
 }
 

@@ -1,3 +1,4 @@
+import { exists } from './analyzer';
 import { MonoRepoType } from './monorepo';
 import { npmRun } from './node-commands';
 import { Project } from './project';
@@ -6,7 +7,8 @@ import { getPackageJSON, PackageFile } from './utilities';
 
 // Look in package.json for scripts and add options to execute
 export function addScripts(project: Project) {
-  project.setGroup(`Scripts`, `Any scripts from your package.json will appear here`, TipType.Files, false);
+  const expand = !(exists('@capacitor/core') || exists('cordova-ios') || exists('cordova-android'));
+  project.setGroup(`Scripts`, `Any scripts from your package.json will appear here`, TipType.Files, expand);
 
   addScriptsFrom(getPackageJSON(project.projectFolder()), project);
 

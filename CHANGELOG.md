@@ -1,5 +1,14 @@
 ## Changelog
 
+### Version 1.28
+
+- Remote logging enabled without requiring code changes
+- If its not a Capacitor or Cordova app then expand Scripts
+- Fix detection of Capacitor projects that do not use @capacitor/core
+- Fix color logging for vite projects
+- Fix project statistics for projects folders that have spaces
+- Provide recommendation to projects whose ionic.config.json is malformed
+
 ### Version 1.27.1
 
 - Preview apps with Nexus Browser

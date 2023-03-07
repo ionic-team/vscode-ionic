@@ -64,6 +64,9 @@ export async function handleError(error: string, logs: Array<string>, folder: st
 
   const retryOp = false; // Turning this off for now. It isn't working consistently
 
+  if (errorMessage && errorMessage.includes(`The project's package.json file seems malformed`)) {
+    errorMessage = `The Ionic CLI thinks your project is malformed. This can happen if your ionic.config.json is misconfigured. Try deleting ionic.config.json and let the extension recreate it.`;
+  }
   if (errors.length == 0 && errorMessage) {
     vscode.window.showErrorMessage(errorMessage, 'Ok');
   } else {

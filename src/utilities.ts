@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 import { RunPoint, TipFeature } from './tip';
-import { debugBrowser, qrView, viewInEditor } from './editor-preview';
+import { debugBrowser, viewInEditor } from './editor-preview';
 import { handleError } from './error-handler';
 import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { getMonoRepoFolder, getPackageJSONFilename } from './monorepo';
@@ -16,6 +16,8 @@ import { Publisher } from './discovery';
 import { join } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { ChildProcess, exec, ExecException } from 'child_process';
+import { startStopLogServer } from './log-server';
+import { qrView } from './nexus-browser';
 
 export interface CancelObject {
   proc: ChildProcess;
@@ -127,11 +129,15 @@ export async function run(
         pub = new Publisher('devapp', auxData, portFrom(externalUrl));
       }
       pub.start().then(() => {
-        if (config == WebConfigSetting.welcome) {
+        if (config == WebConfigSetting.welcome || config == WebConfigSetting.welcomeNoBrowser) {
           qrView(externalUrl);
         }
       });
     }
+
+    // Make sure remote logger service is running
+    startStopLogServer(undefined);
+
     if (features.includes(TipFeature.debugOnWeb)) {
       debugBrowser(localUrl, true);
       return;
@@ -283,7 +289,8 @@ export async function run(
 
     proc.stderr.on('data', (data) => {
       if (!supressInfo) {
-        channel.append(data);
+        const nocolor = data.replace(/[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+        channel.append(nocolor);
       }
       focusOutput(channel);
     });

@@ -128,7 +128,12 @@ export async function load(fn: string, project: Project, context: vscode.Extensi
   };
 
   // Its a capacitor project only if its a dependency and not a dev dependency
-  project.isCapacitor = !!(packageFile.dependencies && packageFile.dependencies['@capacitor/core']);
+  project.isCapacitor = !!(
+    packageFile.dependencies &&
+    (packageFile.dependencies['@capacitor/core'] ||
+      packageFile.dependencies['@capacitor/ios'] ||
+      packageFile.dependencies['@capacitor/android'])
+  );
 
   project.isCordova = !!(allDependencies['cordova-ios'] || allDependencies['cordova-android'] || packageFile.cordova);
 

@@ -6,10 +6,14 @@ import { OutputChannel } from 'vscode';
 import { injectScript, removeScript } from './log-server-scripts';
 import { extname, join } from 'path';
 import { readFile } from 'fs';
+import { replaceAll } from './utilities';
 
 let logServer: http.Server;
 
 export async function startStopLogServer(folder: string): Promise<boolean> {
+  if (logServer && !folder) {
+    return; // We've already started the log server
+  }
   const channel = getOutputChannel();
   if (logServer) {
     logServer.close();
@@ -107,12 +111,12 @@ function writeLog(body: string, channel: OutputChannel) {
     if (typeof message === 'object') {
       channel.appendLine(`[${level}] ${JSON.stringify(message)}`);
     } else {
-      channel.appendLine(`[${level}] ${message}`);
+      channel.appendLine(`[${level}] ${replaceAll(message, '\n', '')}`);
     }
+    channel.show(true);
   }
   try {
     const lines = JSON.parse(body);
-    console.log(lines);
     if (!Array.isArray(lines)) {
       write(lines.level, lines.message);
     } else {

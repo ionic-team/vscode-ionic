@@ -2,19 +2,16 @@
 
 x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 
-- (feat) If its not a Cap app then auto expand Scripts
+- (feat) Open in Editor as web site
 - (feat) Dark/Light mode (add 'dark' to class of body)
 - (feat) Rotate device
-
-- (feat) new projects name should use the name of the folder
 - (feat) Support flavors and schemes using the CLI
 - (feat) Preview in Editor - Show Device Name with Check mark
 - (feat) Editor preview - option to rotate
 - (feat) Editor preview - dark / light mode switch
 - (fix) Remote logging for android turn on clearText
-- (feat) Select Run > Web - Show checkmark next to Editor/Web
 - (feat) Run > Web - Change label to Run > Editor
-- (fix) On a Stencil project selecting run in editor doesnt seem to work
+- (fix) On a Stencil project selecting run in editor doesn't seem to work
 - (fix) If upgrading/changing a package then make sure dev server is stopped
 - (fix) For a regular Angular project that is in a subfolder it reports not finding www folder when running npx cap copy. But dist exists and the extension can correct that in capacitor.config.ts. The dist folder may be separated by app too so dist/my-app may be where the index.html is located
 - (fix) When running on web for regular Angular app it doesn't launch the browser
@@ -38,7 +35,7 @@ x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 
 - Button on Toolbar for Build
 - Button on Toolbar for Run Web, Run iOS, Run Android
-- Option to hide logs that arent errors
+- Option to hide logs that aren't errors
 - Click QR Code to display "Use the 'Capacitor View' App to open this application
 - Use this to add QR Code / Webview in side panel:
   https://stackoverflow.com/questions/67150547/vs-code-extension-how-to-add-a-webviewpanel-to-the-sidebar
@@ -73,7 +70,7 @@ x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - See `tslint.json` and angular 12+ then link to [blog](https://ionicframework.com/blog/eslint-for-ionic-angular/) for migration
 - Show git remote url somewhere (`git config --get remote.origin.url`)
 - Detect plugins/platforms folders in a capacitor project and recommend removal
-- Listing recent appflow builds and allowing users to sideload the artifacts from those builds onto their simulators/devices (lots of potential cert issues with iOS here)
+- Listing recent Appflow builds and allowing users to sideload the artifacts from those builds onto their simulators/devices (lots of potential cert issues with iOS here)
 
 - Augmenting the New Project functionality to create the app in appflow and begin with the project linked, similar to the Ionic App Wizard
   Starting an appflow trial directly from the extension… thinking a 1-click experience to install AC/IV/etc
@@ -83,7 +80,7 @@ x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - (feat) Twitter to RSS feed - pull news into plugin ??
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
 - (32) Debugging for iOS
-- (2) If you sync but the build didnt work then show suitable error (or trigger build)
+- (2) If you sync but the build didn't work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand
 - (2) Show gotchas page for Angular migration x to x+1
 - (2) For web based projects have "Run on Web" under an Ionic Project
@@ -93,7 +90,7 @@ x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - (16) If using say @capacitor/camera then allow editing of info.plist and Android permissions (highlight if empty)
 - (4) When running for web, if you close the browser, a button for "Open Browser" should allow opening it again.
 - (8) Show preview as soon as "Run on Web" is clicked and show progress until app is ready
-- (8) Amp eslink rules to 11: using https://gist.github.com/dtarnawsky/7c42cec330443c7093976136286b5473
+- (8) Amp eslint rules to 11: using https://gist.github.com/dtarnawsky/7c42cec330443c7093976136286b5473
 - (8) Evaluate age of packages: when current version was released, when latest was released. If latest > 365 then warn. If latest - current > 365 then warn
 - (4) Highlight dev dependencies in some way
 - (4) Check for leftover platforms and plugins folders when removing cordova or when capacitor is detected

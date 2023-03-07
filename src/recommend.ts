@@ -309,7 +309,7 @@ export async function getRecommendations(
     }
     project.add(useHttps(project));
 
-    project.add(remoteLogging(project));
+    //project.add(remoteLogging(project));
   }
 
   project.add(new Tip('Advanced', '', TipType.Settings));
