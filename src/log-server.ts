@@ -118,7 +118,7 @@ function writeLog(body: string, channel: OutputChannel) {
         ? `[${level}] ${JSON.stringify(message)}`
         : `[${level}] ${replaceAll(message, '\n', '')}`;
 
-    if (passesFilter(msg, getLogFilters())) {
+    if (passesFilter(msg, getLogFilters(), false)) {
       channel.appendLine(msg);
       channel.show(true);
     }

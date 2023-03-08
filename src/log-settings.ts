@@ -1,4 +1,4 @@
-import { QuickPickItem, window } from 'vscode';
+import { QuickPickItem, QuickPickItemKind, window } from 'vscode';
 import { Project } from './project';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 
@@ -25,6 +25,9 @@ function selectedOptions(): QuickPickItem[] {
   for (const option of getOptions()) {
     const choice: QuickPickItem = option as QuickPickItem;
     choice.picked = !filter || !filter.includes(option.value);
+    if (option.separator) {
+      result.push({ label: option.separator, kind: QuickPickItemKind.Separator });
+    }
     result.push(choice);
   }
   return result;
@@ -32,7 +35,23 @@ function selectedOptions(): QuickPickItem[] {
 
 function getOptions(): LogOption[] {
   return [
-    { label: 'Info logging', description: 'General info level logging', value: '' },
+    {
+      label: 'Info logging',
+      description: 'General info level logging',
+      value: '',
+      separator: 'Task Logging',
+    },
+    {
+      label: 'Angular',
+      description: 'Logging from the Angular CLI [ng]',
+      value: '[ng]',
+    },
+    {
+      label: 'Console Logging',
+      description: 'Console.log, Console.warn and Console.error',
+      value: 'console',
+      separator: 'Nexus Browser Logging',
+    },
     {
       label: 'Capacitor Calls',
       description: 'Calls to native capacitor plugin methods [capacitor]',
@@ -43,8 +62,11 @@ function getOptions(): LogOption[] {
       description: 'Responses from native capacitor methods [capacitor-js]',
       value: '[capacitor-js]',
     },
-    { label: 'Cordova Calls', description: 'Calls to native cordova plugin methods [cordova]', value: '[cordova]' },
-    { label: 'Angular', description: 'Logging from calls to ng [ng]', value: '[ng]' },
+    {
+      label: 'Cordova Calls',
+      description: 'Calls to native cordova plugin methods [cordova]',
+      value: '[cordova]',
+    },
     {
       label: 'Webpack Dev Server',
       description: 'Logging from web pack dev server [webpack-dev-server]',
@@ -57,4 +79,5 @@ interface LogOption {
   label: string;
   description: string;
   value: string;
+  separator?: string;
 }

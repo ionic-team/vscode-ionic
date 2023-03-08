@@ -74,10 +74,14 @@ export function stopPublishing() {
   }
 }
 
-export function passesFilter(msg: string, logFilters: string[]): boolean {
+export function passesRemoteFilter(msg: string, logFilters: string[]): boolean {
+  return passesFilter(msg, logFilters, true);
+}
+
+export function passesFilter(msg: string, logFilters: string[], isRemote: boolean): boolean {
   if (!logFilters) return true;
   for (const logFilter of logFilters) {
-    if (logFilter == '') {
+    if (logFilter == '' && !isRemote) {
       // If we're filtering out most logs then provide exception
       if (!msg.startsWith('[') || msg.startsWith('[info]') || msg.startsWith('[INFO]')) {
         if (new RegExp('Warn|warn|Error|error').test(msg)) {
@@ -85,6 +89,11 @@ export function passesFilter(msg: string, logFilters: string[]): boolean {
         } else {
           return false;
         }
+      }
+    } else if (logFilter == 'console' && isRemote) {
+      // Remote logging sends console statements as [info|warn|error]
+      if (msg.startsWith('[info]') || msg.startsWith('[warn]') || msg.startsWith('[error]')) {
+        return false;
       }
     } else {
       if (msg?.includes(logFilter)) {
@@ -295,7 +304,7 @@ export async function run(
 
         for (const logLine of logLines) {
           if (logLine.startsWith('[capacitor]')) {
-            if (!suppressInfo && passesFilter(logLine, logFilters)) {
+            if (!suppressInfo && passesFilter(logLine, logFilters, false)) {
               channel.appendLine(logLine.replace('[capacitor]', ''));
             }
           } else if (logLine && !suppressInfo) {
@@ -303,7 +312,7 @@ export async function run(
               /[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
               ''
             );
-            if (passesFilter(uncolored, logFilters)) {
+            if (passesFilter(uncolored, logFilters, false)) {
               channel.appendLine(uncolored);
             }
           }
@@ -315,7 +324,7 @@ export async function run(
     proc.stderr.on('data', (data) => {
       if (!suppressInfo) {
         const uncolored = data.replace(/[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
-        if (passesFilter(uncolored, logFilters)) {
+        if (passesFilter(uncolored, logFilters, false)) {
           channel.append(uncolored);
         }
       }
