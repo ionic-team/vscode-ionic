@@ -635,9 +635,7 @@ async function execute(tip: Tip, context: vscode.ExtensionContext): Promise<void
   if (result == ActionResult.Ignore) {
     ignore(tip, context);
   }
-  if (tip.type == TipType.Settings) {
-    await vscode.commands.executeCommand('workbench.action.openSettings', "Ionic'");
-  } else if (tip.url) {
+  if (tip.url) {
     await openUri(tip.url);
   }
 }

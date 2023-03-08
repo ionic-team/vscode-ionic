@@ -6,6 +6,7 @@ export enum WorkspaceSetting {
   httpsForWeb = 'httpsForWeb',
   pluginDrift = 'pluginDrift', // Whether the user has been shown the plugin drift compared to NexusBrowser app
   webAction = 'webAction',
+  logFilter = 'logFilter',
 }
 
 export enum ExtensionSetting {

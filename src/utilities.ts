@@ -9,7 +9,7 @@ import { InternalCommand } from './command-name';
 import { exists } from './analyzer';
 import { ionicInit } from './ionic-init';
 import { request } from 'https';
-import { ExtensionSetting, getExtSetting } from './workspace-state';
+import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
 import { writeError, writeIonic } from './extension';
 import { getWebConfiguration, WebConfigSetting } from './web-configuration';
 import { Publisher } from './discovery';
@@ -73,6 +73,28 @@ export function stopPublishing() {
     pub.stop();
   }
 }
+
+export function passesFilter(msg: string, logFilters: string[]): boolean {
+  if (!logFilters) return true;
+  for (const logFilter of logFilters) {
+    if (logFilter == '') {
+      // If we're filtering out most logs then provide exception
+      if (!msg.startsWith('[') || msg.startsWith('[info]') || msg.startsWith('[INFO]')) {
+        if (new RegExp('Warn|warn|Error|error').test(msg)) {
+          // Its not info so allow
+        } else {
+          return false;
+        }
+      }
+    } else {
+      if (msg?.includes(logFilter)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 export async function run(
   folder: string,
   command: string,
@@ -83,7 +105,7 @@ export async function run(
   progress: any,
   ionicProvider?: IonicTreeProvider,
   output?: RunResults,
-  supressInfo?: boolean,
+  suppressInfo?: boolean,
   auxData?: string
 ): Promise<boolean> {
   if (command == InternalCommand.removeCordova) {
@@ -166,6 +188,7 @@ export async function run(
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
+  const logFilters: string[] = getSetting(WorkspaceSetting.logFilter);
   let logs: Array<string> = [];
   return new Promise((resolve, reject) => {
     const start_time = process.hrtime();
@@ -272,15 +295,17 @@ export async function run(
 
         for (const logLine of logLines) {
           if (logLine.startsWith('[capacitor]')) {
-            if (!supressInfo) {
+            if (!suppressInfo && passesFilter(logLine, logFilters)) {
               channel.appendLine(logLine.replace('[capacitor]', ''));
             }
-          } else if (logLine && !supressInfo) {
-            const nocolor = logLine.replace(
+          } else if (logLine && !suppressInfo) {
+            const uncolored = logLine.replace(
               /[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
               ''
             );
-            channel.appendLine(nocolor);
+            if (passesFilter(uncolored, logFilters)) {
+              channel.appendLine(uncolored);
+            }
           }
         }
         focusOutput(channel);
@@ -288,9 +313,11 @@ export async function run(
     });
 
     proc.stderr.on('data', (data) => {
-      if (!supressInfo) {
-        const nocolor = data.replace(/[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
-        channel.append(nocolor);
+      if (!suppressInfo) {
+        const uncolored = data.replace(/[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+        if (passesFilter(uncolored, logFilters)) {
+          channel.append(uncolored);
+        }
       }
       focusOutput(channel);
     });
