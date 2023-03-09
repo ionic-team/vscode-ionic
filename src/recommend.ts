@@ -37,6 +37,7 @@ import { audit } from './audit';
 import { analyzeSize } from './analyze-size';
 import { ionicExport } from './ionic-export';
 import { angularGenerate } from './angular-generate';
+import { LoggingSettings } from './log-settings';
 
 export async function getRecommendations(
   project: Project,
@@ -310,9 +311,14 @@ export async function getRecommendations(
     project.add(useHttps(project));
 
     //project.add(remoteLogging(project));
+    project.add(
+      new Tip('Logging', undefined, TipType.Settings, undefined)
+        .setTooltip('Settings for logging displayed in the output window')
+        .setAction(LoggingSettings, project)
+    );
   }
 
-  project.add(new Tip('Advanced', '', TipType.Settings));
+  project.add(new Tip('Advanced', '', TipType.Settings).setAction(settings));
 
   // Support and Feedback
   project.setGroup(`Support`, 'Feature requests and bug fixes', TipType.Ionic, false);
@@ -350,6 +356,10 @@ async function supportTicket(project: Project): Promise<void> {
   const url =
     'https://ionic.zendesk.com/hc/en-us/requests/new?tf_subject=blar&tf_description=desc&tf_anonymous_requester_email=blar@blar.com';
   await vscode.env.openExternal(vscode.Uri.parse(url));
+}
+
+async function settings() {
+  await vscode.commands.executeCommand('workbench.action.openSettings', "Ionic'");
 }
 
 function debugOnWeb(project: Project): Tip {

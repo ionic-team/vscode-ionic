@@ -6,7 +6,8 @@ import { OutputChannel } from 'vscode';
 import { injectScript, removeScript } from './log-server-scripts';
 import { extname, join } from 'path';
 import { readFile } from 'fs';
-import { replaceAll } from './utilities';
+import { passesFilter, replaceAll } from './utilities';
+import { getSetting, WorkspaceSetting } from './workspace-state';
 
 let logServer: http.Server;
 
@@ -106,22 +107,29 @@ function getAddress(): string {
   }
 }
 
+function getLogFilters(): string[] {
+  return getSetting(WorkspaceSetting.logFilter);
+}
+
 function writeLog(body: string, channel: OutputChannel) {
-  function write(level, message) {
-    if (typeof message === 'object') {
-      channel.appendLine(`[${level}] ${JSON.stringify(message)}`);
-    } else {
-      channel.appendLine(`[${level}] ${replaceAll(message, '\n', '')}`);
+  function write(level, message, tag) {
+    const msg =
+      typeof message === 'object'
+        ? `[${level}][${tag}] ${JSON.stringify(message)}`
+        : `[${level}][${tag}] ${replaceAll(message, '\n', '')}`;
+
+    if (passesFilter(msg, getLogFilters(), false)) {
+      channel.appendLine(msg);
+      channel.show(true);
     }
-    channel.show(true);
   }
   try {
     const lines = JSON.parse(body);
     if (!Array.isArray(lines)) {
-      write(lines.level, lines.message);
+      write(lines.level, lines.message, lines.tag);
     } else {
       for (const line of lines) {
-        write(line.level, line.message);
+        write(line.level, line.message, line.tag);
       }
     }
   } catch {

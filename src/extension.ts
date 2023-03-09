@@ -164,12 +164,12 @@ export function writeIonic(message: string) {
 
 export function writeError(message: string) {
   const channel = getOutputChannel();
-  channel.appendLine(`[Error] ${message}`);
+  channel.appendLine(`[error] ${message}`);
 }
 
 export function writeWarning(message: string) {
   const channel = getOutputChannel();
-  channel.appendLine(`[Warning] ${message}`);
+  channel.appendLine(`[warning] ${message}`);
 }
 
 export function markActionAsRunning(tip: Tip) {
@@ -635,9 +635,7 @@ async function execute(tip: Tip, context: vscode.ExtensionContext): Promise<void
   if (result == ActionResult.Ignore) {
     ignore(tip, context);
   }
-  if (tip.type == TipType.Settings) {
-    await vscode.commands.executeCommand('workbench.action.openSettings', "Ionic'");
-  } else if (tip.url) {
+  if (tip.url) {
     await openUri(tip.url);
   }
 }

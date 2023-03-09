@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.29
+
+- Logging filters added to settings
+
 ### Version 1.28
 
 - Remote logging enabled without requiring code changes

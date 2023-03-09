@@ -6,10 +6,11 @@ import { ionicState } from './ionic-tree-provider';
 import { join } from 'path';
 import { debugBrowser, viewInEditor } from './editor-preview';
 import { httpRequest, openUri } from './utilities';
-import { getOutputChannel, writeError, writeIonic, writeWarning } from './extension';
+import { getOutputChannel, writeError, writeWarning } from './extension';
 import { inspectProject, ProjectSummary } from './project';
 import { PackageInfo } from './package-info';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
+import { coerce } from 'semver';
 
 export function qrView(externalUrl: string) {
   commands.executeCommand(VSCommand.setContext, Context.isDevServing, true);
@@ -75,9 +76,17 @@ export async function troubleshootPlugins() {
         if (pkg.depType == libType) {
           if (versions[library]) {
             if (versions[library] != pkg.version) {
-              channel.appendLine(
-                `Your project has ${versions[library]}${library} but Nexus Browser has ${pkg.version}`
-              );
+              const projectv = coerce(pkg.version);
+              const browserv = coerce(versions[library]);
+              if (projectv.major != browserv.major) {
+                writeWarning(
+                  `Your project has v${pkg.version} of ${library} but Nexus Browser has v${versions[library]}`
+                );
+              } else {
+                channel.appendLine(
+                  `[info] Your project has v${pkg.version} of ${library} but Nexus Browser has v${versions[library]}`
+                );
+              }
             }
           } else if (!unimportant.includes(library)) {
             pluginList.push(library);
@@ -94,9 +103,9 @@ export async function troubleshootPlugins() {
       );
     } else if (problems > 0) {
       writeWarning(
-        `Nexus Browser does not have the following plugins: ${pluginList.join(
+        `Your project has these plugins: ${pluginList.join(
           ', '
-        )}. You can suggest adding one of these plugins here: https://github.com/ionic-team/vscode-extension/issues/91`
+        )} but Nexus Browser does not. You can suggest adding these here: https://github.com/ionic-team/vscode-extension/issues/91`
       );
       vscode.window.showWarningMessage(
         `Your project has ${problems} plugins that are not in the Nexus Browser app, so you may have issues related to functionality that relies on those plugins.`,

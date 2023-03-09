@@ -15,7 +15,7 @@
             <dict>
                 <!-- Ionic start/end -->
                 <key>match</key>
-                <string>^(\[Ionic\]|\[capacitor\]|\[cordova\]|\[capacitor-js\]).*</string>
+                <string>^(\[Ionic\]).*</string>
                 <key>name</key>
                 <string>support.type</string>
             </dict>
@@ -29,7 +29,7 @@
             <dict>
                 <!-- Critical Vunerability -->
                 <key>match</key>
-                <string>\[critical\]|\[fatal\].*</string>
+                <string>(\[critical\]|\[fatal\]|\[error\]).*</string>
                 <key>name</key>
                 <string>invalid.illegal</string>
             </dict>
@@ -73,15 +73,30 @@
                 <key>match</key>
                 <string>^(npm WARN|WARNING:|Warning:|\[Warning\]).*</string>
                 <key>name</key>
-                <string>entity.name.function</string>
+                <string>markup.deleted log.warning</string>
             </dict>	 	
             <dict>
                 <!-- Warning -->
                 <key>match</key>
-                <string>\[warn\].*</string>
+                <string>(\[warn\]|\[warning\]).*</string>
                 <key>name</key>
-                <string>invalid.illegal</string>
-            </dict>	             	
+                <string>markup.deleted log.warning</string>
+            </dict>
+            <dict>
+                <!-- Info -->
+                <key>match</key>
+                <string>\[info\].*</string>
+                <key>name</key>
+                <string>markup.changed log.debug</string>
+            </dict>	  	    
+            <dict>
+                <!-- Verbose -->
+                <key>match</key>
+                <string>\[verbose\].*</string>
+                <key>name</key>
+                <string>comment log.verbose </string>
+            </dict>	  	     
+                   	
         </array>
         <key>uuid</key>
         <string>ab259404-3072-4cd4-a943-7cbbd32e373f</string>
