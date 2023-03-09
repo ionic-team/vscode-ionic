@@ -164,12 +164,12 @@ export function writeIonic(message: string) {
 
 export function writeError(message: string) {
   const channel = getOutputChannel();
-  channel.appendLine(`[Error] ${message}`);
+  channel.appendLine(`[error] ${message}`);
 }
 
 export function writeWarning(message: string) {
   const channel = getOutputChannel();
-  channel.appendLine(`[Warning] ${message}`);
+  channel.appendLine(`[warning] ${message}`);
 }
 
 export function markActionAsRunning(tip: Tip) {

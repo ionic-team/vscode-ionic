@@ -112,11 +112,11 @@ function getLogFilters(): string[] {
 }
 
 function writeLog(body: string, channel: OutputChannel) {
-  function write(level, message) {
+  function write(level, message, tag) {
     const msg =
       typeof message === 'object'
-        ? `[${level}] ${JSON.stringify(message)}`
-        : `[${level}] ${replaceAll(message, '\n', '')}`;
+        ? `[${level}][${tag}] ${JSON.stringify(message)}`
+        : `[${level}][${tag}] ${replaceAll(message, '\n', '')}`;
 
     if (passesFilter(msg, getLogFilters(), false)) {
       channel.appendLine(msg);
@@ -126,10 +126,10 @@ function writeLog(body: string, channel: OutputChannel) {
   try {
     const lines = JSON.parse(body);
     if (!Array.isArray(lines)) {
-      write(lines.level, lines.message);
+      write(lines.level, lines.message, lines.tag);
     } else {
       for (const line of lines) {
-        write(line.level, line.message);
+        write(line.level, line.message, line.tag);
       }
     }
   } catch {

@@ -48,7 +48,7 @@ function getOptions(): LogOption[] {
     },
     {
       label: 'Console Logging',
-      description: 'Console.log, Console.warn and Console.error',
+      description: 'Console.log, Console.warn or Console.error',
       value: 'console',
       separator: 'Nexus Browser Logging',
     },
@@ -56,11 +56,6 @@ function getOptions(): LogOption[] {
       label: 'Capacitor Calls',
       description: 'Calls to native capacitor plugin methods [capacitor]',
       value: '[capacitor]',
-    },
-    {
-      label: 'Capacitor Responses',
-      description: 'Responses from native capacitor methods [capacitor-js]',
-      value: '[capacitor-js]',
     },
     {
       label: 'Cordova Calls',
@@ -71,6 +66,21 @@ function getOptions(): LogOption[] {
       label: 'Webpack Dev Server',
       description: 'Logging from web pack dev server [webpack-dev-server]',
       value: '[webpack-dev-server]',
+    },
+    {
+      label: 'Verbose',
+      description: 'Verbose level [verbose]',
+      value: '[verbose]',
+    },
+    {
+      label: 'Warning',
+      description: 'Warning level [warn]',
+      value: '[warn]',
+    },
+    {
+      label: 'Error',
+      description: 'Error level [error]',
+      value: '[error]',
     },
   ];
 }
