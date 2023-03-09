@@ -1,8 +1,9 @@
 ## Changelog
 
-### Version 1.29
+### Version 1.29.1
 
 - Logging filters added to settings
+- Fix for NX projects that expect @nrwl/cli globally
 
 ### Version 1.28
 
