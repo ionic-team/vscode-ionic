@@ -1,4 +1,4 @@
-import { inspectProject, ProjectSummary } from './project';
+import { inspectProject, Project, ProjectSummary } from './project';
 import * as vscode from 'vscode';
 import { writeFileSync, readdirSync, statSync, existsSync } from 'fs';
 import { join } from 'path';
@@ -6,8 +6,12 @@ import { PackageInfo } from './package-info';
 import { getStringFrom } from './utilities';
 import { Recommendation } from './recommendation';
 
-export async function ionicExport(workspaceRoot: string, context: vscode.ExtensionContext): Promise<void> {
-  const summary: ProjectSummary = await inspectProject(workspaceRoot, context, undefined);
+export async function ionicExport(project: Project, context: vscode.ExtensionContext): Promise<void> {
+  let folder = project.projectFolder();
+  if (project.monoRepo.nodeModulesAtRoot) {
+    folder = project.folder;
+  }
+  const summary: ProjectSummary = await inspectProject(folder, context, undefined);
   let txt = '';
   for (const libType of ['Capacitor Plugin', 'Plugin', 'Dependency']) {
     let lastScope = '';

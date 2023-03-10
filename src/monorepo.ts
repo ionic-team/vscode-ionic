@@ -12,6 +12,7 @@ import { Context, VSCommand } from './context-variables';
 import { getPnpmWorkspaces } from './monorepos-pnpm';
 import { PackageManager } from './node-commands';
 import { getLernaWorkspaces } from './monorepos-lerna';
+import { join } from 'path';
 
 export interface MonoRepoProject {
   name: string;
@@ -52,7 +53,7 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
   const pw = path.join(project.folder, 'pnpm-workspace.yaml');
   const isPnpm = fs.existsSync(pw);
 
-  if (exists('@nrwl/cli')) {
+  if (exists('@nrwl/cli') || fs.existsSync(join(project.folder, 'nx.json'))) {
     project.repoType = MonoRepoType.nx;
     projects = getNXProjects(project);
     ionicState.projects = projects;

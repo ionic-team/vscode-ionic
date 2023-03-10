@@ -1,3 +1,4 @@
+import { exists } from './analyzer';
 import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
 import { Tip, TipType } from './tip';
@@ -9,7 +10,15 @@ export function checkIonicNativePackages(packages, project: Project) {
       if (name == '@ionic-native/unique-device-id' || name == '@ionic-native/contacts') {
         project.deprecatedPlugin(name, 'Its support was removed from @awesome-cordova-plugins');
       } else {
-        replacePackage(project, name, replacement);
+        if (exists(replacement)) {
+          project.recommendRemove(
+            name,
+            name,
+            `You already have a newer version if this package installed (${replacement}) so ${name} can be uninstalled as it is not needed`
+          );
+        } else {
+          replacePackage(project, name, replacement);
+        }
       }
     }
   }

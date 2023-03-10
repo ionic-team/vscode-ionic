@@ -254,7 +254,7 @@ export async function getRecommendations(
     );
     project.add(
       new Tip('Export', '', TipType.Media)
-        .setAction(ionicExport, project.projectFolder(), ionicState.context)
+        .setAction(ionicExport, project, ionicState.context)
         .setTooltip('Export a markdown file with all project dependencies and plugins')
     );
   }
