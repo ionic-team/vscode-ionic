@@ -5,6 +5,7 @@
 - Logging filters added to settings
 - Fix for NX projects that expect @nrwl/cli globally
 - Rule for duplicate @ionic-native and @awesome-cordova-plugins packages
+- Project export for NX fixed
 
 ### Version 1.28
 
