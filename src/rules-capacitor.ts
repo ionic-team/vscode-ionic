@@ -27,6 +27,7 @@ import { migrateCapacitor } from './capacitor-migrate';
 import { checkAngularJson } from './rules-angular-json';
 import { checkBrowsersList } from './rules-browserslist';
 import { ionicState } from './ionic-tree-provider';
+import { integratePrettier } from './prettier';
 
 /**
  * Check rules for Capacitor projects
@@ -281,6 +282,16 @@ export function capacitorRecommendations(project: Project): Tip[] {
           .canIgnore()
       );
     }
+  }
+
+  if (!exists('husky')) {
+    const csTip = new Tip(
+      'Enforce Coding Standards',
+      '',
+      TipType.Idea,
+      'Enforce coding standard using Prettier, ESLint and Husky'
+    ).canIgnore();
+    tips.push(csTip.setAction(integratePrettier, project, csTip, ionicState.context));
   }
 
   // List of incompatible plugins

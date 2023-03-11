@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.30
+
+- Feature to enforce coding standards using Prettier and ESLint
+
 ### Version 1.29.1
 
 - Logging filters added to settings

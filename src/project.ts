@@ -5,7 +5,7 @@ import * as path from 'path';
 import { Recommendation } from './recommendation';
 import { Tip, TipType } from './tip';
 import { load, exists } from './analyzer';
-import { fixIssue, isRunning } from './extension';
+import { fixIssue, getOutputChannel, isRunning } from './extension';
 import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
 import { Context, VSCommand } from './context-variables';
@@ -17,6 +17,7 @@ import { checkForMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
 import { CapacitorPlatform } from './capacitor-platform';
 import { addCommand, npmInstall, npmUninstall, PackageManager } from './node-commands';
 import { getCapacitorConfigWebDir } from './capacitor-configure';
+import { run } from './utilities';
 
 export class Project {
   name: string;
@@ -257,6 +258,22 @@ export class Project {
     } else {
       this.group.children.push(r);
     }
+  }
+
+  public async run2(command: string, suppressOutput?: boolean): Promise<boolean> {
+    const channel = getOutputChannel();
+    return await run(
+      this.projectFolder(),
+      command,
+      channel,
+      undefined,
+      [],
+      [],
+      undefined,
+      undefined,
+      undefined,
+      suppressOutput
+    );
   }
 
   public asRecommendation(tip: Tip): Recommendation {

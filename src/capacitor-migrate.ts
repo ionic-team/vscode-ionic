@@ -5,7 +5,7 @@ import { exists, isVersionGreaterOrEqual } from './analyzer';
 import { getOutputChannel, writeError, writeIonic } from './extension';
 import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
-import { getStringFrom, run, setAllStringIn, showProgress } from './utilities';
+import { getStringFrom, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
 import { ActionResult } from './command-name';
 
@@ -34,14 +34,13 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
     try {
       let replaceStorage = false;
       if (exists('@capacitor/storage')) {
-        await run2(project, npmUninstall(`@capacitor/storage --force`));
+        await project.run2(npmUninstall(`@capacitor/storage --force`));
         replaceStorage = true;
       }
       if (exists('@capacitor/cli')) {
-        await run2(project, npmInstall(`@capacitor/cli@4 --save-dev --force`));
+        await project.run2(npmInstall(`@capacitor/cli@4 --save-dev --force`));
       }
-      await run2(
-        project,
+      await project.run2(
         install(
           ['@capacitor/core', '@capacitor/ios', '@capacitor/android', '@capacitor/cli'],
           [
@@ -75,7 +74,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
       );
 
       if (replaceStorage) {
-        await run2(project, npmInstall(`@capacitor/preferences@${pluginVersion}`));
+        await project.run2(npmInstall(`@capacitor/preferences@${pluginVersion}`));
         writeIonic('Migrated @capacitor/storage to @capacitor/preferences.');
       }
 
@@ -205,7 +204,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
       }
 
       // Ran Cap Sync
-      await run2(project, capacitorSync(project), true);
+      await project.run2(capacitorSync(project), true);
 
       writeIonic('Capacitor 4 Migration Completed.');
 
@@ -658,22 +657,6 @@ function install(libs: Array<string>, plugins: Array<string>, version: string, p
   }
 
   return npmInstall(result.trim() + ' --force');
-}
-
-async function run2(project: Project, command: string, suppressOutput?: boolean): Promise<boolean> {
-  const channel = getOutputChannel();
-  return await run(
-    project.projectFolder(),
-    command,
-    channel,
-    undefined,
-    [],
-    [],
-    undefined,
-    undefined,
-    undefined,
-    suppressOutput
-  );
 }
 
 function daysUntil(date_1: Date) {

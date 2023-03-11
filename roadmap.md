@@ -2,6 +2,10 @@
 
 x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 
+- (feat) Coding standards;: Review
+  https://github.com/ionic-team/prettier-config
+  https://github.com/ionic-team/eslint-config
+
 - (feat) Use https://stackoverflow.com/a/22040887 for Android and dont use Julios SSL plugin
 - (feat) Open in Editor as web site
 - (feat) Dark/Light mode (add 'dark' to class of body)
