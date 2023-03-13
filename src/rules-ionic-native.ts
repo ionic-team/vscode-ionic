@@ -14,7 +14,7 @@ export function checkIonicNativePackages(packages, project: Project) {
           project.recommendRemove(
             name,
             name,
-            `You already have a newer version if this package installed (${replacement}) so ${name} can be uninstalled as it is not needed`
+            `You already have a newer version of this package installed (${replacement}) so ${name} can be uninstalled as it is not needed`
           );
         } else {
           replacePackage(project, name, replacement);
