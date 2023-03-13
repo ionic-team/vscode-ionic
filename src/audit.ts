@@ -7,7 +7,11 @@ export async function audit(project: Project): Promise<void> {
   try {
     clearOutput();
     await showProgress('Auditing project dependencies...', async () => {
-      const data = await getRunOutput('npm audit --json', project.projectFolder());
+      let folder = project.projectFolder();
+      if (project.monoRepo.nodeModulesAtRoot) {
+        folder = project.folder;
+      }
+      const data = await getRunOutput('npm audit --json', folder);
       const audit: Audit = JSON.parse(data);
       completeAudit(project, audit);
     });

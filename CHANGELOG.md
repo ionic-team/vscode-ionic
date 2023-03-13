@@ -3,6 +3,7 @@
 ### Version 1.30
 
 - Feature to enforce coding standards using Prettier and ESLint
+- NX Projects now run statistics and security audits
 
 ### Version 1.29.1
 

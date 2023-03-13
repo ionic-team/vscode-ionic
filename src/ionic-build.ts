@@ -30,7 +30,7 @@ export function ionicBuild(project: Project, configurationArg?: string): string 
     case MonoRepoType.npm:
       return `${InternalCommand.cwd}${preop}${ionicCLIBuild(prod, project, configurationArg)}`;
     case MonoRepoType.nx:
-      return `${preop}${nxBuild(prod, project)}`;
+      return `${preop}${nxBuild(prod, project, configurationArg)}`;
     case MonoRepoType.folder:
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
