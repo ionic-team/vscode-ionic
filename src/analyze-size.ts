@@ -1,6 +1,6 @@
 import { getOutputChannel, writeError, writeIonic } from './extension';
 import { Project } from './project';
-import { openUri, run, RunResults, showProgress } from './utilities';
+import { openUri, run, RunResults, showProgress, stripJSON } from './utilities';
 import * as vscode from 'vscode';
 import { basename, extname, join } from 'path';
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'fs';
@@ -41,7 +41,7 @@ export async function analyzeSize(project: Project) {
 
       const html =
         analyseResults(
-          analyzeBundles(result.output),
+          analyzeBundles(stripJSON(result.output, '{')),
           'Bundle Analysis',
           'Size of Javascript bundles for your code and 3rd party packages.'
         ) +

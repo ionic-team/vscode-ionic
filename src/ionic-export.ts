@@ -8,7 +8,7 @@ import { Recommendation } from './recommendation';
 
 export async function ionicExport(project: Project, context: vscode.ExtensionContext): Promise<void> {
   let folder = project.projectFolder();
-  if (project.monoRepo.nodeModulesAtRoot) {
+  if (project.monoRepo?.nodeModulesAtRoot) {
     folder = project.folder;
   }
   const summary: ProjectSummary = await inspectProject(folder, context, undefined);

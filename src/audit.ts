@@ -1,6 +1,6 @@
 import { clearOutput, getOutputChannel, writeError, writeIonic } from './extension';
 import { Project } from './project';
-import { getRunOutput, run, showProgress } from './utilities';
+import { getRunOutput, run, showProgress, stripJSON } from './utilities';
 import * as vscode from 'vscode';
 
 export async function audit(project: Project): Promise<void> {
@@ -8,12 +8,17 @@ export async function audit(project: Project): Promise<void> {
     clearOutput();
     await showProgress('Auditing project dependencies...', async () => {
       let folder = project.projectFolder();
-      if (project.monoRepo.nodeModulesAtRoot) {
+      if (project.monoRepo?.nodeModulesAtRoot) {
         folder = project.folder;
       }
       const data = await getRunOutput('npm audit --json', folder);
-      const audit: Audit = JSON.parse(data);
-      completeAudit(project, audit);
+      try {
+        const audit: Audit = JSON.parse(stripJSON(data, '{'));
+        completeAudit(project, audit);
+      } catch (error) {
+        writeError('npm audit --json failed with:');
+        writeError(data);
+      }
     });
   } catch (error) {
     writeError(error);

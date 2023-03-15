@@ -9,9 +9,10 @@ import {
   warnMinVersion,
 } from './analyzer';
 import { getPackageJSONFilename } from './monorepo';
-import { npmInstall } from './node-commands';
+import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
 import { Tip, TipType } from './tip';
+import { getRunOutput } from './utilities';
 
 /**
  * Check rules for Cordova projects
@@ -135,6 +136,12 @@ async function fixPackageJson(project: Project): Promise<void> {
     delete data.cordova;
     const updated = JSON.stringify(data, undefined, 2);
     writeFileSync(filename, updated);
+  }
+  if (exists('cordova-ios')) {
+    await getRunOutput(npmUninstall('cordova-ios'), project.folder);
+  }
+  if (exists('cordova-android')) {
+    await getRunOutput(npmUninstall('cordova-android'), project.folder);
   }
 }
 

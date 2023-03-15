@@ -433,6 +433,15 @@ export function debugSkipFiles(): string {
   }
 }
 
+export function stripJSON(txt: string, startText: string): string {
+  // This removed output from nvm from json
+  const idx = txt.indexOf(startText);
+  if (idx != -1) {
+    return txt.substring(idx);
+  }
+  return txt;
+}
+
 export async function getRunOutput(command: string, folder: string, shell?: string): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';

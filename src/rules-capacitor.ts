@@ -293,7 +293,8 @@ export function capacitorRecommendations(project: Project, forMigration: boolean
     }
   }
 
-  if (!exists('husky') && project.isCapacitor) {
+  const codingStandards = false; // TODO: REMOVE THIS WHEN THE FEATURE IS AVAILABLE
+  if (!exists('husky') && project.isCapacitor && codingStandards) {
     const csTip = new Tip(
       'Enforce Coding Standards',
       '',
