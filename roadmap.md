@@ -5,7 +5,9 @@ x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - (feat) Coding standards;: Review
   https://github.com/ionic-team/prettier-config
   https://github.com/ionic-team/eslint-config
-
+- (feat) Run->iOS - if windows then prompt that "This feature requires a Mac"
+- (feat) Open in Xcode - Similarly requires a Mac
+- (feat) Use Https - if openssl is not installed show an error message
 - (feat) Use https://stackoverflow.com/a/22040887 for Android and dont use Julios SSL plugin
 - (feat) Open in Editor as web site
 - (feat) Dark/Light mode (add 'dark' to class of body)
