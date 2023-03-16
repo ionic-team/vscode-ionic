@@ -293,7 +293,7 @@ export async function getRecommendations(
     checkCapacitorRules(project);
     checkIonicNativePackages(packages, project);
     checkCordovaPlugins(packages, project);
-    project.tips(capacitorRecommendations(project));
+    project.tips(capacitorRecommendations(project, false));
   }
   if (!project.isCapacitor && !project.isCordova) {
     // The project is not using Cordova or Capacitor

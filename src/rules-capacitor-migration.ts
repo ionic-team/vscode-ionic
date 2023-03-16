@@ -16,7 +16,7 @@ export function capacitorMigrationChecks(packages, project: Project) {
     true
   );
 
-  tips.push(...capacitorRecommendations(project));
+  tips.push(...capacitorRecommendations(project, true));
 
   // Plugins with Hooks
   tips.push(...reviewPluginsWithHooks(packages));

@@ -29,8 +29,7 @@ export function capacitorRun(project: Project, platform: CapacitorPlatform): str
   if (ionicState.projectDirty) {
     const channel = getOutputChannel();
     channel.appendLine('[Ionic] Rebuilding as you changed your project...');
-    preop = ionicBuild(project) + ' && ';
-    preop += `${npx(project.packageManager)} cap copy ${platform} && `;
+    preop = ionicBuild(project);
     rebuilt = true;
   } else {
     preop = preflightNPMCheck(project);
@@ -50,7 +49,7 @@ export function capacitorRun(project: Project, platform: CapacitorPlatform): str
     case MonoRepoType.npm:
       return preop + capRun(platform, project.repoType, rebuilt, noSync, project);
     case MonoRepoType.nx:
-      return preop + nxRun(project, platform);
+      return preop + nxRun(platform, project.repoType, rebuilt, noSync, project);
     default:
       throw new Error('Unsupported Monorepo type');
   }
@@ -146,7 +145,16 @@ function capRun(
   } ${capRunFlags}`;
 }
 
-function nxRun(project: Project, platform: CapacitorPlatform): string {
+function nxRun(
+  platform: CapacitorPlatform,
+  repoType: MonoRepoType,
+  noBuild: boolean,
+  noSync: boolean,
+  project: Project
+): string {
+  if (project.monoRepo?.isNXStandalone) {
+    return capRun(platform, repoType, noBuild, noSync, project);
+  }
   // Note: This may change, see: https://github.com/nxtend-team/nxtend/issues/490
   return `${npx(project.packageManager)} nx run ${project.monoRepo.name}:cap --cmd "run ${platform} --target=${
     InternalCommand.target

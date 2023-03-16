@@ -10,6 +10,7 @@ import { existsSync, readFileSync, writeFileSync } from 'fs';
 
 enum Features {
   migrateToPNPM = 'Migrate to PNPM',
+  migrateToNX = 'Migrate to NX',
   reinstallNodeModules = 'Reinstall Node Modules',
   angularESBuild = 'Switch from WebPack to ESBuild (experimental)',
 }
@@ -18,6 +19,10 @@ export async function advancedActions(project: Project) {
   const picks: Array<Features> = [];
   if (project.packageManager == PackageManager.npm) {
     picks.push(Features.migrateToPNPM);
+
+    if (isGreaterOrEqual('@angular/core', '14.0.0')) {
+      picks.push(Features.migrateToNX);
+    }
     picks.push(Features.reinstallNodeModules);
   }
   if (isGreaterOrEqual('@angular-devkit/build-angular', '14.0.0')) {
@@ -29,6 +34,9 @@ export async function advancedActions(project: Project) {
   switch (selection) {
     case Features.migrateToPNPM:
       await runCommands(migrateToPNPM(), selection, project);
+      break;
+    case Features.migrateToNX:
+      await vscode.window.showInformationMessage('Run the following command: npx nx init', 'OK');
       break;
     case Features.reinstallNodeModules:
       await runCommands(reinstallNodeModules(), selection, project);

@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { coerce } from 'semver';
 import { Command, Tip, TipType } from './tip';
 import { Project } from './project';
-import { getRunOutput, getStringFrom, setAllStringIn } from './utilities';
+import { getRunOutput, getStringFrom, setAllStringIn, stripJSON } from './utilities';
 import { NpmDependency, NpmOutdatedDependency, NpmPackage, PackageType, PackageVersion } from './npm-model';
 import { listCommand, outdatedCommand } from './node-commands';
 import { CapProjectCache, PackageCacheList, PackageCacheModified, PackageCacheOutdated } from './context-variables';
@@ -112,7 +112,7 @@ export async function processPackages(
 
 function getOutdatedData(outdated: string): any {
   try {
-    return JSON.parse(outdated);
+    return JSON.parse(stripJSON(outdated, '{'));
   } catch {
     return [];
   }

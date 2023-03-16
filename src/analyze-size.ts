@@ -1,10 +1,11 @@
 import { getOutputChannel, writeError, writeIonic } from './extension';
 import { Project } from './project';
-import { openUri, run, RunResults, showProgress } from './utilities';
+import { openUri, run, RunResults, showProgress, stripJSON } from './utilities';
 import * as vscode from 'vscode';
 import { basename, extname, join } from 'path';
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'fs';
 import { ionicBuild } from './ionic-build';
+import { MonoRepoType } from './monorepo';
 
 /**
  * Generates a readable analysis of Javascript bundle sizes
@@ -18,7 +19,11 @@ export async function analyzeSize(project: Project) {
     try {
       previousValue = enableSourceMaps(project);
       writeIonic('Building for production with Sourcemaps...');
-      const cmd = ionicBuild(project, '--prod');
+      let args = '--prod';
+      if (project.repoType == MonoRepoType.nx) {
+        args = '--configuration=production';
+      }
+      const cmd = ionicBuild(project, args);
       const bumpSize = process.platform !== 'win32' ? 'export NODE_OPTIONS="--max-old-space-size=8192" && ' : '';
       try {
         await run2(project, `${bumpSize}${cmd}`, undefined);
@@ -35,13 +40,13 @@ export async function analyzeSize(project: Project) {
       }
 
       const html =
-        analyseResults(
-          analyzeBundles(result.output),
+        analyzeResults(
+          analyzeBundles(stripJSON(result.output, '{')),
           'Bundle Analysis',
           'Size of Javascript bundles for your code and 3rd party packages.'
         ) +
-        analyseResults(
-          analyseAssets(dist, project.projectFolder()),
+        analyzeResults(
+          analyzeAssets(dist, project.projectFolder()),
           'Asset Analysis',
           'Size of assets in your distribution folder.'
         );
@@ -60,19 +65,24 @@ export async function analyzeSize(project: Project) {
  */
 function enableSourceMaps(project: Project): string {
   try {
-    const filename = join(project.folder, 'angular.json');
+    let filename = join(project.folder, 'angular.json');
+    if (!existsSync(filename)) {
+      filename = join(project.projectFolder(), 'project.json'); // NX Style
+    }
     let changeMade = false;
     if (existsSync(filename)) {
       const json = readFileSync(filename, 'utf-8');
       const config = JSON.parse(json);
-      for (const prj of Object.keys(config.projects)) {
-        if (config.projects[prj].architect?.build?.configurations?.production) {
-          const previousValue = config.projects[prj].architect.build.configurations.production.sourceMap;
+      const projects = config.projects ? config.projects : { app: config };
+      for (const prj of Object.keys(projects)) {
+        const cfg = projects[prj].architect ? projects[prj].architect : projects[prj].targets;
+        if (cfg.build?.configurations?.production) {
+          const previousValue = cfg.build.configurations.production.sourceMap;
           if (previousValue == true) {
             // Great nothing to do, already enabled
             return previousValue;
           } else {
-            config.projects[prj].architect.build.configurations.production.sourceMap = true;
+            cfg.build.configurations.production.sourceMap = true;
             writeIonic(`Temporarily modified production sourceMap of ${prj} to true in angular.json`);
             changeMade = true;
           }
@@ -90,7 +100,7 @@ function enableSourceMaps(project: Project): string {
 }
 
 /**
- * Reverts the projects configuation back to its previous settings before source maps were turned on
+ * Reverts the projects configuration back to its previous settings before source maps were turned on
  * @param  {Project} project
  * @param  {string} previousValue
  */
@@ -98,7 +108,10 @@ function revertSourceMaps(project: Project, previousValue: string) {
   if (previousValue == undefined) {
     return;
   }
-  const filename = join(project.folder, 'angular.json');
+  let filename = join(project.folder, 'angular.json');
+  if (!existsSync(filename)) {
+    filename = join(project.projectFolder(), 'project.json'); // NX Style
+  }
   if (existsSync(filename)) {
     writeFileSync(filename, previousValue, { encoding: 'utf-8' });
   }
@@ -188,7 +201,7 @@ function analyzeBundles(json: string): Array<FileInfo> {
   return files;
 }
 
-function analyseResults(files: Array<FileInfo>, title: string, blurb: string): string {
+function analyzeResults(files: Array<FileInfo>, title: string, blurb: string): string {
   let html = '';
   let largestGroup = 0;
   const groups = {};
@@ -468,7 +481,7 @@ async function run2(project: Project, command: string, output: RunResults): Prom
   return await run(project.projectFolder(), command, channel, undefined, [], [], undefined, undefined, output, true);
 }
 
-function analyseAssets(distFolder: string, prjFolder: string): Array<FileInfo> {
+function analyzeAssets(distFolder: string, prjFolder: string): Array<FileInfo> {
   // Summarize files other than js
   const files = getAllFiles(distFolder);
   const excludedFileTypes = ['.js', '.map'];

@@ -20,6 +20,7 @@ export interface MonoRepoProject {
   localPackageJson?: boolean; // Is the package.json in the local project folder
   nodeModulesAtRoot?: boolean; // Is the node_modules folder at the root
   isIonic?: boolean; // Does it looks like an ionic project using @ionic/vue etc
+  isNXStandalone?: boolean; // Is this a standalone NX Monorepo
 }
 
 export interface MonoFolder {
@@ -56,6 +57,10 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
   if (exists('@nrwl/cli') || fs.existsSync(join(project.folder, 'nx.json'))) {
     project.repoType = MonoRepoType.nx;
     projects = getNXProjects(project);
+    if (projects.length == 0) {
+      // Standalone nx project
+      projects.push({ name: 'app', folder: '', nodeModulesAtRoot: true, isNXStandalone: true });
+    }
     ionicState.projects = projects;
     ionicState.projectsView.title = 'NX Projects';
   } else if (project.workspaces?.length > 0 && !isPnpm) {
@@ -140,9 +145,9 @@ export function isFolderBasedMonoRepo(rootFolder: string): Array<MonoFolder> {
     .map((dir) => dir.name);
   const result = [];
   for (const folder of folders) {
-    const packagejson = path.join(rootFolder, folder, 'package.json');
-    if (fs.existsSync(packagejson)) {
-      result.push({ name: folder, packageJson: packagejson, path: path.join(rootFolder, folder) });
+    const packageJson = path.join(rootFolder, folder, 'package.json');
+    if (fs.existsSync(packageJson)) {
+      result.push({ name: folder, packageJson: packageJson, path: path.join(rootFolder, folder) });
     }
   }
   return result;

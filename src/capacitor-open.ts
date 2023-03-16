@@ -42,5 +42,8 @@ function ionicCLIOpen(platform: CapacitorPlatform, packageManager: PackageManage
 }
 
 function nxOpen(project: Project, platform: CapacitorPlatform): string {
+  if (project.monoRepo.isNXStandalone) {
+    return capCLIOpen(platform, project.packageManager);
+  }
   return `${npx(project.packageManager)} nx run ${project.monoRepo.name}:open:${platform}`;
 }

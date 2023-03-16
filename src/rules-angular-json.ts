@@ -10,8 +10,8 @@ import { ionicState } from './ionic-tree-provider';
 /**
  * For Capacitor project if @angular/core >= v13 then
  * Check if aot is false in angular.json and remove it
- * Note: When Angular defaulted to AOT only the Ionic starter wasnt updated
- * and it misses syntax errors checked by AOT that arent in JIT
+ * Note: When Angular defaulted to AOT only the Ionic starter was not updated
+ * and it misses syntax errors checked by AOT that are not in JIT
  * @param  {Project} project
  */
 export function checkAngularJson(project: Project) {
