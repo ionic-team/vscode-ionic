@@ -2,7 +2,7 @@
 
 ### Version 1.30
 
-- Feature to enforce coding standards using Prettier and ESLint
+- NX 15 support for Standalone projects or projects with @nxext/capacitor
 - NX Projects now run statistics and security audits
 - Preselect real devices if there is only one real device connected
 - Simplify list of devices with icon for real or emulator
