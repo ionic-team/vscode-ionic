@@ -40,13 +40,13 @@ export async function analyzeSize(project: Project) {
       }
 
       const html =
-        analyseResults(
+        analyzeResults(
           analyzeBundles(stripJSON(result.output, '{')),
           'Bundle Analysis',
           'Size of Javascript bundles for your code and 3rd party packages.'
         ) +
-        analyseResults(
-          analyseAssets(dist, project.projectFolder()),
+        analyzeResults(
+          analyzeAssets(dist, project.projectFolder()),
           'Asset Analysis',
           'Size of assets in your distribution folder.'
         );
@@ -100,7 +100,7 @@ function enableSourceMaps(project: Project): string {
 }
 
 /**
- * Reverts the projects configuation back to its previous settings before source maps were turned on
+ * Reverts the projects configuration back to its previous settings before source maps were turned on
  * @param  {Project} project
  * @param  {string} previousValue
  */
@@ -201,7 +201,7 @@ function analyzeBundles(json: string): Array<FileInfo> {
   return files;
 }
 
-function analyseResults(files: Array<FileInfo>, title: string, blurb: string): string {
+function analyzeResults(files: Array<FileInfo>, title: string, blurb: string): string {
   let html = '';
   let largestGroup = 0;
   const groups = {};
@@ -481,7 +481,7 @@ async function run2(project: Project, command: string, output: RunResults): Prom
   return await run(project.projectFolder(), command, channel, undefined, [], [], undefined, undefined, output, true);
 }
 
-function analyseAssets(distFolder: string, prjFolder: string): Array<FileInfo> {
+function analyzeAssets(distFolder: string, prjFolder: string): Array<FileInfo> {
   // Summarize files other than js
   const files = getAllFiles(distFolder);
   const excludedFileTypes = ['.js', '.map'];

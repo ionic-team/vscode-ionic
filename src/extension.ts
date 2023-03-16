@@ -125,10 +125,12 @@ export function finishCommand(tip: Tip) {
   });
 }
 
-function startCommand(tip: Tip, cmd: string, ionicProvider: IonicTreeProvider) {
+function startCommand(tip: Tip, cmd: string, clear?: boolean) {
   if (tip.title) {
     const message = tip.commandTitle ? tip.commandTitle : tip.title;
-    channel.clear();
+    if (clear !== false) {
+      channel.clear();
+    }
     channel.appendLine(`[Ionic] ${message}...`);
     let command = cmd;
     if (command?.includes(InternalCommand.cwd)) {
@@ -252,6 +254,7 @@ export async function fixIssue(
   lastOperation = tip;
   let msg = tip.commandProgress ? tip.commandProgress : tip.commandTitle ? tip.commandTitle : command;
   if (title) msg = title;
+  let failed = false;
   await vscode.window.withProgress(
     {
       location: tip.progressDialog ? vscode.ProgressLocation.Notification : vscode.ProgressLocation.Window,
@@ -293,8 +296,10 @@ export async function fixIssue(
 
       const commands = Array.isArray(command) ? command : [command];
 
+      let clear = true;
       for (const cmd of commands) {
-        startCommand(tip, cmd, ionicProvider);
+        startCommand(tip, cmd, clear);
+        clear = false;
         const secondsTotal = estimateRunTime(cmd);
         if (secondsTotal) {
           increment = 100.0 / secondsTotal;
@@ -319,7 +324,8 @@ export async function fixIssue(
               );
             } catch (err) {
               retry = false;
-              channel.appendLine('[Ionic] ' + err);
+              failed = true;
+              writeError(err);
             }
           }
         } finally {
@@ -336,7 +342,11 @@ export async function fixIssue(
     channel.appendLine(successMessage);
   }
   if (tip.title) {
-    channel.appendLine(`[Ionic] ${tip.title} Completed.`);
+    if (failed) {
+      writeError(`${tip.title} Failed.`);
+    } else {
+      writeIonic(`${tip.title} Completed.`);
+    }
     channel.appendLine('');
     channelShow(channel);
   }

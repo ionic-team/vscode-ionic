@@ -45,6 +45,7 @@ function runOptions(command: string, folder: string, shell?: string) {
     command.includes('sync') ||
     command.includes('capacitor init') ||
     command.includes('cap run ios') ||
+    command.includes('npx nx run') ||
     command.includes('cap add') ||
     command.includes('npm run')
   ) {
@@ -54,9 +55,9 @@ function runOptions(command: string, folder: string, shell?: string) {
   if (javaHome) {
     env.JAVA_HOME = javaHome;
   } else if (!env.JAVA_HOME && process.platform !== 'win32') {
-    const jhome = '/Applications/Android Studio.app/Contents/jre/Contents/Home';
-    if (existsSync(jhome)) {
-      env.JAVA_HOME = jhome;
+    const jHome = '/Applications/Android Studio.app/Contents/jre/Contents/Home';
+    if (existsSync(jHome)) {
+      env.JAVA_HOME = jHome;
     }
   }
 
@@ -211,7 +212,7 @@ export async function run(
     const proc = exec(
       command,
       runOptions(command, folder),
-      async (error: ExecException, stdout: string, stderror: string) => {
+      async (error: ExecException, stdout: string, stdError: string) => {
         let retry = false;
         if (error) {
           console.error(error);
@@ -233,7 +234,7 @@ export async function run(
           resolve(retry);
         } else {
           if (!cancelObject?.cancelled) {
-            retry = await handleError(stderror, logs, folder);
+            retry = await handleError(stdError, logs, folder);
           }
           clearInterval(interval);
           if (retry) {
@@ -446,16 +447,16 @@ export async function getRunOutput(command: string, folder: string, shell?: stri
   return new Promise((resolve, reject) => {
     let out = '';
     command = qualifyCommand(command, folder);
-    exec(command, runOptions(command, folder, shell), (error: ExecException, stdout: string, stderror: string) => {
+    exec(command, runOptions(command, folder, shell), (error: ExecException, stdout: string, stdError: string) => {
       if (stdout) {
         out += stdout;
       }
       if (!error) {
         resolve(out);
       } else {
-        if (stderror) {
-          writeError(stderror);
-          reject(stderror);
+        if (stdError) {
+          writeError(stdError);
+          reject(stdError);
         } else {
           // This is to fix a bug in npm outdated where it returns an exit code when it succeeds
           resolve(out);
@@ -572,7 +573,7 @@ export function generateUUID(): string {
   return new Date().getTime().toString(36) + Math.random().toString(36).slice(2);
 }
 /**
- * Given user input convert to a usuable app identifier
+ * Given user input convert to a usable app identifier
  * @param  {string} name
  * @returns string
  */
@@ -668,14 +669,14 @@ function removeCordovaFromPackageJSON(folder: string): Promise<boolean> {
       writeFileSync(filename, JSON.stringify(packageFile, undefined, 2));
 
       // Also replace cordova in ionic.config.json
-      const ifilename = join(folder, 'ionic.config.json');
-      if (existsSync(ifilename)) {
-        const ionicConfig = JSON.parse(readFileSync(ifilename, 'utf8'));
+      const iFilename = join(folder, 'ionic.config.json');
+      if (existsSync(iFilename)) {
+        const ionicConfig = JSON.parse(readFileSync(iFilename, 'utf8'));
         if (ionicConfig.integrations.cordova) {
           delete ionicConfig.integrations.cordova;
           ionicConfig.integrations.capacitor = new Object();
         }
-        writeFileSync(ifilename, JSON.stringify(ionicConfig, undefined, 2));
+        writeFileSync(iFilename, JSON.stringify(ionicConfig, undefined, 2));
       }
       resolve(false);
     } catch (err) {

@@ -2,13 +2,16 @@
 
 x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 
+- In NX, if project.json is missing a name then add name to it
+- In NX, if running the Podfile will fail (seems to be relative node_modules folder issue)
+
 - (feat) Coding standards;: Review
   https://github.com/ionic-team/prettier-config
   https://github.com/ionic-team/eslint-config
 - (feat) Run->iOS - if windows then prompt that "This feature requires a Mac"
 - (feat) Open in Xcode - Similarly requires a Mac
 - (feat) Use Https - if openssl is not installed show an error message
-- (feat) Use https://stackoverflow.com/a/22040887 for Android and dont use Julios SSL plugin
+- (feat) Use https://stackoverflow.com/a/22040887 for Android and dont use Julio's SSL plugin
 - (feat) Open in Editor as web site
 - (feat) Dark/Light mode (add 'dark' to class of body)
 - (feat) Rotate device

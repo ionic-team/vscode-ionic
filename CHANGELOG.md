@@ -260,7 +260,7 @@
 
 ### Version 1.8.3
 
-- Fix for splashscreen/icon viewing on Windows
+- Fix for splash screen/icon viewing on Windows
 - Settings for live reload, external IP and preview in editor now displayed
 - Hide progress dialogs for running on iOS and Android
 - Fix for mono repos when ionic cli is installed and capacitor sync is called
@@ -340,7 +340,7 @@
 - When re-running on iOS or Android the device does not need to be reselected
 - For projects not integrated with Ionic automate initialization of custom project with ionic:build and ionic:serve scripts
 - If you change your project and click run on iOS/Android it will rebuild the app before running
-- Undisplayable Ansi color text is removed from the output window
+- Un-displayable Ansi color text is removed from the output window
 - Recommendation for Ionic CLI installation to allow Live Reload to work for Ionic projects
 
 ### Version 1.4.1
@@ -451,11 +451,11 @@
 - Windows support added (fix for creating new Ionic/Capacitor projects)
 - Fix for duplicate commands when installed with Microsoft Cordova Tools extension
 - Fix to allow setting version numbers to non-semver strings
-- Fix for unrequired plugin cordova-plugin-add-swift-support is reported twice
+- Fix for un-required plugin cordova-plugin-add-swift-support is reported twice
 - Add recommendation for Capacitor migration for cordova-plugin-firebase-analytics
-- Add recommendaton for Capacitor migration of removal of cordova-plugin-enable-multidex
+- Add recommendation for Capacitor migration of removal of cordova-plugin-enable-multidex
 - Add cordova-plugin-firebasex to incompatible list for Capacitor
-- Add cordova-plugin-swrve to imcompatible list for Capacitor
+- Add cordova-plugin-swrve to incompatible list for Capacitor
 - App title is displayed above the tree view
 
 ### Version 1.0.0
@@ -476,7 +476,7 @@
 
 - When building/syncing show percentage (eg Building 65%)
 - When building Will perform npm install if no node_modules folder present
-- Ionic ClI comands are prefixed with npx to ensure that the local cli is used before global
+- Ionic ClI commands are prefixed with npx to ensure that the local cli is used before global
 - Scoped packages are placed in a subfolder. Eg @capacitor, @ionic etc
 - Packages are sorted alphabetically
 - Fix for preview of app in Editor (2 panes opened)
@@ -488,7 +488,7 @@
 - Option to install new packages
 - Option to uninstall packages
 - Allow JAVA_HOME to be set (to allow building with different version of Java)
-- Settings are now applied immediated (do not require a refresh)
+- Settings are now applied immediately (do not require a refresh)
 - Build command now uses ionic build
 - Production flag setting now correctly works
 - When rerunning an operation the previous operation is cancelled

@@ -229,6 +229,24 @@ export function capacitorRecommendations(project: Project, forMigration: boolean
     }
   }
 
+  if (project.repoType == MonoRepoType.nx && !exists('@nxext/capacitor') && exists('@nrwl/workspace')) {
+    tips.push(
+      new Tip(
+        'Add Capacitor Extension for NX',
+        '',
+        TipType.Capacitor,
+        'Add Capacitor Extension for NX?',
+        [npmInstall('@nxext/capacitor')],
+        'Add Capacitor NX',
+        'NX Support added for your project',
+        'https://nxext.dev/docs/capacitor/overview.html',
+        'Adding NX Support...'
+      )
+        .showProgressDialog()
+        .canIgnore()
+    );
+  }
+
   // Capacitor Integrations
   if (
     !project.fileExists('capacitor.config.ts') &&
@@ -294,7 +312,8 @@ export function capacitorRecommendations(project: Project, forMigration: boolean
     }
   }
 
-  if (!exists('husky') && project.isCapacitor) {
+  const TODO = false; // TODO: ALLOW THIS FEATURE
+  if (!exists('husky') && project.isCapacitor && TODO) {
     if (isGreaterOrEqual('typescript', '4.0.0')) {
       const csTip = new Tip(
         'Enforce Coding Standards',
@@ -391,7 +410,7 @@ export function capacitorRecommendations(project: Project, forMigration: boolean
   tips.push(
     notRequiredPlugin(
       'cordova-plugin-androidx',
-      'This was required for Cordova Android 10 support but isnt required by Capacitor'
+      'This was required for Cordova Android 10 support but is not required by Capacitor'
     )
   );
   tips.push(
@@ -401,7 +420,7 @@ export function capacitorRecommendations(project: Project, forMigration: boolean
   tips.push(
     notRequiredPlugin(
       'cordova-plugin-enable-multidex',
-      'Multidex is handled by Android Stuido and doesnt requiure a plugin'
+      'Multidex is handled by Android Studio and does not require a plugin'
     )
   );
   tips.push(

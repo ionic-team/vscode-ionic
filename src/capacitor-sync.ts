@@ -47,5 +47,8 @@ function ionicCLISync(packageManager: PackageManager): string {
 }
 
 function nxSync(project: Project): string {
+  if (project.monoRepo.isNXStandalone) {
+    return capCLISync(project.packageManager);
+  }
   return `${npx(project.packageManager)} nx sync ${project.monoRepo.name}${getConfigurationArgs()}`;
 }
