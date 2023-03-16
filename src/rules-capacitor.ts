@@ -10,6 +10,7 @@ import {
   incompatibleReplacementPlugin,
   isGreaterOrEqual,
   isLess,
+  isVersionGreaterOrEqual,
   notRequiredPlugin,
   replacementPlugin,
   startsWith,
@@ -293,8 +294,7 @@ export function capacitorRecommendations(project: Project, forMigration: boolean
     }
   }
 
-  const codingStandards = false; // TODO: REMOVE THIS WHEN THE FEATURE IS AVAILABLE
-  if (!exists('husky') && project.isCapacitor && codingStandards) {
+  if (!exists('husky') && project.isCapacitor && isVersionGreaterOrEqual('typescript', '4.0.0')) {
     const csTip = new Tip(
       'Enforce Coding Standards',
       '',
