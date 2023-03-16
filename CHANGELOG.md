@@ -4,6 +4,8 @@
 
 - Feature to enforce coding standards using Prettier and ESLint
 - NX Projects now run statistics and security audits
+- Preselect real devices if there is only one real device connected
+- Simplify list of devices with icon for real or emulator
 
 ### Version 1.29.1
 

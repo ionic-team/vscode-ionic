@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
+import { CommandName } from './command-name';
 import { handleError } from './error-handler';
+import { writeIonic } from './extension';
 import { ionicState } from './ionic-tree-provider';
 
 import { Tip } from './tip';
@@ -10,9 +12,16 @@ import { getRunOutput, replaceAll } from './utilities';
  * returns the command used to run on the selected device
  * @param  {string} command
  * @param  {string} rootPath
+ * @param {CommandName} srcCommand The command that triggered this (eg the ... button)
  */
-export async function selectDevice(command: string, rootPath: string, tip: Tip): Promise<string> {
-  const preselected = command.includes('android') ? ionicState.selectedAndroidDevice : ionicState.selectedIOSDevice;
+export async function selectDevice(
+  command: string,
+  rootPath: string,
+  tip: Tip,
+  srcCommand?: CommandName
+): Promise<string> {
+  const isAndroid = command.includes('android');
+  const preselected = isAndroid ? ionicState.selectedAndroidDevice : ionicState.selectedIOSDevice;
   if (preselected) {
     return preselected;
   }
@@ -21,22 +30,49 @@ export async function selectDevice(command: string, rootPath: string, tip: Tip):
     devices = await getDevices(command, rootPath);
   });
 
-  const names = devices.map((device) => device.name);
+  const realDevices = devices.filter(
+    (device) => !device.name.includes('(simulator)') && !device.name.includes('(emulator)')
+  );
+  const names = devices.map((device) => {
+    device.title = formatDeviceName(device.name);
+    return device.title;
+  });
+
   if (names.length == 0) {
     return;
   }
-  const selected = await vscode.window.showQuickPick(names, { placeHolder: 'Select a device to run application on' });
-  const device = devices.find((device) => device.name == selected);
+  let userChosen = false;
+  let selected: string | undefined = undefined;
+
+  if (realDevices?.length == 1 && srcCommand != CommandName.SelectDevice) {
+    // Auto select the device if it is not an emulator and the user did not choose the ... for device selection
+    selected = realDevices[0].title;
+  } else {
+    selected = await vscode.window.showQuickPick(names, { placeHolder: 'Select a device to run application on' });
+    userChosen = true;
+  }
+  const device = devices.find((device) => device.title == selected);
   if (!device) return;
   tip.commandTitle = device?.name;
-  if (command.includes('android')) {
-    ionicState.selectedAndroidDevice = device?.target;
-    ionicState.selectedAndroidDeviceName = device?.name;
-  } else {
-    ionicState.selectedIOSDevice = device?.target;
-    ionicState.selectedIOSDeviceName = device?.name;
+  if (userChosen) {
+    if (command.includes('android')) {
+      ionicState.selectedAndroidDevice = device?.target;
+      ionicState.selectedAndroidDeviceName = device?.name;
+    } else {
+      ionicState.selectedIOSDevice = device?.target;
+      ionicState.selectedIOSDeviceName = device?.name;
+    }
   }
   return device?.target;
+}
+
+function formatDeviceName(name: string): string {
+  const nice = name.replace('(simulator)', '').replace('(emulator)', '');
+  if (nice.length != name.length) {
+    return `$(device-mobile) ${nice}`;
+  } else {
+    return `$(ports-view-icon) ${nice}`;
+  }
 }
 
 function friendlyName(name: string): string {

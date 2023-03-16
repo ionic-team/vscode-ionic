@@ -511,7 +511,7 @@ export async function activate(context: vscode.ExtensionContext) {
       ionicState.selectedIOSDevice = undefined;
       ionicState.selectedIOSDeviceName = undefined;
     }
-    runAction(r.tip, ionicProvider, rootPath);
+    runAction(r.tip, ionicProvider, rootPath, CommandName.SelectDevice);
   });
 
   vscode.commands.registerCommand(CommandName.Link, async (tip: Tip) => {
@@ -540,7 +540,7 @@ function trackProjectChange() {
   });
 }
 
-async function runAction(tip: Tip, ionicProvider: IonicTreeProvider, rootPath: string) {
+async function runAction(tip: Tip, ionicProvider: IonicTreeProvider, rootPath: string, srcCommand?: CommandName) {
   if (await waitForOtherActions(tip)) {
     return; // Canceled
   }
@@ -562,7 +562,7 @@ async function runAction(tip: Tip, ionicProvider: IonicTreeProvider, rootPath: s
       }
     }
     if (tip.doDeviceSelection) {
-      const target = await selectDevice(tip.secondCommand as string, tip.data, tip);
+      const target = await selectDevice(tip.secondCommand as string, tip.data, tip, srcCommand);
       if (!target) {
         markActionAsCancelled(tip);
         ionicProvider.refresh();
