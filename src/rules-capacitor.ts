@@ -294,14 +294,16 @@ export function capacitorRecommendations(project: Project, forMigration: boolean
     }
   }
 
-  if (!exists('husky') && project.isCapacitor && isVersionGreaterOrEqual('typescript', '4.0.0')) {
-    const csTip = new Tip(
-      'Enforce Coding Standards',
-      '',
-      TipType.Idea,
-      'Enforce coding standard using Prettier, ESLint and Husky'
-    ).canIgnore();
-    tips.push(csTip.setAction(integratePrettier, project, csTip, ionicState.context));
+  if (!exists('husky') && project.isCapacitor) {
+    if (isGreaterOrEqual('typescript', '4.0.0')) {
+      const csTip = new Tip(
+        'Enforce Coding Standards',
+        '',
+        TipType.Idea,
+        'Enforce coding standard using Prettier, ESLint and Husky'
+      ).canIgnore();
+      tips.push(csTip.setAction(integratePrettier, project, csTip, ionicState.context));
+    }
   }
 
   // List of incompatible plugins
