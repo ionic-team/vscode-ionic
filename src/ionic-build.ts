@@ -1,6 +1,4 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
 
 import { Project } from './project';
 import { MonoRepoType } from './monorepo';
@@ -8,13 +6,14 @@ import { ionicState } from './ionic-tree-provider';
 import { InternalCommand } from './command-name';
 import { npx, preflightNPMCheck } from './node-commands';
 import { exists } from './analyzer';
+import { CapacitorPlatform } from './capacitor-platform';
 
 /**
  * Creates the ionic build command
  * @param  {Project} project
  * @returns string
  */
-export function ionicBuild(project: Project, configurationArg?: string): string {
+export function ionicBuild(project: Project, configurationArg?: string, platform?: CapacitorPlatform): string {
   const preop = preflightNPMCheck(project);
 
   ionicState.projectDirty = false;
@@ -26,30 +25,36 @@ export function ionicBuild(project: Project, configurationArg?: string): string 
   }
   switch (project.repoType) {
     case MonoRepoType.none:
-      return `${preop}${ionicCLIBuild(prod, project, configurationArg)}${projectName}`;
+      return `${preop}${ionicCLIBuild(prod, project, configurationArg, platform)}${projectName}`;
     case MonoRepoType.npm:
-      return `${InternalCommand.cwd}${preop}${ionicCLIBuild(prod, project, configurationArg)}`;
+      return `${InternalCommand.cwd}${preop}${ionicCLIBuild(prod, project, configurationArg, platform)}`;
     case MonoRepoType.nx:
       return `${preop}${nxBuild(prod, project, configurationArg)}`;
     case MonoRepoType.folder:
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
     case MonoRepoType.pnpm:
-      return `${InternalCommand.cwd}${preop}${ionicCLIBuild(prod, project, configurationArg)}`;
+      return `${InternalCommand.cwd}${preop}${ionicCLIBuild(prod, project, configurationArg, platform)}`;
     default:
       throw new Error('Unsupported Monorepo type');
   }
 }
 
-function ionicCLIBuild(prod: boolean, project: Project, configurationArg?: string): string {
+function ionicCLIBuild(
+  prod: boolean,
+  project: Project,
+  configurationArg?: string,
+  platform?: CapacitorPlatform
+): string {
   let cmd = `${npx(project.packageManager)} ionic build`;
   if (configurationArg) {
     cmd += ` ${configurationArg}`;
   } else if (prod) {
     cmd += ' --prod';
   }
-  if (exists('@capacitor/ios') || exists('@capacitor/android')) {
+  if (platform || exists('@capacitor/ios') || exists('@capacitor/android')) {
     cmd += ` && ${npx(project.packageManager)} cap copy`;
+    if (platform) cmd += ` ${platform}`;
   }
   return cmd;
 }

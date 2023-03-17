@@ -29,7 +29,7 @@ export function capacitorRun(project: Project, platform: CapacitorPlatform): str
   if (ionicState.projectDirty) {
     const channel = getOutputChannel();
     channel.appendLine('[Ionic] Rebuilding as you changed your project...');
-    preop = ionicBuild(project);
+    preop = ionicBuild(project, undefined, platform) + ' && ';
     rebuilt = true;
   } else {
     preop = preflightNPMCheck(project);

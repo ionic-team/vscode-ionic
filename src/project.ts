@@ -646,7 +646,7 @@ export async function inspectProject(
     vscode.commands.executeCommand(VSCommand.setContext, Context.isAnonymous, false);
   }
 
-  checkForMonoRepo(project, selectedProject, context);
+  await checkForMonoRepo(project, selectedProject, context);
 
   if (project.monoRepo?.localPackageJson) {
     packages = await load(project.monoRepo.folder, project, context);
