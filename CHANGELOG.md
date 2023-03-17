@@ -1,6 +1,6 @@
 ## Changelog
 
-### Version 1.30
+### Version 1.30.1
 
 - NX 15 support for Standalone projects or projects with @nxext/capacitor
 - NX Projects now run statistics and security audits

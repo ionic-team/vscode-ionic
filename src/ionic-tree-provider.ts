@@ -68,6 +68,14 @@ export const ionicState: IonicState = {
   project: undefined,
 };
 
+interface FolderInfo {
+  packageJsonExists: boolean;
+  folderBased: boolean;
+  folder: string;
+}
+
+let folderInfoCache: FolderInfo = undefined;
+
 export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {
   private _onDidChangeTreeData: vscode.EventEmitter<Recommendation | undefined | void> = new vscode.EventEmitter<
     Recommendation | undefined | void
@@ -109,16 +117,29 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
         return Promise.resolve(element.children);
       }
     } else {
-      const packageJsonPath = path.join(this.workspaceRoot, 'package.json');
-      const folders = isFolderBasedMonoRepo(this.workspaceRoot);
-      const folderBased = folders.length > 0;
-      const packageJsonExists = this.pathExists(packageJsonPath);
-      if (packageJsonExists || folderBased) {
+      let folderInfo: FolderInfo = folderInfoCache;
+      if (!folderInfo || folderInfo.folder != this.workspaceRoot) {
+        folderInfo = this.getFolderInfo(this.workspaceRoot);
+        folderInfoCache = folderInfo;
+      }
+      if (folderInfo.packageJsonExists || folderInfo.folderBased) {
         return reviewProject(this.workspaceRoot, this.context, this.selectedProject);
       } else {
         return Promise.resolve(starterProject(this.workspaceRoot));
       }
     }
+  }
+
+  private getFolderInfo(folder: string): FolderInfo {
+    const packageJsonPath = path.join(this.workspaceRoot, 'package.json');
+    const folders = isFolderBasedMonoRepo(this.workspaceRoot);
+    const folderBased = folders.length > 0;
+    const packageJsonExists = this.pathExists(packageJsonPath);
+    return {
+      packageJsonExists,
+      folderBased,
+      folder,
+    };
   }
 
   private pathExists(p: string): boolean {

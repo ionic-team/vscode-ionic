@@ -44,7 +44,7 @@ export enum MonoRepoType {
  * Check to see if this is a monorepo and what type.
  * @param  {Project} project
  */
-export function checkForMonoRepo(project: Project, selectedProject: string, context: vscode.ExtensionContext) {
+export async function checkForMonoRepo(project: Project, selectedProject: string, context: vscode.ExtensionContext) {
   project.repoType = MonoRepoType.none;
   if (!selectedProject) {
     selectedProject = context.workspaceState.get('SelectedProject');
@@ -56,7 +56,7 @@ export function checkForMonoRepo(project: Project, selectedProject: string, cont
 
   if (exists('@nrwl/cli') || fs.existsSync(join(project.folder, 'nx.json'))) {
     project.repoType = MonoRepoType.nx;
-    projects = getNXProjects(project);
+    projects = await getNXProjects(project);
     if (projects.length == 0) {
       // Standalone nx project
       projects.push({ name: 'app', folder: '', nodeModulesAtRoot: true, isNXStandalone: true });
