@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.31.0
+
+- Fix for starter projects switching to project view
+
 ### Version 1.30.1
 
 - NX 15 support for Standalone projects or projects with @nxext/capacitor

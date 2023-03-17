@@ -280,7 +280,7 @@ export function capacitorRecommendations(project: Project, forMigration: boolean
         new Tip(
           'Add Android Project',
           '',
-          TipType.Capacitor,
+          TipType.Android,
           'Add Android support to your Capacitor project?',
           [npmInstall('@capacitor/android'), capacitorAdd(project, CapacitorPlatform.android)],
           'Add Android',
@@ -298,7 +298,7 @@ export function capacitorRecommendations(project: Project, forMigration: boolean
         new Tip(
           'Add iOS Project',
           '',
-          TipType.Capacitor,
+          TipType.Apple,
           'Add iOS support to your Capacitor project?',
           [npmInstall('@capacitor/ios'), capacitorAdd(project, CapacitorPlatform.ios)],
           'Add iOS',
