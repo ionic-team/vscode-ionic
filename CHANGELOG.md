@@ -3,6 +3,7 @@
 ### Version 1.31.0
 
 - Fix for starter projects switching to project view
+- Fix for NX projects with subfolders
 
 ### Version 1.30.1
 
