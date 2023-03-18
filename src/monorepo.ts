@@ -57,6 +57,9 @@ export async function checkForMonoRepo(project: Project, selectedProject: string
   if (exists('@nrwl/cli') || fs.existsSync(join(project.folder, 'nx.json'))) {
     project.repoType = MonoRepoType.nx;
     projects = await getNXProjects(project);
+    if (!projects) {
+      projects = [];
+    }
     if (projects.length == 0) {
       // Standalone nx project
       projects.push({ name: 'app', folder: '', nodeModulesAtRoot: true, isNXStandalone: true });

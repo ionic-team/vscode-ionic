@@ -41,15 +41,38 @@ export async function getNXProjects(project: Project): Promise<Array<MonoRepoPro
 
 // npx nx print-affected --type=app --all
 async function getNXProjectsFromNX(project: Project): Promise<MonoRepoProject[]> {
-  const result: MonoRepoProject[] = [];
-  const txt = await getRunOutput(`npx nx print-affected --type=app --all`, project.folder);
-  const projects = JSON.parse(txt).projects;
-  for (const prj of projects) {
-    const folder = join(project.folder, 'apps', prj);
-    if (fs.existsSync(folder)) {
-      result.push({ name: prj, folder });
-    } else {
-      writeError(`The NX project "${prj}" does not exist at ${folder}`);
+  try {
+    const result: MonoRepoProject[] = [];
+    const projects = listProjects(project.folder);
+    for (const prj of projects) {
+      try {
+        const txt = fs.readFileSync(prj, 'utf-8');
+        const p = JSON.parse(txt);
+        if (p.name && p.projectType == 'application') {
+          result.push({ name: p.name, folder: prj });
+        }
+      } catch (err) {
+        writeError(err);
+      }
+    }
+    return result;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+function listProjects(folder: string): string[] {
+  const result = [];
+  const files = fs.readdirSync(folder);
+  for (const file of files) {
+    const stat = fs.statSync(join(folder, file));
+    if (stat.isDirectory() && file != 'node_modules') {
+      for (const prj of listProjects(join(folder, file))) {
+        result.push(prj);
+      }
+    } else if (file.toLowerCase() == 'project.json') {
+      result.push(join(folder, file));
     }
   }
   return result;
