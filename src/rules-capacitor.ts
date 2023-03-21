@@ -471,6 +471,13 @@ export function capacitorRecommendations(project: Project, forMigration: boolean
   );
   addOptional(
     replacementPlugin(
+      'cordova-plugin-customurlscheme',
+      '@capacitor/app',
+      'https://capacitorjs.com/docs/guides/deep-links'
+    )
+  );
+  addOptional(
+    replacementPlugin(
       '@ionic-enterprise/clipboard',
       '@capacitor/clipboard',
       'https://capacitorjs.com/docs/apis/clipboard'
