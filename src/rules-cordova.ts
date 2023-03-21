@@ -92,6 +92,14 @@ export function checkCordovaRules(project: Project) {
     '@havesource/cordova-plugin-push'
   );
 
+  if (exists('cordova-plugin-customurlscheme') && exists('ionic-plugin-deeplinks')) {
+    project.recommendRemove(
+      'cordova-plugin-customurlscheme',
+      'cordova-plugin-customurlscheme',
+      'Remove as the functionality is part of ionic-plugin-deeplinks which is already installed.'
+    );
+  }
+
   if (exists('@ionic-enterprise/identity-vault')) {
     // Make sure Swift is 4.2 or 5 when using identity vault
     project.tip(checkCordovaIosPreference('UseSwiftLanguageVersion', [4.2, 5], 4.2));

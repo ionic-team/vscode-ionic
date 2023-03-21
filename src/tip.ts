@@ -274,6 +274,7 @@ export enum TipType {
   Dependency,
   Media,
   Debug,
+  Apple,
   None,
 }
 

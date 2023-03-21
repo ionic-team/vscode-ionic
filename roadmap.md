@@ -5,6 +5,8 @@ x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 - In NX, if project.json is missing a name then add name to it
 - In NX, if running the Podfile will fail (seems to be relative node_modules folder issue)
 
+- (feat) if @angular/core >= 14 and no .eslintrc.json or exists(tslint) then recommend eslint migration:
+
 - (feat) Coding standards;: Review
   https://github.com/ionic-team/prettier-config
   https://github.com/ionic-team/eslint-config
@@ -149,3 +151,17 @@ npm ERR! to accept an incorrect (and potentially broken) dependency resolution.
 
 Where the error could read:
 `v3.3.3-2 of @capacitor-community/sqlite does not work with your project because you are using v4 of @capacitor/core (it only supports v3). Find a version of @capacitor-community/sqlite that works with @capacitor/core v4 or file an issue.`
+
+## Lint
+
+- Must use Public/Private:
+  "@typescript-eslint/explicit-member-accessibility": [
+  "error",
+  {
+  "overrides": {
+  "constructors": "off"
+  }
+  }
+  ],
+
+"@typescript-eslint/explicit-function-return-type": "error"

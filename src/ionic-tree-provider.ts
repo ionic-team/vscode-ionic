@@ -118,7 +118,7 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
       }
     } else {
       let folderInfo: FolderInfo = folderInfoCache;
-      if (!folderInfo || folderInfo.folder != this.workspaceRoot) {
+      if (!folderInfo || folderInfo.folder != this.workspaceRoot || !folderInfo.packageJsonExists) {
         folderInfo = this.getFolderInfo(this.workspaceRoot);
         folderInfoCache = folderInfo;
       }
