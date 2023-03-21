@@ -334,20 +334,8 @@ export function capacitorRecommendations(project: Project, forMigration: boolean
 
   tips.push(notRequiredPlugin('cordova-support-google-services'));
   tips.push(incompatiblePlugin('cordova-plugin-passbook'));
-  tips.push(
-    incompatibleReplacementPlugin(
-      'cordova-plugin-ionic-keyboard',
-      '@capacitor/keyboard',
-      'It is not compatible with Capacitor'
-    )
-  );
-  tips.push(
-    incompatibleReplacementPlugin(
-      'cordova-plugin-splashscreen',
-      '@capacitor/splash-screen',
-      'It is not compatible with Capacitor'
-    )
-  );
+  tips.push(incompatibleReplacementPlugin('cordova-plugin-ionic-keyboard', '@capacitor/keyboard'));
+  tips.push(incompatibleReplacementPlugin('cordova-plugin-splashscreen', '@capacitor/splash-screen'));
 
   tips.push(
     incompatiblePlugin(

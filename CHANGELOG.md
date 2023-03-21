@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.32.0
+
+- Fix for Capacitor migration recommended replacement plugins
+
 ### Version 1.31.0
 
 - Fix for starter projects switching to project view

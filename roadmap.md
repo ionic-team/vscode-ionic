@@ -2,6 +2,7 @@
 
 x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 
+- Cap migration - anything "not required" or "upgrade inapp browser to v5" should be a nice icon not red
 - In NX, if project.json is missing a name then add name to it
 - In NX, if running the Podfile will fail (seems to be relative node_modules folder issue)
 

@@ -322,7 +322,7 @@ export function notRequiredPlugin(name: string, message?: string): Tip {
     return new Tip(
       name,
       `Not required with Capacitor${msg}`,
-      TipType.Error,
+      TipType.Comment,
       `The plugin ${name} is not required with Capacitor${msg}`,
       npmUninstall(name),
       'Uninstall',
@@ -351,7 +351,7 @@ export function incompatibleReplacementPlugin(name: string, replacement: string,
     return new Tip(
       name,
       `Replace with ${replacement}${url ? ' (' + url + ')' : ''}`,
-      TipType.Error,
+      TipType.Comment,
       `The plugin ${name} is incompatible with Capacitor and must be replaced with ${replacement}${
         url ? ' (' + url + ')' : ''
       }`,
