@@ -258,6 +258,7 @@ export enum TipType {
   Capacitor,
   Cordova,
   Check,
+  CheckMark,
   Box,
   Ionic,
   Run,

@@ -2,6 +2,7 @@
 
 ### Version 1.32.0
 
+- Splash screen and icon generation now uses @capacitor/assets instead of cordova-res
 - Fix for Capacitor migration recommended replacement plugins
 
 ### Version 1.31.0
