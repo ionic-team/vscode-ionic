@@ -3,17 +3,18 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { channelShow, run } from './utilities';
-import { getOutputChannel } from './extension';
+import { getOutputChannel, writeIonic } from './extension';
 import { Tip, TipType } from './tip';
 import { Project } from './project';
 import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
-import { npmInstall, npx } from './node-commands';
+import { npmInstall, npmUninstall, npx } from './node-commands';
 import { Context } from './context-variables';
 import { join } from 'path';
 
 export enum AssetType {
   splash = 'splash.png',
+  splashDark = 'splash-dark.png',
   icon = 'icon.png',
   adaptiveForeground = 'icon-foreground.png',
   adaptiveBackground = 'icon-background.png',
@@ -26,9 +27,10 @@ export function addSplashAndIconFeatures(project: Project) {
     'Allows setting of the Splash Screen and Icon. Clicking Rebuild will create assets for your iOS and Android native projects.',
     Context.rebuild
   ).tip = new Tip('Rebuild Assets', undefined).setAction(async () => {
-    await runCordovaRes(project);
+    await runCapacitorAssets(project);
   });
   project.add(createFeature('Splash Screen', AssetType.splash, project));
+  project.add(createFeature('Splash Screen Dark', AssetType.splashDark, project));
   project.add(createFeature('Icon', AssetType.icon, project));
   project.add(createFeature('Icon Foreground', AssetType.adaptiveForeground, project));
   project.add(createFeature('Icon Background', AssetType.adaptiveBackground, project));
@@ -38,7 +40,7 @@ export function addSplashAndIconFeatures(project: Project) {
 function getAssetTipType(folder: string, filename: AssetType): TipType {
   const assetfilename = path.join(getResourceFolder(folder, filename), filename);
   if (fs.existsSync(assetfilename)) {
-    return TipType.None;
+    return TipType.CheckMark;
   } else {
     return TipType.Warning;
   }
@@ -72,6 +74,9 @@ function getAssetTooltip(folder: string, filename: AssetType): string {
   switch (filename) {
     case AssetType.splash:
       return 'Your splash screen should be a 2732×2732px png file. It will be used as the original asset to create suitably sized splash screens for iOS and Android.';
+      break;
+    case AssetType.splashDark:
+      return 'Your dark mode splash screen should be a 2732×2732px png file. It will be used as the original asset to create suitably sized dark mode splash screens for iOS and Android.';
       break;
     case AssetType.icon:
       return 'Your icon should be a 1024×1024px png file that does not contain transparency. It will be used as the original asset to create suitably sized icons for iOS and Android.';
@@ -130,7 +135,7 @@ async function setAssetResource(project: Project, filename: AssetType) {
       }
     }
 
-    await runCordovaRes(project);
+    await runCapacitorAssets(project);
   } catch (err) {
     vscode.window.showErrorMessage(`Operation failed ${err}`);
   }
@@ -139,9 +144,7 @@ async function setAssetResource(project: Project, filename: AssetType) {
 function hasNeededAssets(folder: string): string {
   const icon = path.join(getResourceFolder(folder, AssetType.icon), AssetType.icon);
   const splash = path.join(getResourceFolder(folder, AssetType.splash), AssetType.splash);
-  if (!fs.existsSync(icon) || !fs.existsSync(splash)) {
-    return 'The Splash screen and icon need to be set before you can rebuild generated assets.';
-  }
+  const splashDark = path.join(getResourceFolder(folder, AssetType.splashDark), AssetType.splashDark);
 
   if (!fs.existsSync(icon)) {
     return 'An icon needs to be specified next.';
@@ -149,10 +152,13 @@ function hasNeededAssets(folder: string): string {
   if (!fs.existsSync(splash)) {
     return 'A splash screen needs to be specified next.';
   }
+  if (!fs.existsSync(splashDark)) {
+    return 'A dark mode splash screen needs to be specified next.';
+  }
 }
 
-async function runCordovaRes(project: Project) {
-  const hasCordovaRes = exists('cordova-res');
+async function runCapacitorAssets(project: Project) {
+  const hasCordovaRes = exists('@capacitor/assets');
   const ios = project.hasCapacitorProject(CapacitorPlatform.ios);
   const android = project.hasCapacitorProject(CapacitorPlatform.android);
   const folder = project.projectFolder();
@@ -163,16 +169,20 @@ async function runCordovaRes(project: Project) {
   }
 
   const channel = getOutputChannel();
-  channel.appendLine('[Ionic] Generating Splash Screen and Icon Assets...');
+  writeIonic('Generating Splash Screen and Icon Assets...');
   channelShow(channel);
   await showProgress('Generating Splash Screen and Icon Assets', async () => {
     if (!hasCordovaRes) {
-      await run(folder, npmInstall('cordova-res', '--save-dev'), channel, undefined, [], undefined, undefined);
+      writeIonic(`Installing @capacitor/assets temporarily...`);
+      await run(folder, npmInstall('@capacitor/assets', '--save-dev'), channel, undefined, [], undefined, undefined);
+    }
+    if (exists('cordova-res')) {
+      await run(folder, npmUninstall('cordova-res'), channel, undefined, [], undefined, undefined);
     }
     if (ios) {
       await run(
         folder,
-        `${npx(project.packageManager)} cordova-res ios --skip-config --copy`,
+        `${npx(project.packageManager)} @capacitor/assets generate --ios`,
         channel,
         undefined,
         [],
@@ -184,7 +194,7 @@ async function runCordovaRes(project: Project) {
     if (android) {
       await run(
         folder,
-        `${npx(project.packageManager)} cordova-res android --skip-config --copy`,
+        `${npx(project.packageManager)} @capacitor/assets generate --android`,
         channel,
         undefined,
         [],
@@ -194,7 +204,22 @@ async function runCordovaRes(project: Project) {
       addToGitIgnore(folder, 'resources/android/**/*');
     }
   });
-  channel.appendLine('[Ionic] Completed created Splash Screen and Icon Assets');
+
+  writeIonic(`Removing @capacitor/assets...`);
+  await run(
+    folder,
+    npmUninstall('@capacitor/assets'),
+    channel,
+    undefined,
+    [],
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    true
+  );
+
+  writeIonic('Completed created Splash Screen and Icon Assets');
   channelShow(channel);
 }
 

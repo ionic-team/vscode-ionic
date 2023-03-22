@@ -189,6 +189,9 @@ export class Project {
       case TipType.Check:
         r.setIcon('checkbox');
         break;
+      case TipType.CheckMark:
+        r.setIcon('checkmark');
+        break;
       case TipType.Media:
         r.setIcon('file-media');
         break;
