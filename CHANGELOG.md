@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.33.0
+
+- Support for Standalone modules and use of Standalone pages by default for new pages
+- Updated from built in Ionic CLI 6.20.9 to 7.0.0
+
 ### Version 1.32.0
 
 - Splash screen and icon generation now uses @capacitor/assets instead of cordova-res

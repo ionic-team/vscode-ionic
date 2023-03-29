@@ -10,6 +10,7 @@ import {
   incompatibleReplacementPlugin,
   isGreaterOrEqual,
   isLess,
+  isLessOrEqual,
   isVersionGreaterOrEqual,
   notRequiredPlugin,
   replacementPlugin,
@@ -208,6 +209,12 @@ export function checkCapacitorRules(project: Project) {
         'as the current version is missing important security fixes.',
         'https://ionic.io/docs/identity-vault'
       )
+    );
+  }
+
+  if (isLessOrEqual('@ionic/angular-toolkit', '8.1.0') && isGreaterOrEqual('@angular/core', '15.0.0')) {
+    project.tip(
+      checkMinVersion('@ionic/angular-toolkit', '8.1.0', 'as the current version is missing Angular 15 support.')
     );
   }
 }
