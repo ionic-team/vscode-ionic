@@ -134,7 +134,7 @@ export async function getRecommendations(
       .setContext(Context.selectAction);
     if (project.isCapacitor) {
       if (exists('@angular/core')) {
-        project.setSubGroup('New', TipType.Add);
+        project.setSubGroup('New', TipType.Add, 'Create new Angular Components, Pages and more');
 
         ['Page', 'Component', 'Service', 'Module', 'Class', 'Directive'].forEach((item) => {
           project.add(
