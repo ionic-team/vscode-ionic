@@ -3,6 +3,7 @@
 ### Version 1.34.0
 
 - Fix for projects that appear to have folder based monorepos but are not
+- Support for Capacitor 5 beta migration
 
 ### Version 1.33.0
 
