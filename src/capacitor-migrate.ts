@@ -9,6 +9,30 @@ import { getStringFrom, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
 import { ActionResult } from './command-name';
 
+export async function migrateCapacitor5(project: Project, currentVersion: string): Promise<ActionResult> {
+  const coreVersion = '5.0.0-beta.0';
+  const result = await vscode.window.showInformationMessage(
+    `Capacitor 5 sets a deployment target of iOS 13 and Android 13 (SDK 33).`,
+    'Migrate to v5',
+    'Ignore'
+  );
+  if (result == 'Ignore') {
+    return ActionResult.Ignore;
+  }
+  if (!result) {
+    return;
+  }
+  await project.run2(npmInstall(`@capacitor/cli@${coreVersion} --save-dev --force`));
+  await project.run2(`npx cap migrate`);
+  writeIonic('Capacitor 5 Migration Completed.');
+
+  writeBreakingChanges();
+  getOutputChannel().show();
+  const message = `Migration to Capacitor 5 is complete. Run and test your app!`;
+
+  vscode.window.showInformationMessage(message, 'OK');
+}
+
 export async function migrateCapacitor(project: Project, currentVersion: string): Promise<ActionResult> {
   const coreVersion = '^4.0.1';
   const pluginVersion = '^4.0.1';

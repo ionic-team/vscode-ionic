@@ -13,6 +13,7 @@ import { getPnpmWorkspaces } from './monorepos-pnpm';
 import { PackageManager } from './node-commands';
 import { getLernaWorkspaces } from './monorepos-lerna';
 import { join } from 'path';
+import { writeError } from './extension';
 
 export interface MonoRepoProject {
   name: string;
@@ -193,30 +194,54 @@ export function getLocalFolder(rootFolder: string): string {
 function getFolderBasedProjects(prj: Project): Array<MonoRepoProject> {
   const projects = isFolderBasedMonoRepo(prj.folder);
   let result: Array<MonoRepoProject> = [];
-  let hasIonicBasedProjects = false;
+  let likelyFolderBasedMonoRepo = false;
+  let exampleFolder = '';
+
   for (const project of projects) {
-    // Look for suitable dependencies: @ionic/*, @angular/*
-    try {
-      const pck = JSON.parse(fs.readFileSync(project.packageJson, 'utf8'));
-      const isIonic = !!(
-        pck?.dependencies?.['@ionic/vue'] ||
-        pck?.dependencies?.['@ionic/angular'] ||
-        pck?.dependencies?.['@ionic/react'] ||
-        pck?.dependencies?.['@angular/core']
-      );
-      if (pck.dependencies) {
-        result.push({ name: project.name, folder: project.path, isIonic: isIonic });
-      }
-      if (isIonic) {
-        hasIonicBasedProjects = true;
-      }
-    } catch {
-      //
+    const folderType = checkFolder(project.packageJson);
+    if (folderType != FolderType.unknown) {
+      result.push({ name: project.name, folder: project.path, isIonic: folderType == FolderType.hasIonic });
+    }
+    if (folderType == FolderType.hasIonic) {
+      exampleFolder = project.path;
+      likelyFolderBasedMonoRepo = true;
     }
   }
-  // if (!hasIonicBasedProjects) {
-  //   return [];
-  // }
+  if (!likelyFolderBasedMonoRepo) {
+    return [];
+  }
+  if (checkFolder(join(prj.folder, 'package.json')) == FolderType.hasIonic) {
+    // Its definitely an Ionic or Capacitor project in the root but we have sub folders that look like Ionic projects so throw error
+    writeError(
+      `This folder has Capacitor/Ionic dependencies but there are subfolders that do too which will be ignored (eg ${exampleFolder})`
+    );
+    return [];
+  }
   result = result.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
   return result;
+}
+
+enum FolderType {
+  hasDependencies,
+  hasIonic,
+  unknown,
+}
+
+function checkFolder(filename: string): FolderType {
+  try {
+    if (!fs.existsSync(filename)) {
+      return FolderType.unknown;
+    }
+    const pck = JSON.parse(fs.readFileSync(filename, 'utf8'));
+    const isIonic = !!(
+      pck?.dependencies?.['@ionic/vue'] ||
+      pck?.dependencies?.['@ionic/angular'] ||
+      pck?.dependencies?.['@ionic/react'] ||
+      pck?.dependencies?.['@capacitor/core'] ||
+      pck?.dependencies?.['@angular/core']
+    );
+    return isIonic ? FolderType.hasIonic : pck.dependencies ? FolderType.hasDependencies : FolderType.unknown;
+  } catch {
+    return FolderType.unknown;
+  }
 }
