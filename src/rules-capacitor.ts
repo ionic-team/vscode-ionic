@@ -25,7 +25,7 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall, npx } from './node-commands';
 import { InternalCommand } from './command-name';
 import { MonoRepoType } from './monorepo';
-import { migrateCapacitor } from './capacitor-migrate';
+import { migrateCapacitor, migrateCapacitor5 } from './capacitor-migrate';
 import { checkAngularJson } from './rules-angular-json';
 import { checkBrowsersList } from './rules-browserslist';
 import { ionicState } from './ionic-tree-provider';
@@ -179,6 +179,16 @@ export function checkCapacitorRules(project: Project) {
       project.tip(
         new Tip('Migrate to Capacitor 4', '', TipType.Idea)
           .setAction(migrateCapacitor, project, getPackageVersion('@capacitor/core'))
+          .canIgnore()
+      );
+    }
+  }
+
+  if (isLess('@capacitor/core', '5.0.0')) {
+    if (ionicState.hasNodeModules && isGreaterOrEqual('@capacitor/core', '4.0.0')) {
+      project.tip(
+        new Tip('Migrate to Capacitor 5 Beta', '', TipType.Idea)
+          .setAction(migrateCapacitor5, project, getPackageVersion('@capacitor/core'))
           .canIgnore()
       );
     }

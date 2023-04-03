@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.34.0
+
+- Fix for projects that appear to have folder based monorepos but are not
+- Support for Capacitor 5 beta migration
+
 ### Version 1.33.0
 
 - Support for Standalone modules and use of Standalone pages by default for new pages

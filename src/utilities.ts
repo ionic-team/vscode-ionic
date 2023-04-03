@@ -47,7 +47,8 @@ function runOptions(command: string, folder: string, shell?: string) {
     command.includes('cap run ios') ||
     command.includes('npx nx run') ||
     command.includes('cap add') ||
-    command.includes('npm run')
+    command.includes('npm run') ||
+    command.includes('cap migrate')
   ) {
     env.LANG = 'en_US.UTF-8';
   }
@@ -203,7 +204,7 @@ export async function run(
   return new Promise((resolve, reject) => {
     const start_time = process.hrtime();
     const interval = setInterval(() => {
-      if (cancelObject.cancelled) {
+      if (cancelObject?.cancelled) {
         clearInterval(interval);
         reject(`${command} Cancelled`);
       }

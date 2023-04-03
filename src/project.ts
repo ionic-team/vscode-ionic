@@ -344,6 +344,9 @@ export class Project {
     if (title == 'angular') {
       // Option to upgrade with:
       // ng update @angular/cli@13 @angular/core@13 --allow-dirty
+      if (!latestVersion) {
+        return;
+      }
       tip = angularMigrate(latestVersion);
     } else {
       tip = new Tip('Upgrade All Packages', undefined, TipType.Run, undefined, undefined, 'Upgrade');

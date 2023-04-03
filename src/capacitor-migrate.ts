@@ -8,6 +8,36 @@ import { Project } from './project';
 import { getStringFrom, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
 import { ActionResult } from './command-name';
+import { ionicState } from './ionic-tree-provider';
+import { PackageManager } from './node-commands';
+import { openUri } from './utilities';
+
+export async function migrateCapacitor5(project: Project, currentVersion: string): Promise<ActionResult> {
+  const coreVersion = '5.0.0-beta.1';
+  const result = await vscode.window.showInformationMessage(
+    `Capacitor 5 sets a deployment target of iOS 13 and Android 13 (SDK 33).`,
+    'Migrate to v5',
+    'Ignore'
+  );
+  if (result == 'Ignore') {
+    return ActionResult.Ignore;
+  }
+  if (!result) {
+    return;
+  }
+  await showProgress('Migrating to Capacitor 5 beta...', async () => {
+    await project.run2(npmInstall(`@capacitor/cli@${coreVersion} --save-dev --force`));
+    const manager = getPackageManager(ionicState.packageManager);
+    await project.run2(`npx cap migrate --noprompt --packagemanager=${manager}`);
+    writeIonic('Capacitor 5 Migration Completed.');
+
+    getOutputChannel().show();
+  });
+  const message = `Migration to Capacitor 5 is complete. You can also read about the changes in Capacitor 5.`;
+  if ((await vscode.window.showInformationMessage(message, 'Capacitor 5 Changes', 'OK')) == 'Capacitor 5 Changes') {
+    openUri('https://capacitorjs.com/docs/next/updating/5-0');
+  }
+}
 
 export async function migrateCapacitor(project: Project, currentVersion: string): Promise<ActionResult> {
   const coreVersion = '^4.0.1';
@@ -217,6 +247,19 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
       writeError(`Failed to migrate: ${err}`);
     }
   });
+}
+
+function getPackageManager(manager: PackageManager): string {
+  switch (manager) {
+    case PackageManager.npm:
+      return 'npm';
+    case PackageManager.pnpm:
+      return 'pnpm';
+    case PackageManager.yarn:
+      return 'yarn';
+    default:
+      writeError(`Unknown package manager ${manager}`);
+  }
 }
 
 function addQuotes(value: string): string {
