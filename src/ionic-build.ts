@@ -19,22 +19,22 @@ export function ionicBuild(project: Project, configurationArg?: string, platform
   ionicState.projectDirty = false;
 
   const prod: boolean = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
-  let projectName = '';
+  let args = configurationArg ? configurationArg : '';
   if (ionicState.project) {
-    projectName = ` --project=${ionicState.project}`;
+    args += ` --project=${ionicState.project}`;
   }
   switch (project.repoType) {
     case MonoRepoType.none:
-      return `${preop}${ionicCLIBuild(prod, project, configurationArg, platform)}${projectName}`;
+      return `${preop}${ionicCLIBuild(prod, project, args, platform)}`;
     case MonoRepoType.npm:
-      return `${InternalCommand.cwd}${preop}${ionicCLIBuild(prod, project, configurationArg, platform)}`;
+      return `${InternalCommand.cwd}${preop}${ionicCLIBuild(prod, project, args, platform)}`;
     case MonoRepoType.nx:
-      return `${preop}${nxBuild(prod, project, configurationArg)}`;
+      return `${preop}${nxBuild(prod, project, args)}`;
     case MonoRepoType.folder:
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
     case MonoRepoType.pnpm:
-      return `${InternalCommand.cwd}${preop}${ionicCLIBuild(prod, project, configurationArg, platform)}`;
+      return `${InternalCommand.cwd}${preop}${ionicCLIBuild(prod, project, args, platform)}`;
     default:
       throw new Error('Unsupported Monorepo type');
   }

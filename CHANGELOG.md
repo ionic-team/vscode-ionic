@@ -1,8 +1,10 @@
 ## Changelog
 
-### Version 1.34.0
+### Version 1.34.1
 
 - Fix for projects that appear to have folder based monorepos but are not
+- Fix for Angular projects with non default (app) project names
+- Fix for Ionic login (revert to cli v6.20.9 from v7.0.0)
 - Support for Capacitor 5 beta migration
 
 ### Version 1.33.0
