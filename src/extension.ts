@@ -26,6 +26,7 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { kill } from './process-list';
 import { selectExternalIPAddress } from './ionic-serve';
 import { advancedActions } from './advanced-actions';
+import { PluginExplorerPanel } from './plugin-explorer';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
@@ -449,6 +450,10 @@ export async function activate(context: vscode.ExtensionContext) {
     }
     ionicState.configuration = config;
     runAction(r.tip, ionicProvider, rootPath);
+  });
+
+  const showHelloWorldCommand = vscode.commands.registerCommand(CommandName.PluginExplorer, () => {
+    PluginExplorerPanel.render(context.extensionUri);
   });
 
   vscode.commands.registerCommand(CommandName.SkipLogin, async () => {

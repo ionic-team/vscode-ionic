@@ -2,6 +2,12 @@ roadmap.md
 site/videos/**
 site/**
 **/*.vsix
+plugin-explorer/.angular
+plugin-explorer/node_modules
+plugin-explorer/src
+plugin-explorer/*.json
+plugin-explorer/*.js
+plugin-explorer/*.md
 node_modules/typescript
 node_modules/chevotrain
 node_modules/esbuild
