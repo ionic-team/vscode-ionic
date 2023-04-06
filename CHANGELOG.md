@@ -3,6 +3,7 @@
 ### Version 1.35
 
 - Fix live reload for Angular project with non default (app) project names
+- Fix running for iOS/Android to ensure stop option always available
 
 ### Version 1.34.2
 

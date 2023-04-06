@@ -79,8 +79,15 @@ export async function getRecommendations(
     ];
 
     if (hasCapAndroid) {
-      const title = ionicState.selectedAndroidDevice ? `${ionicState.selectedAndroidDeviceName}` : 'Android';
-      const runAndroid = new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
+      const runAndroid = new Tip(
+        'Android',
+        ionicState.selectedAndroidDeviceName,
+        TipType.Run,
+        'Run',
+        undefined,
+        'Running',
+        'Project is running'
+      )
         .requestDeviceSelection()
         .requestIPSelection()
         .setDynamicCommand(capacitorRun, project, CapacitorPlatform.android)
@@ -97,8 +104,15 @@ export async function getRecommendations(
       ionicState.runAndroid = runAndroid;
     }
     if (hasCapIos) {
-      const title = ionicState.selectedIOSDevice ? `${ionicState.selectedIOSDeviceName}` : 'iOS';
-      const runIos = new Tip(title, '', TipType.Run, 'Run', undefined, 'Running', 'Project is running')
+      const runIos = new Tip(
+        'iOS',
+        ionicState.selectedIOSDeviceName,
+        TipType.Run,
+        'Run',
+        undefined,
+        'Running',
+        'Project is running'
+      )
         .requestDeviceSelection()
         .requestIPSelection()
         .setDynamicCommand(capacitorRun, project, CapacitorPlatform.ios)

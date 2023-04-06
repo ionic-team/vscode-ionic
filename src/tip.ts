@@ -96,7 +96,7 @@ export class Tip {
   }
 
   public sameAs(tip: Tip): boolean {
-    return this.title == tip.title && this.message == tip.message;
+    return this.title == tip.title; // && this.message == tip.message;
   }
 
   canStop() {

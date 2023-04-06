@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
 import { CommandName } from './command-name';
 import { handleError } from './error-handler';
-import { writeIonic } from './extension';
 import { ionicState } from './ionic-tree-provider';
 
 import { Tip } from './tip';
 import { getRunOutput, replaceAll } from './utilities';
+import { WorkspaceSetting, getSetting } from './workspace-state';
 
 /**
  * Uses vscodes Quick pick dialog to allow selection of a device and
@@ -61,6 +61,14 @@ export async function selectDevice(
     } else {
       ionicState.selectedIOSDevice = device?.target;
       ionicState.selectedIOSDeviceName = device?.name;
+    }
+  } else {
+    if (getSetting(WorkspaceSetting.liveReload)) {
+      if (command.includes('android')) {
+        ionicState.selectedAndroidDeviceName = `(running)`;
+      } else {
+        ionicState.selectedIOSDeviceName = `(running)`;
+      }
     }
   }
   return device?.target;
