@@ -117,6 +117,11 @@ function capRun(
     capRunFlags += '--no-sync';
   }
 
+  if (ionicState.project && ionicState.project != 'app') {
+    if (capRunFlags.length >= 0) capRunFlags += ' ';
+    capRunFlags += `--project=${ionicState.project}`;
+  }
+
   capRunFlags += getConfigurationArgs();
 
   if (httpsForWeb) {

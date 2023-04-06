@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.35
+
+- Fix live reload for Angular project with non default (app) project names
+
 ### Version 1.34.2
 
 - Fix for projects that appear to have folder based monorepos but are not
