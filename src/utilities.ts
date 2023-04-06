@@ -159,7 +159,7 @@ export async function run(
       if (pub) {
         pub.stop();
       } else {
-        pub = new Publisher('devapp', auxData, portFrom(externalUrl));
+        pub = new Publisher('devapp', auxData, portFrom(externalUrl), externalUrl.startsWith('https'));
       }
       pub.start().then(() => {
         if (config == WebConfigSetting.welcome || config == WebConfigSetting.welcomeNoBrowser) {
