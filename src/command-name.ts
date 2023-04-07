@@ -21,6 +21,7 @@ export enum CommandName {
   WebConfig = 'ionic-official.webConfig',
   SelectAction = 'ionic-official.selectAction',
   DebugMode = 'ionic-official.debugMode',
+  PluginExplorer = 'ionic-official.pluginExplorer',
   RunMode = 'ionic-official.runMode',
   SelectDevice = 'ionic-official.selectDevice',
   RunIOS = 'ionic-official.run',

@@ -1,0 +1,25 @@
+/* You can add global styles to this file, and also import other style files */
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+main > * {
+  margin: 1rem 0;
+}
+
+.columns {
+  display: flex;
+  width: 100%;
+}
+
+.panel {
+  background-color: rgba(255, 255, 255, 0.03);
+  padding: 1rem;
+}
+
+vscode-text-field {
+  width: 100%;
+}

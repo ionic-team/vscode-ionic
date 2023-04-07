@@ -2,6 +2,10 @@
 
 x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 
+- When live reload is turned on and the app runs the stop button disappears. It should also stop if you queue a task (or check if you want to stop it)
+- If you are presented with multiple external ip addresses then remember the selected option and if the IP address exists on next run use it
+- If local address is turned on then show warning on start that Nexus wont work
+- React Vite can write Network: rather than External:
 - Cap migration - anything "not required" or "upgrade inapp browser to v5" should be a nice icon not red
 - In NX, if project.json is missing a name then add name to it
 - In NX, if running the Podfile will fail (seems to be relative node_modules folder issue)
