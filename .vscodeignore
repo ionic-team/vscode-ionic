@@ -18,6 +18,9 @@ node_modules/**/LICENSE
 log-client/node_modules
 log-client/*.ts
 log-client/*.map
+plugin-explorer/.angular
+plugin-explorer/node_modules
+plugin-explorer/src
 **/*.ts
 **/*.jar
 **/*.map
