@@ -24,8 +24,8 @@ export function checkAngularJson(project: Project) {
         defaultConfiguration = angular.projects[projectName].architect?.build?.defaultConfiguration;
         if (!ionicState.configuration && defaultConfiguration) {
           ionicState.configuration = defaultConfiguration;
-          ionicState.project = projectName == 'app' ? undefined : projectName;
         }
+        ionicState.project = projectName == 'app' ? undefined : projectName;
         if (angular.projects[projectName].architect?.build?.options?.aot === false) {
           project.add(
             new Tip(

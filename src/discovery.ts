@@ -27,7 +27,7 @@ export class Publisher extends events.EventEmitter implements IPublisher {
   client?: dgram.Socket;
   interfaces?: Interface[];
 
-  constructor(public namespace: string, public name: string, public port: number) {
+  constructor(public namespace: string, public name: string, public port: number, public secure: boolean) {
     super();
 
     if (name.indexOf(':') >= 0) {
@@ -96,6 +96,7 @@ export class Publisher extends events.EventEmitter implements IPublisher {
       ip: ip,
       port: this.port,
       path: this.path,
+      secure: this.secure,
     };
     return PREFIX + JSON.stringify(message);
   }
@@ -146,9 +147,9 @@ export function prepareInterfaces(interfaces: any): Interface[] {
     });
 }
 
-export function newSilentPublisher(namespace: string, name: string, port: number): Publisher {
+export function newSilentPublisher(namespace: string, name: string, port: number, secure: boolean): Publisher {
   name = `${name}@${port}`;
-  const service = new Publisher(namespace, name, port);
+  const service = new Publisher(namespace, name, port, secure);
   service.on('error', (error) => {
     console.log(error);
   });

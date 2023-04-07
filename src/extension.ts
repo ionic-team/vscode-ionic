@@ -275,6 +275,14 @@ export async function fixIssue(
           if (tip.features.includes(TipFeature.welcome)) {
             vscode.commands.executeCommand(CommandName.hideDevServer);
           }
+
+          if (tip.title.toLowerCase() == CapacitorPlatform.ios) {
+            ionicState.selectedIOSDeviceName = '';
+          }
+          if (tip.title.toLowerCase() == CapacitorPlatform.android) {
+            ionicState.selectedAndroidDeviceName = '';
+          }
+
           channelShow(channel);
           clearInterval(interval);
           finishCommand(tip);
