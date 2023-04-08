@@ -6,6 +6,11 @@ main {
   height: 100%;
 }
 
+h2,
+h3 {
+  margin: 0;
+}
+
 main > * {
   margin: 1rem 0;
 }
@@ -15,11 +20,13 @@ main > * {
   width: 100%;
 }
 
-.panel {
-  background-color: rgba(255, 255, 255, 0.03);
-  padding: 1rem;
-}
-
 vscode-text-field {
   width: 100%;
 }
+
+/* For live editing */
+/* body {
+  background-color: #2c2c2c;
+  color: white;
+  font-family:Arial, Helvetica, sans-serif;
+} */

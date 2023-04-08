@@ -1,4 +1,9 @@
 import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn } from 'vscode';
+import { PluginSummary } from './plugin-summary';
+import { httpRequest } from './utilities';
+import { writeIonic } from './extension';
+import { writeFileSync } from 'fs';
+import { join } from 'path';
 
 export class PluginExplorerPanel {
   public static currentPanel: PluginExplorerPanel | undefined;
@@ -9,7 +14,7 @@ export class PluginExplorerPanel {
     this._panel = panel;
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
     this._panel.webview.html = this._getWebviewContent(this._panel.webview, extensionUri);
-    this._setWebviewMessageListener(this._panel.webview);
+    this._setWebviewMessageListener(this._panel.webview, extensionUri);
   }
 
   public static render(extensionUri: Uri) {
@@ -29,7 +34,7 @@ export class PluginExplorerPanel {
         {
           // Enable JavaScript in the webview
           enableScripts: true,
-          // Restrict the webview to only load resources from the `out` and `webview-ui/build` directories
+          // Restrict the webview to only load resources from the `out` and `plugin-explorer/build` directories
           localResourceRoots: [
             Uri.joinPath(extensionUri, 'out'),
             Uri.joinPath(extensionUri, 'plugin-explorer', 'build'),
@@ -67,7 +72,7 @@ export class PluginExplorerPanel {
         <head>
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+          <!--<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">-->
           <link rel="stylesheet" type="text/css" href="${stylesUri}">
           <title>Plugins</title>
         </head>
@@ -81,19 +86,21 @@ export class PluginExplorerPanel {
     `;
   }
 
-  private _setWebviewMessageListener(webview: Webview) {
+  private _setWebviewMessageListener(webview: Webview, extensionUri: Uri) {
     webview.onDidReceiveMessage(
-      (message: any) => {
+      async (message: any) => {
         const command = message.command;
         const text = message.text;
-
+        writeIonic(`Plugin Explorer: ${command}`);
         switch (command) {
           case 'hello':
             // Code that should run in response to the hello message command
             window.showInformationMessage(text);
             return;
-          // Add more switch case statements here as more webview message commands
-          // are created within the webview context (i.e. inside media/main.js)
+          case 'getPlugins':
+            const uri = await fetchPluginData(webview, extensionUri);
+            webview.postMessage({ command, uri: `${uri}` });
+            return;
         }
       },
       undefined,
@@ -113,4 +120,14 @@ function getNonce() {
 
 function getUri(webview: Webview, extensionUri: Uri, pathList: string[]) {
   return webview.asWebviewUri(Uri.joinPath(extensionUri, ...pathList));
+}
+
+async function fetchPluginData(webview: Webview, extensionUri: Uri): Promise<Uri> {
+  //const url = `https://webnative-plugins.netlify.app/detailed-plugins.json`;
+  const json = (await httpRequest('GET', 'webnative-plugins.netlify.app', '/detailed-plugins.json')) as PluginSummary;
+  writeIonic(`Read ${json.plugins.length} plugins.`);
+  const path = join(extensionUri.fsPath, 'plugin-explorer', 'build', 'plugins.json');
+  writeIonic(path);
+  writeFileSync(path, JSON.stringify(json));
+  return getUri(webview, extensionUri, ['plugin-explorer', 'build', 'plugins.json']);
 }

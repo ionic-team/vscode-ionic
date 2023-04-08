@@ -1,11 +1,20 @@
 <main>
   <div class="columns">
-    <vscode-text-field class="wide" placeholder="Search for Capacitor and Cordova Plugins"></vscode-text-field>
-    <vscode-button (click)="handleHowdyClick()">Search</vscode-button>
+    <vscode-text-field
+      id="sch"
+      (keydown.enter)="search()"
+      autofocus
+      class="wide"
+      placeholder="Search for Capacitor and Cordova Plugins"
+    >
+    </vscode-text-field>
+    <vscode-button type="submit" (click)="search()">Search</vscode-button>
   </div>
-  <div class="panel">
-    <h3>Zebra Capacitor</h3>
-    <p>Capacitor plugin for Zebra Printers</p>
-    <vscode-button (click)="handleHowdyClick()">Install</vscode-button>
+  <div *ngIf="terms">
+    <h1>Search for "{{ terms }}"</h1>
+    <vscode-badge>{{ count }} results</vscode-badge>
+  </div>
+  <div class="panel" *ngFor="let plugin of plugins">
+    <plugin [data]="plugin"></plugin>
   </div>
 </main>

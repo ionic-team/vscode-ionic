@@ -1,0 +1,41 @@
+vscode-badge {
+  margin: 0.2rem;
+  padding: 0.2rem;
+  border-radius: 0.1rem;
+  opacity: 0.3;
+  background: rgba(255, 255, 255, 0.1);
+  line-height: 2;
+}
+
+.subtitle {
+  font-family: monospace, 'Courier New', Courier;
+  opacity: 0.5;
+  margin-top: 0.2rem;
+  margin-bottom: 0;
+  font-size: smaller;
+}
+
+.group {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.side {
+  width: 200px;
+  justify-content: flex-end;
+}
+
+.profile {
+  vertical-align: middle;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  padding-right: 1rem;
+  padding-bottom: 1rem;
+}
+
+.panel2 {
+  width: 100%;
+}
