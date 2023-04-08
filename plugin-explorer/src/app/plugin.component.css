@@ -15,25 +15,32 @@ vscode-badge {
   font-size: smaller;
 }
 
-.group {
+.px-group {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: stretch;
   width: 100%;
 }
 
 .side {
-  width: 200px;
+  min-width: 200px;
   justify-content: flex-end;
 }
 
-.profile {
+.author {
   vertical-align: middle;
   width: 50px;
   height: 50px;
+  object-fit: contain;
   border-radius: 50%;
-  padding-right: 1rem;
-  padding-bottom: 1rem;
+}
+
+.prof {
+  min-width: 55px;
+  height: 55px;
+  margin-right: 1rem;
+  display: flex;
+  justify-content: center;
 }
 
 .panel2 {

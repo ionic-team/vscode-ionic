@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {
   provideVSCodeDesignSystem,
   vsCodeButton,
+  vsCodeLink,
   vsCodePanelView,
   vsCodeTag,
   vsCodeTextField,
@@ -14,7 +15,7 @@ import { d } from './utilities/dom';
 // In order to use the Webview UI Toolkit web components they
 // must be registered with the browser (i.e. webview) using the
 // syntax below.
-provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField(), vsCodePanelView(), vsCodeTag());
+provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField(), vsCodePanelView(), vsCodeLink(), vsCodeTag());
 
 @Component({
   selector: 'app-root',
@@ -24,7 +25,7 @@ provideVSCodeDesignSystem().register(vsCodeButton(), vsCodeTextField(), vsCodePa
 export class AppComponent implements OnInit {
   plugins: Plugin[] = [];
   terms: string | undefined;
-  count: number = 0;
+  count = 0;
   constructor(private pluginService: PluginService) {}
 
   async ngOnInit() {
@@ -43,9 +44,5 @@ export class AppComponent implements OnInit {
     this.terms = d('sch');
     this.plugins = this.pluginService.search(this.terms);
     this.count = this.plugins.length;
-    // vscode.postMessage({
-    //   command: 'hello',
-    //   text: 'Hey there partner! 🤠',
-    // });
   }
 }

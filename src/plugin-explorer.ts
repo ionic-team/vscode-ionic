@@ -2,8 +2,12 @@ import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn } from 'vsco
 import { PluginSummary } from './plugin-summary';
 import { httpRequest } from './utilities';
 import { writeIonic } from './extension';
-import { writeFileSync } from 'fs';
+import { existsSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { npmInstall } from './node-commands';
+import { ionicState } from './ionic-tree-provider';
+import { getOutputChannel } from './extension';
+import { run } from './utilities';
 
 export class PluginExplorerPanel {
   public static currentPanel: PluginExplorerPanel | undefined;
@@ -93,19 +97,30 @@ export class PluginExplorerPanel {
         const text = message.text;
         writeIonic(`Plugin Explorer: ${command}`);
         switch (command) {
-          case 'hello':
+          case 'install': {
             // Code that should run in response to the hello message command
-            window.showInformationMessage(text);
-            return;
-          case 'getPlugins':
+            this.install(text);
+            break;
+          }
+          case 'getPlugins': {
             const uri = await fetchPluginData(webview, extensionUri);
             webview.postMessage({ command, uri: `${uri}` });
-            return;
+            break;
+          }
         }
       },
       undefined,
       this._disposables
     );
+  }
+
+  async install(plugin: string) {
+    this.dispose();
+    const channel = getOutputChannel();
+    const cmd = npmInstall(plugin);
+    channel.clear();
+    channel.appendLine(`> ${cmd}`);
+    await run(ionicState.rootFolder, cmd, channel, undefined, [], [], undefined, undefined, undefined, false);
   }
 }
 
@@ -123,11 +138,12 @@ function getUri(webview: Webview, extensionUri: Uri, pathList: string[]) {
 }
 
 async function fetchPluginData(webview: Webview, extensionUri: Uri): Promise<Uri> {
-  //const url = `https://webnative-plugins.netlify.app/detailed-plugins.json`;
-  const json = (await httpRequest('GET', 'webnative-plugins.netlify.app', '/detailed-plugins.json')) as PluginSummary;
-  writeIonic(`Read ${json.plugins.length} plugins.`);
   const path = join(extensionUri.fsPath, 'plugin-explorer', 'build', 'plugins.json');
-  writeIonic(path);
-  writeFileSync(path, JSON.stringify(json));
+  if (!existsSync(path)) {
+    //const url = `https://webnative-plugins.netlify.app/detailed-plugins.json`;
+    const json = (await httpRequest('GET', 'webnative-plugins.netlify.app', '/detailed-plugins.json')) as PluginSummary;
+    writeIonic(`Read ${json.plugins.length} plugins.`);
+    writeFileSync(path, JSON.stringify(json));
+  }
   return getUri(webview, extensionUri, ['plugin-explorer', 'build', 'plugins.json']);
 }

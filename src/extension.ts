@@ -460,7 +460,7 @@ export async function activate(context: vscode.ExtensionContext) {
     runAction(r.tip, ionicProvider, rootPath);
   });
 
-  const showHelloWorldCommand = vscode.commands.registerCommand(CommandName.PluginExplorer, () => {
+  vscode.commands.registerCommand(CommandName.PluginExplorer, () => {
     PluginExplorerPanel.render(context.extensionUri);
   });
 

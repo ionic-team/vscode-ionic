@@ -21,4 +21,8 @@ export interface Plugin {
   updated?: string;
   title: string; // Calculated
   tags: string[]; // Calculated
+  rating: number; // Calculated
+  ratingInfo: string; // Calculated
+  dailyDownloads: string; // Calculated
+  changed: string; // Calculated
 }
