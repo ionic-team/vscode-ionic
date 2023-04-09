@@ -27,7 +27,6 @@ export class PluginService {
       plugin.tags = this.cleanupTags(plugin.success);
       plugin.rating = this.calculateRating(scope, plugin, publishedMonths);
       plugin.dailyDownloads = this.calculateDaily(plugin);
-      plugin.keywords = this.cleanupKeywords(plugin.keywords);
       plugin.tags = [...plugin.tags, ...plugin.keywords];
     }
     this.summary = data;
@@ -130,50 +129,6 @@ export class PluginService {
       rating++;
     }
     return rating;
-  }
-
-  // Remove keywords that add no meaning to a search
-  private cleanupKeywords(keywords: string[]): string[] {
-    if (!keywords) return [];
-    return keywords.filter(
-      (keyword: string) =>
-        ![
-          'cordova',
-          'javascript',
-          'mobile',
-          'typescript',
-          'plugin',
-          'capacitor',
-          'mobile',
-          'ecosystem:cordova',
-          'capacitor-plugin',
-          'capacitor-plugins',
-          'ios',
-          'package',
-          'cordova-windows',
-          'cordova-browser',
-          'csharp',
-          'java',
-          'library',
-          'ecosystem:phonegap',
-          'nodejs',
-          'react',
-          'react-native',
-          'objective-c',
-          'android',
-          'cross-platform',
-          'phonegap',
-          'ionic',
-          'capacitor-ios',
-          'capacitor-android',
-          'cordova-plugin',
-          'cordova:plugin',
-          'native',
-          'capacitor-community',
-          'cordova-ios',
-          'cordova-android',
-        ].includes(keyword.toLowerCase())
-    );
   }
 
   private titleCase(str: string) {

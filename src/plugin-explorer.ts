@@ -2,7 +2,7 @@ import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn } from 'vsco
 import { PluginSummary } from './plugin-summary';
 import { httpRequest } from './utilities';
 import { writeIonic } from './extension';
-import { existsSync, writeFileSync } from 'fs';
+import { existsSync, statSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { npmInstall } from './node-commands';
 import { ionicState } from './ionic-tree-provider';
@@ -139,11 +139,19 @@ function getUri(webview: Webview, extensionUri: Uri, pathList: string[]) {
 
 async function fetchPluginData(webview: Webview, extensionUri: Uri): Promise<Uri> {
   const path = join(extensionUri.fsPath, 'plugin-explorer', 'build', 'plugins.json');
-  if (!existsSync(path)) {
+
+  if (!existsSync(path) || ageInHours(path) > 24) {
     //const url = `https://webnative-plugins.netlify.app/detailed-plugins.json`;
     const json = (await httpRequest('GET', 'webnative-plugins.netlify.app', '/detailed-plugins.json')) as PluginSummary;
     writeIonic(`Read ${json.plugins.length} plugins.`);
     writeFileSync(path, JSON.stringify(json));
   }
   return getUri(webview, extensionUri, ['plugin-explorer', 'build', 'plugins.json']);
+}
+
+function ageInHours(path: string): number {
+  const info = statSync(path);
+  const d = new Date(info.mtime);
+  const n = new Date();
+  return (n.getTime() - d.getTime()) / 3600000;
 }
