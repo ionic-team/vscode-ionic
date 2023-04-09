@@ -25,4 +25,10 @@ export interface Plugin {
   ratingInfo: string; // Calculated
   dailyDownloads: string; // Calculated
   changed: string; // Calculated
+  installed: boolean; // Calculated: whether the plugin is installed in the current project
+}
+
+export interface PluginInfo {
+  name: string;
+  version: string;
 }

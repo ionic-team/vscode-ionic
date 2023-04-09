@@ -7,7 +7,7 @@ import { ionicLogin, ionicSignup } from './ionic-auth';
 import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
-import { installPackage } from './project';
+import { installPackage, reviewProject } from './project';
 import { Command, Tip, TipFeature, TipType } from './tip';
 import { CancelObject, run, estimateRunTime, channelShow, openUri, stopPublishing, replaceAll } from './utilities';
 import { ignore } from './ignore';
@@ -460,8 +460,9 @@ export async function activate(context: vscode.ExtensionContext) {
     runAction(r.tip, ionicProvider, rootPath);
   });
 
-  vscode.commands.registerCommand(CommandName.PluginExplorer, () => {
-    PluginExplorerPanel.render(context.extensionUri);
+  vscode.commands.registerCommand(CommandName.PluginExplorer, async () => {
+    await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
+    PluginExplorerPanel.init(context.extensionUri, rootPath, context);
   });
 
   vscode.commands.registerCommand(CommandName.SkipLogin, async () => {

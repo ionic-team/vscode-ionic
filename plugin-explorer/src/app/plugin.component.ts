@@ -23,7 +23,8 @@ import { vscode } from './utilities/vscode';
         <vscode-badge *ngFor="let tag of data.tags">{{ tag }}</vscode-badge>
         <br />
         <br />
-        <vscode-button (click)="install()">Install</vscode-button>
+        <vscode-button (click)="install()">{{ data.installed ? 'Update' : 'Install' }}</vscode-button>
+        <vscode-button *ngIf="data.installed" (click)="uninstall()">Uninstall</vscode-button>
       </div>
       <div class="side">
         <star class="tooltip" [rating]="data.rating">
@@ -53,6 +54,7 @@ export class PluginComponent {
     rating: 1,
     changed: '',
     ratingInfo: '',
+    installed: false,
     dailyDownloads: '',
   };
 
@@ -61,6 +63,13 @@ export class PluginComponent {
   public install() {
     vscode.postMessage({
       command: 'install',
+      text: this.data.name,
+    });
+  }
+
+  public uninstall() {
+    vscode.postMessage({
+      command: 'uninstall',
       text: this.data.name,
     });
   }

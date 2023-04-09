@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Plugin, PluginSummary } from './plugin-summary';
+import { Plugin, PluginInfo, PluginSummary } from './plugin-summary';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PluginService {
   private summary: PluginSummary = { plugins: [] };
+  private installed: any = {};
 
   public async get(url: string) {
     const response = await fetch(url);
@@ -32,12 +33,20 @@ export class PluginService {
     this.summary = data;
   }
 
-  search(terms: string): Plugin[] {
+  public setInstalled(plugins: PluginInfo[]) {
+    this.installed = {};
+    for (const plugin of plugins) {
+      this.installed[plugin.name] = plugin.version;
+    }
+  }
+
+  public search(terms: string): Plugin[] {
     let count = 0;
     const found = this.summary.plugins.filter((plugin) => {
       const found =
         plugin.name?.includes(terms) || plugin.description?.includes(terms) || plugin.keywords?.includes(terms);
       if (found) count++;
+      plugin.installed = this.installed[plugin.name];
       return found && count < 50;
     });
     return found.sort((a, b) => b.rating - a.rating);

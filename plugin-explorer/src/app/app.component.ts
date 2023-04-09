@@ -11,6 +11,7 @@ import { vscode } from './utilities/vscode';
 import { PluginService } from './plugin.service';
 import { Plugin } from './plugin-summary';
 import { d } from './utilities/dom';
+import { MessageType, sendMessage } from './utilities/messages';
 
 // In order to use the Webview UI Toolkit web components they
 // must be registered with the browser (i.e. webview) using the
@@ -30,13 +31,18 @@ export class AppComponent implements OnInit {
 
   async ngOnInit() {
     window.addEventListener('message', this.onMessage.bind(this));
-    vscode.postMessage({ command: 'getPlugins', text: '' });
+    sendMessage(MessageType.getPlugins, '');
+    sendMessage(MessageType.getInstalledDeps, '');
   }
 
   async onMessage(event: any) {
-    if (event.data.command == 'getPlugins') {
-      if (!this.pluginService) console.error('unable to get plugin service');
-      await this.pluginService.get(event.data.uri);
+    switch (event.data.command) {
+      case MessageType.getPlugins:
+        await this.pluginService.get(event.data.uri);
+        break;
+      case MessageType.getInstalledDeps:
+        this.pluginService.setInstalled(event.data.list);
+        break;
     }
   }
 

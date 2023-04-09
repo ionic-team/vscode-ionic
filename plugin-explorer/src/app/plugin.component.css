@@ -7,6 +7,10 @@ vscode-badge {
   line-height: 2;
 }
 
+vscode-button {
+  margin-right: 0.5rem;
+}
+
 .subtitle {
   font-family: monospace, 'Courier New', Courier;
   opacity: 0.5;
@@ -23,7 +27,7 @@ vscode-badge {
 }
 
 .side {
-  min-width: 200px;
+  min-width: 160px;
   justify-content: flex-end;
 }
 
@@ -45,4 +49,5 @@ vscode-badge {
 
 .panel2 {
   width: 100%;
+  padding-right: 1rem;
 }
