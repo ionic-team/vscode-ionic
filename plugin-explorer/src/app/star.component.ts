@@ -41,6 +41,5 @@ export class StarComponent {
   @Input() set rating(value: number) {
     this._stars = [].constructor(value);
     this._misses = [].constructor(5 - value);
-    console.log(this._stars, this._misses);
   }
 }

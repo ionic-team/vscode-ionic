@@ -1,4 +1,15 @@
 .panel {
-  background-color: rgba(255, 255, 255, 0.01);
+  background-color: rgba(255, 255, 255, 0.02);
+  margin-bottom: 1rem;
+  margin-left: 0;
+  margin-right: 0;
   padding: 1rem;
+}
+
+.two-col {
+  display: flex;
+}
+
+.side {
+  min-width: 180px;
 }

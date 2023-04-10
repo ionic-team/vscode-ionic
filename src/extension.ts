@@ -408,10 +408,12 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   vscode.commands.registerCommand(CommandName.Add, async () => {
-    await installPackage(context.extensionPath, rootPath);
-    if (ionicProvider) {
-      ionicProvider.refresh();
-    }
+    await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
+    PluginExplorerPanel.init(context.extensionUri, rootPath, context);
+    // await installPackage(context.extensionPath, rootPath);
+    // if (ionicProvider) {
+    //   ionicProvider.refresh();
+    // }
   });
 
   vscode.commands.registerCommand(CommandName.Stop, async (recommendation: Recommendation) => {

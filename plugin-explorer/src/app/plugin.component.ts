@@ -19,9 +19,9 @@ import { vscode } from './utilities/vscode';
       <div class="panel2">
         <h2>{{ data.title }}</h2>
         <p class="subtitle">{{ data.name }} v{{ data.version }}</p>
-        <p>{{ data.description }}.</p>
         <vscode-badge *ngFor="let tag of data.tags">{{ tag }}</vscode-badge>
-        <br />
+        <p>{{ data.description }}</p>
+
         <br />
         <vscode-button (click)="install()">{{ data.installed ? 'Update' : 'Install' }}</vscode-button>
         <vscode-button *ngIf="data.installed" (click)="uninstall()">Uninstall</vscode-button>
@@ -30,7 +30,7 @@ import { vscode } from './utilities/vscode';
         <star class="tooltip" [rating]="data.rating">
           <span class="tooltiptext">{{ data.ratingInfo }}</span>
         </star>
-        <p *ngIf="data.dailyDownloads !== '0'">{{ data.dailyDownloads }} Daily Downloads</p>
+        <p *ngIf="data.dailyDownloads !== '0'">{{ data.dailyDownloads }} Downloads Daily</p>
         <p>{{ data.changed }}</p>
         <vscode-link [href]="'https://www.npmjs.com/package/' + data.name">More Information</vscode-link><br />
         <vscode-link *ngIf="data.repo && data.updated" [href]="data.repo">Source Code</vscode-link

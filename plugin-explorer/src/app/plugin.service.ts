@@ -1,12 +1,18 @@
 import { Injectable } from '@angular/core';
 import { Plugin, PluginInfo, PluginSummary } from './plugin-summary';
 
+export enum PluginFilter {
+  installed = 1,
+  search = 2,
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class PluginService {
   private summary: PluginSummary = { plugins: [] };
   private installed: any = {};
+  private unknownPlugins: Plugin[] = [];
 
   public async get(url: string) {
     const response = await fetch(url);
@@ -28,7 +34,7 @@ export class PluginService {
       plugin.tags = this.cleanupTags(plugin.success);
       plugin.rating = this.calculateRating(scope, plugin, publishedMonths);
       plugin.dailyDownloads = this.calculateDaily(plugin);
-      plugin.tags = [...plugin.tags, ...plugin.keywords];
+      //plugin.tags = [...plugin.tags, ...plugin.keywords];
     }
     this.summary = data;
   }
@@ -40,16 +46,75 @@ export class PluginService {
     }
   }
 
-  public search(terms: string): Plugin[] {
+  public calculatedUnknownPlugins() {
+    this.unknownPlugins = [];
+    const names = [];
+    for (const key of Object.keys(this.installed)) {
+      names.push(key);
+    }
+    for (const plugin of this.summary.plugins) {
+      const index = names.indexOf(plugin.name);
+      if (index !== -1) {
+        names.splice(index, 1);
+      }
+    }
+    for (const name of names) {
+      this.unknownPlugins.push({
+        name: name,
+        success: [],
+        fails: [],
+        version: this.installed[name],
+        ratingInfo: '',
+        changed: '',
+        installed: true,
+        versions: [],
+        title: name,
+        published: '',
+        author: '',
+        tags: [],
+        rating: 0,
+        dailyDownloads: '?',
+      });
+    }
+  }
+
+  public search(filters: PluginFilter[], terms: string): Plugin[] {
     let count = 0;
-    const found = this.summary.plugins.filter((plugin) => {
-      const found =
-        plugin.name?.includes(terms) || plugin.description?.includes(terms) || plugin.keywords?.includes(terms);
-      if (found) count++;
-      plugin.installed = this.installed[plugin.name];
-      return found && count < 50;
+    let filter = PluginFilter.installed;
+    if (filters.includes(PluginFilter.search)) {
+      filter = PluginFilter.search;
+    }
+
+    const list = this.summary.plugins.filter((plugin) => {
+      try {
+        let found = false;
+        if (filter == PluginFilter.search) {
+          found =
+            plugin.name?.includes(terms) ||
+            plugin.description?.includes(terms) ||
+            plugin.keywords?.includes(terms) ||
+            false;
+        }
+        if (filter == PluginFilter.installed) {
+          found = this.installed[plugin.name];
+        }
+        if (found) {
+          count++;
+          plugin.installed = this.installed[plugin.name];
+        }
+        return found && count < 50;
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
     });
-    return found.sort((a, b) => b.rating - a.rating);
+    if (filter == PluginFilter.installed) {
+      // Need to add any plugins that are installed but not indexed
+      for (const plugin of this.unknownPlugins) {
+        list.push(plugin);
+      }
+    }
+    return list.sort((a, b) => b.rating - a.rating);
   }
 
   // Returns an amount of daily downloads: eg (10k, 100)

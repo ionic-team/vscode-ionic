@@ -35,9 +35,12 @@ x Report bug: in `iOS` the `.gitignore` needs to ignore the `App/output` folder
 
 ## Plugin Explorer
 
-- Filter: installed plugins
-- Find a plugin that is in npm but not in our list
 - Filters: Capacitor 4, Capacitor 5, Capacitor 3, Cordova
+- Filters: Android, iOS
+- Filters: Official Support
+- Find a plugin that is in npm but not in our list
+- Choose from available versions
+- Option to add plugin for indexing
 
 ## Ditch Ionic CLI
 

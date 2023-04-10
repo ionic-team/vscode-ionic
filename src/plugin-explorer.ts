@@ -121,6 +121,8 @@ export class PluginExplorerPanel {
             break;
           }
           case MessageType.getPlugins: {
+            const list = await getInstalledDeps(path, context);
+            webview.postMessage({ command: MessageType.getInstalledDeps, list });
             const uri = await fetchPluginData(webview, extensionUri);
             webview.postMessage({ command, uri: `${uri}` });
             break;
