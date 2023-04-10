@@ -27,6 +27,7 @@ log-client/*.map
 plugin-explorer/.angular
 plugin-explorer/node_modules
 plugin-explorer/src
+.husky
 **/*.ts
 **/*.jar
 **/*.map
