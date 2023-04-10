@@ -80,6 +80,9 @@ export class PluginService {
 
   public search(filters: PluginFilter[], terms: string): Plugin[] {
     let count = 0;
+    if (filters.length == 0) {
+      return [];
+    }
     let filter = PluginFilter.installed;
     if (filters.includes(PluginFilter.search)) {
       filter = PluginFilter.search;

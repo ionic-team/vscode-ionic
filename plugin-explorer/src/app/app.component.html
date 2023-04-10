@@ -3,6 +3,7 @@
     <vscode-text-field
       autofocus
       id="sch"
+      [value]="terms"
       (keydown.enter)="search()"
       class="wide"
       placeholder="Search for Capacitor and Cordova Plugins"
@@ -23,7 +24,9 @@
       <vscode-checkbox>iOS</vscode-checkbox><br />
       <br />
       <p>Filters</p>
-      <vscode-checkbox id="installed" checked>Installed</vscode-checkbox><br />
+      <vscode-checkbox id="installed" (click)="this.terms = ''; change()" [attr.checked]="isInstalled"
+        >Installed</vscode-checkbox
+      ><br />
       <vscode-checkbox>Official Support</vscode-checkbox><br />
     </div>
     <div style="width: 100%" [hidden]="!plugins">

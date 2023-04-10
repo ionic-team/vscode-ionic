@@ -32,8 +32,9 @@ provideVSCodeDesignSystem().register(
 })
 export class AppComponent implements OnInit {
   plugins: Plugin[] = [];
-  terms: string | undefined;
+  terms = '';
   listTitle = '';
+  isInstalled: string | undefined = 'true';
   count = 0;
   constructor(private pluginService: PluginService) {}
 
@@ -55,17 +56,26 @@ export class AppComponent implements OnInit {
         break;
     }
   }
+  change() {
+    setTimeout(() => {
+      this.search();
+    }, 1);
+  }
 
   search() {
     this.terms = d('sch');
     const filters: PluginFilter[] = [];
-    if (this.terms?.length > 0) filters.push(PluginFilter.search);
+    if (this.terms?.length > 0) {
+      filters.push(PluginFilter.search);
+      this.isInstalled = undefined;
+    }
     if (checked('installed')) filters.push(PluginFilter.installed);
 
     this.plugins = this.pluginService.search(filters, this.terms);
     this.count = this.plugins.length;
 
-    this.listTitle = `${this.count} search results for '${this.terms}'`;
+    this.listTitle = `No results shown`;
+    if (filters.includes(PluginFilter.search)) this.listTitle = `${this.count} search results for '${this.terms}'`;
     if (checked('installed') && !filters.includes(PluginFilter.search)) {
       this.listTitle = `${this.count} installed plugins`;
     }
