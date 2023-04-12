@@ -4,6 +4,7 @@ import { Plugin, PluginInfo, PluginSummary } from './plugin-summary';
 export enum PluginFilter {
   installed = 1,
   search = 2,
+  official = 3,
 }
 
 @Injectable({
@@ -78,28 +79,30 @@ export class PluginService {
     }
   }
 
-  public search(filters: PluginFilter[], terms: string): Plugin[] {
+  public search(filters: PluginFilter[], terms: string, tests: string[]): Plugin[] {
     let count = 0;
-    if (filters.length == 0) {
+    if (filters.length == 0 && tests.length == 0 && terms.length == 0) {
       return [];
-    }
-    let filter = PluginFilter.installed;
-    if (filters.includes(PluginFilter.search)) {
-      filter = PluginFilter.search;
     }
 
     const list = this.summary.plugins.filter((plugin) => {
       try {
-        let found = false;
-        if (filter == PluginFilter.search) {
+        let found = true;
+        if (filters.includes(PluginFilter.search)) {
           found =
             plugin.name?.includes(terms) ||
             plugin.description?.includes(terms) ||
             plugin.keywords?.includes(terms) ||
             false;
         }
-        if (filter == PluginFilter.installed) {
-          found = this.installed[plugin.name];
+        if (filters.includes(PluginFilter.installed)) {
+          found = found && !!this.installed[plugin.name];
+        }
+        if (filters.includes(PluginFilter.official)) {
+          found = found && this.isOfficial(plugin.name);
+        }
+        if (tests.length > 0) {
+          found = found && this.passedTests(tests, plugin.success);
         }
         if (found) {
           count++;
@@ -111,7 +114,7 @@ export class PluginService {
         return false;
       }
     });
-    if (filter == PluginFilter.installed) {
+    if (filters.includes(PluginFilter.installed)) {
       // Need to add any plugins that are installed but not indexed
       for (const plugin of this.unknownPlugins) {
         list.push(plugin);
@@ -128,6 +131,18 @@ export class PluginService {
     } else {
       return `${daily}`;
     }
+  }
+
+  private isOfficial(name: string): boolean {
+    return name.startsWith('@capacitor/') || name.startsWith('@ionic-enterprise');
+  }
+
+  // Returns true if the plugin passed at least one test
+  private passedTests(tests: string[], results: string[]): boolean {
+    for (const test of tests) {
+      if (results.includes(test)) return true;
+    }
+    return false;
   }
 
   private calcChange(published: string): number {

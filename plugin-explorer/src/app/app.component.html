@@ -14,20 +14,21 @@
   <div class="two-col">
     <div class="side">
       <p>Compatibility</p>
-      <vscode-checkbox>Capacitor 5</vscode-checkbox><br />
-      <vscode-checkbox>Capacitor 4</vscode-checkbox><br />
-      <vscode-checkbox>Capacitor 3</vscode-checkbox><br />
-      <vscode-checkbox>Cordova</vscode-checkbox><br />
+      <div *ngFor="let filter of testFilters">
+        <vscode-checkbox id="{{ filter.id }}" (click)="change()">{{ filter.name }}</vscode-checkbox
+        ><br />
+      </div>
+
       <br />
       <p>Platform</p>
-      <vscode-checkbox>Android</vscode-checkbox><br />
-      <vscode-checkbox>iOS</vscode-checkbox><br />
+      <vscode-checkbox id="android" (click)="change()">Android</vscode-checkbox><br />
+      <vscode-checkbox id="ios" (click)="change()">iOS</vscode-checkbox><br />
       <br />
       <p>Filters</p>
       <vscode-checkbox id="installed" (click)="this.terms = ''; change()" [attr.checked]="isInstalled"
         >Installed</vscode-checkbox
       ><br />
-      <vscode-checkbox>Official Support</vscode-checkbox><br />
+      <vscode-checkbox id="official" (click)="change()">Official Support</vscode-checkbox><br />
     </div>
     <div style="width: 100%" [hidden]="!plugins">
       <p>{{ listTitle }}</p>
