@@ -30,7 +30,10 @@
       ><br />
       <vscode-checkbox id="official" (click)="change()">Official Support</vscode-checkbox><br />
     </div>
-    <div style="width: 100%" [hidden]="!plugins">
+    <div class="progress" *ngIf="busy">
+      <vscode-progress-ring></vscode-progress-ring>
+    </div>
+    <div style="width: 100%" [hidden]="!plugins || busy">
       <p>{{ listTitle }}</p>
       <div class="panel" *ngFor="let plugin of plugins">
         <plugin [data]="plugin"></plugin>

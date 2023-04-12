@@ -5,6 +5,7 @@ import {
   vsCodeCheckbox,
   vsCodeLink,
   vsCodePanelView,
+  vsCodeProgressRing,
   vsCodeTag,
   vsCodeTextField,
 } from '@vscode/webview-ui-toolkit';
@@ -23,7 +24,8 @@ provideVSCodeDesignSystem().register(
   vsCodePanelView(),
   vsCodeLink(),
   vsCodeTag(),
-  vsCodeCheckbox()
+  vsCodeCheckbox(),
+  vsCodeProgressRing()
 );
 
 @Component({
@@ -39,6 +41,7 @@ export class AppComponent implements OnInit {
   testFilters: TestFilter[] = getTestFilters();
 
   count = 0;
+  busy = true;
   constructor(private pluginService: PluginService) {}
 
   async ngOnInit() {
@@ -52,6 +55,7 @@ export class AppComponent implements OnInit {
         await this.pluginService.get(event.data.uri);
         this.pluginService.calculatedUnknownPlugins();
         this.search();
+        this.busy = false;
         break;
       case MessageType.getInstalledDeps:
         this.pluginService.setInstalled(event.data.list);
@@ -64,7 +68,7 @@ export class AppComponent implements OnInit {
     }, 1);
   }
 
-  search() {
+  search(): void {
     this.terms = d('sch');
     const filters: PluginFilter[] = [];
     if (this.terms?.length > 0) {
