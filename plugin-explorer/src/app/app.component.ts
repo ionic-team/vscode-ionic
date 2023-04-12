@@ -71,9 +71,9 @@ export class AppComponent implements OnInit {
       filters.push(PluginFilter.search);
       this.isInstalled = undefined;
     }
-    this.listTitle = `No results shown`;
+    this.listTitle = `Plugins`;
 
-    if (checked('installed')) {
+    if (checked('installed') && this.isInstalled) {
       filters.push(PluginFilter.installed);
       this.listTitle = 'Installed Plugins';
     }
@@ -87,13 +87,21 @@ export class AppComponent implements OnInit {
       this.listTitle = `Plugins that work with ${checkedTestsTitle}`;
     }
 
-    this.plugins = this.pluginService.search(filters, this.terms, this.checkedTests());
+    this.plugins = this.pluginService.search(
+      filters,
+      this.terms,
+      this.checkedTests(),
+      checked('android'),
+      checked('ios')
+    );
     this.count = this.plugins.length;
 
-    if (filters.includes(PluginFilter.search)) this.listTitle = `plugins related to '${this.terms}'`;
+    if (filters.includes(PluginFilter.search)) this.listTitle += ` related to '${this.terms}'`;
 
     if (this.count > 0) {
-      this.listTitle = `${this.count} ${this.listTitle}`;
+      this.listTitle = `${this.count == 50 ? 'Top ' : ''}${this.count} ${this.listTitle}`;
+    } else {
+      this.listTitle = 'No results shown';
     }
   }
 
@@ -104,7 +112,7 @@ export class AppComponent implements OnInit {
         result = [...result, testFilter.name];
       }
     }
-    return result.join(', ');
+    return result.join(' or ');
   }
 
   private checkedTests(): string[] {

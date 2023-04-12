@@ -4,7 +4,7 @@ export function getTestFilters(): TestFilter[] {
 
   const results = [];
   for (let v = capacitorFrom; v <= capacitorTo; v++) {
-    results.push({
+    results.unshift({
       name: `Capacitor ${v}`,
       id: `capacitor-${v}`,
       list: [`capacitor-ios-${v}`, `capacitor-android-${v}`],

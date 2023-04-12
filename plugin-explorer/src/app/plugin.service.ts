@@ -79,11 +79,8 @@ export class PluginService {
     }
   }
 
-  public search(filters: PluginFilter[], terms: string, tests: string[]): Plugin[] {
+  public search(filters: PluginFilter[], terms: string, tests: string[], android: boolean, ios: boolean): Plugin[] {
     let count = 0;
-    if (filters.length == 0 && tests.length == 0 && terms.length == 0) {
-      return [];
-    }
 
     const list = this.summary.plugins.filter((plugin) => {
       try {
@@ -101,6 +98,9 @@ export class PluginService {
         if (filters.includes(PluginFilter.official)) {
           found = found && this.isOfficial(plugin.name);
         }
+
+        found = found && this.passedPlatforms(android, ios, plugin.success);
+
         if (tests.length > 0) {
           found = found && this.passedTests(tests, plugin.success);
         }
@@ -108,7 +108,7 @@ export class PluginService {
           count++;
           plugin.installed = this.installed[plugin.name];
         }
-        return found && count < 50;
+        return found && count <= 50;
       } catch (error) {
         console.error(error);
         return false;
@@ -120,7 +120,11 @@ export class PluginService {
         list.push(plugin);
       }
     }
-    return list.sort((a, b) => b.rating - a.rating);
+    return list.sort((a, b) => this.sortFactor(b) - this.sortFactor(a));
+  }
+
+  private sortFactor(p: Plugin): number {
+    return (this.isOfficial(p.name) ? 10000 : 0) + p.rating;
   }
 
   // Returns an amount of daily downloads: eg (10k, 100)
@@ -141,6 +145,16 @@ export class PluginService {
   private passedTests(tests: string[], results: string[]): boolean {
     for (const test of tests) {
       if (results.includes(test)) return true;
+    }
+    return false;
+  }
+
+  // Returns true if the plugin passed at least one test for the platform
+  private passedPlatforms(android: boolean, ios: boolean, results: string[]): boolean {
+    console.log(android, ios, results);
+    for (const result of results) {
+      if (android && result.includes('android')) return true;
+      if (ios && result.includes('ios')) return true;
     }
     return false;
   }
