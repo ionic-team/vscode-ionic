@@ -13,8 +13,8 @@ import { vscode } from './utilities/vscode';
   template: `
     <div class="px-group">
       <div class="prof tooltip">
-        <img [hidden]="hide" (error)="hide = true" class="author" alt="data.author" [src]="data.image" />
-        <span style="top:55px" class="tooltiptext">{{ data.author }}</span>
+        <img [hidden]="hide" (error)="hide = true" class="author" alt="data.author.name" [src]="data.image" />
+        <span style="top:55px" class="tooltiptext">{{ data.author.name ? data.author.name : data.author }}</span>
       </div>
       <div class="panel2">
         <h2>{{ data.title }}</h2>

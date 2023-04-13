@@ -27,6 +27,7 @@ import { kill } from './process-list';
 import { selectExternalIPAddress } from './ionic-serve';
 import { advancedActions } from './advanced-actions';
 import { PluginExplorerPanel } from './plugin-explorer';
+import { features } from './features';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
@@ -408,12 +409,15 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   vscode.commands.registerCommand(CommandName.Add, async () => {
-    await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
-    PluginExplorerPanel.init(context.extensionUri, rootPath, context);
-    // await installPackage(context.extensionPath, rootPath);
-    // if (ionicProvider) {
-    //   ionicProvider.refresh();
-    // }
+    if (features.pluginExplorer) {
+      await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
+      PluginExplorerPanel.init(context.extensionUri, rootPath, context);
+    } else {
+      await installPackage(context.extensionPath, rootPath);
+      if (ionicProvider) {
+        ionicProvider.refresh();
+      }
+    }
   });
 
   vscode.commands.registerCommand(CommandName.Stop, async (recommendation: Recommendation) => {

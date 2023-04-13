@@ -1,7 +1,7 @@
-export function getTestFilters(): TestFilter[] {
-  const capacitorFrom = 3; // Capacitor 3
-  const capacitorTo = 5; // Capacitor 5
+export const capacitorFrom = 3; // Capacitor 3
+export const capacitorTo = 5; // Capacitor 5
 
+export function getTestFilters(): TestFilter[] {
   const results = [];
   for (let v = capacitorFrom; v <= capacitorTo; v++) {
     results.unshift({

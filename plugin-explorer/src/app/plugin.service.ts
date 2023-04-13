@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Plugin, PluginInfo, PluginSummary } from './plugin-summary';
+import { capacitorFrom, capacitorTo } from './test-filter';
 
 export enum PluginFilter {
   installed = 1,
@@ -248,15 +249,12 @@ export class PluginService {
   private cleanupTags(tags: string[]): string[] {
     const result = [];
 
-    if (tags.includes(`capacitor-ios-3`) && tags.includes(`capacitor-android-3`)) {
-      result.push(`Capacitor 3`);
+    for (let v = capacitorFrom; v <= capacitorTo; v++) {
+      if (tags.includes(`capacitor-ios-${v}`) && tags.includes(`capacitor-android-${v}`)) {
+        result.push(`Capacitor ${v}`);
+      }
     }
-    if (tags.includes(`capacitor-ios-4`) && tags.includes(`capacitor-android-4`)) {
-      result.push(`Capacitor 4`);
-    }
-    if (tags.includes(`capacitor-ios-5`) && tags.includes(`capacitor-android-5`)) {
-      result.push(`Capacitor 5`);
-    }
+
     if (tags.includes(`cordova-ios-6`) && tags.includes(`cordova-android-11`)) {
       result.push(`Cordova`);
     }
