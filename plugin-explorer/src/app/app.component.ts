@@ -42,6 +42,8 @@ export class AppComponent implements OnInit {
 
   count = 0;
   busy = true;
+  private searchedPlugin: Plugin | undefined; // Found from search
+
   constructor(private pluginService: PluginService) {}
 
   async ngOnInit() {
@@ -57,6 +59,15 @@ export class AppComponent implements OnInit {
         this.search();
         this.busy = false;
         break;
+      case MessageType.getPlugin:
+        this.searchedPlugin = event.data.data;
+        // Add to the list of displayed plugins if found
+        if (this.plugins.length > 0 && this.searchedPlugin) {
+          this.searchedPlugin.title = this.pluginService.getTitle(this.searchedPlugin.name);
+          this.searchedPlugin.dailyDownloads = '0';
+          this.plugins.push(this.searchedPlugin);
+        }
+        break;
       case MessageType.getInstalledDeps:
         this.pluginService.setInstalled(event.data.list);
         break;
@@ -70,6 +81,8 @@ export class AppComponent implements OnInit {
 
   search(): void {
     this.terms = d('sch');
+    this.searchedPlugin = undefined;
+    sendMessage(MessageType.getPlugin, this.terms);
     const filters: PluginFilter[] = [];
     if (this.terms?.length > 0) {
       filters.push(PluginFilter.search);
@@ -98,6 +111,9 @@ export class AppComponent implements OnInit {
       checked('android'),
       checked('ios')
     );
+    if (this.searchedPlugin) {
+      this.plugins.push(this.searchedPlugin);
+    }
     this.count = this.plugins.length;
 
     if (filters.includes(PluginFilter.search)) this.listTitle += ` related to '${this.terms}'`;

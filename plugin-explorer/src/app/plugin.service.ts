@@ -27,10 +27,7 @@ export class PluginService {
         scope = tmp[0];
         name = tmp[1];
       }
-      const words = name.replace('/', '-').replaceAll('.', ' ').split('-');
-      plugin.title = this.titleCase(
-        words.filter((word: string) => word !== 'capacitor' && word !== 'cordova' && word !== 'plugin').join(' ')
-      );
+      plugin.title = this.getTitle(name);
       const publishedMonths = this.calcChange(plugin.published);
       plugin.changed = this.changeInMonths(publishedMonths);
       plugin.tags = this.cleanupTags(plugin.success);
@@ -39,6 +36,13 @@ export class PluginService {
       //plugin.tags = [...plugin.tags, ...plugin.keywords];
     }
     this.summary = data;
+  }
+
+  public getTitle(name: any): string {
+    const words = name.replace('/', '-').replaceAll('.', ' ').split('-');
+    return this.titleCase(
+      words.filter((word: string) => word !== 'capacitor' && word !== 'cordova' && word !== 'plugin').join(' ')
+    );
   }
 
   public setInstalled(plugins: PluginInfo[]) {
@@ -152,7 +156,6 @@ export class PluginService {
 
   // Returns true if the plugin passed at least one test for the platform
   private passedPlatforms(android: boolean, ios: boolean, results: string[]): boolean {
-    console.log(android, ios, results);
     for (const result of results) {
       if (android && result.includes('android')) return true;
       if (ios && result.includes('ios')) return true;

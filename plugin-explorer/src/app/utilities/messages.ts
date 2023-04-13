@@ -2,6 +2,7 @@ import { vscode } from './vscode';
 
 export enum MessageType {
   getPlugins = 'getPlugins',
+  getPlugin = 'getPlugin',
   getInstalledDeps = 'getInstalledDeps',
 }
 

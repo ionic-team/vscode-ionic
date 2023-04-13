@@ -1,5 +1,5 @@
 import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn, ExtensionContext } from 'vscode';
-import { PluginSummary } from './plugin-summary';
+import { PluginSummary, Plugin } from './plugin-summary';
 import { httpRequest, showProgress } from './utilities';
 import { existsSync, statSync, writeFileSync } from 'fs';
 import { join } from 'path';
@@ -18,6 +18,7 @@ enum MessageType {
   getPlugins = 'getPlugins',
   getInstalledDeps = 'getInstalledDeps',
   install = 'install',
+  getPlugin = 'getPlugin',
   uninstall = 'uninstall',
 }
 
@@ -120,6 +121,11 @@ export class PluginExplorerPanel {
             webview.postMessage({ command, list });
             break;
           }
+          case MessageType.getPlugin: {
+            const data = await getPluginInfo(text);
+            webview.postMessage({ command, data });
+            break;
+          }
           case MessageType.getPlugins: {
             const list = await getInstalledDeps(path, context);
             webview.postMessage({ command: MessageType.getInstalledDeps, list });
@@ -194,6 +200,29 @@ async function fetchPluginData(webview: Webview, extensionUri: Uri): Promise<Uri
     writeFileSync(path, JSON.stringify(json));
   }
   return getUri(webview, extensionUri, ['plugin-explorer', 'build', 'plugins.json']);
+}
+
+async function getPluginInfo(name: string): Promise<Plugin> {
+  // The UI is searching for a particular plugin or dependency.
+  // As not all packages are indexed and may not even be a plugin we search and return info
+  const p: any = await httpRequest('GET', `registry.npmjs.org`, `/${name}`);
+  if (!p.name) {
+    console.error(`getPluginInfo(${name}}) ${p}`);
+    return undefined;
+  }
+  return {
+    name: p.name,
+    version: p['dist-tags'].latest,
+    success: [],
+    fails: [],
+    versions: [],
+    description: p.description,
+    author: p.author,
+    published: p.time.modified,
+    keywords: p.keywords,
+    repo: p.repository.url,
+    license: p.license,
+  };
 }
 
 function ageInHours(path: string): number {
