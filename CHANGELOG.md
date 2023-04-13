@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.36
+
+- NX projects run web will use external address and work with Nexus Browser
+
 ### Version 1.35
 
 - Fix live reload for Angular project with non default (app) project names
