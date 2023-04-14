@@ -39,7 +39,12 @@ export class StarComponent {
   _stars = [0, 1, 2];
   _misses = [3, 4, 5];
   @Input() set rating(value: number) {
-    this._stars = [].constructor(value);
-    this._misses = [].constructor(5 - value);
+    if (!value) {
+      this._stars = [];
+      this._misses = [].constructor(5);
+    } else {
+      this._stars = [].constructor(value);
+      this._misses = [].constructor(5 - value);
+    }
   }
 }

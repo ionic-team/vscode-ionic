@@ -652,6 +652,8 @@ export function httpRequest(method: string, host: string, path: string, postData
         resolve(body);
       });
     });
+    req.setHeader('User-Agent', 'Ionic VS Code Extension (https://capacitorjs.com/docs/vscode/getting-started)');
+    req.setHeader('Accept', '*/*');
     req.on('error', function (err) {
       reject(err);
     });

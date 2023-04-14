@@ -11,7 +11,7 @@ import {
 } from '@vscode/webview-ui-toolkit';
 import { PluginFilter, PluginService } from './plugin.service';
 import { Plugin } from './plugin-summary';
-import { checked, d } from './utilities/dom';
+import { checked, d, setChecked } from './utilities/dom';
 import { MessageType, sendMessage } from './utilities/messages';
 import { TestFilter, getTestFilters } from './test-filter';
 
@@ -60,12 +60,18 @@ export class AppComponent implements OnInit {
         this.busy = false;
         break;
       case MessageType.getPlugin:
+        if (!event.data || !event.data.data || !event.data.data.name) break;
         this.searchedPlugin = event.data.data;
         // Add to the list of displayed plugins if found
-        if (this.plugins.length > 0 && this.searchedPlugin) {
+        if (this.searchedPlugin) {
           this.searchedPlugin.title = this.pluginService.getTitle(this.searchedPlugin.name);
           this.searchedPlugin.dailyDownloads = '0';
+          this.searchedPlugin.ratingInfo = 'This dependency was found on npmjs.com and has not been tested yet.';
           this.plugins.push(this.searchedPlugin);
+          if (this.plugins.length == 1) {
+            this.listTitle = `Found "${this.searchedPlugin.name}" on npmjs.com`;
+          }
+          console.log(`Added plugin from search`, event.data);
         }
         break;
       case MessageType.getInstalledDeps:
@@ -79,18 +85,23 @@ export class AppComponent implements OnInit {
     }, 1);
   }
 
+  // User checked Official plugins
+  changeOfficial() {
+    setChecked('installed', false);
+    this.change();
+  }
+
   search(): void {
     this.terms = d('sch');
     this.searchedPlugin = undefined;
-    sendMessage(MessageType.getPlugin, this.terms);
     const filters: PluginFilter[] = [];
     if (this.terms?.length > 0) {
       filters.push(PluginFilter.search);
-      this.isInstalled = undefined;
+      setChecked('installed', false);
     }
     this.listTitle = `Plugins`;
 
-    if (checked('installed') && this.isInstalled) {
+    if (checked('installed')) {
       filters.push(PluginFilter.installed);
       this.listTitle = 'Installed Plugins';
     }
@@ -111,17 +122,18 @@ export class AppComponent implements OnInit {
       checked('android'),
       checked('ios')
     );
-    if (this.searchedPlugin) {
-      this.plugins.push(this.searchedPlugin);
-    }
     this.count = this.plugins.length;
 
     if (filters.includes(PluginFilter.search)) this.listTitle += ` related to '${this.terms}'`;
 
     if (this.count > 0) {
-      this.listTitle = `${this.count == 50 ? 'Top ' : ''}${this.count} ${this.listTitle}`;
+      this.listTitle = `${this.count == 50 ? 'First ' : ''}${this.count} ${this.listTitle}`;
     } else {
       this.listTitle = 'No results shown';
+    }
+    if (this.terms) {
+      console.log(`Send request for ${this.terms}`);
+      sendMessage(MessageType.getPlugin, this.terms);
     }
   }
 

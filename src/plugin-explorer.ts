@@ -1,6 +1,6 @@
 import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn, ExtensionContext } from 'vscode';
 import { PluginSummary, Plugin } from './plugin-summary';
-import { httpRequest, showProgress } from './utilities';
+import { getRunOutput, httpRequest, showProgress } from './utilities';
 import { existsSync, statSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { npmInstall, npmUninstall } from './node-commands';
@@ -122,7 +122,7 @@ export class PluginExplorerPanel {
             break;
           }
           case MessageType.getPlugin: {
-            const data = await getPluginInfo(text);
+            const data = await getPluginInfo(text, path);
             webview.postMessage({ command, data });
             break;
           }
@@ -202,27 +202,72 @@ async function fetchPluginData(webview: Webview, extensionUri: Uri): Promise<Uri
   return getUri(webview, extensionUri, ['plugin-explorer', 'build', 'plugins.json']);
 }
 
-async function getPluginInfo(name: string): Promise<Plugin> {
+async function getPluginInfo(name: string, path: string): Promise<Plugin> {
   // The UI is searching for a particular plugin or dependency.
   // As not all packages are indexed and may not even be a plugin we search and return info
-  const p: any = await httpRequest('GET', `registry.npmjs.org`, `/${name}`);
-  if (!p.name) {
-    console.error(`getPluginInfo(${name}}) ${p}`);
+  if (!name) return undefined;
+  try {
+    const p: any = JSON.parse(await getRunOutput(`npm view ${name} --json`, path));
+
+    //const p: any = await httpRequest('GET', `registry.npmjs.org`, `/${name}`);
+    if (!p.name) {
+      console.error(`getPluginInfo(${name}}) ${p}`);
+      return undefined;
+    }
+    const gh = await getGHInfo(p.repository.url);
+    const data: Plugin = {
+      name: p.name,
+      version: p.version,
+      success: [],
+      fails: [],
+      versions: [],
+      description: p.description,
+      author: p.author,
+      bugs: p.bugs.url,
+      image: gh?.owner?.avatar_url,
+      stars: gh?.stargazers_count,
+      fork: gh?.fork,
+      updated: gh?.updated_at,
+      published: p.time.modified,
+      keywords: p.keywords,
+      repo: cleanRepo(p.repository?.url),
+      license: p.license,
+    };
+    console.log(`Found npm package ${name}`, p);
+    return data;
+  } catch (error) {
+    console.error(`getPluginInfo(${name})`, error);
     return undefined;
   }
-  return {
-    name: p.name,
-    version: p['dist-tags'].latest,
-    success: [],
-    fails: [],
-    versions: [],
-    description: p.description,
-    author: p.author,
-    published: p.time.modified,
-    keywords: p.keywords,
-    repo: p.repository.url,
-    license: p.license,
-  };
+}
+
+function cleanRepo(url: string): string {
+  if (url) {
+    return url
+      .replace('git+', '')
+      .replace('ssh://git@', '')
+      .replace('.git', '')
+      .replace('git://github.com/', 'https://github.com/');
+  }
+}
+
+async function getGHInfo(repo: string): Promise<any> {
+  try {
+    if (!repo) return undefined;
+    const part = repo
+      .replace('https://github.com/', '')
+      .replace('.git', '')
+      .replace('ssh://git@', '')
+      .replace('git+', '')
+      .replace('git://github.com/', '');
+    console.log(`getGHInfo api.github.com/repos/${part}`);
+    const gh = await httpRequest('GET', `api.github.com`, `/repos/${part}`);
+    console.log(gh);
+    return gh;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
 }
 
 function ageInHours(path: string): number {

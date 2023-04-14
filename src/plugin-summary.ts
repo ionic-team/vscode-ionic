@@ -19,5 +19,6 @@ export interface Plugin {
   stars?: number;
   image?: string;
   updated?: string;
+  fork?: boolean;
   license?: string;
 }

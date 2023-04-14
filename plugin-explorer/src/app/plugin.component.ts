@@ -13,13 +13,16 @@ import { vscode } from './utilities/vscode';
   template: `
     <div class="px-group">
       <div class="prof tooltip">
-        <img [hidden]="hide" (error)="hide = true" class="author" alt="data.author.name" [src]="data.image" />
-        <span style="top:55px" class="tooltiptext">{{ data.author.name ? data.author.name : data.author }}</span>
+        <img [hidden]="hide" (error)="hide = true" class="author" alt="data.author?.name" [src]="data.image" />
+        <span style="top:55px" class="tooltiptext">{{ data.author?.name ? data.author.name : data.author }}</span>
       </div>
       <div class="panel2">
         <h2>{{ data.title }}</h2>
         <p class="subtitle">{{ data.name }} v{{ data.version }}</p>
-        <vscode-badge *ngFor="let tag of data.tags">{{ tag }}</vscode-badge>
+        <div class="tooltip">
+          <span class="tooltiptext wide-tip">{{ data.tagInfo }}</span>
+          <vscode-badge *ngFor="let tag of data.tags">{{ tag }}</vscode-badge>
+        </div>
         <p>{{ data.description }}</p>
 
         <br />
@@ -54,6 +57,7 @@ export class PluginComponent {
     rating: 1,
     changed: '',
     ratingInfo: '',
+    tagInfo: '',
     installed: false,
     dailyDownloads: '',
   };

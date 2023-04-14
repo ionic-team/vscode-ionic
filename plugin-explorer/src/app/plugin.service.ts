@@ -31,11 +31,28 @@ export class PluginService {
       const publishedMonths = this.calcChange(plugin.published);
       plugin.changed = this.changeInMonths(publishedMonths);
       plugin.tags = this.cleanupTags(plugin.success);
+      plugin.tagInfo = `Version ${plugin.version} builds with ${this.prettify(
+        plugin.success
+      )}.\n\n Failed on ${this.prettify(plugin.fails)}`;
       plugin.rating = this.calculateRating(scope, plugin, publishedMonths);
       plugin.dailyDownloads = this.calculateDaily(plugin);
       //plugin.tags = [...plugin.tags, ...plugin.keywords];
     }
     this.summary = data;
+  }
+
+  private prettify(tests: string[]): string {
+    const res: string[] = [];
+    for (const test of tests) {
+      res.push(
+        test
+          .replace('capacitor-', 'Capacitor ')
+          .replace('cordova-', 'Cordova ')
+          .replace('ios-', 'IOS ')
+          .replace('android-', 'Android ')
+      );
+    }
+    return res.join(', ');
   }
 
   public getTitle(name: any): string {
@@ -71,6 +88,7 @@ export class PluginService {
         fails: [],
         version: this.installed[name],
         ratingInfo: '',
+        tagInfo: '',
         changed: '',
         installed: true,
         versions: [],
@@ -96,6 +114,7 @@ export class PluginService {
             plugin.description?.includes(terms) ||
             plugin.keywords?.includes(terms) ||
             false;
+          console.log(found);
         }
         if (filters.includes(PluginFilter.installed)) {
           found = found && !!this.installed[plugin.name];
@@ -129,7 +148,7 @@ export class PluginService {
   }
 
   private sortFactor(p: Plugin): number {
-    return (this.isOfficial(p.name) ? 10000 : 0) + p.rating;
+    return this.boost(p.name) + p.rating;
   }
 
   // Returns an amount of daily downloads: eg (10k, 100)
@@ -144,6 +163,11 @@ export class PluginService {
 
   private isOfficial(name: string): boolean {
     return name.startsWith('@capacitor/') || name.startsWith('@ionic-enterprise');
+  }
+
+  // We rate @capacitor first then @ionic-enterprise
+  private boost(name: string): number {
+    return (name.startsWith('@capacitor/') ? 100000 : 0) + (name.startsWith('@ionic-enterprise') ? 10000 : 0);
   }
 
   // Returns true if the plugin passed at least one test
@@ -249,6 +273,8 @@ export class PluginService {
     return tmp.join(' ');
   }
 
+  // Given a set of tags for successful tests (eg capacitor-ios-4)
+  // Return user friendly names to indicate compatibility (eg Capacitor 4)
   private cleanupTags(tags: string[]): string[] {
     const result = [];
 

@@ -51,3 +51,10 @@ vscode-button {
   width: 100%;
   padding-right: 1rem;
 }
+
+.wide-tip {
+  width: 300px !important;
+  top: 25px;
+  line-height: 2;
+  padding: 1rem;
+}

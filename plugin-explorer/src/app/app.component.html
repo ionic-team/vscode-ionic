@@ -28,7 +28,7 @@
       <vscode-checkbox id="installed" (click)="this.terms = ''; change()" [attr.checked]="isInstalled"
         >Installed</vscode-checkbox
       ><br />
-      <vscode-checkbox id="official" (click)="change()">Official Support</vscode-checkbox><br />
+      <vscode-checkbox id="official" (click)="changeOfficial()">Official Support</vscode-checkbox><br />
     </div>
     <div class="progress" *ngIf="busy">
       <vscode-progress-ring></vscode-progress-ring>

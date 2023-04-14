@@ -23,6 +23,7 @@ export interface Plugin {
   tags: string[]; // Calculated
   rating: number; // Calculated
   ratingInfo: string; // Calculated
+  tagInfo: string; // Calcuilated
   dailyDownloads: string; // Calculated
   changed: string; // Calculated
   installed: boolean; // Calculated: whether the plugin is installed in the current project
