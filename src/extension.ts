@@ -28,6 +28,7 @@ import { selectExternalIPAddress } from './ionic-serve';
 import { advancedActions } from './advanced-actions';
 import { PluginExplorerPanel } from './plugin-explorer';
 import { features } from './features';
+import * as path from 'path';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
@@ -49,32 +50,30 @@ async function requestAppName(tip: Tip, path: string) {
     },
   });
   if (name && name.length > 1) {
-    const result = [];
+    const commands = [];
     name = name.replace(/ /g, '-');
     let packageId = name.replace(/ /g, '.').replace(/-/g, '.');
     if (!packageId.includes('.')) {
       packageId = `ionic.${packageId}`;
     }
     for (const command of tip.command) {
-      result.push(
+      commands.push(
         command
           .replace(new RegExp('@app', 'g'), `${name.trim()}`)
           .replace(new RegExp('@package-id', 'g'), `${packageId.trim()}`)
       );
     }
-    return result;
+    commands.push('git init');
+    return commands;
   } else {
     return undefined;
   }
 }
 
-function suggestName(path: string): string {
+function suggestName(path2: string): string {
   let name = 'my-app';
   try {
-    let tmp = path.split('/');
-    if (tmp.length == 0) {
-      tmp = path.split('\\');
-    }
+    const tmp = path2.split(path.sep);
     if (tmp.length > 0) {
       name = tmp[tmp.length - 1];
       name = replaceAll(name, ' ', '-').toLowerCase().trim();

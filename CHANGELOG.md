@@ -3,6 +3,8 @@
 ### Version 1.36
 
 - NX projects run web will use external address and work with Nexus Browser
+- On Windows machines starters will correctly suggest a project name
+- Running iOS and Android projects at the same time no longer queues
 
 ### Version 1.35
 
