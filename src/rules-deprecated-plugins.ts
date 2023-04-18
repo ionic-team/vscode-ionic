@@ -42,4 +42,10 @@ export function checkDeprecatedPlugins(project: Project) {
     '@ionic-enterprise/offline-storage',
     'Replace this plugin with @ionic-enterprise/secure-storage'
   );
+
+  project.recommendRemove(
+    'jetifier',
+    'jetifier',
+    'This tool was used to transition non-AndroidX libraries. By now though all plugins support Android 10 and this tool should be removed.'
+  );
 }
