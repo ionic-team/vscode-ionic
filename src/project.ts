@@ -82,6 +82,8 @@ export class Project {
       case MonoRepoType.pnpm:
       case MonoRepoType.folder:
         return this.monoRepo ? this.monoRepo.folder : this.folder;
+      case MonoRepoType.nx:
+        return this.monoRepo.folder;
       default:
         return path.join(this.folder, this.monoRepo.folder);
     }

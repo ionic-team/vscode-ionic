@@ -5,6 +5,7 @@
 - NX projects run web will use external address and work with Nexus Browser
 - On Windows machines starters will correctly suggest a project name
 - Running iOS and Android projects at the same time no longer queues
+- Fix for NX projects and Capacitor detection
 - Add jetifier removal recommendation
 
 ### Version 1.35
