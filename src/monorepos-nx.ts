@@ -49,7 +49,7 @@ async function getNXProjectsFromNX(project: Project): Promise<MonoRepoProject[]>
         const txt = fs.readFileSync(prj, 'utf-8');
         const p = JSON.parse(txt);
         if (p.name && p.projectType == 'application') {
-          result.push({ name: p.name, folder: prj });
+          result.push({ name: p.name, folder: path.dirname(prj) });
         }
       } catch (err) {
         writeError(err);

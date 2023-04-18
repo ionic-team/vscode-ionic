@@ -283,6 +283,7 @@ export async function run(
               'On Your Network:',
               '> Network:', // Nuxt
               '➜  Network:', // AnalogJs
+              'open your browser on ', // NX
             ]);
             if (url) {
               findExternalUrl = false;
@@ -355,6 +356,10 @@ function checkForUrls(data: string, list: Array<string>): string {
 function checkForUrl(data: string, text: string): string {
   if (data.includes(text) && data.includes('http')) {
     let url = getStringFrom(data, text, '\n').trim();
+    if (url && url.endsWith(' **')) {
+      // This is for NX which logs urls like http://192.168.0.1:4200/ **
+      url = url.substring(0, url.length - 3);
+    }
     if (url && url.endsWith('/')) {
       url = url.slice(0, -1);
     }
@@ -647,6 +652,8 @@ export function httpRequest(method: string, host: string, path: string, postData
         resolve(body);
       });
     });
+    req.setHeader('User-Agent', 'Ionic VS Code Extension (https://capacitorjs.com/docs/vscode/getting-started)');
+    req.setHeader('Accept', '*/*');
     req.on('error', function (err) {
       reject(err);
     });

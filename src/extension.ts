@@ -7,7 +7,7 @@ import { ionicLogin, ionicSignup } from './ionic-auth';
 import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
-import { installPackage } from './project';
+import { installPackage, reviewProject } from './project';
 import { Command, Tip, TipFeature, TipType } from './tip';
 import { CancelObject, run, estimateRunTime, channelShow, openUri, stopPublishing, replaceAll } from './utilities';
 import { ignore } from './ignore';
@@ -26,6 +26,9 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { kill } from './process-list';
 import { selectExternalIPAddress } from './ionic-serve';
 import { advancedActions } from './advanced-actions';
+import { PluginExplorerPanel } from './plugin-explorer';
+import { features } from './features';
+import * as path from 'path';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
@@ -47,32 +50,30 @@ async function requestAppName(tip: Tip, path: string) {
     },
   });
   if (name && name.length > 1) {
-    const result = [];
+    const commands = [];
     name = name.replace(/ /g, '-');
     let packageId = name.replace(/ /g, '.').replace(/-/g, '.');
     if (!packageId.includes('.')) {
       packageId = `ionic.${packageId}`;
     }
     for (const command of tip.command) {
-      result.push(
+      commands.push(
         command
           .replace(new RegExp('@app', 'g'), `${name.trim()}`)
           .replace(new RegExp('@package-id', 'g'), `${packageId.trim()}`)
       );
     }
-    return result;
+    commands.push('git init');
+    return commands;
   } else {
     return undefined;
   }
 }
 
-function suggestName(path: string): string {
+function suggestName(path2: string): string {
   let name = 'my-app';
   try {
-    let tmp = path.split('/');
-    if (tmp.length == 0) {
-      tmp = path.split('\\');
-    }
+    const tmp = path2.split(path.sep);
     if (tmp.length > 0) {
       name = tmp[tmp.length - 1];
       name = replaceAll(name, ' ', '-').toLowerCase().trim();
@@ -407,9 +408,14 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   vscode.commands.registerCommand(CommandName.Add, async () => {
-    await installPackage(context.extensionPath, rootPath);
-    if (ionicProvider) {
-      ionicProvider.refresh();
+    if (features.pluginExplorer) {
+      await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
+      PluginExplorerPanel.init(context.extensionUri, rootPath, context);
+    } else {
+      await installPackage(context.extensionPath, rootPath);
+      if (ionicProvider) {
+        ionicProvider.refresh();
+      }
     }
   });
 
@@ -457,6 +463,11 @@ export async function activate(context: vscode.ExtensionContext) {
     }
     ionicState.configuration = config;
     runAction(r.tip, ionicProvider, rootPath);
+  });
+
+  vscode.commands.registerCommand(CommandName.PluginExplorer, async () => {
+    await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
+    PluginExplorerPanel.init(context.extensionUri, rootPath, context);
   });
 
   vscode.commands.registerCommand(CommandName.SkipLogin, async () => {

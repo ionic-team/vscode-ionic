@@ -28,7 +28,7 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
         TipType.Run,
         'Create Project',
         [
-          `npx ionic start @app ${starter.name} --type=${starter.type} --capacitor --package-id=@package-id`,
+          `npx ionic start @app ${starter.name} --type=${starter.type} --capacitor --package-id=@package-id --no-git`,
           process.platform === 'win32'
             ? `robocopy @app . /MOVE /E /NFL /NDL /NJH /NJS /nc /ns /np`
             : `mv @app/{,.[^.]}* . && rmdir @app`,

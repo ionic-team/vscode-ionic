@@ -72,7 +72,17 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
 }
 
 function nxServe(project: Project): string {
-  return `${npx(project.packageManager)} nx serve ${project.monoRepo.name}`;
+  let serveFlags = '';
+  const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
+  if (externalIP) {
+    const list = getAddresses();
+    if (list.length == 1) {
+      serveFlags += ` --host=${list[0]}`;
+    } else {
+      serveFlags += ' --host=0.0.0.0';
+    }
+  }
+  return `${npx(project.packageManager)} nx serve ${project.monoRepo.name}${serveFlags}`;
 }
 
 export async function selectExternalIPAddress(): Promise<string> {
