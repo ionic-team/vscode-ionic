@@ -302,14 +302,14 @@ export async function getRecommendations(
   if (project.isCordova) {
     checkCordovaRules(project);
     if (!project.isCapacitor) {
-      checkCapacitorMigrationRules(packages, project);
+      await checkCapacitorMigrationRules(packages, project);
     }
   }
   if (project.isCapacitor) {
     checkCapacitorRules(project);
     checkIonicNativePackages(packages, project);
     checkCordovaPlugins(packages, project);
-    project.tips(capacitorRecommendations(project, false));
+    project.tips(await capacitorRecommendations(project, false));
   }
   if (!project.isCapacitor && !project.isCordova) {
     // The project is not using Cordova or Capacitor

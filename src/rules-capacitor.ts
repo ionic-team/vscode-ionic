@@ -19,7 +19,7 @@ import {
 import { checkMigrationAngularToolkit } from './rules-angular-toolkit';
 import { Project } from './project';
 import { Tip, TipType } from './tip';
-import { asAppId } from './utilities';
+import { asAppId, getRunOutput, showProgress } from './utilities';
 import { capacitorAdd } from './capacitor-add';
 import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall, npx } from './node-commands';
@@ -30,6 +30,8 @@ import { checkAngularJson } from './rules-angular-json';
 import { checkBrowsersList } from './rules-browserslist';
 import { ionicState } from './ionic-tree-provider';
 import { integratePrettier } from './prettier';
+import { getOutputChannel, writeIonic } from './extension';
+import { window } from 'vscode';
 
 /**
  * Check rules for Capacitor projects
@@ -241,7 +243,7 @@ export function checkCapacitorRules(project: Project) {
  * @param {bool} forMigration Whether the recommendations are for a migration of a Cordova project
  * @returns Tip
  */
-export function capacitorRecommendations(project: Project, forMigration: boolean): Tip[] {
+export async function capacitorRecommendations(project: Project, forMigration: boolean): Promise<Tip[]> {
   const tips: Tip[] = [];
 
   // This is used for recommendations that arent required for a migration from Cordova but are for Capacitor projects
@@ -401,6 +403,19 @@ export function capacitorRecommendations(project: Project, forMigration: boolean
       'It will not compile but can be replaced with the plugin appsflyer-capacitor-plugin'
     )
   );
+
+  if (process.platform !== 'win32' && exists('@capacitor/ios')) {
+    const cocoaPods = await getCocoaPodsVersion(project);
+    if (cocoaPods && !isVersionGreaterOrEqual(cocoaPods, '1.12.1')) {
+      project.add(
+        new Tip(
+          'Update Cocoapods',
+          `XCode 14.3+ will fail with version ${cocoaPods} of Cocoapods.`,
+          TipType.Error
+        ).setAction(updateCocoaPods, cocoaPods, project)
+      );
+    }
+  }
 
   // Plugins that are not required
   tips.push(notRequiredPlugin('cordova-plugin-compat'));
@@ -639,4 +654,37 @@ function checkBuildGradleForMinifyInRelease(project: Project) {
       );
     }
   }
+}
+
+let cocoaPodsVersion = undefined;
+async function getCocoaPodsVersion(project: Project): Promise<string> {
+  try {
+    if (cocoaPodsVersion) {
+      return cocoaPodsVersion;
+    }
+    const data = await getRunOutput('pod --version', project.folder);
+    cocoaPodsVersion = data;
+    return data;
+  } catch (error) {
+    return undefined;
+  }
+}
+
+async function updateCocoaPods(currentVersion: string, project: Project) {
+  const txt = 'Update Cocoapods';
+  const res = await window.showInformationMessage(
+    `XCode 14.3+ will fail when using Project > Archive when used with Cocoapods ${currentVersion}. Upgrade Cocoapods via "brew install cocoapods" to fix the issue.`,
+    txt,
+    'Exit'
+  );
+  if (!res || res != txt) return;
+
+  getOutputChannel().show();
+  await showProgress('Updating Cocoapods...', async () => {
+    await project.run2(`brew install cocoapods`, false);
+
+    cocoaPodsVersion = undefined;
+    const v = await getCocoaPodsVersion(project);
+    writeIonic(`Cocoapods Updated to .${v}`);
+  });
 }

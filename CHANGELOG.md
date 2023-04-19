@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.37
+
+- Show recommendation of Cocoapods upgrade to fix XCode 14.3+ issue
+
 ### Version 1.36
 
 - NX projects run web will use external address and work with Nexus Browser
