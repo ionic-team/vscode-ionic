@@ -101,7 +101,7 @@ function getNXProjectsByFolder(project: Project): MonoRepoProject[] {
     const list = fs.readdirSync(folder, { withFileTypes: true });
     for (const item of list) {
       if (item.isDirectory && !item.name.startsWith('.')) {
-        result.push({ name: item.name, folder: path.relative(project.folder, join(folder, item.name)) });
+        result.push({ name: item.name, folder: join(folder, item.name) });
       }
     }
     return result;

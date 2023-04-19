@@ -5,7 +5,7 @@ import { Project } from './project';
 import { capacitorRecommendations } from './rules-capacitor';
 import { Tip, TipType } from './tip';
 
-export function capacitorMigrationChecks(packages, project: Project) {
+export async function capacitorMigrationChecks(packages, project: Project): Promise<void> {
   const tips: Tip[] = [];
   project.setGroup(
     'Capacitor Migration',
@@ -16,7 +16,8 @@ export function capacitorMigrationChecks(packages, project: Project) {
     true
   );
 
-  tips.push(...capacitorRecommendations(project, true));
+  const list = await capacitorRecommendations(project, true);
+  tips.push(...list);
 
   // Plugins with Hooks
   tips.push(...reviewPluginsWithHooks(packages));
