@@ -32,6 +32,7 @@ import { ionicState } from './ionic-tree-provider';
 import { integratePrettier } from './prettier';
 import { getOutputChannel, writeIonic } from './extension';
 import { window } from 'vscode';
+import { WorkspaceSetting, getSetting, setSetting } from './workspace-state';
 
 /**
  * Check rules for Capacitor projects
@@ -656,14 +657,14 @@ function checkBuildGradleForMinifyInRelease(project: Project) {
   }
 }
 
-let cocoaPodsVersion = undefined;
-async function getCocoaPodsVersion(project: Project): Promise<string> {
+async function getCocoaPodsVersion(project: Project, avoidCache?: boolean): Promise<string> {
   try {
-    if (cocoaPodsVersion) {
+    const cocoaPodsVersion = getSetting(WorkspaceSetting.cocoaPods);
+    if (!avoidCache && cocoaPodsVersion) {
       return cocoaPodsVersion;
     }
     const data = await getRunOutput('pod --version', project.folder);
-    cocoaPodsVersion = data;
+    setSetting(WorkspaceSetting.cocoaPods, data);
     return data;
   } catch (error) {
     return undefined;
@@ -683,8 +684,7 @@ async function updateCocoaPods(currentVersion: string, project: Project) {
   await showProgress('Updating Cocoapods...', async () => {
     await project.run2(`brew install cocoapods`, false);
 
-    cocoaPodsVersion = undefined;
-    const v = await getCocoaPodsVersion(project);
+    const v = await getCocoaPodsVersion(project, true);
     writeIonic(`Cocoapods Updated to .${v}`);
   });
 }
