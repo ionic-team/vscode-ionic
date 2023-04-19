@@ -599,6 +599,19 @@ export interface PackageFile {
   description: string;
   version: string;
   scripts: Record<string, unknown>;
+  devDependencies?: Record<string, string>;
+
+  // This is used for plugins
+  capacitor?: CapacitorPackageInfo;
+}
+
+export interface CapacitorPackageInfo {
+  ios?: CapacitorPackagePlatform;
+  android?: CapacitorPackagePlatform;
+}
+
+export interface CapacitorPackagePlatform {
+  src: string;
 }
 
 export async function showMessage(message: string, ms: number) {

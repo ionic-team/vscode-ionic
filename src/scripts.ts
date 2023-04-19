@@ -29,6 +29,9 @@ function addScriptsFrom(packages: PackageFile, project: Project) {
       );
     }
   }
+
+  // We may be able to migrate a Capacitor Plugin
+  project.isCapacitorPlugin = !!(packages.capacitor?.ios || packages.capacitor?.android);
 }
 
 function addNXScripts(names: Array<string>, project: Project) {

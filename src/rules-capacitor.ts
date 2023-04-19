@@ -277,7 +277,8 @@ export async function capacitorRecommendations(project: Project, forMigration: b
   if (
     !project.fileExists('capacitor.config.ts') &&
     !project.fileExists('capacitor.config.js') &&
-    !project.fileExists('capacitor.config.json')
+    !project.fileExists('capacitor.config.json') &&
+    !project.isCapacitorPlugin
   ) {
     const local = project.repoType != MonoRepoType.none ? InternalCommand.cwd : '';
     tips.push(
