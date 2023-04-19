@@ -29,10 +29,7 @@ async function migratePluginToCapacitor5(project: Project) {
 
   getOutputChannel().show();
 
-  let target = '^5.0.0';
-
-  // Remove this line when 5.0.0 comes out
-  target = '5.0.0-beta.2';
+  const target = '^5.0.0';
 
   await showProgress('Migrating Plugin...', async () => {
     let changes = 0;
