@@ -19,6 +19,7 @@ export interface Plugin {
   stars?: number;
   image?: string;
   updated?: string;
+  license: string;
   title: string; // Calculated
   tags: string[]; // Calculated
   rating: number; // Calculated

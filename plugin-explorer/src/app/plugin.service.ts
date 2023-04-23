@@ -36,6 +36,9 @@ export class PluginService {
       )}.\n\n Failed on ${this.prettify(plugin.fails)}`;
       plugin.rating = this.calculateRating(scope, plugin, publishedMonths);
       plugin.dailyDownloads = this.calculateDaily(plugin);
+      if (plugin.license?.length > 20) {
+        plugin.license = plugin.license.substring(0, 20) + '...';
+      }
       //plugin.tags = [...plugin.tags, ...plugin.keywords];
     }
     this.summary = data;
@@ -91,6 +94,7 @@ export class PluginService {
         tagInfo: '',
         changed: '',
         installed: true,
+        license: '',
         versions: [],
         title: name,
         published: '',
@@ -260,7 +264,7 @@ export class PluginService {
     }
 
     if (official) {
-      rating++;
+      rating = 5; // Assume awesomeness
     }
     return rating;
   }

@@ -35,6 +35,7 @@ import { vscode } from './utilities/vscode';
         </star>
         <p *ngIf="data.dailyDownloads !== '0'">{{ data.dailyDownloads }} Downloads Daily</p>
         <p>{{ data.changed }}</p>
+        <p>License: {{ data.license }}</p>
         <vscode-link [href]="'https://www.npmjs.com/package/' + data.name">More Information</vscode-link><br />
         <vscode-link *ngIf="data.repo && data.updated" [href]="data.repo">Source Code</vscode-link
         ><br *ngIf="data.repo && data.updated" />
@@ -53,6 +54,7 @@ export class PluginComponent {
     author: '',
     published: '',
     title: '',
+    license: '',
     tags: [],
     rating: 1,
     changed: '',
