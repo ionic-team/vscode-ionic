@@ -41,8 +41,11 @@ export class Project {
   // Mono Repo Project selected
   public monoRepo: MonoRepoProject;
 
+  public isCapacitorPlugin: boolean;
+
   constructor(_name: string) {
     this.name = _name;
+    this.isCapacitorPlugin = false;
   }
 
   public getIgnored(context: vscode.ExtensionContext) {

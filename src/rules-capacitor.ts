@@ -277,7 +277,8 @@ export async function capacitorRecommendations(project: Project, forMigration: b
   if (
     !project.fileExists('capacitor.config.ts') &&
     !project.fileExists('capacitor.config.js') &&
-    !project.fileExists('capacitor.config.json')
+    !project.fileExists('capacitor.config.json') &&
+    !project.isCapacitorPlugin
   ) {
     const local = project.repoType != MonoRepoType.none ? InternalCommand.cwd : '';
     tips.push(
@@ -409,11 +410,11 @@ export async function capacitorRecommendations(project: Project, forMigration: b
     const cocoaPods = await getCocoaPodsVersion(project);
     if (cocoaPods && !isVersionGreaterOrEqual(cocoaPods, '1.12.1')) {
       project.add(
-        new Tip(
-          'Update Cocoapods',
-          `XCode 14.3+ will fail with version ${cocoaPods} of Cocoapods.`,
-          TipType.Error
-        ).setAction(updateCocoaPods, cocoaPods, project)
+        new Tip('Update Cocoapods', `Cocoapods requires updating.`, TipType.Error).setAction(
+          updateCocoaPods,
+          cocoaPods,
+          project
+        )
       );
     }
   }
@@ -663,28 +664,45 @@ async function getCocoaPodsVersion(project: Project, avoidCache?: boolean): Prom
     if (!avoidCache && cocoaPodsVersion) {
       return cocoaPodsVersion;
     }
-    const data = await getRunOutput('pod --version', project.folder);
+    let data = await getRunOutput('pod --version', project.folder);
+    data = data.replace('\n', '');
     setSetting(WorkspaceSetting.cocoaPods, data);
     return data;
   } catch (error) {
+    if (error?.includes('GemNotFoundException')) {
+      return 'missing';
+    }
     return undefined;
   }
 }
 
 async function updateCocoaPods(currentVersion: string, project: Project) {
-  const txt = 'Update Cocoapods';
+  const msg = currentVersion == 'missing' ? 'Install' : 'Update';
+  const txt = `${msg} Cocoapods`;
+  const data = await getRunOutput('which pod', project.folder);
+  let cmd = 'brew install cocoapods';
+  if (!data.includes('homebrew')) {
+    cmd = 'gem install cocoapods --user-install';
+  }
+
   const res = await window.showInformationMessage(
-    `XCode 14.3+ will fail when using Project > Archive when used with Cocoapods ${currentVersion}. Upgrade Cocoapods via "brew install cocoapods" to fix the issue.`,
+    `XCode 14.3+ will fail when using Project > Archive. ${msg} Cocoapods using "${cmd}" to fix the issue?`,
     txt,
     'Exit'
   );
   if (!res || res != txt) return;
 
   getOutputChannel().show();
-  await showProgress('Updating Cocoapods...', async () => {
-    await project.run2(`brew install cocoapods`, false);
+  await showProgress(`${msg} Cocoapods...`, async () => {
+    const channel = getOutputChannel();
+    channel.appendLine(`> ${cmd}`);
+    await project.run2(cmd, false);
 
     const v = await getCocoaPodsVersion(project, true);
-    writeIonic(`Cocoapods Updated to .${v}`);
+    const msg = `Cocoapods Updated to ${v}. Be sure to "Sync" your project.`;
+    writeIonic(msg);
+    if (isVersionGreaterOrEqual(v, '1.12.1')) {
+      window.showInformationMessage(msg, 'OK');
+    }
   });
 }

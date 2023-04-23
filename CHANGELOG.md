@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.38
+
+- Automated migration for Capacitor 4 Plugins
+- Detect if gem used to install Cocoapods and use it for upgrades
+
 ### Version 1.37
 
 - Show recommendation of Cocoapods upgrade to fix XCode 14.3+ issue

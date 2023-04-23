@@ -8,6 +8,7 @@ import { npmInstall, npx } from './node-commands';
 import { Project } from './project';
 import { Tip, TipType } from './tip';
 import { asAppId } from './utilities';
+import { checkCapacitorPluginMigration } from './rules-capacitor-plugins';
 
 /**
  * Web projects are not using Capacitor or Cordova
@@ -27,24 +28,30 @@ export function webProject(project: Project) {
 
   const pre = project.repoType != MonoRepoType.none ? InternalCommand.cwd : '';
 
-  project.tip(
-    new Tip(
-      'Add Capacitor Integration',
-      '',
-      TipType.Capacitor,
-      'Integrate Capacitor with this project to make it native mobile?',
-      [
-        npmInstall(`@capacitor/core`),
-        npmInstall(`@capacitor/cli`),
-        npmInstall(`@capacitor/app @capacitor/haptics @capacitor/keyboard @capacitor/status-bar`),
-        `${pre}${npx(project.packageManager)} capacitor init "${project.name}" "${asAppId(
-          project.name
-        )}" --web-dir ${outFolder}`,
-        InternalCommand.ionicInit,
-      ],
-      'Add Capacitor',
-      'Capacitor added to this project',
-      'https://capacitorjs.com'
-    )
-  );
+  if (project.isCapacitorPlugin) {
+    checkCapacitorPluginMigration(project);
+  }
+
+  if (!project.isCapacitorPlugin) {
+    project.tip(
+      new Tip(
+        'Add Capacitor Integration',
+        '',
+        TipType.Capacitor,
+        'Integrate Capacitor with this project to make it native mobile?',
+        [
+          npmInstall(`@capacitor/core`),
+          npmInstall(`@capacitor/cli`),
+          npmInstall(`@capacitor/app @capacitor/haptics @capacitor/keyboard @capacitor/status-bar`),
+          `${pre}${npx(project.packageManager)} capacitor init "${project.name}" "${asAppId(
+            project.name
+          )}" --web-dir ${outFolder}`,
+          InternalCommand.ionicInit,
+        ],
+        'Add Capacitor',
+        'Capacitor added to this project',
+        'https://capacitorjs.com'
+      )
+    );
+  }
 }
