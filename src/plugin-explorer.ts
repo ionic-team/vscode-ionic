@@ -67,7 +67,6 @@ export class PluginExplorerPanel {
         }
       );
 
-      panel.provider = provider;
       PluginExplorerPanel.currentPanel = new PluginExplorerPanel(panel, extensionUri, path, context, provider);
     }
   }

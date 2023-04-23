@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.39
+
+- Plugin Explorer added for finding and installing rated Capacitor and Cordova plugins
+
 ### Version 1.38
 
 - Automated migration for Capacitor 4 Plugins

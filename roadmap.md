@@ -48,9 +48,6 @@
 
 - Choose from available versions
 - Run sync after install
-- Show a tag "Compilation Issues" if a plugin has no tags
-- Investigate why API calls for @capacitor plugins are failing
-- Link to the error log
 
 ## Pin Dependencies
 
