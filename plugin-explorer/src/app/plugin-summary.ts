@@ -12,6 +12,7 @@ export interface Plugin {
   description?: string;
   quality?: number;
   versions: string[];
+  platforms: string[];
   author: any;
   bugs?: string;
   published: string;

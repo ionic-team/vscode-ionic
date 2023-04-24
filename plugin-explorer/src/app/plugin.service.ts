@@ -31,6 +31,13 @@ export class PluginService {
       const publishedMonths = this.calcChange(plugin.published);
       plugin.changed = this.changeInMonths(publishedMonths);
       plugin.tags = this.cleanupTags(plugin.success);
+      if (plugin.platforms.length == 1) {
+        if (plugin.platforms.includes('android')) {
+          plugin.tags.push('Android Only');
+        } else if (plugin.platforms.includes('ios')) {
+          plugin.tags.push('iOS Only');
+        }
+      }
       plugin.tagInfo = `Version ${plugin.version} builds with ${this.prettify(
         plugin.success
       )}.\n\n Failed on ${this.prettify(plugin.fails)}`;
@@ -96,6 +103,7 @@ export class PluginService {
         installed: true,
         license: '',
         versions: [],
+        platforms: [],
         title: name,
         published: '',
         author: '',
@@ -106,7 +114,15 @@ export class PluginService {
     }
   }
 
-  public search(filters: PluginFilter[], terms: string, tests: string[], android: boolean, ios: boolean): Plugin[] {
+  public search(
+    filters: PluginFilter[],
+    terms: string,
+    tests: string[],
+    android: boolean,
+    ios: boolean,
+    both: boolean,
+    any: boolean
+  ): Plugin[] {
     let count = 0;
 
     const list = this.summary.plugins.filter((plugin) => {
@@ -115,6 +131,7 @@ export class PluginService {
         if (filters.includes(PluginFilter.search)) {
           found =
             plugin.name?.includes(terms) ||
+            plugin.title?.includes(terms) ||
             plugin.description?.includes(terms) ||
             plugin.keywords?.includes(terms) ||
             false;
@@ -127,7 +144,7 @@ export class PluginService {
           found = found && this.isOfficial(plugin.name);
         }
 
-        found = found && this.passedPlatforms(android, ios, plugin.success);
+        found = found && this.passedPlatforms(android, ios, both, any, plugin);
 
         if (tests.length > 0) {
           found = found && this.passedTests(tests, plugin.success);
@@ -183,11 +200,11 @@ export class PluginService {
   }
 
   // Returns true if the plugin passed at least one test for the platform
-  private passedPlatforms(android: boolean, ios: boolean, results: string[]): boolean {
-    for (const result of results) {
-      if (android && result.includes('android')) return true;
-      if (ios && result.includes('ios')) return true;
-    }
+  private passedPlatforms(android: boolean, ios: boolean, both: boolean, any: boolean, plugin: Plugin): boolean {
+    if (any) return true;
+    if (android && plugin.platforms.includes('android')) return true;
+    if (ios && plugin.platforms.includes('ios')) return true;
+    if (both && plugin.platforms.length == 2) return true;
     return false;
   }
 

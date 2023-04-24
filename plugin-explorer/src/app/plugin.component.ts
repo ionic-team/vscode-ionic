@@ -56,6 +56,7 @@ export class PluginComponent {
     title: '',
     license: '',
     tags: [],
+    platforms: [],
     rating: 1,
     changed: '',
     ratingInfo: '',
