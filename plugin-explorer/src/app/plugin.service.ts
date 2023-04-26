@@ -100,7 +100,7 @@ export class PluginService {
         ratingInfo: '',
         tagInfo: '',
         changed: '',
-        installed: true,
+        installed: this.installed[name],
         license: '',
         versions: [],
         platforms: [],
@@ -247,7 +247,7 @@ export class PluginService {
     }
 
     if (publishedMonths >= 13) {
-      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'Infrequently Updated');
+      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'Possibly Unmaintained');
     }
 
     // Has source in Github that has been updated
@@ -268,6 +268,8 @@ export class PluginService {
     if (plugin.repo && !plugin.version.startsWith('0')) {
       rating++;
       plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'Is Open Source');
+    } else if (!plugin.repo) {
+      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'Is Closed Source / Commercial');
     }
 
     if (plugin.version.startsWith('0')) {

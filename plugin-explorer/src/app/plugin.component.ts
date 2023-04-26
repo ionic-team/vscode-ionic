@@ -26,7 +26,10 @@ import { vscode } from './utilities/vscode';
         <p>{{ data.description }}</p>
 
         <br />
-        <vscode-button (click)="install()">{{ data.installed ? 'Update' : 'Install' }}</vscode-button>
+        <vscode-button *ngIf="data.installed == data.version" disabled>Up To Date</vscode-button>
+        <vscode-button *ngIf="data.installed !== data.version" (click)="install()">{{
+          data.installed ? 'Update' : 'Install'
+        }}</vscode-button>
         <vscode-button *ngIf="data.installed" (click)="uninstall()">Uninstall</vscode-button>
       </div>
       <div class="side">
@@ -61,7 +64,7 @@ export class PluginComponent {
     changed: '',
     ratingInfo: '',
     tagInfo: '',
-    installed: false,
+    installed: '',
     dailyDownloads: '',
   };
 
