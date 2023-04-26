@@ -5,15 +5,39 @@ import { exists, isVersionGreaterOrEqual } from './analyzer';
 import { getOutputChannel, writeError, writeIonic } from './extension';
 import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
-import { getStringFrom, setAllStringIn, showProgress } from './utilities';
+import { getStringFrom, run, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
 import { ActionResult } from './command-name';
 import { ionicState } from './ionic-tree-provider';
 import { PackageManager } from './node-commands';
 import { openUri } from './utilities';
+import { capacitorOpen } from './capacitor-open';
+import { CapacitorPlatform } from './capacitor-platform';
 
 export async function migrateCapacitor5(project: Project, currentVersion: string): Promise<ActionResult> {
   const coreVersion = '5.0.0-beta.1';
+  // Android Studio Flamingo is Build #AI-222.4459.24.2221.9862592, built on March 31, 2023
+  const openStudio = 'Open Android Studio';
+  if (exists('@capacitor/android') && !checkAndroidStudio('222.4459.24')) {
+    const res = await vscode.window.showInformationMessage(
+      `Android Studio Flamingo (2022.2.1) is the minimum version needed for Capacitor 5 (It comes with Java 17 and Gradle 8). Choosen Android Studio > Check for Updates.`,
+      openStudio,
+      'Continue...'
+    );
+    if (res === openStudio) {
+      await run(
+        project.folder,
+        capacitorOpen(project, CapacitorPlatform.android),
+        getOutputChannel(),
+        undefined,
+        [],
+        undefined,
+        undefined
+      );
+      return;
+    }
+    if (!res) return;
+  }
   const result = await vscode.window.showInformationMessage(
     `Capacitor 5 sets a deployment target of iOS 13 and Android 13 (SDK 33).`,
     'Migrate to v5',
@@ -37,6 +61,36 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
   if ((await vscode.window.showInformationMessage(message, 'Capacitor 5 Changes', 'OK')) == 'Capacitor 5 Changes') {
     openUri('https://capacitorjs.com/docs/next/updating/5-0');
   }
+}
+
+function checkAndroidStudio(minVersion: string): boolean {
+  // This returns true if the installed version of Android Studio meets the minimum version
+  try {
+    const studioFile = `/Applications/Android Studio.app/Contents/Resources/product-info.json`;
+    if (existsSync(studioFile)) {
+      const data = readFileSync(studioFile, 'utf-8');
+      const info: AndroidStudioInfo = JSON.parse(data);
+      const build = info.buildNumber;
+      const v = build.split('.');
+      const version = `${v[0]}.${v[1]}.${v[2]}`;
+      return isVersionGreaterOrEqual(version, minVersion);
+    }
+  } catch (error) {
+    writeError(`Unable to check Android Studio Version ${error}`);
+    return true;
+  }
+  return true;
+}
+
+export interface AndroidStudioInfo {
+  buildNumber: string;
+  customProperties: any[];
+  dataDirectoryName: string;
+  launch: any;
+  name: string;
+  productCode: string;
+  svgIconPath: string;
+  version: string;
 }
 
 export async function migrateCapacitor(project: Project, currentVersion: string): Promise<ActionResult> {

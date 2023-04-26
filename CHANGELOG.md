@@ -4,6 +4,7 @@
 
 - Plugin Explorer added for finding and installing rated Capacitor and Cordova plugins
 - Recommend removal of @awesome-cordova-plugin wrappers when plugin is not installed
+- Capacitor 5 upgrade will check for minimum Android Studio version
 
 ### Version 1.38
 
