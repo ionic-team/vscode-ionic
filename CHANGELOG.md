@@ -5,6 +5,7 @@
 - Plugin Explorer added for finding and installing rated Capacitor and Cordova plugins
 - Recommend removal of @awesome-cordova-plugin wrappers when plugin is not installed
 - Capacitor 5 upgrade will check for minimum Android Studio version
+- Selection of debug browser is now done through the 3 dots next to "debug"
 - Recommend removal of all deprecated @ionic-native wrappers
 
 ### Version 1.38

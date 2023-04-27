@@ -7,6 +7,7 @@ export enum WorkspaceSetting {
   pluginDrift = 'pluginDrift', // Whether the user has been shown the plugin drift compared to NexusBrowser app
   webAction = 'webAction',
   logFilter = 'logFilter',
+  debugBrowser = 'debugBrowser',
   cocoaPods = 'cocoaPods2',
 }
 

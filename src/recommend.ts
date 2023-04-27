@@ -38,6 +38,7 @@ import { analyzeSize } from './analyze-size';
 import { ionicExport } from './ionic-export';
 import { angularGenerate } from './angular-generate';
 import { LoggingSettings } from './log-settings';
+import { webDebugSetting } from './web-debug';
 
 export async function getRecommendations(
   project: Project,
@@ -387,6 +388,7 @@ function debugOnWeb(project: Project): Tip {
       { title: 'Serving', text: 'Development server running' },
     ])
     .canStop()
+    .setContextValue(Context.webDebugConfig)
     .willNotBlock()
     .canAnimate()
     .setTooltip(`Debug using ${getDebugBrowserName()}. The browser can be changed in Settings.`);

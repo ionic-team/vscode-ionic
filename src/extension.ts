@@ -29,6 +29,7 @@ import { advancedActions } from './advanced-actions';
 import { PluginExplorerPanel } from './plugin-explorer';
 import { features } from './features';
 import * as path from 'path';
+import { webDebugSetting } from './web-debug';
 
 let channel: vscode.OutputChannel = undefined;
 let runningOperations = [];
@@ -504,6 +505,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
   vscode.commands.registerCommand(CommandName.Function, async (recommendation: Recommendation) => {
     await recommendation.tip.executeAction();
+  });
+
+  vscode.commands.registerCommand(CommandName.WebDebugConfig, async (recommendation: Recommendation) => {
+    await webDebugSetting();
+    ionicProvider.refresh();
   });
 
   vscode.commands.registerCommand(CommandName.Fix, async (tip: Tip) => {

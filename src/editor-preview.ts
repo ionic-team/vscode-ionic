@@ -2,6 +2,7 @@ import { debug, DebugConfiguration, ViewColumn, window, workspace } from 'vscode
 import { cancelLastOperation } from './extension';
 import { ionicState } from './ionic-tree-provider';
 import { debugSkipFiles, openUri } from './utilities';
+import { getSetting, WorkspaceSetting } from './workspace-state';
 
 interface device {
   name: string;
@@ -38,7 +39,7 @@ export function viewInEditor(url: string, active?: boolean) {
 }
 
 export function getDebugBrowserName(): string {
-  const browser = workspace.getConfiguration('ionic').get('browser') as string;
+  const browser = getSetting(WorkspaceSetting.debugBrowser);
   if (browser == 'pwa-msedge') return 'Microsoft Edge';
   if (browser == 'chrome') return 'Google Chrome';
   return browser;
@@ -46,7 +47,7 @@ export function getDebugBrowserName(): string {
 
 export async function debugBrowser(url: string, stopWebServerAfter: boolean) {
   try {
-    const browserType: string = workspace.getConfiguration('ionic').get('browser');
+    const browserType: string = getSetting(WorkspaceSetting.debugBrowser);
     const launchConfig: DebugConfiguration = {
       type: browserType,
       name: 'Debug Web',

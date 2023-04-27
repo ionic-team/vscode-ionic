@@ -229,6 +229,14 @@
         }
       },
       {
+        "command": "ionic-official.webDebugConfig",
+        "title": "Web Debug Configuration",
+        "icon": {
+          "light": "resources/light/more.svg",
+          "dark": "resources/dark/more.svg"
+        }
+      },
+      {
         "command": "ionic-official.selectAction",
         "title": "Select an action",
         "icon": {
@@ -301,6 +309,10 @@
         },
         {
           "command": "ionic-official.webConfig",
+          "when": "false"
+        },
+        {
+          "command": "ionic-official.webDebugConfig",
           "when": "false"
         },
         {
@@ -382,6 +394,11 @@
           "group": "inline"
         },
         {
+          "command": "ionic-official.webDebugConfig",
+          "when": "view == ionic-tree && viewItem == webDebugConfig",
+          "group": "inline"
+        },
+        {
           "command": "ionic-official.selectAction",
           "when": "view == ionic-tree && viewItem == selectAction",
           "group": "inline"
@@ -396,19 +413,6 @@
     "configuration": {
       "title": "Ionic",
       "properties": {
-        "ionic.browser": {
-          "type": "string",
-          "default": "chrome",
-          "enum": [
-            "chrome",
-            "pwa-msedge"
-          ],
-          "enumDescriptions": [
-            "Google Chrome",
-            "Microsoft Edge"
-          ],
-          "description": "When Debugging for web which browser should be launched."
-        },
         "ionic.defaultPort": {
           "type": "number",
           "default": 8100,

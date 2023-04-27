@@ -19,6 +19,7 @@ export enum CommandName {
   ProjectSelect = 'ionic-official.projectSelect',
   BuildConfig = 'ionic-official.buildConfig',
   WebConfig = 'ionic-official.webConfig',
+  WebDebugConfig = 'ionic-official.webDebugConfig',
   SelectAction = 'ionic-official.selectAction',
   DebugMode = 'ionic-official.debugMode',
   PluginExplorer = 'ionic-official.pluginExplorer',
