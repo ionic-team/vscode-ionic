@@ -12,6 +12,7 @@ export interface Plugin {
   description?: string;
   quality?: number;
   versions: string[];
+  platforms: string[];
   author: any;
   bugs?: string;
   published: string;
@@ -19,6 +20,7 @@ export interface Plugin {
   stars?: number;
   image?: string;
   updated?: string;
+  license: string;
   title: string; // Calculated
   tags: string[]; // Calculated
   rating: number; // Calculated
@@ -26,7 +28,7 @@ export interface Plugin {
   tagInfo: string; // Calcuilated
   dailyDownloads: string; // Calculated
   changed: string; // Calculated
-  installed: boolean; // Calculated: whether the plugin is installed in the current project
+  installed: string; // Calculated: whether the plugin is installed in the current project
 }
 
 export interface PluginInfo {

@@ -1,13 +1,14 @@
 import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn, ExtensionContext } from 'vscode';
 import { PluginSummary, Plugin } from './plugin-summary';
 import { getRunOutput, httpRequest, showProgress } from './utilities';
-import { existsSync, statSync, writeFileSync } from 'fs';
+import { existsSync, statSync, writeFileSync, readFileSync } from 'fs';
 import { join } from 'path';
-import { npmInstall, npmUninstall } from './node-commands';
+import { PackageManager, npmInstall, npmUninstall } from './node-commands';
 import { getOutputChannel } from './extension';
 import { run } from './utilities';
 import { ProjectSummary, inspectProject } from './project';
 import { PackageInfo } from './package-info';
+import { IonicTreeProvider, ionicState } from './ionic-tree-provider';
 
 interface Dependency {
   name: string;
@@ -26,19 +27,28 @@ export class PluginExplorerPanel {
   public static currentPanel: PluginExplorerPanel | undefined;
   private readonly panel: WebviewPanel;
   private disposables: Disposable[] = [];
+  private provider: IonicTreeProvider;
   private path: string;
 
-  private constructor(panel: WebviewPanel, extensionUri: Uri, path: string, context: ExtensionContext) {
+  private constructor(
+    panel: WebviewPanel,
+    extensionUri: Uri,
+    path: string,
+    context: ExtensionContext,
+    provider: IonicTreeProvider
+  ) {
     this.panel = panel;
     this.path = path;
+    this.provider = provider;
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
     this.panel.webview.html = this.getWebviewContent(this.panel.webview, extensionUri);
     this.setWebviewMessageListener(this.panel.webview, extensionUri, path, context);
   }
 
-  public static init(extensionUri: Uri, path: string, context: ExtensionContext) {
+  public static init(extensionUri: Uri, path: string, context: ExtensionContext, provider: IonicTreeProvider) {
     if (PluginExplorerPanel.currentPanel) {
       // If the webview panel already exists reveal it
+      PluginExplorerPanel.currentPanel.provider = provider;
       PluginExplorerPanel.currentPanel.panel.reveal(ViewColumn.One);
     } else {
       // If a webview panel does not already exist create and show a new one
@@ -57,7 +67,7 @@ export class PluginExplorerPanel {
         }
       );
 
-      PluginExplorerPanel.currentPanel = new PluginExplorerPanel(panel, extensionUri, path, context);
+      PluginExplorerPanel.currentPanel = new PluginExplorerPanel(panel, extensionUri, path, context, provider);
     }
   }
 
@@ -140,14 +150,51 @@ export class PluginExplorerPanel {
     );
   }
 
+  async checkEnterpriseRegister(plugin: string): Promise<boolean> {
+    if (ionicState.packageManager !== PackageManager.npm) {
+      return;
+    }
+    if (!plugin.startsWith('@ionic-enterprise/')) {
+      return;
+    }
+
+    if (this.hasProductKey()) {
+      return;
+    }
+
+    const productKey = await window.showInputBox({
+      title: 'Ionic Enterprise Product Key',
+      placeHolder: 'Enter product key',
+    });
+    if (!productKey) return false;
+    const cmd = `npx ionic enterprise register --key=${productKey}`;
+    return await run(this.path, cmd, getOutputChannel(), undefined, [], [], undefined, undefined, undefined, false);
+  }
+
+  hasProductKey(): boolean {
+    const npmrc = join(this.path, '.npmrc');
+    if (existsSync(npmrc)) {
+      const data = readFileSync(npmrc, 'utf-8');
+      if (data.includes('@ionic-enterprise') && data.includes('_authToken')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   async install(plugin: string) {
-    this.dispose();
     const channel = getOutputChannel();
     const cmd = npmInstall(plugin);
+    const result = await this.checkEnterpriseRegister(plugin);
+    if (result == false) return;
+    this.dispose();
+
     await showProgress(`Installing ${plugin}`, async () => {
       channel.clear();
       channel.appendLine(`> ${cmd}`);
       await run(this.path, cmd, channel, undefined, [], [], undefined, undefined, undefined, false);
+      this.provider.refresh();
+      window.showInformationMessage(`${plugin} was installed.`, 'OK');
     });
   }
 
@@ -159,6 +206,8 @@ export class PluginExplorerPanel {
       channel.clear();
       channel.appendLine(`> ${cmd}`);
       await run(this.path, cmd, channel, undefined, [], [], undefined, undefined, undefined, false);
+      this.provider.refresh();
+      window.showInformationMessage(`${plugin} was removed.`, 'OK');
     });
   }
 }

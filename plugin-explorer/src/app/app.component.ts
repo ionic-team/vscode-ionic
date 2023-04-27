@@ -7,6 +7,8 @@ import {
   vsCodePanelView,
   vsCodeProgressRing,
   vsCodeTag,
+  vsCodeRadio,
+  vsCodeRadioGroup,
   vsCodeTextField,
 } from '@vscode/webview-ui-toolkit';
 import { PluginFilter, PluginService } from './plugin.service';
@@ -25,6 +27,8 @@ provideVSCodeDesignSystem().register(
   vsCodeLink(),
   vsCodeTag(),
   vsCodeCheckbox(),
+  vsCodeRadio(),
+  vsCodeRadioGroup(),
   vsCodeProgressRing()
 );
 
@@ -82,7 +86,7 @@ export class AppComponent implements OnInit {
   change() {
     setTimeout(() => {
       this.search();
-    }, 1);
+    }, 100);
   }
 
   // User checked Official plugins
@@ -115,16 +119,18 @@ export class AppComponent implements OnInit {
       this.listTitle = `Plugins that work with ${checkedTestsTitle}`;
     }
 
-    this.plugins = this.pluginService.search(
-      filters,
-      this.terms,
-      this.checkedTests(),
-      checked('android'),
-      checked('ios')
-    );
+    const android = checked('android');
+    const ios = checked('ios');
+    const both = checked('both');
+    const any = checked('any');
+
+    this.plugins = this.pluginService.search(filters, this.terms, this.checkedTests(), android, ios, both, any);
     this.count = this.plugins.length;
 
     if (filters.includes(PluginFilter.search)) this.listTitle += ` related to '${this.terms}'`;
+    if (android && !ios) this.listTitle += ` that work on Android`;
+    if (!android && ios) this.listTitle += ` that work on iOS`;
+    if (both) this.listTitle += ` that work on iOS and Android`;
 
     if (this.count > 0) {
       this.listTitle = `${this.count == 50 ? 'First ' : ''}${this.count} ${this.listTitle}`;

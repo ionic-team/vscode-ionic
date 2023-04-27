@@ -410,7 +410,7 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand(CommandName.Add, async () => {
     if (features.pluginExplorer) {
       await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
-      PluginExplorerPanel.init(context.extensionUri, rootPath, context);
+      PluginExplorerPanel.init(context.extensionUri, rootPath, context, ionicProvider);
     } else {
       await installPackage(context.extensionPath, rootPath);
       if (ionicProvider) {
@@ -467,7 +467,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   vscode.commands.registerCommand(CommandName.PluginExplorer, async () => {
     await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
-    PluginExplorerPanel.init(context.extensionUri, rootPath, context);
+    PluginExplorerPanel.init(context.extensionUri, rootPath, context, ionicProvider);
   });
 
   vscode.commands.registerCommand(CommandName.SkipLogin, async () => {

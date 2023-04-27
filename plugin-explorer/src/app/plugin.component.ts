@@ -26,7 +26,10 @@ import { vscode } from './utilities/vscode';
         <p>{{ data.description }}</p>
 
         <br />
-        <vscode-button (click)="install()">{{ data.installed ? 'Update' : 'Install' }}</vscode-button>
+        <vscode-button *ngIf="data.installed == data.version" disabled>Up To Date</vscode-button>
+        <vscode-button *ngIf="data.installed !== data.version" (click)="install()">{{
+          data.installed ? 'Update' : 'Install'
+        }}</vscode-button>
         <vscode-button *ngIf="data.installed" (click)="uninstall()">Uninstall</vscode-button>
       </div>
       <div class="side">
@@ -35,6 +38,7 @@ import { vscode } from './utilities/vscode';
         </star>
         <p *ngIf="data.dailyDownloads !== '0'">{{ data.dailyDownloads }} Downloads Daily</p>
         <p>{{ data.changed }}</p>
+        <p>License: {{ data.license }}</p>
         <vscode-link [href]="'https://www.npmjs.com/package/' + data.name">More Information</vscode-link><br />
         <vscode-link *ngIf="data.repo && data.updated" [href]="data.repo">Source Code</vscode-link
         ><br *ngIf="data.repo && data.updated" />
@@ -53,12 +57,14 @@ export class PluginComponent {
     author: '',
     published: '',
     title: '',
+    license: '',
     tags: [],
+    platforms: [],
     rating: 1,
     changed: '',
     ratingInfo: '',
     tagInfo: '',
-    installed: false,
+    installed: '',
     dailyDownloads: '',
   };
 
