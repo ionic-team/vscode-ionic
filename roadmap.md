@@ -1,6 +1,11 @@
 # Roadmap
 
 - If you are presented with multiple external ip addresses then remember the selected option and if the IP address exists on next run use it
+- Add 3 dots next to debug > web to change browser
+- When searching for a package show spinner
+- Dynamically rate packages based on npm/github when searched for
+- Move the side menu for plugin explorer to the right
+- 3 dots for packages should plugin explorer info for the package
 - If local address is turned on then show warning on start that Nexus wont work
 - React Vite can write Network: rather than External:
 
