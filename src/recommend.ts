@@ -24,7 +24,7 @@ import { ionicState } from './ionic-tree-provider';
 import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
 import { checkIonicNativePackages } from './rules-ionic-native';
-import { cmdCtrl, getRunOutput, showProgress } from './utilities';
+import { alt, getRunOutput, showProgress } from './utilities';
 import { startStopLogServer } from './log-server';
 import { getConfigurationName } from './build-configuration';
 import { liveReloadSSL } from './live-reload';
@@ -47,7 +47,7 @@ export async function getRecommendations(
   packages: any
 ): Promise<void> {
   if (project.isCapacitor) {
-    project.setGroup(`Run`, `Press ${cmdCtrl()}+R to run the last chosen platform or Web.`, TipType.Ionic, true);
+    project.setGroup(`Run`, `Press ${alt('R')} to run the last chosen platform or Web.`, TipType.Ionic, true);
 
     const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
     const hasCapAndroid = project.hasCapacitorProject(CapacitorPlatform.android);
@@ -65,7 +65,7 @@ export async function getRecommendations(
       .canStop()
       .willNotBlock()
       .canAnimate()
-      .setTooltip('Run a development server and open using the default web browser');
+      .setTooltip(`Run a development server and open using the default web browser (${alt('R')})`);
     project.add(runWeb);
     ionicState.runWeb = runWeb;
 
@@ -134,14 +134,12 @@ export async function getRecommendations(
 
     const r = project.setGroup(
       'Debug',
-      'Running Ionic applications you can debug',
+      `Running Ionic applications you can debug (${alt('D')})`,
       TipType.Ionic,
       ionicState.refreshDebugDevices,
       Context.refreshDebug
     );
-    // project.add(
-    //   debugOnWeb(project)
-    // );
+
     r.whenExpanded = async () => {
       return [
         project.asRecommendation(debugOnWeb(project), CommandName.Debug),
@@ -395,7 +393,7 @@ export function debugOnWeb(project: Project): Tip {
     .setContextValue(Context.webDebugConfig)
     .willNotBlock()
     .canAnimate()
-    .setTooltip(`Debug using ${getDebugBrowserName()}. The browser can be changed in Settings.`);
+    .setTooltip(`Debug using ${getDebugBrowserName()}. (${alt('D')})`);
 }
 
 function remoteLogging(project: Project): Tip {

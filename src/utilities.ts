@@ -501,6 +501,10 @@ export function getPackageJSON(folder: string): PackageFile {
   return JSON.parse(readFileSync(filename, 'utf8'));
 }
 
+export function alt(key: string): string {
+  return process.platform === 'win32' ? `Alt+${key}` : `⌥+${key}`;
+}
+
 export function getStringFrom(data: string, start: string, end: string): string {
   const foundIdx = data.lastIndexOf(start);
   if (foundIdx == -1) {
@@ -510,10 +514,6 @@ export function getStringFrom(data: string, start: string, end: string): string 
   const edx = data.indexOf(end, idx);
   if (edx == -1) return data.substring(idx);
   return data.substring(idx, edx);
-}
-
-export function cmdCtrl(): string {
-  return process.platform == 'darwin' ? 'cmd' : 'ctrl';
 }
 
 export function setStringIn(data: string, start: string, end: string, replacement: string): string {

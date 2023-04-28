@@ -1,5 +1,6 @@
 import { window } from 'vscode';
 import { WorkspaceSetting, getSetting, setSetting } from './workspace-state';
+import { alt } from './utilities';
 
 // Feature Flags for experimental options
 export const features = {
@@ -11,7 +12,7 @@ export function showTips() {
   const shortcuts = '[shortcuts]';
   const tips = getSetting(WorkspaceSetting.tips);
   if (!tips?.includes(shortcuts)) {
-    window.showInformationMessage('Ionic Tip: Press Alt+D to debug your app and Alt+R to run it!', 'OK');
+    window.showInformationMessage(`Ionic Tip: Press ${alt('D')} to debug your app and ${alt('R')} to run it!`, 'OK');
     setSetting(WorkspaceSetting.tips, tips + shortcuts);
   }
 }
