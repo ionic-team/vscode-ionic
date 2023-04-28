@@ -39,17 +39,23 @@ export function viewInEditor(url: string, active?: boolean) {
 }
 
 export function getDebugBrowserName(): string {
-  const browser = getSetting(WorkspaceSetting.debugBrowser);
+  const browser = getDebugBrowserSetting();
   if (browser == 'pwa-msedge') return 'Microsoft Edge';
   if (browser == 'chrome') return 'Google Chrome';
   return browser;
 }
 
+function getDebugBrowserSetting() {
+  let browserType: string = getSetting(WorkspaceSetting.debugBrowser);
+  if (!browserType) {
+    browserType = 'chrome';
+  }
+  return browserType;
+}
 export async function debugBrowser(url: string, stopWebServerAfter: boolean) {
   try {
-    const browserType: string = getSetting(WorkspaceSetting.debugBrowser);
     const launchConfig: DebugConfiguration = {
-      type: browserType,
+      type: getDebugBrowserSetting(),
       name: 'Debug Web',
       request: 'launch',
       url: url,
