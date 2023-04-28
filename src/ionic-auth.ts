@@ -3,9 +3,9 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 
 import { Context, VSCommand } from './context-variables';
-import { getOutputChannel } from './extension';
 import { ionicState } from './ionic-tree-provider';
 import { sendTelemetryEvent, TelemetryEventType } from './telemetry';
+import { writeAppend } from './logging';
 
 /**
  * ionic login and signup commands
@@ -14,9 +14,8 @@ import { sendTelemetryEvent, TelemetryEventType } from './telemetry';
  */
 export async function ionicLogin(folder: string, context: vscode.ExtensionContext) {
   const ifolder = path.join(folder, 'node_modules', '@ionic', 'cli', 'bin');
-  const channel = getOutputChannel();
   try {
-    await run(`node ionic login --confirm`, ifolder, channel);
+    await run(`node ionic login --confirm`, ifolder);
     sendTelemetryEvent(folder, TelemetryEventType.Login, context);
   } catch (err) {
     vscode.window.showErrorMessage(err);
@@ -27,12 +26,11 @@ export async function ionicLogin(folder: string, context: vscode.ExtensionContex
 
 export async function ionicSignup(folder: string, context: vscode.ExtensionContext) {
   const ifolder = path.join(folder, 'node_modules', '@ionic', 'cli', 'bin');
-  const channel = getOutputChannel();
-  await run('npx ionic signup', ifolder, channel);
+  await run('npx ionic signup', ifolder);
   sendTelemetryEvent(folder, TelemetryEventType.SignUp, context);
 }
 
-async function run(command: string, folder: string, channel: vscode.OutputChannel): Promise<string> {
+async function run(command: string, folder: string): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';
     const cmd = child_process.exec(
@@ -41,10 +39,10 @@ async function run(command: string, folder: string, channel: vscode.OutputChanne
       (error: child_process.ExecException, stdout: string, stderror: string) => {
         if (stdout) {
           out += stdout;
-          channel.append(out);
+          writeAppend(out);
         }
         if (!error) {
-          channel.append(out);
+          writeAppend(out);
           resolve(out);
         } else {
           if (stderror) {

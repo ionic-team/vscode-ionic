@@ -13,7 +13,7 @@ import { getPnpmWorkspaces } from './monorepos-pnpm';
 import { PackageManager } from './node-commands';
 import { getLernaWorkspaces } from './monorepos-lerna';
 import { join } from 'path';
-import { writeError } from './extension';
+import { writeError } from './logging';
 
 export interface MonoRepoProject {
   name: string;

@@ -1,7 +1,7 @@
-import { debug, DebugConfiguration, ViewColumn, window, workspace } from 'vscode';
-import { cancelLastOperation } from './extension';
+import { debug, DebugConfiguration, ViewColumn, window } from 'vscode';
+import { cancelLastOperation } from './tasks';
 import { ionicState } from './ionic-tree-provider';
-import { debugSkipFiles, openUri } from './utilities';
+import { debugSkipFiles } from './utilities';
 import { getSetting, WorkspaceSetting } from './workspace-state';
 
 interface device {

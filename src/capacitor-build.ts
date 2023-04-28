@@ -4,7 +4,7 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { InternalCommand } from './command-name';
 import * as vscode from 'vscode';
 import { runWithProgress, getStringFrom, setStringIn } from './utilities';
-import { getOutputChannel, writeError, writeIonic } from './extension';
+import { writeError, writeIonic } from './logging';
 import { exists, isGreaterOrEqual } from './analyzer';
 import { getCapacitorConfigureFilename } from './capacitor-configure';
 import { readFileSync, writeFileSync } from 'fs';
@@ -47,7 +47,7 @@ export async function capacitorBuild(project: Project) {
   try {
     const command = capBuildCommand(project, platform, args, settings);
     writeIonic(command);
-    await runWithProgress(command, 'Preparing Release Build...', project.projectFolder(), getOutputChannel());
+    await runWithProgress(command, 'Preparing Release Build...', project.projectFolder());
     writeConfig(project, settings);
   } catch (err) {
     writeError(err);
@@ -72,12 +72,7 @@ async function verifySettings(
       return undefined;
     }
     if (selection == 'Open Android Studio') {
-      await runWithProgress(
-        capacitorOpen(project, platform),
-        'Opening Android Studio...',
-        project.projectFolder(),
-        getOutputChannel()
-      );
+      await runWithProgress(capacitorOpen(project, platform), 'Opening Android Studio...', project.projectFolder());
       return undefined;
     }
     const path = await vscode.window.showOpenDialog({

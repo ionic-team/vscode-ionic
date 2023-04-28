@@ -1,13 +1,13 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { lastOperation } from './extension';
 import { CommandName } from './command-name';
 import { openUri, showMessage } from './utilities';
 import { ionicInit } from './ionic-init';
 import { Context } from './context-variables';
 import { ionicState } from './ionic-tree-provider';
 import { Project } from './project';
+import { getLastOperation } from './tasks';
 
 interface ErrorLine {
   uri: string;
@@ -79,8 +79,9 @@ export async function handleError(error: string, logs: Array<string>, folder: st
       onSave = vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
         if (document.fileName == currentErrorFilename) {
           onSave.dispose();
-          const title = lastOperation.title;
-          const r = new Project('').asRecommendation(lastOperation);
+          const lastOp = getLastOperation();
+          const title = lastOp.title;
+          const r = new Project('').asRecommendation(lastOp);
           vscode.commands.executeCommand(CommandName.Run, r);
           showMessage(`Lets try to ${title} again...`, 3000);
         }

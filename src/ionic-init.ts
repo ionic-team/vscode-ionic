@@ -5,14 +5,12 @@ import * as path from 'path';
 // Run ionic init using the project name of the package.json and type of custom
 // Create ionic:build if there is a build script
 
-import { getOutputChannel } from './extension';
 import { getRunOutput } from './utilities';
+import { write, writeError, writeIonic } from './logging';
 
 // Create ionic:serve if there is a serve script
 export async function ionicInit(folder: string): Promise<boolean> {
-  const channel = getOutputChannel();
-
-  channel.appendLine('[Ionic] Creating Ionic project...');
+  write('[Ionic] Creating Ionic project...');
   try {
     const filename = path.join(folder, 'package.json');
     const packageFile = JSON.parse(fs.readFileSync(filename, 'utf8'));
@@ -39,10 +37,10 @@ export async function ionicInit(folder: string): Promise<boolean> {
     }
     fs.writeFileSync(filename, JSON.stringify(packageFile, undefined, 2));
     addIonicConfigCapacitor(folder);
-    channel.appendLine('[Ionic] Created Ionic Project');
+    writeIonic('Created Ionic Project');
     return true;
   } catch (err) {
-    channel.appendLine('[Ionic] Unable to create Ionic project:' + err);
+    writeError('Unable to create Ionic project:' + err);
     return false;
   }
 }

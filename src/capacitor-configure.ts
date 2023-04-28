@@ -5,12 +5,12 @@ import * as fs from 'fs';
 import { CapacitorProject } from '@capacitor/project';
 import { CapacitorConfig } from '@capacitor/cli';
 import { CapacitorProjectState } from './cap-project';
-import { getOutputChannel } from './extension';
 import { Project } from './project';
 import { Tip, TipType } from './tip';
 import { channelShow, getStringFrom, setStringIn } from './utilities';
 import { CapProjectCache } from './context-variables';
 import { join } from 'path';
+import { showOutput, write } from './logging';
 
 enum NativePlatform {
   iOSOnly,
@@ -227,23 +227,20 @@ async function setBundleId(bundleId: string, prj: Project, platform: NativePlatf
   }
 
   const project = await getCapacitorProject(prj);
-  const channel = getOutputChannel();
 
   if (project?.ios && platform != NativePlatform.AndroidOnly) {
     const appTarget = project.ios?.getAppTarget();
     for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
-      channel.appendLine(
-        `Set iOS Bundle Id for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newBundleId}`
-      );
+      write(`Set iOS Bundle Id for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newBundleId}`);
       project.ios.setBundleId(appTarget.name, buildConfig.name, newBundleId);
     }
   }
   if (project.android && platform != NativePlatform.iOSOnly) {
-    channel.appendLine(`Set Android Package Name to ${newBundleId}`);
+    write(`Set Android Package Name to ${newBundleId}`);
     await project.android?.setPackageName(newBundleId);
   }
   await project.commit();
-  channelShow(channel);
+  showOutput();
   clearCapProjectCache();
 }
 
@@ -275,23 +272,20 @@ async function setVersion(version: string, prj: Project, platform: NativePlatfor
   }
 
   const project = await getCapacitorProject(prj);
-  const channel = getOutputChannel();
 
   if (project?.ios && platform != NativePlatform.AndroidOnly) {
     const appTarget = project.ios?.getAppTarget();
     for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
-      channel.appendLine(
-        `Set iOS Version for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newVersion}`
-      );
+      write(`Set iOS Version for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newVersion}`);
       await project.ios.setVersion(appTarget.name, buildConfig.name, newVersion);
     }
   }
   if (project.android && platform != NativePlatform.iOSOnly) {
-    channel.appendLine(`Set Android Version to ${newVersion}`);
+    write(`Set Android Version to ${newVersion}`);
     await project.android?.setVersionName(newVersion);
   }
   await project.commit();
-  channelShow(channel);
+  channelShow();
   clearCapProjectCache();
 }
 
@@ -320,22 +314,21 @@ async function setBuild(build: string, prj: Project, platform: NativePlatform) {
   }
 
   const project = await getCapacitorProject(prj);
-  const channel = getOutputChannel();
 
   if (project?.ios && platform != NativePlatform.AndroidOnly) {
     const appTarget = project.ios?.getAppTarget();
     for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
-      channel.appendLine(`Set iOS Version for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newBuild}`);
+      write(`Set iOS Version for target ${appTarget.name} buildConfig.${buildConfig.name} to ${newBuild}`);
       await project.ios.setBuild(appTarget.name, buildConfig.name, parseInt(newBuild));
     }
   }
   if (project.android && platform != NativePlatform.iOSOnly) {
-    channel.appendLine(`Set Android Version to ${newBuild}`);
+    write(`Set Android Version to ${newBuild}`);
     await project.android?.setVersionCode(parseInt(newBuild));
   }
   await project.commit();
   clearCapProjectCache();
-  channelShow(channel);
+  channelShow();
 }
 
 /**
@@ -356,35 +349,32 @@ async function setDisplayName(currentDisplayName: string, prj: Project, folder: 
   }
 
   const project = await getCapacitorProject(prj);
-  const channel = getOutputChannel();
 
   console.log(`Display name changed to ${displayName}`);
   if (project.ios != null && platform != NativePlatform.AndroidOnly) {
     const appTarget = project.ios?.getAppTarget();
     for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
-      channel.appendLine(
-        `Set iOS Displayname for target ${appTarget.name} buildConfig.${buildConfig.name} to ${displayName}`
-      );
+      write(`Set iOS Displayname for target ${appTarget.name} buildConfig.${buildConfig.name} to ${displayName}`);
       await project.ios.setDisplayName(appTarget.name, buildConfig.name, displayName);
     }
   }
   if (project.android != null && platform != NativePlatform.iOSOnly) {
     let data = await project.android?.getResource('values', 'strings.xml');
     if (!data) {
-      channel.appendLine(`Unable to set Android display name`);
+      write(`Unable to set Android display name`);
     }
     data = setStringIn(data as string, `<string name="app_name">`, `</string>`, displayName);
     data = setStringIn(data as string, `<string name="title_activity_main">`, `</string>`, displayName);
     const filename = path.join(folder, 'android/app/src/main/res/values/strings.xml');
     if (fs.existsSync(filename)) {
       fs.writeFileSync(filename, data);
-      channel.appendLine(`Set Android app_name to ${displayName}`);
-      channel.appendLine(`Set Android title_activity_main to ${displayName}`);
+      write(`Set Android app_name to ${displayName}`);
+      write(`Set Android title_activity_main to ${displayName}`);
     } else {
       vscode.window.showErrorMessage('Unable to write to ' + filename);
     }
   }
-  channelShow(channel);
+  channelShow();
   project.commit();
   clearCapProjectCache();
 }

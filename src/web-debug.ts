@@ -1,5 +1,4 @@
 import { window } from 'vscode';
-import { Project } from './project';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 
 export enum WebDebugSetting {

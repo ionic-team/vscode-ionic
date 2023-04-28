@@ -46,19 +46,21 @@
   "activationEvents": [
     "onView:ionic",
     "onLanguage:json",
-    "onLanguage:jsonc",
-    "onCommand:ionic-official.refresh",
-    "onCommand:ionic-official.add",
-    "onCommand:ionic-official.fix",
-    "onCommand:ionic-official.lightbulb"
+    "onLanguage:jsonc"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "keybindings": [
       {
         "command": "ionic-official.run",
-        "key": "ctrl+r",
-        "mac": "cmd+r",
+        "key": "alt+r",
+        "mac": "alt+r",
+        "when": "true"
+      },
+      {
+        "command": "ionic-official.debug",
+        "key": "alt+d",
+        "mac": "alt+d",
         "when": "true"
       }
     ],
@@ -159,6 +161,14 @@
       {
         "command": "ionic-official.pluginExplorer",
         "title": "Ionic: Plugins"
+      },
+      {
+        "command": "ionic-official.run",
+        "title": "Ionic: Run"
+      },
+      {
+        "command": "ionic-official.debug",
+        "title": "Ionic: Run and Debug"
       },
       {
         "command": "ionic-official.lightbulb",

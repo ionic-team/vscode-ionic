@@ -6,7 +6,7 @@ import { ionicState } from './ionic-tree-provider';
 import { join } from 'path';
 import { debugBrowser, viewInEditor } from './editor-preview';
 import { httpRequest, openUri } from './utilities';
-import { getOutputChannel, writeError, writeWarning } from './extension';
+import { write, writeError, writeWarning } from './logging';
 import { inspectProject, ProjectSummary } from './project';
 import { PackageInfo } from './package-info';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
@@ -67,7 +67,6 @@ export async function troubleshootPlugins() {
     let problems = 0;
     let problem = '';
     const pluginList = [];
-    const channel = getOutputChannel();
 
     const summary: ProjectSummary = await inspectProject(ionicState.rootFolder, ionicState.context, undefined);
     for (const libType of ['Capacitor Plugin', 'Plugin']) {
@@ -83,7 +82,7 @@ export async function troubleshootPlugins() {
                   `Your project has v${pkg.version} of ${library} but Nexus Browser has v${versions[library]}`
                 );
               } else {
-                channel.appendLine(
+                write(
                   `[info] Your project has v${pkg.version} of ${library} but Nexus Browser has v${versions[library]}`
                 );
               }

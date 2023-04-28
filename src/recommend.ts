@@ -29,7 +29,6 @@ import { startStopLogServer } from './log-server';
 import { getConfigurationName } from './build-configuration';
 import { liveReloadSSL } from './live-reload';
 import { npmInstall, npmUninstall, PackageManager } from './node-commands';
-import { cancelLastOperation, writeIonic } from './extension';
 import { capacitorBuild } from './capacitor-build';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 import { updateMinorDependencies } from './update-minor';
@@ -38,7 +37,9 @@ import { analyzeSize } from './analyze-size';
 import { ionicExport } from './ionic-export';
 import { angularGenerate } from './angular-generate';
 import { LoggingSettings } from './log-settings';
-import { webDebugSetting } from './web-debug';
+import { writeIonic } from './logging';
+import { cancelLastOperation } from './tasks';
+import { CommandName } from './command-name';
 
 export async function getRecommendations(
   project: Project,
@@ -138,9 +139,12 @@ export async function getRecommendations(
       ionicState.refreshDebugDevices,
       Context.refreshDebug
     );
+    // project.add(
+    //   debugOnWeb(project)
+    // );
     r.whenExpanded = async () => {
       return [
-        project.asRecommendation(debugOnWeb(project)),
+        project.asRecommendation(debugOnWeb(project), CommandName.Debug),
         ...(await getAndroidWebViewList(hasCapAndroid, project.getDistFolder())),
       ];
     };
@@ -379,7 +383,7 @@ async function settings() {
   await vscode.commands.executeCommand('workbench.action.openSettings', "Ionic'");
 }
 
-function debugOnWeb(project: Project): Tip {
+export function debugOnWeb(project: Project): Tip {
   return new Tip('Web', `(${getDebugBrowserName()})`, TipType.Debug, 'Serve', undefined, 'Debugging', `Project Served`)
     .setDynamicCommand(ionicServe, project, true)
     .setFeatures([TipFeature.debugOnWeb])

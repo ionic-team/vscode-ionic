@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { ignore } from './ignore';
 import { npmInstall, npmRun } from './node-commands';
-import { writeError, writeIonic } from './extension';
+import { writeError, writeIonic } from './logging';
 import { ExtensionContext, window } from 'vscode';
 import { Tip } from './tip';
 

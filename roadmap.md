@@ -1,6 +1,8 @@
 # Roadmap
 
 - If you are presented with multiple external ip addresses then remember the selected option and if the IP address exists on next run use it
+- Ctrl + R - Make this work
+- Make debug easier by allowing "Debug" as an option for Run > Web
 - If local address is turned on then show warning on start that Nexus wont work
 - React Vite can write Network: rather than External:
 

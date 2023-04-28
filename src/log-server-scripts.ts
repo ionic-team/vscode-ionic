@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { exists } from './analyzer';
-import { writeError, writeIonic } from './extension';
+import { writeError, writeIonic } from './logging';
 import { npmInstall } from './node-commands';
 import { getRunOutput, showProgress } from './utilities';
 

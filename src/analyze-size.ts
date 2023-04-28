@@ -1,4 +1,4 @@
-import { getOutputChannel, writeError, writeIonic } from './extension';
+import { writeError, writeIonic } from './logging';
 import { Project } from './project';
 import { openUri, run, RunResults, showProgress, stripJSON } from './utilities';
 import * as vscode from 'vscode';
@@ -477,8 +477,7 @@ function friendlyPath(path: string): string {
 }
 
 async function run2(project: Project, command: string, output: RunResults): Promise<boolean> {
-  const channel = getOutputChannel();
-  return await run(project.projectFolder(), command, channel, undefined, [], [], undefined, undefined, output, true);
+  return await run(project.projectFolder(), command, undefined, [], [], undefined, undefined, output, true);
 }
 
 function analyzeAssets(distFolder: string, prjFolder: string): Array<FileInfo> {

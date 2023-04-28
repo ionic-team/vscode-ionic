@@ -8,8 +8,8 @@ import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
 import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage, reviewProject } from './project';
-import { Command, Tip, TipFeature, TipType } from './tip';
-import { CancelObject, run, estimateRunTime, channelShow, openUri, stopPublishing, replaceAll } from './utilities';
+import { Command, Tip, TipFeature } from './tip';
+import { CancelObject, run, estimateRunTime, channelShow, openUri, replaceAll } from './utilities';
 import { ignore } from './ignore';
 import { ActionResult, CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
@@ -27,14 +27,20 @@ import { kill } from './process-list';
 import { selectExternalIPAddress } from './ionic-serve';
 import { advancedActions } from './advanced-actions';
 import { PluginExplorerPanel } from './plugin-explorer';
-import { features } from './features';
+import { features, showTips } from './features';
 import * as path from 'path';
 import { webDebugSetting } from './web-debug';
-
-let channel: vscode.OutputChannel = undefined;
-let runningOperations = [];
-let runningActions: Array<Tip> = [];
-export let lastOperation: Tip;
+import { showOutput, write, writeError, writeIonic } from './logging';
+import {
+  cancelIfRunning,
+  finishCommand,
+  markActionAsCancelled,
+  markActionAsRunning,
+  markOperationAsRunning,
+  startCommand,
+  waitForOtherActions,
+} from './tasks';
+import { debugOnWeb } from './recommend';
 
 async function requestAppName(tip: Tip, path: string) {
   const suggestion = suggestName(path);
@@ -85,140 +91,6 @@ function suggestName(path2: string): string {
   return name;
 }
 
-export function isRunning(tip: Tip) {
-  const found: Tip = runningOperations.find((found) => {
-    return found.sameAs(tip);
-  });
-  if (found == undefined) {
-    const foundAction: Tip = runningActions.find((found) => {
-      return found.sameAs(tip);
-    });
-    return foundAction != undefined;
-  }
-  return found != undefined;
-}
-
-export async function cancelLastOperation() {
-  if (!lastOperation) return;
-  if (!isRunning(lastOperation)) return;
-  await cancelRunning(lastOperation);
-}
-
-function cancelRunning(tip: Tip): Promise<void> {
-  const found: Tip = runningOperations.find((found) => {
-    return found.sameAs(tip);
-  });
-  if (found) {
-    found.cancelRequested = true;
-    console.log('Found task to cancel...');
-    if (tip.description == 'Serve') {
-      stopPublishing();
-    }
-  }
-  return new Promise((resolve) => setTimeout(resolve, 1000));
-}
-
-export function finishCommand(tip: Tip) {
-  runningOperations = runningOperations.filter((op: Tip) => {
-    return !op.sameAs(tip);
-  });
-  runningActions = runningActions.filter((op: Tip) => {
-    return !op.sameAs(tip);
-  });
-}
-
-function startCommand(tip: Tip, cmd: string, clear?: boolean) {
-  if (tip.title) {
-    const message = tip.commandTitle ? tip.commandTitle : tip.title;
-    if (clear !== false) {
-      channel.clear();
-    }
-    channel.appendLine(`[Ionic] ${message}...`);
-    let command = cmd;
-    if (command?.includes(InternalCommand.cwd)) {
-      command = command.replace(InternalCommand.cwd, '');
-      if (ionicState.workspace) {
-        channel.appendLine(`> Workspace: ${ionicState.workspace}`);
-      }
-    }
-    channel.appendLine(`> ${command}`);
-    channelShow(channel);
-  }
-}
-
-export function getOutputChannel(): vscode.OutputChannel {
-  if (!channel) {
-    channel = vscode.window.createOutputChannel('Ionic');
-    channel.show();
-  }
-  return channel;
-}
-
-export function clearOutput(): vscode.OutputChannel {
-  const channel = getOutputChannel();
-  channel.clear();
-  channel.show();
-  return channel;
-}
-
-export function writeIonic(message: string) {
-  const channel = getOutputChannel();
-  channel.appendLine(`[Ionic] ${message}`);
-}
-
-export function writeError(message: string) {
-  const channel = getOutputChannel();
-  channel.appendLine(`[error] ${message}`);
-}
-
-export function writeWarning(message: string) {
-  const channel = getOutputChannel();
-  channel.appendLine(`[warning] ${message}`);
-}
-
-export function markActionAsRunning(tip: Tip) {
-  runningActions.push(tip);
-}
-
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function queueEmpty(): boolean {
-  if (runningActions.length == 0) return true;
-  if (runningActions.length == 1 && runningActions[0].isNonBlocking()) return true;
-  return false;
-}
-
-export async function waitForOtherActions(tip: Tip): Promise<boolean> {
-  let cancelled = false;
-  if (queueEmpty()) return false;
-  if (tip.willNotWait()) return false;
-  await vscode.window.withProgress(
-    {
-      location: vscode.ProgressLocation.Notification,
-      title: `Task Queued: ${tip.title}`,
-      cancellable: true,
-    },
-    async (progress, token: vscode.CancellationToken) => {
-      while (!queueEmpty() && !cancelled) {
-        await delay(500);
-
-        if (token.isCancellationRequested) {
-          cancelled = true;
-        }
-      }
-    }
-  );
-  return cancelled;
-}
-
-export function markActionAsCancelled(tip: Tip) {
-  runningActions = runningActions.filter((op: Tip) => {
-    return !op.sameAs(tip);
-  });
-}
-
 /**
  * Runs the command while showing a vscode window that can be cancelled
  * @param  {string|string[]} command Node command
@@ -234,7 +106,6 @@ export async function fixIssue(
   successMessage?: string,
   title?: string
 ) {
-  const channel = getOutputChannel();
   const hasRunPoints = tip && tip.runPoints && tip.runPoints.length > 0;
 
   if (command == Command.NoOp) {
@@ -244,16 +115,11 @@ export async function fixIssue(
   }
 
   // If the task is already running then cancel it
-  if (isRunning(tip)) {
-    await cancelRunning(tip);
-    if (tip.data == Context.stop) {
-      channelShow(channel);
-      return; // User clicked stop
-    }
-  }
+  const didCancel = await cancelIfRunning(tip);
+  if (didCancel) return;
 
-  runningOperations.push(tip);
-  lastOperation = tip;
+  markOperationAsRunning(tip);
+
   let msg = tip.commandProgress ? tip.commandProgress : tip.commandTitle ? tip.commandTitle : command;
   if (title) msg = title;
   let failed = false;
@@ -273,7 +139,7 @@ export async function fixIssue(
         // Kill the process if the user cancels
         if (token.isCancellationRequested || tip.cancelRequested) {
           tip.cancelRequested = false;
-          channel.appendLine(`[Ionic] Stopped "${tip.title}"`);
+          writeIonic(`Stopped "${tip.title}"`);
           if (tip.features.includes(TipFeature.welcome)) {
             vscode.commands.executeCommand(CommandName.hideDevServer);
           }
@@ -285,7 +151,7 @@ export async function fixIssue(
             ionicState.selectedAndroidDeviceName = '';
           }
 
-          channelShow(channel);
+          channelShow();
           clearInterval(interval);
           finishCommand(tip);
           cancelObject.cancelled = true;
@@ -322,7 +188,6 @@ export async function fixIssue(
               retry = await run(
                 rootPath,
                 cmd,
-                channel,
                 cancelObject,
                 tip.features,
                 tip.runPoints,
@@ -349,7 +214,7 @@ export async function fixIssue(
     ionicProvider.refresh();
   }
   if (successMessage) {
-    channel.appendLine(successMessage);
+    write(successMessage);
   }
   if (tip.title) {
     if (failed) {
@@ -357,8 +222,8 @@ export async function fixIssue(
     } else {
       writeIonic(`${tip.title} Completed.`);
     }
-    channel.appendLine('');
-    channelShow(channel);
+    write('');
+    showOutput();
   }
 
   if (tip.syncOnSuccess) {
@@ -410,7 +275,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
   vscode.commands.registerCommand(CommandName.Add, async () => {
     if (features.pluginExplorer) {
-      await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
       PluginExplorerPanel.init(context.extensionUri, rootPath, context, ionicProvider);
     } else {
       await installPackage(context.extensionPath, rootPath);
@@ -485,19 +349,9 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   vscode.commands.registerCommand(CommandName.RunIOS, async (recommendation: Recommendation) => {
-    let runInfo = ionicState.runWeb;
-    switch (ionicState.lastRun) {
-      case CapacitorPlatform.android:
-        runInfo = ionicState.runAndroid;
-        break;
-      case CapacitorPlatform.ios:
-        runInfo = ionicState.runIOS;
-        break;
-    }
-    if (runInfo) {
-      runAction(runInfo, ionicProvider, rootPath);
-    }
+    runAgain(ionicProvider, rootPath);
   });
+
   vscode.commands.registerCommand(CommandName.Rebuild, async (recommendation: Recommendation) => {
     await recommendation.tip.executeAction();
     ionicProvider.refresh();
@@ -538,6 +392,10 @@ export async function activate(context: vscode.ExtensionContext) {
     runAction(r.tip, ionicProvider, rootPath);
   });
 
+  vscode.commands.registerCommand(CommandName.Debug, async (r: Recommendation) => {
+    runAction(debugOnWeb(ionicState.projectRef), ionicProvider, rootPath);
+  });
+
   vscode.commands.registerCommand(CommandName.SelectDevice, async (r: Recommendation) => {
     if (r.tip.actionArg(1) == CapacitorPlatform.android) {
       ionicState.selectedAndroidDevice = undefined;
@@ -557,6 +415,26 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.debug.registerDebugConfigurationProvider(AndroidDebugType, new AndroidDebugProvider())
   );
   context.subscriptions.push(vscode.debug.onDidTerminateDebugSession(androidDebugUnforward));
+
+  if (!ionicState.runWeb) {
+    await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
+  }
+  showTips();
+}
+
+async function runAgain(ionicProvider: IonicTreeProvider, rootPath: string) {
+  let runInfo = ionicState.runWeb;
+  switch (ionicState.lastRun) {
+    case CapacitorPlatform.android:
+      runInfo = ionicState.runAndroid;
+      break;
+    case CapacitorPlatform.ios:
+      runInfo = ionicState.runIOS;
+      break;
+  }
+  if (runInfo) {
+    runAction(runInfo, ionicProvider, rootPath);
+  }
 }
 
 function trackProjectChange() {

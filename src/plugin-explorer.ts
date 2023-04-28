@@ -4,11 +4,11 @@ import { getRunOutput, httpRequest, showProgress } from './utilities';
 import { existsSync, statSync, writeFileSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { PackageManager, npmInstall, npmUninstall } from './node-commands';
-import { getOutputChannel } from './extension';
 import { run } from './utilities';
 import { ProjectSummary, inspectProject } from './project';
 import { PackageInfo } from './package-info';
 import { IonicTreeProvider, ionicState } from './ionic-tree-provider';
+import { clearOutput, write } from './logging';
 
 interface Dependency {
   name: string;
@@ -168,7 +168,7 @@ export class PluginExplorerPanel {
     });
     if (!productKey) return false;
     const cmd = `npx ionic enterprise register --key=${productKey}`;
-    return await run(this.path, cmd, getOutputChannel(), undefined, [], [], undefined, undefined, undefined, false);
+    return await run(this.path, cmd, undefined, [], [], undefined, undefined, undefined, false);
   }
 
   hasProductKey(): boolean {
@@ -183,16 +183,14 @@ export class PluginExplorerPanel {
   }
 
   async install(plugin: string) {
-    const channel = getOutputChannel();
     const cmd = npmInstall(plugin);
     const result = await this.checkEnterpriseRegister(plugin);
     if (result == false) return;
     this.dispose();
 
     await showProgress(`Installing ${plugin}`, async () => {
-      channel.clear();
-      channel.appendLine(`> ${cmd}`);
-      await run(this.path, cmd, channel, undefined, [], [], undefined, undefined, undefined, false);
+      write(`> ${cmd}`);
+      await run(this.path, cmd, undefined, [], [], undefined, undefined, undefined, false);
       this.provider.refresh();
       window.showInformationMessage(`${plugin} was installed.`, 'OK');
     });
@@ -200,12 +198,11 @@ export class PluginExplorerPanel {
 
   async uninstall(plugin: string) {
     this.dispose();
-    const channel = getOutputChannel();
     const cmd = npmUninstall(plugin);
     await showProgress(`Uninstalling ${plugin}`, async () => {
-      channel.clear();
-      channel.appendLine(`> ${cmd}`);
-      await run(this.path, cmd, channel, undefined, [], [], undefined, undefined, undefined, false);
+      clearOutput();
+      write(`> ${cmd}`);
+      await run(this.path, cmd, undefined, [], [], undefined, undefined, undefined, false);
       this.provider.refresh();
       window.showInformationMessage(`${plugin} was removed.`, 'OK');
     });

@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { clearOutput, getOutputChannel, writeError, writeIonic } from './extension';
+import { clearOutput, writeError, writeIonic } from './logging';
 import { npmInstall, outdatedCommand } from './node-commands';
 import { NpmOutdatedDependency } from './npm-model';
 import { Project } from './project';
@@ -62,10 +62,9 @@ export async function updateMinorDependencies(project: Project, packages: object
 }
 
 async function run2(project: Project, command: string): Promise<boolean> {
-  const channel = getOutputChannel();
   const result: RunResults = { output: '', success: false };
   try {
-    await run(project.projectFolder(), command, channel, undefined, [], [], undefined, undefined, result, false);
+    await run(project.projectFolder(), command, undefined, [], [], undefined, undefined, result, false);
     return result.success;
   } catch {
     return false;
