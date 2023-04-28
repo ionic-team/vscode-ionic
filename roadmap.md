@@ -1,14 +1,12 @@
 # Roadmap
 
 - If you are presented with multiple external ip addresses then remember the selected option and if the IP address exists on next run use it
-- Ctrl + R - Make this work
-- Make debug easier by allowing "Debug" as an option for Run > Web
 - If local address is turned on then show warning on start that Nexus wont work
 - React Vite can write Network: rather than External:
 
 - (feat) if @angular/core >= 14 and no .eslintrc.json or exists(tslint) then recommend eslint migration:
 
-- (feat) Coding standards;: Review
+- (feat) Coding standards: Review
   https://github.com/ionic-team/prettier-config
   https://github.com/ionic-team/eslint-config
 - (feat) Run->iOS - if windows then prompt that "This feature requires a Mac"
@@ -58,10 +56,6 @@
 ## Pin Dependencies
 
 - (4) Recommend applying exact version numbers in package.json rather than ~ or ^ or next
-
-## Debugging
-
-- Launch json can be added which sets up debugging with F5 which is a lot easier than clicking Debug > Web
 
 ## Ionitron / ChatGPT
 
@@ -114,7 +108,6 @@ Alterantive visual web views:
 - If you add a @capacitor/plugin then sync should be done as well
 - See `tslint.json` and angular 12+ then link to [blog](https://ionicframework.com/blog/eslint-for-ionic-angular/) for migration
 - Show git remote url somewhere (`git config --get remote.origin.url`)
-- Detect plugins/platforms folders in a capacitor project and recommend removal
 - Listing recent Appflow builds and allowing users to sideload the artifacts from those builds onto their simulators/devices (lots of potential cert issues with iOS here)
 
 - Augmenting the New Project functionality to create the app in appflow and begin with the project linked, similar to the Ionic App Wizard
@@ -123,17 +116,14 @@ Alterantive visual web views:
 - (feat) info.plist editing
 - (feat) Twitter to RSS feed - pull news into plugin ??
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
-- (32) Debugging for iOS
 - (2) If you sync but the build didn't work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand
 - (2) Show gotchas page for Angular migration x to x+1
 - (2) On Web projects that are Angular based hook up dist or configured folder
-- (16) Allow add of plugins: list all official capacitor, ionic enterprise, supported plugins
 - (16) If using say @capacitor/camera then allow editing of info.plist and Android permissions (highlight if empty)
 - (4) When running for web, if you close the browser, a button for "Open Browser" should allow opening it again.
 - (8) Show preview as soon as "Run on Web" is clicked and show progress until app is ready
 - (4) Highlight dev dependencies in some way
-- (4) Check for leftover platforms and plugins folders when removing cordova or when capacitor is detected
 - (4) Detect if Android Studio not installed
 
 ## Ditch Ionic CLI
@@ -146,8 +136,3 @@ Alterantive visual web views:
 ## Performance
 
 - (perf) Only run capacitor config commands when "Configuration" is expanded
-
-## Bugs
-
-- (bug) Bug capturing of inspection with telemetry reporting on exception
-- (bug) On a new project - see if it can be built in current directory otherwise git history is messed up when it moves the folder.
