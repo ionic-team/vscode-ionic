@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { reviewProject } from './project';
+import { Project, reviewProject } from './project';
 import { Recommendation } from './recommendation';
 import { Context, VSCommand } from './context-variables';
 import { starterProject } from './ionic-start';
@@ -42,6 +42,7 @@ interface IonicState {
   runAndroid: Tip;
   runWeb: Tip;
   lastRun: CapacitorPlatform;
+  projectRef: Project;
 }
 export const ionicState: IonicState = {
   view: undefined,
@@ -64,6 +65,7 @@ export const ionicState: IonicState = {
   nvm: undefined,
   rootFolder: undefined,
   lastRun: undefined,
+  projectRef: undefined,
   configuration: undefined,
   project: undefined,
 };

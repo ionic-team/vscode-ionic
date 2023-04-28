@@ -2,7 +2,7 @@ import { existsSync, lstatSync, readdirSync, readFileSync, writeFileSync } from 
 import { join } from 'path';
 import * as vscode from 'vscode';
 import { exists, isVersionGreaterOrEqual } from './analyzer';
-import { getOutputChannel, writeError, writeIonic } from './extension';
+import { showOutput, writeError, writeIonic } from './logging';
 import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
 import { getStringFrom, run, setAllStringIn, showProgress } from './utilities';
@@ -25,15 +25,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
       'Continue...'
     );
     if (res === openStudio) {
-      await run(
-        project.folder,
-        capacitorOpen(project, CapacitorPlatform.android),
-        getOutputChannel(),
-        undefined,
-        [],
-        undefined,
-        undefined
-      );
+      await run(project.folder, capacitorOpen(project, CapacitorPlatform.android), undefined, [], undefined, undefined);
       return;
     }
     if (!res) return;
@@ -54,8 +46,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
     const manager = getPackageManager(ionicState.packageManager);
     await project.run2(`npx cap migrate --noprompt --packagemanager=${manager}`);
     writeIonic('Capacitor 5 Migration Completed.');
-
-    getOutputChannel().show();
+    showOutput();
   });
   const message = `Migration to Capacitor 5 is complete. You can also read about the changes in Capacitor 5.`;
   if ((await vscode.window.showInformationMessage(message, 'Capacitor 5 Changes', 'OK')) == 'Capacitor 5 Changes') {
@@ -293,7 +284,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
       writeIonic('Capacitor 4 Migration Completed.');
 
       writeBreakingChanges();
-      getOutputChannel().show();
+      showOutput();
       const message = `Migration to Capacitor ${coreVersion} is complete. Run and test your app!`;
 
       vscode.window.showInformationMessage(message, 'OK');

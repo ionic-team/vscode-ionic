@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { channelShow, run } from './utilities';
-import { getOutputChannel, writeIonic } from './extension';
+import { writeIonic } from './logging';
 import { Tip, TipType } from './tip';
 import { Project } from './project';
 import { exists } from './analyzer';
@@ -168,22 +168,20 @@ async function runCapacitorAssets(project: Project) {
     return;
   }
 
-  const channel = getOutputChannel();
   writeIonic('Generating Splash Screen and Icon Assets...');
-  channelShow(channel);
+  channelShow();
   await showProgress('Generating Splash Screen and Icon Assets', async () => {
     if (!hasCordovaRes) {
       writeIonic(`Installing @capacitor/assets temporarily...`);
-      await run(folder, npmInstall('@capacitor/assets', '--save-dev'), channel, undefined, [], undefined, undefined);
+      await run(folder, npmInstall('@capacitor/assets', '--save-dev'), undefined, [], undefined, undefined);
     }
     if (exists('cordova-res')) {
-      await run(folder, npmUninstall('cordova-res'), channel, undefined, [], undefined, undefined);
+      await run(folder, npmUninstall('cordova-res'), undefined, [], undefined, undefined);
     }
     if (ios) {
       await run(
         folder,
         `${npx(project.packageManager)} @capacitor/assets generate --ios`,
-        channel,
         undefined,
         [],
         undefined,
@@ -195,7 +193,6 @@ async function runCapacitorAssets(project: Project) {
       await run(
         folder,
         `${npx(project.packageManager)} @capacitor/assets generate --android`,
-        channel,
         undefined,
         [],
         undefined,
@@ -206,21 +203,10 @@ async function runCapacitorAssets(project: Project) {
   });
 
   writeIonic(`Removing @capacitor/assets...`);
-  await run(
-    folder,
-    npmUninstall('@capacitor/assets'),
-    channel,
-    undefined,
-    [],
-    undefined,
-    undefined,
-    undefined,
-    undefined,
-    true
-  );
+  await run(folder, npmUninstall('@capacitor/assets'), undefined, [], undefined, undefined, undefined, undefined, true);
 
   writeIonic('Completed created Splash Screen and Icon Assets');
-  channelShow(channel);
+  channelShow();
 }
 
 function addToGitIgnore(folder: string, ignoreGlob: string) {

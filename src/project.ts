@@ -5,7 +5,7 @@ import * as path from 'path';
 import { Recommendation } from './recommendation';
 import { Tip, TipType } from './tip';
 import { load, exists } from './analyzer';
-import { fixIssue, getOutputChannel, isRunning } from './extension';
+import { isRunning } from './tasks';
 import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
 import { Context, VSCommand } from './context-variables';
@@ -18,6 +18,7 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { addCommand, npmInstall, npmUninstall, PackageManager } from './node-commands';
 import { getCapacitorConfigWebDir } from './capacitor-configure';
 import { run } from './utilities';
+import { fixIssue } from './extension';
 
 export class Project {
   name: string;
@@ -272,22 +273,10 @@ export class Project {
   }
 
   public async run2(command: string, suppressOutput?: boolean): Promise<boolean> {
-    const channel = getOutputChannel();
-    return await run(
-      this.projectFolder(),
-      command,
-      channel,
-      undefined,
-      [],
-      [],
-      undefined,
-      undefined,
-      undefined,
-      suppressOutput
-    );
+    return await run(this.projectFolder(), command, undefined, [], [], undefined, undefined, undefined, suppressOutput);
   }
 
-  public asRecommendation(tip: Tip): Recommendation {
+  public asRecommendation(tip: Tip, command?: CommandName): Recommendation {
     if (this.isIgnored(tip)) return;
 
     let argsIsRecommendation = false;
@@ -313,6 +302,8 @@ export class Project {
       };
       tip.url = tip.description as string;
     }
+
+    if (command) cmd.command = command;
 
     const tooltip = tip.tooltip ? tip.tooltip : tip.message;
     const r = new Recommendation(
@@ -646,6 +637,7 @@ export async function inspectProject(
   project.packageManager = getPackageManager(folder);
   ionicState.packageManager = project.packageManager;
   ionicState.rootFolder = folder;
+  ionicState.projectRef = project;
 
   let packages = await load(folder, project, context);
   ionicState.view.title = project.name;

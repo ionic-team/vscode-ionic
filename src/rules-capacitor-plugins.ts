@@ -1,5 +1,5 @@
 import { isGreaterOrEqual, isLess } from './analyzer';
-import { getOutputChannel, writeIonic } from './extension';
+import { showOutput, writeIonic } from './logging';
 import { Project } from './project';
 import { Tip, TipType } from './tip';
 import { window } from 'vscode';
@@ -27,7 +27,7 @@ async function migratePluginToCapacitor5(project: Project) {
   );
   if (!res || res != txt) return;
 
-  getOutputChannel().show();
+  showOutput();
 
   writeIonic('This feature will be released as soon Capacitor 5 is released.');
   return;

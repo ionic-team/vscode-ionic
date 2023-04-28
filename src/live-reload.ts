@@ -4,7 +4,7 @@ import * as http from 'http';
 import { ionicState } from './ionic-tree-provider';
 import * as vscode from 'vscode';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
-import { writeError, writeIonic } from './extension';
+import { writeError, writeIonic } from './logging';
 import * as os from 'os';
 import { basename, extname, join } from 'path';
 

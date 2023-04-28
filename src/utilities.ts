@@ -10,7 +10,7 @@ import { exists } from './analyzer';
 import { ionicInit } from './ionic-init';
 import { request } from 'https';
 import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
-import { writeError, writeIonic } from './extension';
+import { showOutput, write, writeError, writeIonic } from './logging';
 import { getWebConfiguration, WebConfigSetting } from './web-configuration';
 import { Publisher } from './discovery';
 import { join } from 'path';
@@ -109,7 +109,6 @@ export function passesFilter(msg: string, logFilters: string[], isRemote: boolea
 export async function run(
   folder: string,
   command: string,
-  channel: vscode.OutputChannel,
   cancelObject: CancelObject,
   features: Array<TipFeature>,
   runPoints: Array<RunPoint>,
@@ -308,7 +307,7 @@ export async function run(
         for (const logLine of logLines) {
           if (logLine.startsWith('[capacitor]')) {
             if (!suppressInfo && passesFilter(logLine, logFilters, false)) {
-              channel.appendLine(logLine.replace('[capacitor]', ''));
+              write(logLine.replace('[capacitor]', ''));
             }
           } else if (logLine && !suppressInfo) {
             const uncolored = logLine.replace(
@@ -316,11 +315,11 @@ export async function run(
               ''
             );
             if (passesFilter(uncolored, logFilters, false)) {
-              channel.appendLine(uncolored);
+              write(uncolored);
             }
           }
         }
-        focusOutput(channel);
+        focusOutput();
       }
     });
 
@@ -328,10 +327,10 @@ export async function run(
       if (!suppressInfo) {
         const uncolored = data.replace(/[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
         if (passesFilter(uncolored, logFilters, false)) {
-          channel.append(uncolored);
+          write(uncolored);
         }
       }
-      focusOutput(channel);
+      focusOutput();
     });
 
     if (cancelObject) {
@@ -377,11 +376,10 @@ function stripColors(s: string): string {
 
 /**
  * This ensures that the focus is not pushed to the output window while you are editing a document
- * @param  {vscode.OutputChannel} channel
  */
-function focusOutput(channel: vscode.OutputChannel) {
+function focusOutput() {
   if (ionicState.outputIsFocused) return;
-  channelShow(channel);
+  channelShow();
 }
 
 export function replaceAll(str: string, find: string, replace: string): string {
@@ -472,19 +470,14 @@ export async function getRunOutput(command: string, folder: string, shell?: stri
   });
 }
 
-export function channelShow(channel: vscode.OutputChannel) {
+export function channelShow() {
   if (ionicState.channelFocus) {
-    channel.show();
+    showOutput();
     ionicState.channelFocus = false;
   }
 }
 
-export async function runWithProgress(
-  command: string,
-  title: string,
-  folder: string,
-  channel: vscode.OutputChannel
-): Promise<boolean> {
+export async function runWithProgress(command: string, title: string, folder: string): Promise<boolean> {
   let result = false;
   await vscode.window.withProgress(
     {
@@ -494,7 +487,7 @@ export async function runWithProgress(
     },
     async (progress, token: vscode.CancellationToken) => {
       const cancelObject: CancelObject = { proc: undefined, cancelled: false };
-      result = await run(folder, command, channel, cancelObject, [], [], progress, undefined, undefined, false);
+      result = await run(folder, command, cancelObject, [], [], progress, undefined, undefined, false);
     }
   );
   return result;
@@ -508,6 +501,10 @@ export function getPackageJSON(folder: string): PackageFile {
   return JSON.parse(readFileSync(filename, 'utf8'));
 }
 
+export function alt(key: string): string {
+  return process.platform === 'win32' ? `Alt+${key}` : `⌥+${key}`;
+}
+
 export function getStringFrom(data: string, start: string, end: string): string {
   const foundIdx = data.lastIndexOf(start);
   if (foundIdx == -1) {
@@ -517,10 +514,6 @@ export function getStringFrom(data: string, start: string, end: string): string 
   const edx = data.indexOf(end, idx);
   if (edx == -1) return data.substring(idx);
   return data.substring(idx, edx);
-}
-
-export function cmdCtrl(): string {
-  return process.platform == 'darwin' ? 'cmd' : 'ctrl';
 }
 
 export function setStringIn(data: string, start: string, end: string, replacement: string): string {

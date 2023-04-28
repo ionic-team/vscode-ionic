@@ -1,12 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { join } from 'path';
-import { writeError } from './extension';
+import { writeError } from './logging';
 import { ionicState } from './ionic-tree-provider';
-
 import { MonoRepoProject } from './monorepo';
 import { Project } from './project';
-import { getRunOutput } from './utilities';
 
 export interface NXWorkspace {
   projects: object;

@@ -1,4 +1,4 @@
-import { clearOutput, getOutputChannel, writeError, writeIonic } from './extension';
+import { clearOutput, write, writeError, writeIonic } from './logging';
 import { Project } from './project';
 import { getRunOutput, run, showProgress, stripJSON } from './utilities';
 import * as vscode from 'vscode';
@@ -27,7 +27,6 @@ export async function audit(project: Project): Promise<void> {
 }
 
 async function completeAudit(project: Project, audit: Audit) {
-  const channel = getOutputChannel();
   const severities = ['critical', 'high', 'moderate', 'low'];
   const types = ['direct', 'indirect'];
   writeIonic(
@@ -35,8 +34,8 @@ async function completeAudit(project: Project, audit: Audit) {
   );
   for (const type of types) {
     if (type == 'indirect' && audit.metadata.vulnerabilities.total > 0) {
-      channel.appendLine('');
-      channel.appendLine('Other vulnerable dependencies');
+      write('');
+      write('Other vulnerable dependencies');
     }
     for (const severity of severities) {
       for (const name of Object.keys(audit.vulnerabilities)) {
@@ -46,11 +45,11 @@ async function completeAudit(project: Project, audit: Audit) {
           for (const source of v.via) {
             if (typeof source === 'object') direct = true;
             if (type == 'direct' && typeof source === 'object') {
-              channel.appendLine(`[${v.severity}] ${source.title} ${source.url}`);
+              write(`[${v.severity}] ${source.title} ${source.url}`);
             }
           }
           if (!direct && type === 'indirect') {
-            channel.appendLine(`${v.name} is vulnerable because it uses ${v.via.join(',')}`);
+            write(`${v.name} is vulnerable because it uses ${v.via.join(',')}`);
           }
         }
       }
@@ -64,20 +63,9 @@ async function completeAudit(project: Project, audit: Audit) {
       'Cancel'
     );
     if (response === 'Yes') {
-      channel.clear();
-      channel.appendLine('> npm audit fix');
-      await run(
-        project.projectFolder(),
-        'npm audit fix',
-        channel,
-        undefined,
-        [],
-        [],
-        undefined,
-        undefined,
-        undefined,
-        false
-      );
+      clearOutput();
+      write('> npm audit fix');
+      await run(project.projectFolder(), 'npm audit fix', undefined, [], [], undefined, undefined, undefined, false);
     }
   }
 }

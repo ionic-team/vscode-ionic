@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.39.2",
+  "version": "1.39.3",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -46,19 +46,21 @@
   "activationEvents": [
     "onView:ionic",
     "onLanguage:json",
-    "onLanguage:jsonc",
-    "onCommand:ionic-official.refresh",
-    "onCommand:ionic-official.add",
-    "onCommand:ionic-official.fix",
-    "onCommand:ionic-official.lightbulb"
+    "onLanguage:jsonc"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "keybindings": [
       {
         "command": "ionic-official.run",
-        "key": "ctrl+r",
-        "mac": "cmd+r",
+        "key": "alt+r",
+        "mac": "alt+r",
+        "when": "true"
+      },
+      {
+        "command": "ionic-official.debug",
+        "key": "alt+d",
+        "mac": "alt+d",
         "when": "true"
       }
     ],
@@ -161,6 +163,14 @@
         "title": "Ionic: Plugins"
       },
       {
+        "command": "ionic-official.run",
+        "title": "Ionic: Run"
+      },
+      {
+        "command": "ionic-official.debug",
+        "title": "Ionic: Run and Debug"
+      },
+      {
         "command": "ionic-official.lightbulb",
         "title": "Upgrade",
         "icon": {
@@ -223,6 +233,14 @@
       {
         "command": "ionic-official.webConfig",
         "title": "Web Run Configuration",
+        "icon": {
+          "light": "resources/light/more.svg",
+          "dark": "resources/dark/more.svg"
+        }
+      },
+      {
+        "command": "ionic-official.webDebugConfig",
+        "title": "Web Debug Configuration",
         "icon": {
           "light": "resources/light/more.svg",
           "dark": "resources/dark/more.svg"
@@ -304,6 +322,10 @@
           "when": "false"
         },
         {
+          "command": "ionic-official.webDebugConfig",
+          "when": "false"
+        },
+        {
           "command": "ionic-official.selectAction",
           "when": "false"
         },
@@ -382,6 +404,11 @@
           "group": "inline"
         },
         {
+          "command": "ionic-official.webDebugConfig",
+          "when": "view == ionic-tree && viewItem == webDebugConfig",
+          "group": "inline"
+        },
+        {
           "command": "ionic-official.selectAction",
           "when": "view == ionic-tree && viewItem == selectAction",
           "group": "inline"
@@ -396,19 +423,6 @@
     "configuration": {
       "title": "Ionic",
       "properties": {
-        "ionic.browser": {
-          "type": "string",
-          "default": "chrome",
-          "enum": [
-            "chrome",
-            "pwa-msedge"
-          ],
-          "enumDescriptions": [
-            "Google Chrome",
-            "Microsoft Edge"
-          ],
-          "description": "When Debugging for web which browser should be launched."
-        },
         "ionic.defaultPort": {
           "type": "number",
           "default": 8100,

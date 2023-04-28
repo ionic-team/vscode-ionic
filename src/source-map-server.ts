@@ -1,16 +1,14 @@
 import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
-import { getOutputChannel } from './extension';
+import { writeIonic } from './logging';
 
 export function startSourceMapServer(folder: string) {
-  const channel = getOutputChannel();
-
-  channel.appendLine('[Ionic] Starting source map server on port 80....');
+  writeIonic('Starting source map server on port 80....');
   http
     .createServer((request, response) => {
       const filePath = path.join(folder, request.url);
-      channel.appendLine(`[Ionic] Serving ${filePath}`);
+      writeIonic(`Serving ${filePath}`);
 
       const extname = path.extname(filePath);
       const contentType = getMimeType(extname);

@@ -4,7 +4,7 @@ import * as fs from 'fs';
 
 import { Project } from './project';
 import { Tip, TipType } from './tip';
-import { writeError } from './extension';
+import { writeError } from './logging';
 import { ionicState } from './ionic-tree-provider';
 
 /**

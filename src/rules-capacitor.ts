@@ -30,7 +30,7 @@ import { checkAngularJson } from './rules-angular-json';
 import { checkBrowsersList } from './rules-browserslist';
 import { ionicState } from './ionic-tree-provider';
 import { integratePrettier } from './prettier';
-import { getOutputChannel, writeIonic } from './extension';
+import { showOutput, write, writeIonic } from './logging';
 import { window } from 'vscode';
 import { WorkspaceSetting, getSetting, setSetting } from './workspace-state';
 
@@ -692,10 +692,9 @@ async function updateCocoaPods(currentVersion: string, project: Project) {
   );
   if (!res || res != txt) return;
 
-  getOutputChannel().show();
+  showOutput();
   await showProgress(`${msg} Cocoapods...`, async () => {
-    const channel = getOutputChannel();
-    channel.appendLine(`> ${cmd}`);
+    write(`> ${cmd}`);
     await project.run2(cmd, false);
 
     const v = await getCocoaPodsVersion(project, true);

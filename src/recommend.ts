@@ -24,12 +24,11 @@ import { ionicState } from './ionic-tree-provider';
 import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
 import { checkIonicNativePackages } from './rules-ionic-native';
-import { cmdCtrl, getRunOutput, showProgress } from './utilities';
+import { alt, getRunOutput, showProgress } from './utilities';
 import { startStopLogServer } from './log-server';
 import { getConfigurationName } from './build-configuration';
 import { liveReloadSSL } from './live-reload';
 import { npmInstall, npmUninstall, PackageManager } from './node-commands';
-import { cancelLastOperation, writeIonic } from './extension';
 import { capacitorBuild } from './capacitor-build';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 import { updateMinorDependencies } from './update-minor';
@@ -38,6 +37,9 @@ import { analyzeSize } from './analyze-size';
 import { ionicExport } from './ionic-export';
 import { angularGenerate } from './angular-generate';
 import { LoggingSettings } from './log-settings';
+import { writeIonic } from './logging';
+import { cancelLastOperation } from './tasks';
+import { CommandName } from './command-name';
 
 export async function getRecommendations(
   project: Project,
@@ -45,7 +47,7 @@ export async function getRecommendations(
   packages: any
 ): Promise<void> {
   if (project.isCapacitor) {
-    project.setGroup(`Run`, `Press ${cmdCtrl()}+R to run the last chosen platform or Web.`, TipType.Ionic, true);
+    project.setGroup(`Run`, `Press ${alt('R')} to run the last chosen platform or Web.`, TipType.Ionic, true);
 
     const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
     const hasCapAndroid = project.hasCapacitorProject(CapacitorPlatform.android);
@@ -63,7 +65,7 @@ export async function getRecommendations(
       .canStop()
       .willNotBlock()
       .canAnimate()
-      .setTooltip('Run a development server and open using the default web browser');
+      .setTooltip(`Run a development server and open using the default web browser (${alt('R')})`);
     project.add(runWeb);
     ionicState.runWeb = runWeb;
 
@@ -132,14 +134,15 @@ export async function getRecommendations(
 
     const r = project.setGroup(
       'Debug',
-      'Running Ionic applications you can debug',
+      `Running Ionic applications you can debug (${alt('D')})`,
       TipType.Ionic,
       ionicState.refreshDebugDevices,
       Context.refreshDebug
     );
+
     r.whenExpanded = async () => {
       return [
-        project.asRecommendation(debugOnWeb(project)),
+        project.asRecommendation(debugOnWeb(project), CommandName.Debug),
         ...(await getAndroidWebViewList(hasCapAndroid, project.getDistFolder())),
       ];
     };
@@ -378,7 +381,7 @@ async function settings() {
   await vscode.commands.executeCommand('workbench.action.openSettings', "Ionic'");
 }
 
-function debugOnWeb(project: Project): Tip {
+export function debugOnWeb(project: Project): Tip {
   return new Tip('Web', `(${getDebugBrowserName()})`, TipType.Debug, 'Serve', undefined, 'Debugging', `Project Served`)
     .setDynamicCommand(ionicServe, project, true)
     .setFeatures([TipFeature.debugOnWeb])
@@ -387,9 +390,10 @@ function debugOnWeb(project: Project): Tip {
       { title: 'Serving', text: 'Development server running' },
     ])
     .canStop()
+    .setContextValue(Context.webDebugConfig)
     .willNotBlock()
     .canAnimate()
-    .setTooltip(`Debug using ${getDebugBrowserName()}. The browser can be changed in Settings.`);
+    .setTooltip(`Debug using ${getDebugBrowserName()}. (${alt('D')})`);
 }
 
 function remoteLogging(project: Project): Tip {

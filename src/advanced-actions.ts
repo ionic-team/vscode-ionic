@@ -2,7 +2,7 @@ import { Project } from './project';
 import * as vscode from 'vscode';
 import { PackageManager } from './node-commands';
 import { getRunOutput, replaceAll } from './utilities';
-import { writeError, writeIonic } from './extension';
+import { writeError, writeIonic } from './logging';
 import { isGreaterOrEqual } from './analyzer';
 import { readAngularJson, writeAngularJson } from './rules-angular-json';
 import { join } from 'path';

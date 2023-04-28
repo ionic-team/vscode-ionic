@@ -1,7 +1,7 @@
 import { CapacitorPlatform } from './capacitor-platform';
 import { ActionResult } from './command-name';
 import { Context } from './context-variables';
-import { finishCommand, isRunning, markActionAsRunning, waitForOtherActions } from './extension';
+import { finishCommand, isRunning, markActionAsRunning, waitForOtherActions } from './tasks';
 
 export enum TipFeature {
   debugOnWeb,

@@ -1,13 +1,12 @@
 import * as http from 'http';
 import * as os from 'os';
-import { getOutputChannel } from './extension';
 import { ionicState } from './ionic-tree-provider';
-import { OutputChannel } from 'vscode';
 import { injectScript, removeScript } from './log-server-scripts';
 import { extname, join } from 'path';
 import { readFile } from 'fs';
 import { passesFilter, replaceAll } from './utilities';
 import { getSetting, WorkspaceSetting } from './workspace-state';
+import { writeIonic, write, writeError, showOutput } from './logging';
 
 let logServer: http.Server;
 
@@ -15,12 +14,11 @@ export async function startStopLogServer(folder: string): Promise<boolean> {
   if (logServer && !folder) {
     return; // We've already started the log server
   }
-  const channel = getOutputChannel();
   if (logServer) {
     logServer.close();
     removeScript(folder);
     logServer = undefined;
-    channel.appendLine(`[Ionic] Remote logging stopped.`);
+    writeIonic(`Remote logging stopped.`);
     return true;
   }
 
@@ -46,11 +44,11 @@ export async function startStopLogServer(folder: string): Promise<boolean> {
         });
         request.on('end', () => {
           if (request.url == '/log') {
-            writeLog(body, channel);
+            writeLog(body);
           } else if (request.url == '/devices') {
-            writeDevices(body, channel);
+            writeDevices(body);
           } else {
-            channel.appendLine('[Ionic] ' + body);
+            writeIonic(body);
           }
           response.writeHead(200);
           response.end();
@@ -85,11 +83,11 @@ export async function startStopLogServer(folder: string): Promise<boolean> {
     .listen(port);
 
   const addressInfo = getAddress();
-  channel.appendLine(`[Ionic] Remote logging service has started at http://${addressInfo}:${port}`);
+  writeIonic(`Remote logging service has started at http://${addressInfo}:${port}`);
   removeScript(folder);
   if (!(await injectScript(folder, addressInfo, port))) {
-    channel.appendLine(`[error] Unable to start remote logging (index.html or equivalent cannot be found).`);
-    channel.show();
+    writeError(`Unable to start remote logging (index.html or equivalent cannot be found).`);
+    showOutput();
     return false;
   }
   return true;
@@ -111,38 +109,38 @@ function getLogFilters(): string[] {
   return getSetting(WorkspaceSetting.logFilter);
 }
 
-function writeLog(body: string, channel: OutputChannel) {
-  function write(level, message, tag) {
+function writeLog(body: string) {
+  function write2(level, message, tag) {
     const msg =
       typeof message === 'object'
         ? `[${level}][${tag}] ${JSON.stringify(message)}`
         : `[${level}][${tag}] ${replaceAll(message, '\n', '')}`;
 
     if (passesFilter(msg, getLogFilters(), false)) {
-      channel.appendLine(msg);
-      channel.show(true);
+      write(msg);
+      showOutput();
     }
   }
   try {
     const lines = JSON.parse(body);
     if (!Array.isArray(lines)) {
-      write(lines.level, lines.message, lines.tag);
+      write2(lines.level, lines.message, lines.tag);
     } else {
       for (const line of lines) {
-        write(line.level, line.message, line.tag);
+        write2(line.level, line.message, line.tag);
       }
     }
   } catch {
-    channel.appendLine(body);
+    write(body);
   }
 }
 
-function writeDevices(body: string, channel: OutputChannel) {
+function writeDevices(body: string) {
   try {
     const device = JSON.parse(body);
-    channel.appendLine(`[Ionic] ${device.agent}`);
+    writeIonic(`${device.agent}`);
   } catch {
-    channel.appendLine(body);
+    write(body);
   }
 }
 
