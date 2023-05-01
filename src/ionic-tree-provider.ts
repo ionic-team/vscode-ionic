@@ -105,7 +105,7 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
     this.refresh();
   }
 
-  getChildren(element?: Recommendation): Thenable<Recommendation[]> {
+  async getChildren(element?: Recommendation): Thenable<Recommendation[]> {
     if (!this.workspaceRoot) {
       vscode.commands.executeCommand(VSCommand.setContext, Context.noProjectFound, true);
       return Promise.resolve([]);
@@ -125,7 +125,9 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
         folderInfoCache = folderInfo;
       }
       if (folderInfo.packageJsonExists || folderInfo.folderBased) {
-        return reviewProject(this.workspaceRoot, this.context, this.selectedProject);
+        const summary = await reviewProject(this.workspaceRoot, this.context, this.selectedProject);
+        if (!summary) return [];
+        return summary.project.groups;
       } else {
         return Promise.resolve(starterProject(this.workspaceRoot));
       }

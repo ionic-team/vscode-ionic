@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.39.3",
+  "version": "1.39.4",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -485,7 +485,7 @@
   },
   "dependencies": {
     "@capacitor/project": "2.0.3",
-    "@ionic/cli": "7.0.1",
+    "@ionic/cli": "7.1.0",
     "fast-xml-parser": "3.21.1",
     "globule": "^1.3.3",
     "netmask": "^2.0.2",

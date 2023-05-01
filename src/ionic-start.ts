@@ -18,7 +18,7 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
     if (type != starter.typeName) {
       type = starter.typeName;
 
-      project.setGroup(`New ${type} Project`, '', getType(type), false);
+      project.setGroup(`${type}`, '', getType(type), false);
     }
 
     project.add(
@@ -46,6 +46,7 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
 function getType(framework: string): TipType {
   switch (framework.toLowerCase()) {
     case 'angular':
+    case 'angular (with ngmodules)':
       return TipType.Angular;
     case 'vue':
       return TipType.Vue;
@@ -71,13 +72,16 @@ function parseIonicStart(text: string): Array<any> {
           typeName = 'ionic2';
           break;
         case 'angular':
-          typeName = 'Angular';
+          typeName = 'New Angular Project (Legacy)';
+          break;
+        case 'angular-standalone':
+          typeName = 'New Angular Project';
           break;
         case 'react':
-          typeName = 'React';
+          typeName = 'New React Project';
           break;
         case 'vue':
-          typeName = 'Vue';
+          typeName = 'New Vue Project';
           break;
       }
     }
@@ -93,6 +97,6 @@ function parseIonicStart(text: string): Array<any> {
   result = result.filter((project) => {
     return project.type != 'ionic1' && project.type != 'ionic-angular';
   });
-  result = result.sort((a, b) => (a.type > b.type ? 1 : -1));
+  result = result.sort((a, b) => (a.typeName > b.typeName ? 1 : -1));
   return result;
 }

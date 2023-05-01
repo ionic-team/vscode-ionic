@@ -5,6 +5,7 @@
 - Keyboard shortcut: Alt+R to run your app
 - Keyboard shortcut: Alt+D to run and debug your app
 - Recommend removal of @awesome-cordova-plugin wrappers when plugin is not installed
+- Starters for Angular now have option for either ngModules or Standalone
 - Capacitor 5 upgrade will check for minimum Android Studio version
 - Selection of debug browser is now done through the 3 dots next to "debug"
 - Recommend removal of all deprecated @ionic-native wrappers

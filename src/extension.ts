@@ -417,9 +417,11 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(vscode.debug.onDidTerminateDebugSession(androidDebugUnforward));
 
   if (!ionicState.runWeb) {
-    await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
+    const summary = await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
+    if (summary?.project.isCapacitor) {
+      showTips();
+    }
   }
-  showTips();
 }
 
 async function runAgain(ionicProvider: IonicTreeProvider, rootPath: string) {
