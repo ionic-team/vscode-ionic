@@ -617,10 +617,10 @@ export async function reviewProject(
   folder: string,
   context: vscode.ExtensionContext,
   selectedProject: string
-): Promise<Recommendation[]> {
+): Promise<ProjectSummary | undefined> {
   const summary = await inspectProject(folder, context, selectedProject);
-  if (!summary || !summary.project) return [];
-  return summary.project.groups;
+  if (!summary || !summary.project) return undefined;
+  return summary;
 }
 
 export async function inspectProject(
