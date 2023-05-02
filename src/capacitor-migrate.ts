@@ -15,7 +15,7 @@ import { capacitorOpen } from './capacitor-open';
 import { CapacitorPlatform } from './capacitor-platform';
 
 export async function migrateCapacitor5(project: Project, currentVersion: string): Promise<ActionResult> {
-  const coreVersion = '5.0.0-rc.0';
+  const coreVersion = '5.0.0-rc.1';
   // Android Studio Flamingo is Build #AI-222.4459.24.2221.9862592, built on March 31, 2023
   const openStudio = 'Open Android Studio';
   if (exists('@capacitor/android') && !checkAndroidStudio('222.4459.24')) {
