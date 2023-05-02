@@ -536,7 +536,12 @@ export function setAllStringIn(data: string, start: string, end: string, replace
     } else {
       const idx = foundIdx + start.length;
       position = idx + replacement.length;
-      result = result.substring(0, idx) + replacement + result.substring(result.indexOf(end, idx));
+      const ndx = result.indexOf(end, idx);
+      if (ndx == -1) {
+        replaced = false;
+      } else {
+        result = result.substring(0, idx) + replacement + result.substring(ndx);
+      }
     }
   }
   return result;

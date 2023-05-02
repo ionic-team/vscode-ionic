@@ -196,7 +196,7 @@ export function checkCapacitorRules(project: Project) {
   if (isLess('@capacitor/core', '5.0.0')) {
     if (ionicState.hasNodeModules && isGreaterOrEqual('@capacitor/core', '4.0.0')) {
       project.tip(
-        new Tip('Migrate to Capacitor 5 Beta', '', TipType.Idea)
+        new Tip('Migrate to Capacitor 5 Release Candidate', '', TipType.Idea)
           .setAction(migrateCapacitor5, project, getPackageVersion('@capacitor/core'))
           .canIgnore()
       );

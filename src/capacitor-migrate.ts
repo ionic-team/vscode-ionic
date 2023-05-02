@@ -2,7 +2,7 @@ import { existsSync, lstatSync, readdirSync, readFileSync, writeFileSync } from 
 import { join } from 'path';
 import * as vscode from 'vscode';
 import { exists, isVersionGreaterOrEqual } from './analyzer';
-import { showOutput, writeError, writeIonic } from './logging';
+import { showOutput, write, writeError, writeIonic } from './logging';
 import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
 import { getStringFrom, run, setAllStringIn, showProgress } from './utilities';
@@ -15,7 +15,7 @@ import { capacitorOpen } from './capacitor-open';
 import { CapacitorPlatform } from './capacitor-platform';
 
 export async function migrateCapacitor5(project: Project, currentVersion: string): Promise<ActionResult> {
-  const coreVersion = '5.0.0-beta.1';
+  const coreVersion = '5.0.0-rc.0';
   // Android Studio Flamingo is Build #AI-222.4459.24.2221.9862592, built on March 31, 2023
   const openStudio = 'Open Android Studio';
   if (exists('@capacitor/android') && !checkAndroidStudio('222.4459.24')) {
@@ -41,10 +41,14 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
   if (!result) {
     return;
   }
-  await showProgress('Migrating to Capacitor 5 beta...', async () => {
-    await project.run2(npmInstall(`@capacitor/cli@${coreVersion} --save-dev --force`));
+  await showProgress('Migrating to Capacitor 5...', async () => {
+    const cmd = npmInstall(`@capacitor/cli@${coreVersion} --save-dev --force`);
+    write(`> ${cmd}`);
+    await project.run2(cmd);
     const manager = getPackageManager(ionicState.packageManager);
-    await project.run2(`npx cap migrate --noprompt --packagemanager=${manager}`);
+    const cmd2 = `npx cap migrate --noprompt --packagemanager=${manager}`;
+    write(`> ${cmd2}`);
+    await project.run2(cmd2);
     writeIonic('Capacitor 5 Migration Completed.');
     showOutput();
   });
