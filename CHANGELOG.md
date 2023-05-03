@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.40
+
+- Migration to Capacitor 5!
+- Fix for adding Capacitor platforms for older Capacitor projects
+
 ### Version 1.39
 
 - Keyboard shortcut: Alt+R to run your app
