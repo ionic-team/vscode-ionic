@@ -29,9 +29,6 @@ async function migratePluginToCapacitor5(project: Project) {
 
   showOutput();
 
-  writeIonic('This feature will be released as soon Capacitor 5 is released.');
-  return;
-
   const target = '^5.0.0';
 
   await showProgress('Migrating Plugin...', async () => {
