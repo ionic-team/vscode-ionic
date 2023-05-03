@@ -196,7 +196,7 @@ export function checkCapacitorRules(project: Project) {
   if (isLess('@capacitor/core', '5.0.0')) {
     if (ionicState.hasNodeModules && isGreaterOrEqual('@capacitor/core', '4.0.0')) {
       project.tip(
-        new Tip('Migrate to Capacitor 5 Release Candidate', '', TipType.Idea)
+        new Tip('Migrate to Capacitor 5', '', TipType.Idea)
           .setAction(migrateCapacitor5, project, getPackageVersion('@capacitor/core'))
           .canIgnore()
       );
@@ -292,7 +292,7 @@ export async function capacitorRecommendations(project: Project, forMigration: b
           '',
           TipType.Android,
           'Add Android support to your Capacitor project?',
-          [npmInstall('@capacitor/android'), capacitorAdd(project, CapacitorPlatform.android)],
+          [npmInstall('@capacitor/android' + atVersionOfCapCLI()), capacitorAdd(project, CapacitorPlatform.android)],
           'Add Android',
           'Android support added to your project',
           undefined,
@@ -310,7 +310,7 @@ export async function capacitorRecommendations(project: Project, forMigration: b
           '',
           TipType.Apple,
           'Add iOS support to your Capacitor project?',
-          [npmInstall('@capacitor/ios'), capacitorAdd(project, CapacitorPlatform.ios)],
+          [npmInstall('@capacitor/ios' + atVersionOfCapCLI()), capacitorAdd(project, CapacitorPlatform.ios)],
           'Add iOS',
           'iOS support added to your project',
           undefined,
@@ -617,10 +617,6 @@ export async function capacitorRecommendations(project: Project, forMigration: b
   return tips;
 }
 
-function isIonicBasedProject() {
-  return exists('@ionic/angular') || exists('@ionic/react') || exists('@ionic/vue');
-}
-
 // Capacity Android 3.2.3 added proguard rules for Capacitor for release build
 // Get users to upgrade if they turn on minifyEnabled to true
 function checkBuildGradleForMinifyInRelease(project: Project) {
@@ -639,6 +635,11 @@ function checkBuildGradleForMinifyInRelease(project: Project) {
       );
     }
   }
+}
+
+function atVersionOfCapCLI(): string {
+  const version = getPackageVersion('@capacitor/cli');
+  return version ? `@${version.version}` : '';
 }
 
 async function getCocoaPodsVersion(project: Project, avoidCache?: boolean): Promise<string> {

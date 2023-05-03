@@ -5,7 +5,7 @@ import { exists, isVersionGreaterOrEqual } from './analyzer';
 import { showOutput, write, writeError, writeIonic } from './logging';
 import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
-import { getStringFrom, run, setAllStringIn, showProgress } from './utilities';
+import { getRunOutput, getStringFrom, run, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
 import { ActionResult } from './command-name';
 import { ionicState } from './ionic-tree-provider';
@@ -15,20 +15,40 @@ import { capacitorOpen } from './capacitor-open';
 import { CapacitorPlatform } from './capacitor-platform';
 
 export async function migrateCapacitor5(project: Project, currentVersion: string): Promise<ActionResult> {
-  const coreVersion = '5.0.0-rc.1';
+  const coreVersion = '5';
   // Android Studio Flamingo is Build #AI-222.4459.24.2221.9862592, built on March 31, 2023
   const openStudio = 'Open Android Studio';
-  if (exists('@capacitor/android') && !checkAndroidStudio('222.4459.24')) {
-    const res = await vscode.window.showInformationMessage(
-      `Android Studio Flamingo (2022.2.1) is the minimum version needed for Capacitor 5 (It comes with Java 17 and Gradle 8). Choosen Android Studio > Check for Updates.`,
-      openStudio,
-      'Continue...'
-    );
-    if (res === openStudio) {
-      await run(project.folder, capacitorOpen(project, CapacitorPlatform.android), undefined, [], undefined, undefined);
-      return;
+  if (exists('@capacitor/android')) {
+    if (!checkAndroidStudio('222.4459.24')) {
+      const res = await vscode.window.showInformationMessage(
+        `Android Studio Flamingo (2022.2.1) is the minimum version needed for Capacitor 5 (It comes with Java 17 and Gradle 8). Choose Android Studio > Check for Updates.`,
+        openStudio,
+        'Continue...'
+      );
+      if (res === openStudio) {
+        await run(
+          project.folder,
+          capacitorOpen(project, CapacitorPlatform.android),
+          undefined,
+          [],
+          undefined,
+          undefined
+        );
+        return;
+      }
+      if (!res) return;
     }
-    if (!res) return;
+    const version = await checkJDK(project);
+    if (version < 17) {
+      const result = await vscode.window.showInformationMessage(
+        `Your version of Java is ${version} but version 17 is the minimum required. Please check your JAVA_HOME path and ensure it is using JDK Version 17. You may need to restart VS Code after making this change.`,
+        'OK',
+        'Continue'
+      );
+      if (result != 'Continue') {
+        return;
+      }
+    }
   }
   const result = await vscode.window.showInformationMessage(
     `Capacitor 5 sets a deployment target of iOS 13 and Android 13 (SDK 33).`,
@@ -55,6 +75,27 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
   const message = `Migration to Capacitor 5 is complete. You can also read about the changes in Capacitor 5.`;
   if ((await vscode.window.showInformationMessage(message, 'Capacitor 5 Changes', 'OK')) == 'Capacitor 5 Changes') {
     openUri('https://capacitorjs.com/docs/next/updating/5-0');
+  }
+}
+
+async function checkJDK(project: Project): Promise<number> {
+  const jversion = await getRunOutput(`java --version`, project.folder);
+  const versionRegex = RegExp(/([0-9]+)\.?([0-9]*)\.?([0-9]*)/);
+  const versionMatch = versionRegex.exec(jversion);
+
+  if (versionMatch === null) {
+    return -1;
+  }
+
+  const firstVersionNumber = parseInt(versionMatch[1]);
+  const secondVersionNumber = parseInt(versionMatch[2]);
+
+  if (typeof firstVersionNumber === 'number' && firstVersionNumber != 1) {
+    return firstVersionNumber;
+  } else if (typeof secondVersionNumber === 'number' && firstVersionNumber == 1 && secondVersionNumber < 9) {
+    return secondVersionNumber;
+  } else {
+    return -1;
   }
 }
 
