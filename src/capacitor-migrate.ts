@@ -39,9 +39,9 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
       if (!res) return;
     }
     const version = await checkJDK(project);
-    if (version <= 17) {
+    if (version < 17) {
       const result = await vscode.window.showInformationMessage(
-        `Your version of Java is ${version} ${process.env.JAVA_HOME} but version 17 is the minimum required. Please check your JAVA_HOME path and ensure it is using JDK Version 17. You may need to restart VS Code after making this change.`,
+        `Your version of Java is ${version} but version 17 is the minimum required. Please check your JAVA_HOME path and ensure it is using JDK Version 17. You may need to restart VS Code after making this change.`,
         'OK',
         'Continue'
       );
