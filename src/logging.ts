@@ -18,6 +18,7 @@ export function clearOutput(): OutputChannel {
 }
 
 export function showOutput() {
+  const channel = getOutputChannel();
   channel.show();
 }
 
