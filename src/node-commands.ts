@@ -19,11 +19,11 @@ export enum PMOperation {
   run,
 }
 
-export function outdatedCommand(project: Project): string {
+export function outdatedCommand(): string {
   return 'npm outdated --json';
 }
 
-export function listCommand(project: Project): string {
+export function listCommand(): string {
   return 'npm list --json';
 }
 

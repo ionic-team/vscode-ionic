@@ -2,7 +2,7 @@ import { existsSync, lstatSync, readdirSync, readFileSync, writeFileSync } from 
 import { join } from 'path';
 import * as vscode from 'vscode';
 import { exists, isVersionGreaterOrEqual } from './analyzer';
-import { showOutput, write, writeError, writeIonic } from './logging';
+import { clearOutput, showOutput, write, writeError, writeIonic, writeWarning } from './logging';
 import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
 import { getRunOutput, getStringFrom, run, setAllStringIn, showProgress } from './utilities';
@@ -13,15 +13,19 @@ import { PackageManager } from './node-commands';
 import { openUri } from './utilities';
 import { capacitorOpen } from './capacitor-open';
 import { CapacitorPlatform } from './capacitor-platform';
+import { checkPeerDependencies, PeerReport } from './peer-dependencies';
 
 export async function migrateCapacitor5(project: Project, currentVersion: string): Promise<ActionResult> {
   const coreVersion = '5';
+  const versionTitle = '5';
+  const versionFull = '5.0.0';
+  const changesLink = 'https://capacitorjs.com/docs/updating/5-0';
   // Android Studio Flamingo is Build #AI-222.4459.24.2221.9862592, built on March 31, 2023
   const openStudio = 'Open Android Studio';
   if (exists('@capacitor/android')) {
     if (!checkAndroidStudio('222.4459.24')) {
       const res = await vscode.window.showInformationMessage(
-        `Android Studio Flamingo (2022.2.1) is the minimum version needed for Capacitor 5 (It comes with Java 17 and Gradle 8). Choose Android Studio > Check for Updates.`,
+        `Android Studio Flamingo (2022.2.1) is the minimum version needed for Capacitor ${versionTitle} (It comes with Java 17 and Gradle 8). Choose Android Studio > Check for Updates.`,
         openStudio,
         'Continue...'
       );
@@ -38,6 +42,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
       }
       if (!res) return;
     }
+
     const version = await checkJDK(project);
     if (version < 17) {
       const result = await vscode.window.showInformationMessage(
@@ -50,9 +55,28 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
       }
     }
   }
+
+  clearOutput();
+  showOutput();
+  let report: PeerReport;
+  await showProgress(`Checking plugins in your project...`, async () => {
+    report = await checkPeerDependencies(project, '@capacitor/core', versionFull);
+  });
+
+  if (report.incompatible.length > 0) {
+    const result = await vscode.window.showErrorMessage(
+      `There are ${report.incompatible.length} plugins in your project that do not work with Capacitor ${versionTitle}. Filing an issue with the author is recommended.`,
+      `Continue`,
+      'Exit'
+    );
+    if (result != 'Continue') {
+      return;
+    }
+  }
+
   const result = await vscode.window.showInformationMessage(
-    `Capacitor 5 sets a deployment target of iOS 13 and Android 13 (SDK 33).`,
-    'Migrate to v5',
+    `Capacitor ${versionTitle} sets a deployment target of iOS 13 and Android 13 (SDK 33).`,
+    `Migrate to v${versionTitle}`,
     'Ignore'
   );
   if (result == 'Ignore') {
@@ -61,21 +85,45 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
   if (!result) {
     return;
   }
-  await showProgress('Migrating to Capacitor 5...', async () => {
+
+  let message = '';
+  let changesTitle = '';
+  await showProgress(`Migrating to Capacitor ${versionTitle}...`, async () => {
+    if (report.commands.length > 0) {
+      writeIonic(`Upgrading plugins that were incompatible with Capacitor ${versionTitle}`);
+      for (const command of report.commands) {
+        write(`> ${command}`);
+        await project.run2(command);
+      }
+    }
     const cmd = npmInstall(`@capacitor/cli@${coreVersion} --save-dev --force`);
     write(`> ${cmd}`);
     await project.run2(cmd);
     const manager = getPackageManager(ionicState.packageManager);
     const cmd2 = `npx cap migrate --noprompt --packagemanager=${manager}`;
     write(`> ${cmd2}`);
-    await project.run2(cmd2);
-    writeIonic('Capacitor 5 Migration Completed.');
-    showOutput();
+    try {
+      await project.run2(cmd2);
+    } finally {
+      writeIonic(`Capacitor ${versionTitle} Migration Completed.`);
+      showOutput();
+      const problems =
+        report.incompatible.length == 0
+          ? ''
+          : ` but there are ${report.incompatible.length} dependencies that still need to be updated`;
+      message = `Migration to Capacitor ${versionTitle} is complete${problems}. You can also read about the changes in Capacitor ${versionTitle}.`;
+      changesTitle = `Capacitor ${versionTitle} Changes`;
+      for (const incompat of report.incompatible) {
+        writeWarning(`${incompat} is not compatible with Capacitor ${versionTitle}`);
+      }
+    }
   });
-  const message = `Migration to Capacitor 5 is complete. You can also read about the changes in Capacitor 5.`;
-  if ((await vscode.window.showInformationMessage(message, 'Capacitor 5 Changes', 'OK')) == 'Capacitor 5 Changes') {
-    openUri('https://capacitorjs.com/docs/next/updating/5-0');
-  }
+
+  vscode.window.showInformationMessage(message, changesTitle, 'OK').then((res) => {
+    if (res == changesTitle) {
+      openUri(changesLink);
+    }
+  });
 }
 
 async function checkJDK(project: Project): Promise<number> {

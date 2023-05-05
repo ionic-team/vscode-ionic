@@ -19,7 +19,7 @@ export async function updateMinorDependencies(project: Project, packages: object
     const tmpDir = mkdtempSync(join(tmpdir(), 'vscode.ionic.ext'));
     const tmpFile = join(tmpDir, 'package.json');
     writeFileSync(tmpFile, JSON.stringify(pkg, undefined, 2));
-    const data = await getRunOutput(outdatedCommand(project), tmpDir);
+    const data = await getRunOutput(outdatedCommand(), tmpDir);
     const out = JSON.parse(data);
     let count = 0;
     const updates = [];

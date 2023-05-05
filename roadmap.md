@@ -41,7 +41,6 @@
 
 ## Plugins
 
-- Capacitor Plugin Upgrade to Capacitor 5 - Perform fixes on a Cap 4 plugin to bump to v5
 - Starter Option for new Capacitor Plugin
 
 ## Plugin Explorer

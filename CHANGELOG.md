@@ -3,6 +3,7 @@
 ### Version 1.40
 
 - Migration to Capacitor 5!
+- Migration to Capacitor 5 will look for incompatible plugins and upgrade them if needed.
 - Fix for adding Capacitor platforms for older Capacitor projects
 
 ### Version 1.39
