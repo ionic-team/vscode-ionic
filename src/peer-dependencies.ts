@@ -10,8 +10,8 @@ export async function checkPeerDependencies(
   project: Project,
   peerDependency: string,
   minVersion: string
-): Promise<boolean> {
-  if (ionicState.packageManager != PackageManager.npm) return true;
+): Promise<string[]> {
+  if (ionicState.packageManager != PackageManager.npm) return [];
   const conflicts = await getDependencyConflicts(project.folder, peerDependency, minVersion);
 
   if (conflicts.length > 0) {
@@ -20,13 +20,13 @@ export async function checkPeerDependencies(
       write(conflict);
     }
   }
-  return true;
+  return conflicts;
 }
 
 async function getDependencyConflicts(folder: string, peerDependency: string, minVersion: string): Promise<string[]> {
   try {
     const list: string[] = [];
-    const data = await getRunOutput(`npm ls --depth=1 --long --json`, folder);
+    const data = await getRunOutput(`npm ls --depth=1 --long --json`, folder, undefined, true);
     const deps = JSON.parse(data);
     for (const key of Object.keys(deps.dependencies)) {
       for (const peer of Object.keys(deps.dependencies[key].peerDependencies)) {
@@ -43,7 +43,7 @@ async function getDependencyConflicts(folder: string, peerDependency: string, mi
     }
     return list;
   } catch (error) {
-    writeWarning(`Unable to check for dependencies that may need updating after migration: ${error}`);
+    writeWarning(`Unable to check for dependencies that may need updating after migration.`);
     return [];
   }
 }

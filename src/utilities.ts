@@ -194,10 +194,6 @@ export async function run(
     return parseInt(tmp[2]);
   }
 
-  function delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
   const logFilters: string[] = getSetting(WorkspaceSetting.logFilter);
   let logs: Array<string> = [];
   return new Promise((resolve, reject) => {
@@ -339,6 +335,10 @@ export async function run(
   });
 }
 
+export function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function checkForUrls(data: string, list: Array<string>): string {
   const colorLess = stripColors(data);
   const lines = colorLess.split('\n');
@@ -447,10 +447,16 @@ export function stripJSON(txt: string, startText: string): string {
   return txt;
 }
 
-export async function getRunOutput(command: string, folder: string, shell?: string): Promise<string> {
+export async function getRunOutput(
+  command: string,
+  folder: string,
+  shell?: string,
+  hideErrors?: boolean
+): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';
     command = qualifyCommand(command, folder);
+    console.log(`> ${command}`);
     exec(command, runOptions(command, folder, shell), (error: ExecException, stdout: string, stdError: string) => {
       if (stdout) {
         out += stdout;
@@ -459,7 +465,11 @@ export async function getRunOutput(command: string, folder: string, shell?: stri
         resolve(out);
       } else {
         if (stdError) {
-          writeError(stdError);
+          if (!hideErrors) {
+            writeError(stdError);
+          } else {
+            console.error(stdError);
+          }
           reject(stdError);
         } else {
           // This is to fix a bug in npm outdated where it returns an exit code when it succeeds

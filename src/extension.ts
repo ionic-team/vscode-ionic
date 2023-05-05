@@ -418,6 +418,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   if (!ionicState.runWeb) {
     const summary = await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
+    ionicState.lastSummary = summary;
     if (summary?.project.isCapacitor) {
       showTips();
     }

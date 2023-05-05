@@ -12,6 +12,7 @@ import { listCommand, outdatedCommand } from './node-commands';
 import { CapProjectCache, PackageCacheList, PackageCacheModified, PackageCacheOutdated } from './context-variables';
 import { join } from 'path';
 import { ionicState } from './ionic-tree-provider';
+import { writeError } from './logging';
 
 export interface PluginInformation {
   androidPermissions: Array<string>;
@@ -63,11 +64,11 @@ export async function processPackages(
     }
     if (changed || !outdated || !versions) {
       await Promise.all([
-        getRunOutput(outdatedCommand(project), folder).then((data) => {
+        getRunOutput(outdatedCommand(), folder, undefined, true).then((data) => {
           outdated = data;
           context.workspaceState.update(PackageCacheOutdated(project), outdated);
         }),
-        getRunOutput(listCommand(project), folder).then((data) => {
+        getRunOutput(listCommand(), folder, undefined, true).then((data) => {
           versions = data;
           context.workspaceState.update(PackageCacheList(project), versions);
         }),
@@ -76,12 +77,12 @@ export async function processPackages(
     } else {
       // Use the cached value
       // But also get a copy of the latest packages for updating later
-      getRunOutput(outdatedCommand(project), folder).then((outdatedFresh) => {
+      getRunOutput(outdatedCommand(), folder, undefined, true).then((outdatedFresh) => {
         context.workspaceState.update(PackageCacheOutdated(project), outdatedFresh);
         context.workspaceState.update(PackageCacheModified(project), packagesModified.toUTCString());
       });
 
-      getRunOutput(listCommand(project), folder).then((versionsFresh) => {
+      getRunOutput(listCommand(), folder, undefined, true).then((versionsFresh) => {
         context.workspaceState.update(PackageCacheList(project), versionsFresh);
       });
     }
@@ -94,6 +95,7 @@ export async function processPackages(
         'OK'
       );
     }
+    writeError(`Unable to run 'npm outdated'. Try reinstalling node modules (npm install)`);
     console.error(err);
   }
 

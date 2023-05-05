@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { Project, reviewProject } from './project';
+import { Project, ProjectSummary, reviewProject } from './project';
 import { Recommendation } from './recommendation';
 import { Context, VSCommand } from './context-variables';
 import { starterProject } from './ionic-start';
@@ -43,6 +43,7 @@ interface IonicState {
   runWeb: Tip;
   lastRun: CapacitorPlatform;
   projectRef: Project;
+  lastSummary: ProjectSummary;
 }
 export const ionicState: IonicState = {
   view: undefined,
@@ -68,6 +69,7 @@ export const ionicState: IonicState = {
   projectRef: undefined,
   configuration: undefined,
   project: undefined,
+  lastSummary: undefined,
 };
 
 interface FolderInfo {
@@ -125,7 +127,11 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
         folderInfoCache = folderInfo;
       }
       if (folderInfo.packageJsonExists || folderInfo.folderBased) {
-        const summary = await reviewProject(this.workspaceRoot, this.context, this.selectedProject);
+        const summary = ionicState.lastSummary
+          ? ionicState.lastSummary
+          : await reviewProject(this.workspaceRoot, this.context, this.selectedProject);
+        ionicState.lastSummary = undefined;
+
         if (!summary) return [];
         return summary.project.groups;
       } else {
