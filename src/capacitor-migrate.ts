@@ -2,7 +2,7 @@ import { existsSync, lstatSync, readdirSync, readFileSync, writeFileSync } from 
 import { join } from 'path';
 import * as vscode from 'vscode';
 import { exists, isVersionGreaterOrEqual } from './analyzer';
-import { clearOutput, showOutput, write, writeError, writeIonic } from './logging';
+import { clearOutput, showOutput, write, writeError, writeIonic, writeWarning } from './logging';
 import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
 import { getRunOutput, getStringFrom, run, setAllStringIn, showProgress } from './utilities';
@@ -13,7 +13,7 @@ import { PackageManager } from './node-commands';
 import { openUri } from './utilities';
 import { capacitorOpen } from './capacitor-open';
 import { CapacitorPlatform } from './capacitor-platform';
-import { checkPeerDependencies } from './peer-dependencies';
+import { checkPeerDependencies, PeerReport } from './peer-dependencies';
 
 export async function migrateCapacitor5(project: Project, currentVersion: string): Promise<ActionResult> {
   const coreVersion = '5';
@@ -58,11 +58,14 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
 
   clearOutput();
   showOutput();
-  const conflicts = await checkPeerDependencies(project, '@capacitor/core', versionFull);
+  let report: PeerReport;
+  await showProgress(`Checking plugins in your project...`, async () => {
+    report = await checkPeerDependencies(project, '@capacitor/core', versionFull);
+  });
 
-  if (conflicts.length > 0) {
-    const result = await vscode.window.showInformationMessage(
-      `There are ${conflicts.length} plugins that may not work with Capacitor ${versionTitle}. You will need to update these after migration.`,
+  if (report.incompatible.length > 0) {
+    const result = await vscode.window.showErrorMessage(
+      `There are ${report.incompatible.length} plugins in your project that do not work with Capacitor ${versionTitle}. Filing an issue with the author is recommended.`,
       `Continue`,
       'Exit'
     );
@@ -86,6 +89,13 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
   let message = '';
   let changesTitle = '';
   await showProgress(`Migrating to Capacitor ${versionTitle}...`, async () => {
+    if (report.commands.length > 0) {
+      writeIonic(`Upgrading plugins that were incompatible with Capacitor ${versionTitle}`);
+      for (const command of report.commands) {
+        write(`> ${command}`);
+        await project.run2(command);
+      }
+    }
     const cmd = npmInstall(`@capacitor/cli@${coreVersion} --save-dev --force`);
     write(`> ${cmd}`);
     await project.run2(cmd);
@@ -98,9 +108,14 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
       writeIonic(`Capacitor ${versionTitle} Migration Completed.`);
       showOutput();
       const problems =
-        conflicts.length == 0 ? '' : ` but there are ${conflicts.length} dependencies that still need to be updated`;
+        report.incompatible.length == 0
+          ? ''
+          : ` but there are ${report.incompatible.length} dependencies that still need to be updated`;
       message = `Migration to Capacitor ${versionTitle} is complete${problems}. You can also read about the changes in Capacitor ${versionTitle}.`;
       changesTitle = `Capacitor ${versionTitle} Changes`;
+      for (const incompat of report.incompatible) {
+        writeWarning(`${incompat} is not compatible with Capacitor ${versionTitle}`);
+      }
     }
   });
 
