@@ -1,6 +1,5 @@
 # Roadmap
 
-- Detect peer dep issues before migration to Cap 5
 - If you are presented with multiple external ip addresses then remember the selected option and if the IP address exists on next run use it
 - If local address is turned on then show warning on start that Nexus wont work
 - React Vite can write Network: rather than External:
@@ -42,7 +41,6 @@
 
 ## Plugins
 
-- Capacitor Plugin Upgrade to Capacitor 5 - Perform fixes on a Cap 4 plugin to bump to v5
 - Starter Option for new Capacitor Plugin
 
 ## Plugin Explorer
