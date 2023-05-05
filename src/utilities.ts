@@ -62,7 +62,7 @@ function runOptions(command: string, folder: string, shell?: string) {
     }
   }
 
-  return { cwd: folder, shell: shell ? shell : ionicState.shell, encoding: 'utf8', env: env };
+  return { cwd: folder, shell: shell ? shell : ionicState.shell, encoding: 'utf8', env: env, maxBuffer: 10485760 };
 }
 
 export interface RunResults {

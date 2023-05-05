@@ -13,6 +13,7 @@ import { PackageManager } from './node-commands';
 import { openUri } from './utilities';
 import { capacitorOpen } from './capacitor-open';
 import { CapacitorPlatform } from './capacitor-platform';
+import { checkPeerDependencies } from './peer-dependencies';
 
 export async function migrateCapacitor5(project: Project, currentVersion: string): Promise<ActionResult> {
   const coreVersion = '5';
@@ -38,6 +39,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
       }
       if (!res) return;
     }
+
     const version = await checkJDK(project);
     if (version < 17) {
       const result = await vscode.window.showInformationMessage(
@@ -50,6 +52,9 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
       }
     }
   }
+
+  await checkPeerDependencies(project, '@capacitor/core', '5.0.0');
+
   const result = await vscode.window.showInformationMessage(
     `Capacitor 5 sets a deployment target of iOS 13 and Android 13 (SDK 33).`,
     'Migrate to v5',
