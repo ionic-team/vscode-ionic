@@ -118,7 +118,6 @@ function writeLog(body: string) {
 
     if (passesFilter(msg, getLogFilters(), false)) {
       write(msg);
-      showOutput();
     }
   }
   try {

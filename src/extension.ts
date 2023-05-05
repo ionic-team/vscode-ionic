@@ -151,7 +151,7 @@ export async function fixIssue(
             ionicState.selectedAndroidDeviceName = '';
           }
 
-          channelShow();
+          //channelShow();
           clearInterval(interval);
           finishCommand(tip);
           cancelObject.cancelled = true;
