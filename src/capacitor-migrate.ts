@@ -60,7 +60,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
   showOutput();
   let report: PeerReport;
   await showProgress(`Checking plugins in your project...`, async () => {
-    report = await checkPeerDependencies(project, '@capacitor/core', versionFull);
+    report = await checkPeerDependencies(project.folder, '@capacitor/core', versionFull);
   });
 
   if (report.incompatible.length > 0) {

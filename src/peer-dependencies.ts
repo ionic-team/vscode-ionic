@@ -1,10 +1,9 @@
 import { ionicState } from './ionic-tree-provider';
-import { satisfies } from 'semver';
-import { writeError, writeIonic, writeWarning } from './logging';
+import { satisfies, gt } from 'semver';
+import { writeError, writeWarning } from './logging';
 import { write } from './logging';
 import { PackageManager, npmInstall } from './node-commands';
-import { Project } from './project';
-import { getRunOutput } from './utilities';
+import { getRunOutput, httpRequest, showProgress } from './utilities';
 
 export interface PeerReport {
   // Dependencies that do not meet peer dependency requirements
@@ -23,16 +22,16 @@ export interface PeerReport {
  * @returns {Promise<PeerReport>}
  */
 export async function checkPeerDependencies(
-  project: Project,
+  folder: string,
   peerDependency: string,
   minVersion: string
 ): Promise<PeerReport> {
   if (ionicState.packageManager != PackageManager.npm) return { dependencies: [], incompatible: [], commands: [] };
-  const dependencies = await getDependencyConflicts(project.folder, peerDependency, minVersion);
+  const dependencies = await getDependencyConflicts(folder, peerDependency, minVersion);
   const conflicts = [];
   const commands = [];
   for (const dependency of dependencies) {
-    const cmd = await findCompatibleVersion(dependency, peerDependency, minVersion, project.folder);
+    const cmd = await findCompatibleVersion(dependency, peerDependency, minVersion, folder);
     if (!cmd) {
       conflicts.push(dependency);
     } else {
@@ -106,4 +105,37 @@ async function findCompatibleVersion(
     return;
   }
   return;
+}
+
+export async function findCompatibleVersion2(
+  dependency: string,
+  peerDependency: string,
+  minVersion: string
+): Promise<string> {
+  let best: string;
+  await showProgress(
+    `Finding the best version of ${dependency} that works with ${peerDependency} v${minVersion}`,
+    async () => {
+      try {
+        const pck = (await httpRequest('GET', 'registry.npmjs.org', `/${dependency}`)) as any;
+        for (const version of Object.keys(pck.versions)) {
+          if (pck.versions[version].peerDependencies) {
+            const peerDep = pck.versions[version].peerDependencies[peerDependency];
+            // Is it a real version (not nightly etc) and meets version
+            if (!version.includes('-') && satisfies(minVersion, peerDep)) {
+              if (!best || gt(version, best)) {
+                best = version;
+              }
+            }
+          }
+        }
+        if (!best) best = 'latest';
+      } catch (error) {
+        writeError(`Unable to search for a version of ${dependency} that works with ${peerDependency} v${minVersion}`);
+        console.error(error);
+        best = undefined;
+      }
+    }
+  );
+  return best;
 }

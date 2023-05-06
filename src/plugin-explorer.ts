@@ -9,6 +9,8 @@ import { ProjectSummary, inspectProject } from './project';
 import { PackageInfo } from './package-info';
 import { IonicTreeProvider, ionicState } from './ionic-tree-provider';
 import { clearOutput, write } from './logging';
+import { findCompatibleVersion2 } from './peer-dependencies';
+import { getPackageVersion } from './analyzer';
 
 interface Dependency {
   name: string;
@@ -119,7 +121,7 @@ export class PluginExplorerPanel {
         switch (command) {
           case MessageType.install: {
             // Code that should run in response to the hello message command
-            this.install(text);
+            this.install(text, path);
             break;
           }
           case MessageType.uninstall: {
@@ -182,8 +184,9 @@ export class PluginExplorerPanel {
     return false;
   }
 
-  async install(plugin: string) {
-    const cmd = npmInstall(plugin);
+  async install(plugin: string, folder: string) {
+    const pluginVersion = await findBestVersion(plugin);
+    const cmd = npmInstall(pluginVersion);
     const result = await this.checkEnterpriseRegister(plugin);
     if (result == false) return;
     this.dispose();
@@ -253,7 +256,7 @@ async function getPluginInfo(name: string, path: string): Promise<Plugin> {
   // As not all packages are indexed and may not even be a plugin we search and return info
   if (!name) return undefined;
   try {
-    const p: any = JSON.parse(await getRunOutput(`npm view ${name} --json`, path));
+    const p: any = JSON.parse(await getRunOutput(`npm view ${name} --json`, path, undefined, true));
 
     //const p: any = await httpRequest('GET', `registry.npmjs.org`, `/${name}`);
     if (!p.name) {
@@ -321,4 +324,9 @@ function ageInHours(path: string): number {
   const d = new Date(info.mtime);
   const n = new Date();
   return (n.getTime() - d.getTime()) / 3600000;
+}
+
+async function findBestVersion(plugin: string): Promise<string> {
+  const v = await findCompatibleVersion2(plugin, '@capacitor/core', getPackageVersion('@capacitor/core'));
+  return v ? `${plugin}@${v}` : plugin;
 }

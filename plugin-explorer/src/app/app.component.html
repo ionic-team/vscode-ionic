@@ -12,6 +12,19 @@
     <vscode-button type="submit" (click)="search()">Search</vscode-button>
   </div>
   <div class="two-col">
+    <div class="progress" *ngIf="busy">
+      <vscode-progress-ring></vscode-progress-ring>
+    </div>
+    <div style="width: 100%" [hidden]="!plugins || busy">
+      <p>{{ listTitle }}</p>
+      <div class="panel" *ngFor="let plugin of plugins">
+        <plugin [data]="plugin"></plugin>
+      </div>
+      <p style="opacity: 0.5">
+        The most popular open source plugins are tested and indexed. Got a plugin that isnt here?
+        <vscode-link href="https://github.com/ionic-team/vscode-extension/issues">Submit a suggestion</vscode-link>
+      </p>
+    </div>
     <div class="side">
       <p>Compatibility</p>
       <div *ngFor="let filter of testFilters">
@@ -33,19 +46,6 @@
         >Installed</vscode-checkbox
       ><br />
       <vscode-checkbox id="official" (click)="changeOfficial()">Official Support</vscode-checkbox><br />
-    </div>
-    <div class="progress" *ngIf="busy">
-      <vscode-progress-ring></vscode-progress-ring>
-    </div>
-    <div style="width: 100%" [hidden]="!plugins || busy">
-      <p>{{ listTitle }}</p>
-      <div class="panel" *ngFor="let plugin of plugins">
-        <plugin [data]="plugin"></plugin>
-      </div>
-      <p style="opacity: 0.5">
-        The most popular open source plugins are tested and indexed. Got a plugin that isnt here?
-        <vscode-link href="https://github.com/ionic-team/vscode-extension/issues">Submit a suggestion</vscode-link>
-      </p>
     </div>
   </div>
 </main>
