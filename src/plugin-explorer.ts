@@ -10,10 +10,12 @@ import { PackageInfo } from './package-info';
 import { IonicTreeProvider, ionicState } from './ionic-tree-provider';
 import { clearOutput, write } from './logging';
 import { findCompatibleVersion2 } from './peer-dependencies';
+import { getPackageVersion } from './analyzer';
 
 interface Dependency {
   name: string;
   version: string;
+  latest: string;
 }
 
 enum MessageType {
@@ -120,7 +122,7 @@ export class PluginExplorerPanel {
         switch (command) {
           case MessageType.install: {
             // Code that should run in response to the hello message command
-            this.install(text, path);
+            this.install(text);
             break;
           }
           case MessageType.uninstall: {
@@ -183,9 +185,14 @@ export class PluginExplorerPanel {
     return false;
   }
 
-  async install(plugin: string, folder: string) {
+  async install(plugin: string) {
     const pluginVersion = await findBestVersion(plugin);
     if (!pluginVersion) return;
+    if (pluginVersion.endsWith(getPackageVersion(plugin))) {
+      // Already installed latest possible
+      window.showInformationMessage(`Version ${getPackageVersion(plugin)} of ${plugin} is already installed.`, 'OK');
+      return;
+    }
     const cmd = npmInstall(pluginVersion);
     const result = await this.checkEnterpriseRegister(plugin);
     if (result == false) return;
@@ -232,7 +239,7 @@ async function getInstalledDeps(path: string, context: ExtensionContext): Promis
     for (const library of Object.keys(summary.packages).sort()) {
       const pkg: PackageInfo = summary.packages[library];
       if (pkg.depType == libType) {
-        dependencies.push({ name: library, version: pkg.version });
+        dependencies.push({ name: library, version: pkg.version, latest: pkg.latest });
       }
     }
   }

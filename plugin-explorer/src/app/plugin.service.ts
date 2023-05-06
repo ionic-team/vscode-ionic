@@ -14,6 +14,7 @@ export enum PluginFilter {
 export class PluginService {
   private summary: PluginSummary = { plugins: [] };
   private installed: any = {};
+  private latest: any = {};
   private unknownPlugins: Plugin[] = [];
 
   public async get(url: string) {
@@ -76,6 +77,7 @@ export class PluginService {
     this.installed = {};
     for (const plugin of plugins) {
       this.installed[plugin.name] = plugin.version;
+      this.latest[plugin.name] = plugin.latest;
     }
   }
 
@@ -163,6 +165,14 @@ export class PluginService {
       // Need to add any plugins that are installed but not indexed
       for (const plugin of this.unknownPlugins) {
         list.push(plugin);
+      }
+
+      // Latest versions come from the extension
+      for (const plugin of list) {
+        const latest = this.latest[plugin.name];
+        if (latest) {
+          plugin.version = latest;
+        }
       }
     }
     return list.sort((a, b) => this.sortFactor(b) - this.sortFactor(a));
