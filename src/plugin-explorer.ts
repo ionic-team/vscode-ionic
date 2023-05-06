@@ -10,7 +10,6 @@ import { PackageInfo } from './package-info';
 import { IonicTreeProvider, ionicState } from './ionic-tree-provider';
 import { clearOutput, write } from './logging';
 import { findCompatibleVersion2 } from './peer-dependencies';
-import { getPackageVersion } from './analyzer';
 
 interface Dependency {
   name: string;
@@ -186,6 +185,7 @@ export class PluginExplorerPanel {
 
   async install(plugin: string, folder: string) {
     const pluginVersion = await findBestVersion(plugin);
+    if (!pluginVersion) return;
     const cmd = npmInstall(pluginVersion);
     const result = await this.checkEnterpriseRegister(plugin);
     if (result == false) return;
@@ -263,7 +263,7 @@ async function getPluginInfo(name: string, path: string): Promise<Plugin> {
       console.error(`getPluginInfo(${name}}) ${p}`);
       return undefined;
     }
-    const gh = await getGHInfo(p.repository.url);
+    const gh = p.repository?.url ? await getGHInfo(p.repository.url) : undefined;
     const data: Plugin = {
       name: p.name,
       version: p.version,
@@ -272,7 +272,7 @@ async function getPluginInfo(name: string, path: string): Promise<Plugin> {
       versions: [],
       description: p.description,
       author: p.author,
-      bugs: p.bugs.url,
+      bugs: p.bugs?.url,
       image: gh?.owner?.avatar_url,
       stars: gh?.stargazers_count,
       fork: gh?.fork,
@@ -327,6 +327,13 @@ function ageInHours(path: string): number {
 }
 
 async function findBestVersion(plugin: string): Promise<string> {
-  const v = await findCompatibleVersion2(plugin, '@capacitor/core', getPackageVersion('@capacitor/core'));
+  let v = 'latest';
+  await showProgress(`Finding the best version of ${plugin} that works with your project`, async () => {
+    v = await findCompatibleVersion2(plugin);
+  });
+  if (v == 'latest') {
+    const res = await window.showInformationMessage(`${plugin} is not compatible with your project.`, 'Install Anyway');
+    if (!res) return;
+  }
   return v ? `${plugin}@${v}` : plugin;
 }
