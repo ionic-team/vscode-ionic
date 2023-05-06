@@ -2,6 +2,7 @@ import { Recommendation } from './recommendation';
 import { Project } from './project';
 import { Tip, TipType } from './tip';
 import { getRunOutput } from './utilities';
+import { ionicState } from './ionic-tree-provider';
 
 /**
  * Creates ionic start commands
@@ -38,9 +39,14 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
       )
         .requestAppName()
         .showProgressDialog()
+        .setAction(cleanup)
     );
   }
   return project.groups;
+}
+
+async function cleanup() {
+  ionicState.lastSummary = undefined;
 }
 
 function getType(framework: string): TipType {
