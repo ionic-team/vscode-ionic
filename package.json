@@ -62,6 +62,12 @@
         "key": "alt+d",
         "mac": "alt+d",
         "when": "true"
+      },
+      {
+        "command": "ionic-official.build",
+        "key": "alt+b",
+        "mac": "alt+b",
+        "when": "true"
       }
     ],
     "viewsWelcome": [
@@ -169,6 +175,10 @@
       {
         "command": "ionic-official.debug",
         "title": "Ionic: Run and Debug"
+      },
+      {
+        "command": "ionic-official.build",
+        "title": "Ionic: Build"
       },
       {
         "command": "ionic-official.lightbulb",
