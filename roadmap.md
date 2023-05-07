@@ -27,6 +27,12 @@
 - (fix) For a regular Angular project that is in a subfolder it reports not finding www folder when running npx cap copy. But dist exists and the extension can correct that in capacitor.config.ts. The dist folder may be separated by app too so dist/my-app may be where the index.html is located
 - (fix) When running on web for regular Angular app it doesn't launch the browser
 
+## Key Bindings
+
+- ALT+X for XCode
+- ALT+A for Android Studio
+- ALT+S for Sync
+
 ## NX
 
 - NX 15, Sync not working

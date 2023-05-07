@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.41
+
+- You can now press ALT+B to build your project
+- If computer has multiple IP Addresses then remember the IP Address chosen
+
 ### Version 1.40
 
 - Migration to Capacitor 5!
