@@ -96,6 +96,7 @@ export async function findCompatibleVersion2(
   hasPeerVersion?: string
 ): Promise<string> {
   let best: string;
+  let incompatible = false;
   try {
     const pck = await getNPMInfoFor(dependency);
     const latestVersion = pck.latestVersion;
@@ -124,6 +125,7 @@ export async function findCompatibleVersion2(
                 writeError(
                   `The latest version of ${dependency} (${version}) does not work with ${peerDependency} ${hasPeerVersion}.`
                 );
+                incompatible = true;
 
                 if (pck.bugs?.url) {
                   writeWarning(`Recommendation: File an issue with the plugin author at: ${pck.bugs.url}`);
@@ -132,13 +134,16 @@ export async function findCompatibleVersion2(
             } else {
               if (version == latestVersion && !best && current) {
                 writeWarning(`${dependency} requires ${peerDependency} ${peerVersion} but you have ${current}`);
+                incompatible = true;
               }
             }
           }
         }
       }
     }
-    if (!best) best = 'latest';
+    if (!best) {
+      best = incompatible ? 'latest' : latestVersion;
+    }
   } catch (error) {
     writeError(`Unable to search for a version of ${dependency} that works in your project`);
     console.error(error);

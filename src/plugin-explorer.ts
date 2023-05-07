@@ -11,6 +11,7 @@ import { IonicTreeProvider, ionicState } from './ionic-tree-provider';
 import { clearOutput, write } from './logging';
 import { findCompatibleVersion2 } from './peer-dependencies';
 import { getPackageVersion } from './analyzer';
+import { capacitorSync } from './capacitor-sync';
 
 interface Dependency {
   name: string;
@@ -201,6 +202,17 @@ export class PluginExplorerPanel {
     await showProgress(`Installing ${plugin}`, async () => {
       write(`> ${cmd}`);
       await run(this.path, cmd, undefined, [], [], undefined, undefined, undefined, false);
+      await run(
+        this.path,
+        capacitorSync(ionicState.projectRef),
+        undefined,
+        [],
+        [],
+        undefined,
+        undefined,
+        undefined,
+        false
+      );
       this.provider.refresh();
       window.showInformationMessage(`${plugin} was installed.`, 'OK');
     });
