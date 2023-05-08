@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from '@angular/core';
-import { Plugin } from './plugin-summary';
+import { Plugin } from './plugin-info';
 import { NgFor, NgIf } from '@angular/common';
 import { StarComponent } from './star.component';
 import { vscode } from './utilities/vscode';

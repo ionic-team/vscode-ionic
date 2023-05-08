@@ -262,9 +262,9 @@ async function fetchPluginData(webview: Webview, extensionUri: Uri): Promise<Uri
   const path = join(extensionUri.fsPath, 'plugin-explorer', 'build', 'plugins.json');
 
   // Download plugin data again if we havent before or its been 24 hours
-  if (!existsSync(path) || ageInHours(path) > 24) {
-    //const url = `https://webnative-plugins.netlify.app/detailed-plugins.json`;
-    const json = (await httpRequest('GET', 'webnative-plugins.netlify.app', '/detailed-plugins.json')) as PluginSummary;
+  if (!existsSync(path) || ageInHours(path) > 12) {
+    //const url = `https://capacitorjs.com/directory/plugin-data-raw.json`;
+    const json = (await httpRequest('GET', 'capacitorjs.com', '/directory/plugin-data-raw.json')) as PluginSummary;
     writeFileSync(path, JSON.stringify(json));
   }
   return getUri(webview, extensionUri, ['plugin-explorer', 'build', 'plugins.json']);
