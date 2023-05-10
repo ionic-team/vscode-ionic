@@ -78,6 +78,9 @@ export class AppComponent implements OnInit {
           console.log(`Added plugin from search`, event.data);
         }
         break;
+      case MessageType.chooseVersion:
+        this.search();
+        break;
       case MessageType.getInstalledDeps:
         this.pluginService.setInstalled(event.data.list);
         break;

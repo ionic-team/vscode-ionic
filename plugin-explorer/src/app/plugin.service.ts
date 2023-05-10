@@ -75,6 +75,7 @@ export class PluginService {
 
   public setInstalled(plugins: PluginInfo[]) {
     this.installed = {};
+    console.log(plugins);
     for (const plugin of plugins) {
       this.installed[plugin.name] = plugin.version;
       this.latest[plugin.name] = plugin.latest;

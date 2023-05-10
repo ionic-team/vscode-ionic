@@ -12,6 +12,7 @@ import { clearOutput, write } from './logging';
 import { findCompatibleVersion2 } from './peer-dependencies';
 import { getPackageVersion } from './analyzer';
 import { capacitorSync } from './capacitor-sync';
+import { packageUpgrade } from './rules-package-upgrade';
 
 interface Dependency {
   name: string;
@@ -25,6 +26,7 @@ enum MessageType {
   install = 'install',
   getPlugin = 'getPlugin',
   uninstall = 'uninstall',
+  chooseVersion = 'choose-version',
 }
 
 export class PluginExplorerPanel {
@@ -130,6 +132,11 @@ export class PluginExplorerPanel {
             this.uninstall(text);
             break;
           }
+          case MessageType.chooseVersion: {
+            const changed = await this.chooseVersion(text, path);
+            webview.postMessage({ command, changed });
+            break;
+          }
           case MessageType.getInstalledDeps: {
             const list = await getInstalledDeps(path, context);
             webview.postMessage({ command, list });
@@ -216,6 +223,12 @@ export class PluginExplorerPanel {
       this.provider.refresh();
       window.showInformationMessage(`${plugin} was installed.`, 'OK');
     });
+  }
+
+  async chooseVersion(plugin: string, folder: string): Promise<boolean> {
+    const updated = await packageUpgrade({ name: plugin, version: '' }, folder);
+    this.provider.refresh();
+    return updated;
   }
 
   async uninstall(plugin: string) {

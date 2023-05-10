@@ -480,7 +480,7 @@ function processDependencies(allDependencies: object, outdated: object, devDepen
 
     const recent: NpmOutdatedDependency = outdated[library];
     const wanted = recent?.wanted;
-    const latest = recent?.latest == undefined ? PackageVersion.Unknown : recent.latest;
+    const latest = recent?.latest == undefined ? version : recent.latest;
     const current = recent?.current;
 
     const isDev = devDependencies && library in devDependencies;

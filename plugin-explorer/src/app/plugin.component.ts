@@ -18,7 +18,7 @@ import { vscode } from './utilities/vscode';
       </div>
       <div class="panel2">
         <h2>{{ data.title }}</h2>
-        <p class="subtitle">{{ data.name }} v{{ data.version }}</p>
+        <p class="subtitle">{{ data.name }} v{{ data.installed }}</p>
         <div class="tooltip">
           <span class="tooltiptext wide-tip">{{ data.tagInfo }}</span>
           <vscode-badge *ngFor="let tag of data.tags">{{ tag }}</vscode-badge>
@@ -31,6 +31,18 @@ import { vscode } from './utilities/vscode';
           data.installed ? 'Update' : 'Install'
         }}</vscode-button>
         <vscode-button *ngIf="data.installed" (click)="uninstall()">Uninstall</vscode-button>
+        <vscode-button appearance="icon" (click)="chooseVersion()">
+          <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512">
+            <path
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="48"
+              d="M112 184l144 144 144-144"
+            />
+          </svg>
+        </vscode-button>
       </div>
       <div class="side">
         <star class="tooltip" [rating]="data.rating">
@@ -80,6 +92,13 @@ export class PluginComponent {
   public uninstall() {
     vscode.postMessage({
       command: 'uninstall',
+      text: this.data.name,
+    });
+  }
+
+  public chooseVersion() {
+    vscode.postMessage({
+      command: 'choose-version',
       text: this.data.name,
     });
   }
