@@ -630,6 +630,24 @@ export interface CapacitorPackagePlatform {
   src: string;
 }
 
+export function plural(name: string, count?: number): string {
+  if (count <= 1) {
+    if (name == 'are') return 'is';
+  }
+  if (name == 'Dependency') {
+    return 'Dependencies';
+  } else if (name == 'Plugin') {
+    return 'Cordova Plugins';
+  }
+  return name + 's';
+}
+
+export function pluralize(name: string, count: number): string {
+  if (count) {
+    return count <= 1 ? `${count} ${name}` : `${count} ${name}s`;
+  }
+}
+
 export async function showMessage(message: string, ms: number) {
   vscode.window.withProgress(
     {

@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { writeFileSync, readdirSync, statSync, existsSync } from 'fs';
 import { join } from 'path';
 import { PackageInfo } from './package-info';
-import { getStringFrom } from './utilities';
+import { getStringFrom, plural } from './utilities';
 import { Recommendation } from './recommendation';
 
 export async function ionicExport(project: Project, context: vscode.ExtensionContext): Promise<void> {
@@ -87,13 +87,4 @@ function getTip(library: string, recommendations: Array<Recommendation>) {
     }
   }
   return undefined;
-}
-
-function plural(name: string): string {
-  if (name == 'Dependency') {
-    return 'Dependencies';
-  } else if (name == 'Plugin') {
-    return 'Cordova Plugins';
-  }
-  return name + 's';
 }

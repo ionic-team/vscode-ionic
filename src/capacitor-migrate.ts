@@ -5,7 +5,7 @@ import { exists, isVersionGreaterOrEqual } from './analyzer';
 import { clearOutput, showOutput, write, writeError, writeIonic, writeWarning } from './logging';
 import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
-import { getRunOutput, getStringFrom, run, setAllStringIn, showProgress } from './utilities';
+import { getRunOutput, getStringFrom, plural, pluralize, run, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
 import { ActionResult } from './command-name';
 import { ionicState } from './ionic-tree-provider';
@@ -65,7 +65,10 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
 
   if (report.incompatible.length > 0) {
     const result = await vscode.window.showErrorMessage(
-      `There are ${report.incompatible.length} plugins in your project that do not work with Capacitor ${versionTitle}. Filing an issue with the author is recommended.`,
+      `There ${plural('are', report.incompatible.length)} ${pluralize(
+        'plugin',
+        report.incompatible.length
+      )} in your project that does not work with Capacitor ${versionTitle}. Filing an issue with the author is recommended.`,
       `Continue`,
       'Exit'
     );
