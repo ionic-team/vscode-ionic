@@ -9,7 +9,7 @@ import { MonoRepoType } from './monorepo';
 import { npx, preflightNPMCheck } from './node-commands';
 import { Project } from './project';
 import { liveReloadSSL } from './live-reload';
-import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
+import { ExtensionSetting, getExtSetting, getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 import { getWebConfiguration, WebConfigSetting } from './web-configuration';
 
 /**
@@ -95,9 +95,18 @@ export async function selectExternalIPAddress(): Promise<string> {
   if (list.length <= 1) {
     return;
   }
+  const lastIPAddress = getSetting(WorkspaceSetting.lastIPAddress);
+  for (const address of list) {
+    if (address == lastIPAddress) {
+      return lastIPAddress;
+    }
+  }
   const selected = await vscode.window.showQuickPick(list, {
     placeHolder: 'Select the external network address to use',
   });
+  if (selected) {
+    setSetting(WorkspaceSetting.lastIPAddress, selected);
+  }
   return selected;
 }
 

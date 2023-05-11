@@ -142,7 +142,7 @@ export async function getRecommendations(
 
     r.whenExpanded = async () => {
       return [
-        project.asRecommendation(debugOnWeb(project), CommandName.Debug),
+        project.asRecommendation(debugOnWeb(project)),
         ...(await getAndroidWebViewList(hasCapAndroid, project.getDistFolder())),
       ];
     };
@@ -167,18 +167,7 @@ export async function getRecommendations(
       }
     }
 
-    project.add(
-      new Tip('Build', getConfigurationName(), TipType.Build, 'Build', undefined, 'Building', undefined)
-        .setDynamicCommand(ionicBuild, project)
-        .setContextValue(Context.buildConfig)
-        .canStop()
-        .canAnimate()
-        .setTooltip(
-          hasCapIos || hasCapAndroid
-            ? 'Builds the web project and copies to native platforms'
-            : 'Builds the web project'
-        )
-    );
+    project.add(build(project));
 
     if (hasCapIos || hasCapAndroid) {
       project.add(
@@ -391,9 +380,20 @@ export function debugOnWeb(project: Project): Tip {
     ])
     .canStop()
     .setContextValue(Context.webDebugConfig)
+    .setVSCommand(CommandName.Debug)
     .willNotBlock()
     .canAnimate()
     .setTooltip(`Debug using ${getDebugBrowserName()}. (${alt('D')})`);
+}
+
+export function build(project: Project) {
+  return new Tip('Build', getConfigurationName(), TipType.Build, 'Build', undefined, 'Building', undefined)
+    .setDynamicCommand(ionicBuild, project)
+    .setContextValue(Context.buildConfig)
+    .canStop()
+    .canAnimate()
+    .setVSCommand(CommandName.Build)
+    .setTooltip('Builds the web project (and copies to native platforms)');
 }
 
 function remoteLogging(project: Project): Tip {

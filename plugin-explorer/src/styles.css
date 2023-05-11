@@ -44,6 +44,10 @@ vscode-text-field {
   z-index: 1;
 }
 
+.ionicon {
+  color: var(--vscode-editor-foreground);
+}
+
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }

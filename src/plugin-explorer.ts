@@ -11,10 +11,13 @@ import { IonicTreeProvider, ionicState } from './ionic-tree-provider';
 import { clearOutput, write } from './logging';
 import { findCompatibleVersion2 } from './peer-dependencies';
 import { getPackageVersion } from './analyzer';
+import { capacitorSync } from './capacitor-sync';
+import { packageUpgrade } from './rules-package-upgrade';
 
 interface Dependency {
   name: string;
   version: string;
+  latest: string;
 }
 
 enum MessageType {
@@ -23,6 +26,7 @@ enum MessageType {
   install = 'install',
   getPlugin = 'getPlugin',
   uninstall = 'uninstall',
+  chooseVersion = 'choose-version',
 }
 
 export class PluginExplorerPanel {
@@ -121,11 +125,16 @@ export class PluginExplorerPanel {
         switch (command) {
           case MessageType.install: {
             // Code that should run in response to the hello message command
-            this.install(text, path);
+            this.install(text);
             break;
           }
           case MessageType.uninstall: {
             this.uninstall(text);
+            break;
+          }
+          case MessageType.chooseVersion: {
+            const changed = await this.chooseVersion(text, path);
+            webview.postMessage({ command, changed });
             break;
           }
           case MessageType.getInstalledDeps: {
@@ -184,8 +193,14 @@ export class PluginExplorerPanel {
     return false;
   }
 
-  async install(plugin: string, folder: string) {
+  async install(plugin: string) {
     const pluginVersion = await findBestVersion(plugin);
+    if (!pluginVersion) return;
+    if (pluginVersion.endsWith(getPackageVersion(plugin))) {
+      // Already installed latest possible
+      window.showInformationMessage(`Version ${getPackageVersion(plugin)} of ${plugin} is already installed.`, 'OK');
+      return;
+    }
     const cmd = npmInstall(pluginVersion);
     const result = await this.checkEnterpriseRegister(plugin);
     if (result == false) return;
@@ -194,9 +209,26 @@ export class PluginExplorerPanel {
     await showProgress(`Installing ${plugin}`, async () => {
       write(`> ${cmd}`);
       await run(this.path, cmd, undefined, [], [], undefined, undefined, undefined, false);
+      await run(
+        this.path,
+        capacitorSync(ionicState.projectRef),
+        undefined,
+        [],
+        [],
+        undefined,
+        undefined,
+        undefined,
+        false
+      );
       this.provider.refresh();
       window.showInformationMessage(`${plugin} was installed.`, 'OK');
     });
+  }
+
+  async chooseVersion(plugin: string, folder: string): Promise<boolean> {
+    const updated = await packageUpgrade({ name: plugin, version: '' }, folder);
+    this.provider.refresh();
+    return updated;
   }
 
   async uninstall(plugin: string) {
@@ -232,7 +264,7 @@ async function getInstalledDeps(path: string, context: ExtensionContext): Promis
     for (const library of Object.keys(summary.packages).sort()) {
       const pkg: PackageInfo = summary.packages[library];
       if (pkg.depType == libType) {
-        dependencies.push({ name: library, version: pkg.version });
+        dependencies.push({ name: library, version: pkg.version, latest: pkg.latest });
       }
     }
   }
@@ -243,9 +275,9 @@ async function fetchPluginData(webview: Webview, extensionUri: Uri): Promise<Uri
   const path = join(extensionUri.fsPath, 'plugin-explorer', 'build', 'plugins.json');
 
   // Download plugin data again if we havent before or its been 24 hours
-  if (!existsSync(path) || ageInHours(path) > 24) {
-    //const url = `https://webnative-plugins.netlify.app/detailed-plugins.json`;
-    const json = (await httpRequest('GET', 'webnative-plugins.netlify.app', '/detailed-plugins.json')) as PluginSummary;
+  if (!existsSync(path) || ageInHours(path) > 12) {
+    //const url = `https://capacitorjs.com/directory/plugin-data-raw.json`;
+    const json = (await httpRequest('GET', 'capacitorjs.com', '/directory/plugin-data-raw.json')) as PluginSummary;
     writeFileSync(path, JSON.stringify(json));
   }
   return getUri(webview, extensionUri, ['plugin-explorer', 'build', 'plugins.json']);
@@ -263,7 +295,7 @@ async function getPluginInfo(name: string, path: string): Promise<Plugin> {
       console.error(`getPluginInfo(${name}}) ${p}`);
       return undefined;
     }
-    const gh = await getGHInfo(p.repository.url);
+    const gh = p.repository?.url ? await getGHInfo(p.repository.url) : undefined;
     const data: Plugin = {
       name: p.name,
       version: p.version,
@@ -272,7 +304,7 @@ async function getPluginInfo(name: string, path: string): Promise<Plugin> {
       versions: [],
       description: p.description,
       author: p.author,
-      bugs: p.bugs.url,
+      bugs: p.bugs?.url,
       image: gh?.owner?.avatar_url,
       stars: gh?.stargazers_count,
       fork: gh?.fork,
@@ -327,6 +359,13 @@ function ageInHours(path: string): number {
 }
 
 async function findBestVersion(plugin: string): Promise<string> {
-  const v = await findCompatibleVersion2(plugin, '@capacitor/core', getPackageVersion('@capacitor/core'));
+  let v = 'latest';
+  await showProgress(`Finding the best version of ${plugin} that works with your project`, async () => {
+    v = await findCompatibleVersion2(plugin);
+  });
+  if (v == 'latest') {
+    const res = await window.showInformationMessage(`${plugin} is not compatible with your project.`, 'Install Anyway');
+    if (!res) return;
+  }
   return v ? `${plugin}@${v}` : plugin;
 }

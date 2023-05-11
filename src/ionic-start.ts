@@ -39,14 +39,9 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
       )
         .requestAppName()
         .showProgressDialog()
-        .setAction(cleanup)
     );
   }
   return project.groups;
-}
-
-async function cleanup() {
-  ionicState.lastSummary = undefined;
 }
 
 function getType(framework: string): TipType {

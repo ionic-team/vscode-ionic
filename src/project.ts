@@ -276,7 +276,7 @@ export class Project {
     return await run(this.projectFolder(), command, undefined, [], [], undefined, undefined, undefined, suppressOutput);
   }
 
-  public asRecommendation(tip: Tip, command?: CommandName): Recommendation {
+  public asRecommendation(tip: Tip): Recommendation {
     if (this.isIgnored(tip)) return;
 
     let argsIsRecommendation = false;
@@ -294,6 +294,14 @@ export class Project {
       argsIsRecommendation = true;
     }
 
+    if (tip.vsCommand) {
+      cmd = {
+        command: tip.vsCommand,
+        title: tip.title,
+        arguments: [tip],
+      };
+    }
+
     if (tip.type == TipType.Link) {
       cmd = {
         command: CommandName.Link,
@@ -302,8 +310,6 @@ export class Project {
       };
       tip.url = tip.description as string;
     }
-
-    if (command) cmd.command = command;
 
     const tooltip = tip.tooltip ? tip.tooltip : tip.message;
     const r = new Recommendation(

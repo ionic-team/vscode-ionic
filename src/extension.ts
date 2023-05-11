@@ -40,7 +40,7 @@ import {
   startCommand,
   waitForOtherActions,
 } from './tasks';
-import { debugOnWeb } from './recommend';
+import { build, debugOnWeb } from './recommend';
 
 async function requestAppName(tip: Tip, path: string) {
   const suggestion = suggestName(path);
@@ -392,8 +392,12 @@ export async function activate(context: vscode.ExtensionContext) {
     runAction(r.tip, ionicProvider, rootPath);
   });
 
-  vscode.commands.registerCommand(CommandName.Debug, async (r: Recommendation) => {
+  vscode.commands.registerCommand(CommandName.Debug, async () => {
     runAction(debugOnWeb(ionicState.projectRef), ionicProvider, rootPath);
+  });
+
+  vscode.commands.registerCommand(CommandName.Build, async () => {
+    runAction(build(ionicState.projectRef), ionicProvider, rootPath);
   });
 
   vscode.commands.registerCommand(CommandName.SelectDevice, async (r: Recommendation) => {
@@ -418,7 +422,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
   if (!ionicState.runWeb) {
     const summary = await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
-    ionicState.lastSummary = summary;
     if (summary?.project.isCapacitor) {
       showTips();
     }

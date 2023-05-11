@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Plugin, PluginInfo, PluginSummary } from './plugin-summary';
+import { Plugin, PluginInfo } from './plugin-info';
 import { capacitorFrom, capacitorTo } from './test-filter';
 
 export enum PluginFilter {
@@ -12,14 +12,15 @@ export enum PluginFilter {
   providedIn: 'root',
 })
 export class PluginService {
-  private summary: PluginSummary = { plugins: [] };
+  private plugins: Plugin[] = [];
   private installed: any = {};
+  private latest: any = {};
   private unknownPlugins: Plugin[] = [];
 
   public async get(url: string) {
     const response = await fetch(url);
-    const data = await response.json();
-    for (const plugin of data.plugins) {
+    const plugins: Plugin[] = await response.json();
+    for (const plugin of plugins) {
       let scope = '';
       let name = plugin.name;
       if (plugin.name.startsWith('@')) {
@@ -48,7 +49,7 @@ export class PluginService {
       }
       //plugin.tags = [...plugin.tags, ...plugin.keywords];
     }
-    this.summary = data;
+    this.plugins = plugins;
   }
 
   private prettify(tests: string[]): string {
@@ -74,8 +75,10 @@ export class PluginService {
 
   public setInstalled(plugins: PluginInfo[]) {
     this.installed = {};
+    console.log(plugins);
     for (const plugin of plugins) {
       this.installed[plugin.name] = plugin.version;
+      this.latest[plugin.name] = plugin.latest;
     }
   }
 
@@ -85,7 +88,7 @@ export class PluginService {
     for (const key of Object.keys(this.installed)) {
       names.push(key);
     }
-    for (const plugin of this.summary.plugins) {
+    for (const plugin of this.plugins) {
       const index = names.indexOf(plugin.name);
       if (index !== -1) {
         names.splice(index, 1);
@@ -125,7 +128,7 @@ export class PluginService {
   ): Plugin[] {
     let count = 0;
 
-    const list = this.summary.plugins.filter((plugin) => {
+    const list = this.plugins.filter((plugin) => {
       try {
         let found = true;
         if (filters.includes(PluginFilter.search)) {
@@ -163,6 +166,14 @@ export class PluginService {
       // Need to add any plugins that are installed but not indexed
       for (const plugin of this.unknownPlugins) {
         list.push(plugin);
+      }
+
+      // Latest versions come from the extension
+      for (const plugin of list) {
+        const latest = this.latest[plugin.name];
+        if (latest) {
+          plugin.version = latest;
+        }
       }
     }
     return list.sort((a, b) => this.sortFactor(b) - this.sortFactor(a));

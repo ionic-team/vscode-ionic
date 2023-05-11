@@ -238,7 +238,13 @@ export async function capacitorRecommendations(project: Project, forMigration: b
     }
   }
 
-  if (project.repoType == MonoRepoType.nx && !exists('@nxext/capacitor') && exists('@nrwl/workspace')) {
+  // If @nxtend/capacitor (old project for ~Angular 13) and no new project then suggest extension
+  if (
+    project.repoType == MonoRepoType.nx &&
+    !exists('@nxext/capacitor') &&
+    !exists('@nxtend/capacitor') &&
+    exists('@nrwl/workspace')
+  ) {
     tips.push(
       new Tip(
         'Add Capacitor Extension for NX',

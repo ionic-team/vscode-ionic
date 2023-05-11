@@ -43,7 +43,6 @@ interface IonicState {
   runWeb: Tip;
   lastRun: CapacitorPlatform;
   projectRef: Project;
-  lastSummary: ProjectSummary;
 }
 export const ionicState: IonicState = {
   view: undefined,
@@ -69,7 +68,6 @@ export const ionicState: IonicState = {
   projectRef: undefined,
   configuration: undefined,
   project: undefined,
-  lastSummary: undefined,
 };
 
 interface FolderInfo {
@@ -127,10 +125,7 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
         folderInfoCache = folderInfo;
       }
       if (folderInfo.packageJsonExists || folderInfo.folderBased) {
-        const summary = ionicState.lastSummary
-          ? ionicState.lastSummary
-          : await reviewProject(this.workspaceRoot, this.context, this.selectedProject);
-        ionicState.lastSummary = undefined;
+        const summary = await reviewProject(this.workspaceRoot, this.context, this.selectedProject);
 
         if (!summary) return [];
         return summary.project.groups;

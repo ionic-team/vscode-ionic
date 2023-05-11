@@ -1,6 +1,5 @@
 # Roadmap
 
-- If you are presented with multiple external ip addresses then remember the selected option and if the IP address exists on next run use it
 - If local address is turned on then show warning on start that Nexus wont work
 - React Vite can write Network: rather than External:
 
@@ -27,6 +26,12 @@
 - (fix) For a regular Angular project that is in a subfolder it reports not finding www folder when running npx cap copy. But dist exists and the extension can correct that in capacitor.config.ts. The dist folder may be separated by app too so dist/my-app may be where the index.html is located
 - (fix) When running on web for regular Angular app it doesn't launch the browser
 
+## Key Bindings
+
+- ALT+X for XCode
+- ALT+A for Android Studio
+- ALT+S for Sync
+
 ## NX
 
 - NX 15, Sync not working
@@ -47,10 +52,8 @@
 
 - When searching for a package show spinner
 - Dynamically rate packages based on npm/github when searched for
-- Move the side menu for plugin explorer to the right
 - 3 dots for packages should plugin explorer info for the package
 - Choose from available versions
-- Run sync after install
 
 ## Pin Dependencies
 

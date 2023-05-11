@@ -10,7 +10,7 @@ import { exists } from './analyzer';
 import { ionicInit } from './ionic-init';
 import { request } from 'https';
 import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
-import { showOutput, write, writeError, writeIonic } from './logging';
+import { showOutput, write, writeError, writeIonic, writeWarning } from './logging';
 import { getWebConfiguration, WebConfigSetting } from './web-configuration';
 import { Publisher } from './discovery';
 import { join } from 'path';
@@ -51,6 +51,14 @@ function runOptions(command: string, folder: string, shell?: string) {
     command.includes('cap migrate')
   ) {
     env.LANG = 'en_US.UTF-8';
+  }
+
+  if (process.env.NODE_TLS_REJECT_UNAUTHORIZED) {
+    if (process.env.NODE_TLS_REJECT_UNAUTHORIZED == '0') {
+      // See https://github.com/cweijan/vscode-database-client/issues/834
+      writeWarning(`Another VS Code extension on this machine has disabled TLS (NODE_TLS_REJECT_UNAUTHORIZED).`);
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
+    }
   }
 
   if (javaHome) {
@@ -462,6 +470,9 @@ export async function getRunOutput(
         out += stdout;
       }
       if (!error) {
+        if (out == '' && stdError) {
+          out += stdError;
+        }
         resolve(out);
       } else {
         if (stdError) {
@@ -620,6 +631,24 @@ export interface CapacitorPackageInfo {
 
 export interface CapacitorPackagePlatform {
   src: string;
+}
+
+export function plural(name: string, count?: number): string {
+  if (count <= 1) {
+    if (name == 'are') return 'is';
+  }
+  if (name == 'Dependency') {
+    return 'Dependencies';
+  } else if (name == 'Plugin') {
+    return 'Cordova Plugins';
+  }
+  return name + 's';
+}
+
+export function pluralize(name: string, count: number): string {
+  if (count) {
+    return count <= 1 ? `${count} ${name}` : `${count} ${name}s`;
+  }
 }
 
 export async function showMessage(message: string, ms: number) {

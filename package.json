@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.40.4",
+  "version": "1.41.0",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -61,6 +61,12 @@
         "command": "ionic-official.debug",
         "key": "alt+d",
         "mac": "alt+d",
+        "when": "true"
+      },
+      {
+        "command": "ionic-official.build",
+        "key": "alt+b",
+        "mac": "alt+b",
         "when": "true"
       }
     ],
@@ -169,6 +175,10 @@
       {
         "command": "ionic-official.debug",
         "title": "Ionic: Run and Debug"
+      },
+      {
+        "command": "ionic-official.build",
+        "title": "Ionic: Build"
       },
       {
         "command": "ionic-official.lightbulb",

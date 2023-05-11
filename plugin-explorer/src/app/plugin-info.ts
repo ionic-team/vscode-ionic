@@ -1,7 +1,3 @@
-export interface PluginSummary {
-  plugins: Plugin[];
-}
-
 export interface Plugin {
   name: string;
   version: string;
@@ -34,4 +30,5 @@ export interface Plugin {
 export interface PluginInfo {
   name: string;
   version: string;
+  latest: string;
 }

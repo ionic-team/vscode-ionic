@@ -12,7 +12,7 @@ import {
   vsCodeTextField,
 } from '@vscode/webview-ui-toolkit';
 import { PluginFilter, PluginService } from './plugin.service';
-import { Plugin } from './plugin-summary';
+import { Plugin } from './plugin-info';
 import { checked, d, setChecked } from './utilities/dom';
 import { MessageType, sendMessage } from './utilities/messages';
 import { TestFilter, getTestFilters } from './test-filter';
@@ -77,6 +77,9 @@ export class AppComponent implements OnInit {
           }
           console.log(`Added plugin from search`, event.data);
         }
+        break;
+      case MessageType.chooseVersion:
+        this.search();
         break;
       case MessageType.getInstalledDeps:
         this.pluginService.setInstalled(event.data.list);

@@ -8,6 +8,7 @@ export enum WorkspaceSetting {
   webAction = 'webAction',
   logFilter = 'logFilter',
   tips = 'tipsShown',
+  lastIPAddress = 'lastIPAddress',
   debugBrowser = 'debugBrowser',
 
   cocoaPods = 'cocoaPods2',

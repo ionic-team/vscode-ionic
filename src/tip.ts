@@ -1,5 +1,5 @@
 import { CapacitorPlatform } from './capacitor-platform';
-import { ActionResult } from './command-name';
+import { ActionResult, CommandName } from './command-name';
 import { Context } from './context-variables';
 import { finishCommand, isRunning, markActionAsRunning, waitForOtherActions } from './tasks';
 
@@ -23,6 +23,7 @@ export class Tip {
   public tooltip: string;
   public runPoints: Array<RunPoint>;
   public contextValue?: string;
+  public vsCommand?: CommandName;
   public ignorable: boolean;
   public refresh: boolean; // Whether the tree provider is refresh after action is run
   public syncOnSuccess: CapacitorPlatform; // Which platform was synced
@@ -174,6 +175,11 @@ export class Tip {
       return this;
     }
     this.contextValue = contextValue;
+    return this;
+  }
+
+  setVSCommand(commandName: CommandName) {
+    this.vsCommand = commandName;
     return this;
   }
 

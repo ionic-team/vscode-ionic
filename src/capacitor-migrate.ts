@@ -5,7 +5,7 @@ import { exists, isVersionGreaterOrEqual } from './analyzer';
 import { clearOutput, showOutput, write, writeError, writeIonic, writeWarning } from './logging';
 import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
-import { getRunOutput, getStringFrom, run, setAllStringIn, showProgress } from './utilities';
+import { getRunOutput, getStringFrom, plural, pluralize, run, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
 import { ActionResult } from './command-name';
 import { ionicState } from './ionic-tree-provider';
@@ -65,7 +65,10 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
 
   if (report.incompatible.length > 0) {
     const result = await vscode.window.showErrorMessage(
-      `There are ${report.incompatible.length} plugins in your project that do not work with Capacitor ${versionTitle}. Filing an issue with the author is recommended.`,
+      `There ${plural('are', report.incompatible.length)} ${pluralize(
+        'plugin',
+        report.incompatible.length
+      )} in your project that does not work with Capacitor ${versionTitle}. Filing an issue with the author is recommended.`,
       `Continue`,
       'Exit'
     );
@@ -93,7 +96,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
       writeIonic(`Upgrading plugins that were incompatible with Capacitor ${versionTitle}`);
       for (const command of report.commands) {
         write(`> ${command}`);
-        await project.run2(command);
+        await project.run2(command, true);
       }
     }
     const cmd = npmInstall(`@capacitor/cli@${coreVersion} --save-dev --force`);
@@ -127,23 +130,13 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
 }
 
 async function checkJDK(project: Project): Promise<number> {
-  const jversion = await getRunOutput(`java --version`, project.folder);
-  const versionRegex = RegExp(/([0-9]+)\.?([0-9]*)\.?([0-9]*)/);
-  const versionMatch = versionRegex.exec(jversion);
-
-  if (versionMatch === null) {
-    return -1;
-  }
-
-  const firstVersionNumber = parseInt(versionMatch[1]);
-  const secondVersionNumber = parseInt(versionMatch[2]);
-
-  if (typeof firstVersionNumber === 'number' && firstVersionNumber != 1) {
-    return firstVersionNumber;
-  } else if (typeof secondVersionNumber === 'number' && firstVersionNumber == 1 && secondVersionNumber < 9) {
-    return secondVersionNumber;
-  } else {
-    return -1;
+  try {
+    const jversion = await getRunOutput(`java -version`, project.folder);
+    const version = getStringFrom(jversion, 'java version "', '"');
+    return parseInt(version.split('.')[0]);
+  } catch (error) {
+    writeError(`Unable to find the version of java installed:${error}`);
+    return 0;
   }
 }
 
