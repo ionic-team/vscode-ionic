@@ -53,7 +53,6 @@
 - When searching for a package show spinner
 - Dynamically rate packages based on npm/github when searched for
 - 3 dots for packages should plugin explorer info for the package
-- Choose from available versions
 
 ## Pin Dependencies
 
