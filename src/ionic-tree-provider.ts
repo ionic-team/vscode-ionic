@@ -34,6 +34,7 @@ interface IonicState {
   refreshDebugDevices: boolean; // Should we refresh the list of debuggable devices
   remoteLogging: boolean; // Whether remote logging is enabled
   hasNodeModules: boolean; // Whether node modules are installed
+  hasNodeModulesNotified: boolean; // Whether we've notified the user of no node_modules
   configuration: string; // Build configuration
   project: string; // Angular project name
   nvm: string; // If .nvmrc is used will contain its contents
@@ -56,6 +57,7 @@ export const ionicState: IonicState = {
   outputIsFocused: false,
   channelFocus: true,
   hasNodeModules: undefined,
+  hasNodeModulesNotified: undefined,
   syncDone: [],
   refreshDebugDevices: false,
   remoteLogging: false,
