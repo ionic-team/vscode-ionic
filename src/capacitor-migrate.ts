@@ -96,7 +96,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
       writeIonic(`Upgrading plugins that were incompatible with Capacitor ${versionTitle}`);
       for (const command of report.commands) {
         write(`> ${command}`);
-        await project.run2(command);
+        await project.run2(command, true);
       }
     }
     const cmd = npmInstall(`@capacitor/cli@${coreVersion} --save-dev --force`);
@@ -130,23 +130,13 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
 }
 
 async function checkJDK(project: Project): Promise<number> {
-  const jversion = await getRunOutput(`java --version`, project.folder);
-  const versionRegex = RegExp(/([0-9]+)\.?([0-9]*)\.?([0-9]*)/);
-  const versionMatch = versionRegex.exec(jversion);
-
-  if (versionMatch === null) {
-    return -1;
-  }
-
-  const firstVersionNumber = parseInt(versionMatch[1]);
-  const secondVersionNumber = parseInt(versionMatch[2]);
-
-  if (typeof firstVersionNumber === 'number' && firstVersionNumber != 1) {
-    return firstVersionNumber;
-  } else if (typeof secondVersionNumber === 'number' && firstVersionNumber == 1 && secondVersionNumber < 9) {
-    return secondVersionNumber;
-  } else {
-    return -1;
+  try {
+    const jversion = await getRunOutput(`java -version`, project.folder);
+    const version = getStringFrom(jversion, 'java version "', '"');
+    return parseInt(version.split('.')[0]);
+  } catch (error) {
+    writeError(`Unable to find the version of java installed:${error}`);
+    return 0;
   }
 }
 

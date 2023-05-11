@@ -1,6 +1,6 @@
 import { ionicState } from './ionic-tree-provider';
 import { satisfies, gt } from 'semver';
-import { writeError, writeWarning } from './logging';
+import { write, writeError, writeWarning } from './logging';
 import { PackageManager, npmInstall } from './node-commands';
 import { getRunOutput, httpRequest } from './utilities';
 import { getPackageVersion } from './analyzer';
@@ -29,15 +29,20 @@ export async function checkPeerDependencies(
   if (ionicState.packageManager != PackageManager.npm) return { dependencies: [], incompatible: [], commands: [] };
   const dependencies = await getDependencyConflicts(folder, peerDependency, minVersion);
   const conflicts = [];
+  const updates = [];
   const commands = [];
   for (const dependency of dependencies) {
     const version = await findCompatibleVersion2(dependency, peerDependency, minVersion);
     if (version == 'latest') {
       conflicts.push(dependency);
     } else {
-      const command = npmInstall(`${dependency}@${version}`, `--force`);
-      commands.push(command);
+      write(`${dependency} will be updated to ${version}`);
+      updates.push(`${dependency}@${version}`);
     }
+  }
+
+  if (updates.length > 0) {
+    commands.push(npmInstall(updates.join(' '), '--force'));
   }
 
   return { dependencies, incompatible: conflicts, commands };

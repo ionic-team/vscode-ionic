@@ -470,6 +470,9 @@ export async function getRunOutput(
         out += stdout;
       }
       if (!error) {
+        if (out == '' && stdError) {
+          out += stdError;
+        }
         resolve(out);
       } else {
         if (stdError) {
