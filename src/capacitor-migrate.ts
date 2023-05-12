@@ -130,12 +130,13 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
 }
 
 async function checkJDK(project: Project): Promise<number> {
+  let jversion = '';
   try {
-    const jversion = await getRunOutput(`java -version`, project.folder);
-    const version = getStringFrom(jversion, 'java version "', '"');
+    jversion = await getRunOutput(`java -version`, project.folder);
+    const version = getStringFrom(jversion, 'version "', '"');
     return parseInt(version.split('.')[0]);
   } catch (error) {
-    writeError(`Unable to find the version of java installed:${error}`);
+    writeError(`Unable to find the version of java installed (${jversion}): ${error}`);
     return 0;
   }
 }
