@@ -45,7 +45,8 @@ vscode-text-field {
 }
 
 .ionicon {
-  color: var(--vscode-editor-foreground);
+  width: 16px;
+  height: 16px;
 }
 
 .tooltip:hover .tooltiptext {

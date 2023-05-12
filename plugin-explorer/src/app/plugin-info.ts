@@ -18,13 +18,15 @@ export interface Plugin {
   updated?: string;
   license: string;
   title: string; // Calculated
-  tags: string[]; // Calculated
   rating: number; // Calculated
   ratingInfo: string; // Calculated
   tagInfo: string; // Calcuilated
   dailyDownloads: string; // Calculated
   changed: string; // Calculated
   installed: string; // Calculated: whether the plugin is installed in the current project
+  framework: string | undefined; // Calculated: either capacitor or cordova
+  moreInfoUrl: string; // Calculated
+  singlePlatform: string | undefined; // Calculated: either android or apple
 }
 
 export interface PluginInfo {

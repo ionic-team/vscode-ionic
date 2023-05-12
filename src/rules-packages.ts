@@ -10,7 +10,7 @@ import {
   remotePackages,
   warnMinVersion,
 } from './analyzer';
-import { npmInstallAll } from './node-commands';
+import { npmInstallAll, suggestInstallAll } from './node-commands';
 import { ionicState } from './ionic-tree-provider';
 
 /**
@@ -34,6 +34,9 @@ export function checkPackages(project: Project) {
         .performRun()
         .showProgressDialog()
     );
+    if (!ionicState.hasNodeModulesNotified) {
+      suggestInstallAll(project);
+    }
   }
 
   // Replace momentjs with date-fns

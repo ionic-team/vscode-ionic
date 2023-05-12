@@ -24,7 +24,7 @@ export function checkIonicNativePackages(packages, project: Project) {
       }
     } else if (name.startsWith('@awesome-cordova-plugins')) {
       const plugin = wrappersAndPlugins[name];
-      if (!exists(plugin)) {
+      if (plugin && !exists(plugin)) {
         project.recommendRemove(
           name,
           name,

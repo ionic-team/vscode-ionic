@@ -18,7 +18,7 @@
     <div style="width: 100%" [hidden]="!plugins || busy">
       <p>{{ listTitle }}</p>
       <div class="panel" *ngFor="let plugin of plugins">
-        <plugin [data]="plugin"></plugin>
+        <plugin [assetsUri]="assetsUri" [data]="plugin"></plugin>
       </div>
       <p style="opacity: 0.5">
         The most popular open source plugins are tested and indexed. Got a plugin that isnt here?
@@ -26,12 +26,6 @@
       </p>
     </div>
     <div class="side">
-      <p>Compatibility</p>
-      <div *ngFor="let filter of testFilters">
-        <vscode-checkbox checked id="{{ filter.id }}" (click)="change()">{{ filter.name }}</vscode-checkbox
-        ><br />
-      </div>
-
       <br />
       <vscode-radio-group orientation="vertical">
         <label slot="label">Platform</label>
@@ -46,6 +40,7 @@
         >Installed</vscode-checkbox
       ><br />
       <vscode-checkbox id="official" (click)="changeOfficial()">Official Support</vscode-checkbox><br />
+      <vscode-checkbox id="capOnly" (click)="change()">Capacitor Only</vscode-checkbox><br />
     </div>
   </div>
 </main>

@@ -151,7 +151,8 @@ export class PluginExplorerPanel {
             const list = await getInstalledDeps(path, context);
             webview.postMessage({ command: MessageType.getInstalledDeps, list });
             const uri = await fetchPluginData(webview, extensionUri);
-            webview.postMessage({ command, uri: `${uri}` });
+            const assetsUri = getUri(webview, extensionUri, ['plugin-explorer', 'build', 'assets']).toString();
+            webview.postMessage({ command, uri: `${uri}`, assetsUri: assetsUri });
             break;
           }
         }

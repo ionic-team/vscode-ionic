@@ -1,10 +1,10 @@
 import * as fs from 'fs';
-import * as vscode from 'vscode';
-
-import { InternalCommand } from './command-name';
+import { window, commands } from 'vscode';
+import { CommandName, InternalCommand } from './command-name';
 import { ionicState } from './ionic-tree-provider';
 import { getMonoRepoFolder, MonoRepoType } from './monorepo';
 import { Project } from './project';
+import { showProgress } from './utilities';
 
 export enum PackageManager {
   npm,
@@ -69,6 +69,20 @@ export function preflightNPMCheck(project: Project): string {
   return preop;
 }
 
+export async function suggestInstallAll(project: Project) {
+  ionicState.hasNodeModulesNotified = true;
+  const res = await window.showInformationMessage(
+    `Would you like to install node modules for this project?`,
+    'Yes',
+    'No'
+  );
+  if (res != 'Yes') return;
+  showProgress(`Installing....`, async () => {
+    await project.run2(npmInstallAll());
+    commands.executeCommand(CommandName.Refresh);
+  });
+}
+
 export function npmInstallAll(): string {
   switch (ionicState.repoType) {
     case MonoRepoType.pnpm:
@@ -89,7 +103,7 @@ function pm(operation: PMOperation, name?: string): string {
     case PackageManager.pnpm:
       return pnpm(operation, name);
     default:
-      vscode.window.showErrorMessage('Unknown package manager');
+      window.showErrorMessage('Unknown package manager');
   }
 }
 

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Plugin, PluginInfo } from './plugin-info';
-import { capacitorFrom, capacitorTo } from './test-filter';
 
 export enum PluginFilter {
   installed = 1,
@@ -16,7 +15,6 @@ export class PluginService {
   private installed: any = {};
   private latest: any = {};
   private unknownPlugins: Plugin[] = [];
-
   public async get(url: string) {
     const response = await fetch(url);
     const plugins: Plugin[] = await response.json();
@@ -31,17 +29,16 @@ export class PluginService {
       plugin.title = this.getTitle(name);
       const publishedMonths = this.calcChange(plugin.published);
       plugin.changed = this.changeInMonths(publishedMonths);
-      plugin.tags = this.cleanupTags(plugin.success);
+      plugin.framework = this.getFramework(plugin);
       if (plugin.platforms.length == 1) {
         if (plugin.platforms.includes('android')) {
-          plugin.tags.push('Android Only');
+          plugin.singlePlatform = 'android';
         } else if (plugin.platforms.includes('ios')) {
-          plugin.tags.push('iOS Only');
+          plugin.singlePlatform = 'apple';
         }
       }
-      plugin.tagInfo = `Version ${plugin.version} builds with ${this.prettify(
-        plugin.success
-      )}.\n\n Failed on ${this.prettify(plugin.fails)}`;
+      plugin.moreInfoUrl = this.getMoreInfoUrl(plugin);
+      plugin.tagInfo = this.getTagInfo(plugin);
       plugin.rating = this.calculateRating(scope, plugin, publishedMonths);
       plugin.dailyDownloads = this.calculateDaily(plugin);
       if (plugin.license?.length > 20) {
@@ -52,18 +49,42 @@ export class PluginService {
     this.plugins = plugins;
   }
 
-  private prettify(tests: string[]): string {
-    const res: string[] = [];
-    for (const test of tests) {
-      res.push(
-        test
-          .replace('capacitor-', 'Capacitor ')
-          .replace('cordova-', 'Cordova ')
-          .replace('ios-', 'IOS ')
-          .replace('android-', 'Android ')
-      );
+  private getTagInfo(plugin: Plugin) {
+    let msg = plugin.framework ? `${this.capitialize(plugin.framework)} plugin` : `Package`;
+    if (plugin.singlePlatform) {
+      msg += ` that only works with ${this.capitialize(plugin.singlePlatform)}`;
     }
-    return res.join(', ');
+    return msg + `. Version ${plugin.version} is the latest version reviewed.`;
+  }
+
+  private getMoreInfoUrl(plugin: Plugin): string {
+    let url = 'https://www.npmjs.com/package/' + plugin.name;
+    if (plugin.name.startsWith('@capacitor/')) {
+      url = `https://capacitorjs.com/docs/apis/${plugin.name.replace('@capacitor/', '')}`;
+    } else if (plugin.name.startsWith('@ionic-enterprise/')) {
+      let part = plugin.name.replace('@ionic-enterprise/', '');
+      if (part == 'auth') part = 'auth-connect';
+      url = `https://ionic.io/docs/${part}`;
+    }
+    return url;
+  }
+
+  private capitialize(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  private getFramework(plugin: Plugin): string | undefined {
+    let framework = undefined;
+
+    for (const item of plugin.success) {
+      if (item.includes('capacitor')) {
+        framework = 'capacitor';
+      }
+      if (item.includes('cordova')) {
+        return 'cordova';
+      }
+    }
+    return framework;
   }
 
   public getTitle(name: any): string {
@@ -110,8 +131,10 @@ export class PluginService {
         title: name,
         published: '',
         author: '',
-        tags: [],
         rating: 0,
+        moreInfoUrl: 'https://www.npmjs.com/package/' + name,
+        framework: '',
+        singlePlatform: undefined,
         dailyDownloads: '?',
       });
     }
@@ -120,7 +143,7 @@ export class PluginService {
   public search(
     filters: PluginFilter[],
     terms: string,
-    tests: string[],
+    capacitorOnly: boolean,
     android: boolean,
     ios: boolean,
     both: boolean,
@@ -149,8 +172,8 @@ export class PluginService {
 
         found = found && this.passedPlatforms(android, ios, both, any, plugin);
 
-        if (tests.length > 0) {
-          found = found && this.passedTests(tests, plugin.success);
+        if (capacitorOnly) {
+          found = found && plugin.framework == 'capacitor';
         }
         if (found) {
           count++;
@@ -200,14 +223,6 @@ export class PluginService {
   // We rate @capacitor first then @ionic-enterprise
   private boost(name: string): number {
     return (name.startsWith('@capacitor/') ? 100000 : 0) + (name.startsWith('@ionic-enterprise') ? 10000 : 0);
-  }
-
-  // Returns true if the plugin passed at least one test
-  private passedTests(tests: string[], results: string[]): boolean {
-    for (const test of tests) {
-      if (results.includes(test)) return true;
-    }
-    return false;
   }
 
   // Returns true if the plugin passed at least one test for the platform
@@ -305,22 +320,5 @@ export class PluginService {
       tmp[i] = tmp[i].charAt(0).toUpperCase() + tmp[i].slice(1);
     }
     return tmp.join(' ');
-  }
-
-  // Given a set of tags for successful tests (eg capacitor-ios-4)
-  // Return user friendly names to indicate compatibility (eg Capacitor 4)
-  private cleanupTags(tags: string[]): string[] {
-    const result = [];
-
-    for (let v = capacitorFrom; v <= capacitorTo; v++) {
-      if (tags.includes(`capacitor-ios-${v}`) && tags.includes(`capacitor-android-${v}`)) {
-        result.push(`Capacitor ${v}`);
-      }
-    }
-
-    if (tags.includes(`cordova-ios-6`) && tags.includes(`cordova-android-11`)) {
-      result.push(`Cordova`);
-    }
-    return result;
   }
 }

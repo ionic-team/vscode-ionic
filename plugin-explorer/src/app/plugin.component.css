@@ -52,6 +52,18 @@ vscode-button {
   padding-right: 1rem;
 }
 
+.center-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.center-image {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
 .wide-tip {
   width: 300px !important;
   top: 25px;
