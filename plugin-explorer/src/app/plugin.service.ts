@@ -38,9 +38,7 @@ export class PluginService {
         }
       }
       plugin.moreInfoUrl = this.getMoreInfoUrl(plugin);
-      plugin.tagInfo = `Version ${plugin.version} builds with ${this.prettify(
-        plugin.success
-      )}.\n\n Failed on ${this.prettify(plugin.fails)}`;
+      plugin.tagInfo = this.getTagInfo(plugin);
       plugin.rating = this.calculateRating(scope, plugin, publishedMonths);
       plugin.dailyDownloads = this.calculateDaily(plugin);
       if (plugin.license?.length > 20) {
@@ -51,18 +49,12 @@ export class PluginService {
     this.plugins = plugins;
   }
 
-  private prettify(tests: string[]): string {
-    const res: string[] = [];
-    for (const test of tests) {
-      res.push(
-        test
-          .replace('capacitor-', 'Capacitor ')
-          .replace('cordova-', 'Cordova ')
-          .replace('ios-', 'IOS ')
-          .replace('android-', 'Android ')
-      );
+  private getTagInfo(plugin: Plugin) {
+    let msg = plugin.framework ? `${this.capitialize(plugin.framework)} plugin` : `Package`;
+    if (plugin.singlePlatform) {
+      msg += ` that only works with ${this.capitialize(plugin.singlePlatform)}`;
     }
-    return res.join(', ');
+    return msg + `. Version ${plugin.version} is the latest version reviewed.`;
   }
 
   private getMoreInfoUrl(plugin: Plugin): string {
@@ -75,6 +67,10 @@ export class PluginService {
       url = `https://ionic.io/docs/${part}`;
     }
     return url;
+  }
+
+  private capitialize(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
   private getFramework(plugin: Plugin): string | undefined {
