@@ -15,7 +15,6 @@ import { PluginFilter, PluginService } from './plugin.service';
 import { Plugin } from './plugin-info';
 import { checked, d, setChecked } from './utilities/dom';
 import { MessageType, sendMessage } from './utilities/messages';
-import { TestFilter, getTestFilters } from './test-filter';
 
 // In order to use the Webview UI Toolkit web components they
 // must be registered with the browser (i.e. webview) using the
@@ -42,7 +41,7 @@ export class AppComponent implements OnInit {
   terms = '';
   listTitle = '';
   isInstalled: string | undefined = 'true';
-  testFilters: TestFilter[] = getTestFilters();
+  isCapOnly: string | undefined = 'false';
 
   count = 0;
   assetsUri = '';
@@ -119,9 +118,8 @@ export class AppComponent implements OnInit {
       this.listTitle = 'Official Plugins';
     }
 
-    const checkedTestsTitle = this.checkedTestsTitle();
-    if (checkedTestsTitle != '') {
-      this.listTitle = `Plugins that work with ${checkedTestsTitle}`;
+    if (checked('capOnly')) {
+      this.listTitle = `Plugins excluding Cordova plugins`;
     }
 
     const android = checked('android');
@@ -129,7 +127,7 @@ export class AppComponent implements OnInit {
     const both = checked('both');
     const any = checked('any');
 
-    this.plugins = this.pluginService.search(filters, this.terms, this.checkedTests(), android, ios, both, any);
+    this.plugins = this.pluginService.search(filters, this.terms, checked('capOnly'), android, ios, both, any);
     this.count = this.plugins.length;
 
     if (filters.includes(PluginFilter.search)) this.listTitle += ` related to '${this.terms}'`;
@@ -146,25 +144,5 @@ export class AppComponent implements OnInit {
       console.log(`Send request for ${this.terms}`);
       sendMessage(MessageType.getPlugin, this.terms);
     }
-  }
-
-  private checkedTestsTitle(): string {
-    let result: string[] = [];
-    for (const testFilter of this.testFilters) {
-      if (checked(testFilter.id)) {
-        result = [...result, testFilter.name];
-      }
-    }
-    return result.join(' or ');
-  }
-
-  private checkedTests(): string[] {
-    let result: string[] = [];
-    for (const testFilter of this.testFilters) {
-      if (checked(testFilter.id)) {
-        result = [...result, ...testFilter.list];
-      }
-    }
-    return result;
   }
 }

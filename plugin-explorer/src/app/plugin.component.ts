@@ -23,6 +23,7 @@ import { vscode } from './utilities/vscode';
             <span class="tooltiptext wide-tip">{{ data.tagInfo }}</span>
             <img *ngIf="frameWorkImage" class="ionicon" [src]="frameWorkImage" />
           </div>
+          <img *ngIf="platformImage" class="ionicon" [src]="platformImage" />
         </div>
         <p class="subtitle">{{ data.name }} v{{ data.installed }}</p>
         <!-- <div class="tooltip">
@@ -48,7 +49,7 @@ import { vscode } from './utilities/vscode';
         <p *ngIf="data.dailyDownloads !== '0'">{{ data.dailyDownloads }} Downloads Daily</p>
         <p>{{ data.changed }}</p>
         <p>License: {{ data.license }}</p>
-        <vscode-link [href]="'https://www.npmjs.com/package/' + data.name">More Information</vscode-link><br />
+        <vscode-link [href]="data.moreInfoUrl">More Information</vscode-link><br />
         <vscode-link *ngIf="data.repo && data.updated" [href]="data.repo">Source Code</vscode-link
         ><br *ngIf="data.repo && data.updated" />
         <vscode-link *ngIf="data.bugs" [href]="data.bugs">Report Issue</vscode-link>
@@ -59,11 +60,12 @@ import { vscode } from './utilities/vscode';
 export class PluginComponent {
   _data!: Plugin;
   frameWorkImage: string | undefined;
+  platformImage: string | undefined;
 
   @Input() set data(plugin: Plugin) {
     this._data = plugin;
     this.frameWorkImage = this.getFrameworkImage(plugin.framework);
-    console.log(this.frameWorkImage);
+    this.platformImage = plugin.singlePlatform ? this.assetsUri + `/${plugin.singlePlatform}.svg` : undefined;
   }
   get data(): Plugin {
     return this._data;

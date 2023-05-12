@@ -26,12 +26,6 @@
       </p>
     </div>
     <div class="side">
-      <p>Compatibility</p>
-      <div *ngFor="let filter of testFilters">
-        <vscode-checkbox checked id="{{ filter.id }}" (click)="change()">{{ filter.name }}</vscode-checkbox
-        ><br />
-      </div>
-
       <br />
       <vscode-radio-group orientation="vertical">
         <label slot="label">Platform</label>
@@ -46,6 +40,7 @@
         >Installed</vscode-checkbox
       ><br />
       <vscode-checkbox id="official" (click)="changeOfficial()">Official Support</vscode-checkbox><br />
+      <vscode-checkbox id="capOnly" (click)="change()">Capacitor Only</vscode-checkbox><br />
     </div>
   </div>
 </main>
