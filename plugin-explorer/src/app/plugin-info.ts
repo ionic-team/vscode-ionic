@@ -25,6 +25,7 @@ export interface Plugin {
   dailyDownloads: string; // Calculated
   changed: string; // Calculated
   installed: string; // Calculated: whether the plugin is installed in the current project
+  framework: string | undefined; // Calculated: either capacitor or cordova
 }
 
 export interface PluginInfo {

@@ -18,7 +18,7 @@
     <div style="width: 100%" [hidden]="!plugins || busy">
       <p>{{ listTitle }}</p>
       <div class="panel" *ngFor="let plugin of plugins">
-        <plugin [data]="plugin"></plugin>
+        <plugin [assetsUri]="assetsUri" [data]="plugin"></plugin>
       </div>
       <p style="opacity: 0.5">
         The most popular open source plugins are tested and indexed. Got a plugin that isnt here?

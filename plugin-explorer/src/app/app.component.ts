@@ -45,6 +45,7 @@ export class AppComponent implements OnInit {
   testFilters: TestFilter[] = getTestFilters();
 
   count = 0;
+  assetsUri = '';
   busy = true;
   private searchedPlugin: Plugin | undefined; // Found from search
 
@@ -59,6 +60,7 @@ export class AppComponent implements OnInit {
     switch (event.data.command) {
       case MessageType.getPlugins:
         await this.pluginService.get(event.data.uri);
+        this.assetsUri = event.data.assetsUri;
         this.pluginService.calculatedUnknownPlugins();
         this.search();
         this.busy = false;

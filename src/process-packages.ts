@@ -141,21 +141,21 @@ export function reviewPackages(packages: object, project: Project) {
 
   listPackages(
     project,
-    `Cordova Plugins`,
-    `Your project relies on these Cordova plugins. Consider plugins which have not had updates in more than a year to be a candidate for replacement in favor of a plugin that is actively maintained.`,
+    `Plugins`,
+    `Your project relies on these Capacitor and Cordova plugins. Consider plugins which have not had updates in more than a year to be a candidate for replacement in favor of a plugin that is actively maintained.`,
     packages,
-    [PackageType.CordovaPlugin],
-    TipType.Cordova
-  );
-
-  listPackages(
-    project,
-    `Capacitor Plugins`,
-    `Your project relies on these Capacitor plugins. Consider plugins which have not had updates in more than a year to be a candidate for replacement in favor of a plugin that is actively maintained.`,
-    packages,
-    [PackageType.CapacitorPlugin],
+    [PackageType.CordovaPlugin, PackageType.CapacitorPlugin],
     TipType.Capacitor
   );
+
+  // listPackages(
+  //   project,
+  //   `Capacitor Plugins`,
+  //   `Your project relies on these Capacitor plugins. Consider plugins which have not had updates in more than a year to be a candidate for replacement in favor of a plugin that is actively maintained.`,
+  //   packages,
+  //   [PackageType.CapacitorPlugin],
+  //   TipType.Capacitor
+  // );
 }
 
 // List any plugins that use Cordova Hooks as potential issue

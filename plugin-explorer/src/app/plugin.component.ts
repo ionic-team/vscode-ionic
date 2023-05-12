@@ -17,12 +17,18 @@ import { vscode } from './utilities/vscode';
         <span style="top:55px" class="tooltiptext">{{ data.author?.name ? data.author.name : data.author }}</span>
       </div>
       <div class="panel2">
-        <h2>{{ data.title }}</h2>
+        <div class="center-title">
+          <h2>{{ data.title }}</h2>
+          <div class="tooltip center-image">
+            <span class="tooltiptext wide-tip">{{ data.tagInfo }}</span>
+            <img *ngIf="frameWorkImage" class="ionicon" [src]="frameWorkImage" />
+          </div>
+        </div>
         <p class="subtitle">{{ data.name }} v{{ data.installed }}</p>
-        <div class="tooltip">
+        <!-- <div class="tooltip">
           <span class="tooltiptext wide-tip">{{ data.tagInfo }}</span>
           <vscode-badge *ngFor="let tag of data.tags">{{ tag }}</vscode-badge>
-        </div>
+        </div> -->
         <p>{{ data.description }}</p>
 
         <br />
@@ -32,16 +38,7 @@ import { vscode } from './utilities/vscode';
         }}</vscode-button>
         <vscode-button *ngIf="data.installed" (click)="uninstall()">Uninstall</vscode-button>
         <vscode-button appearance="icon" (click)="chooseVersion()">
-          <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512">
-            <path
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="48"
-              d="M112 184l144 144 144-144"
-            />
-          </svg>
+          <img class="ionicon" [src]="assetsUri + '/chevron-down.svg'" />
         </vscode-button>
       </div>
       <div class="side">
@@ -60,25 +57,19 @@ import { vscode } from './utilities/vscode';
   `,
 })
 export class PluginComponent {
-  @Input() data: Plugin = {
-    name: '',
-    version: '',
-    success: [],
-    fails: [],
-    versions: [],
-    author: '',
-    published: '',
-    title: '',
-    license: '',
-    tags: [],
-    platforms: [],
-    rating: 1,
-    changed: '',
-    ratingInfo: '',
-    tagInfo: '',
-    installed: '',
-    dailyDownloads: '',
-  };
+  _data!: Plugin;
+  frameWorkImage: string | undefined;
+
+  @Input() set data(plugin: Plugin) {
+    this._data = plugin;
+    this.frameWorkImage = this.getFrameworkImage(plugin.framework);
+    console.log(this.frameWorkImage);
+  }
+  get data(): Plugin {
+    return this._data;
+  }
+
+  @Input() assetsUri = '';
 
   hide = false;
 
@@ -101,5 +92,16 @@ export class PluginComponent {
       command: 'choose-version',
       text: this.data.name,
     });
+  }
+
+  private getFrameworkImage(framework: string | undefined): string | undefined {
+    switch (framework) {
+      case 'capacitor':
+        return this.assetsUri + '/capacitor.svg';
+      case 'cordova':
+        return this.assetsUri + '/cordova.svg';
+      default:
+        return undefined;
+    }
   }
 }

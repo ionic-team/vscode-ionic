@@ -16,7 +16,6 @@ export class PluginService {
   private installed: any = {};
   private latest: any = {};
   private unknownPlugins: Plugin[] = [];
-
   public async get(url: string) {
     const response = await fetch(url);
     const plugins: Plugin[] = await response.json();
@@ -32,6 +31,7 @@ export class PluginService {
       const publishedMonths = this.calcChange(plugin.published);
       plugin.changed = this.changeInMonths(publishedMonths);
       plugin.tags = this.cleanupTags(plugin.success);
+      plugin.framework = this.getFramework(plugin);
       if (plugin.platforms.length == 1) {
         if (plugin.platforms.includes('android')) {
           plugin.tags.push('Android Only');
@@ -64,6 +64,20 @@ export class PluginService {
       );
     }
     return res.join(', ');
+  }
+
+  private getFramework(plugin: Plugin): string | undefined {
+    let framework = undefined;
+
+    for (const item of plugin.success) {
+      if (item.includes('capacitor')) {
+        framework = 'capacitor';
+      }
+      if (item.includes('cordova')) {
+        return 'cordova';
+      }
+    }
+    return framework;
   }
 
   public getTitle(name: any): string {
@@ -112,6 +126,7 @@ export class PluginService {
         author: '',
         tags: [],
         rating: 0,
+        framework: '',
         dailyDownloads: '?',
       });
     }

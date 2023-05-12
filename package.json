@@ -158,10 +158,10 @@
       },
       {
         "command": "ionic-official.add",
-        "title": "Ionic: Install Package",
+        "title": "Ionic: Packages",
         "icon": {
-          "light": "resources/light/add.svg",
-          "dark": "resources/dark/add.svg"
+          "light": "resources/light/more.svg",
+          "dark": "resources/dark/more.svg"
         }
       },
       {
