@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.50
+
+- Add recommendation for cordova-sqlite-storage causing errors with Secure Storage
+
 ### Version 1.41
 
 - You can now press ALT+B to build your project

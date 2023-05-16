@@ -352,6 +352,14 @@ export async function capacitorRecommendations(project: Project, forMigration: b
   tips.push(incompatiblePlugin('cordova-plugin-passbook'));
   tips.push(incompatibleReplacementPlugin('cordova-plugin-ionic-keyboard', '@capacitor/keyboard'));
 
+  if (exists('cordova-sqlite-storage') && exists('@ionic-enterprise/secure-storage')) {
+    project.recommendRemove(
+      'cordova-sqlite-storage',
+      'Conflict with Secure Storage',
+      'cordova-sqlite-storage cannot be used with Secure Storage (@ionic-enterprise/secure-storage) as it will cause compilation errors. cordova-sqlite-storage should be removed.'
+    );
+  }
+
   tips.push(
     incompatiblePlugin(
       'cordova-plugin-firebasex',
