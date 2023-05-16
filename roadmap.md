@@ -71,7 +71,6 @@ Alterantive visual web views:
 
 - Run iOS, Android - Show lists of devices and option to run as live reload
 - Splash, Icon, Settings - Named Configuration allow visuals
-- Plugins - Allow checkboxes for functionality with groups Official, Community
 - Support - Link for feedback, framework, each of the components
 - Angular - New components, Show existing pages, components, and settings files
 

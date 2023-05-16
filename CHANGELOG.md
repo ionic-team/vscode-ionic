@@ -1,8 +1,9 @@
 ## Changelog
 
-### Version 1.50
+### Version 1.42
 
 - Add recommendation for cordova-sqlite-storage causing errors with Secure Storage
+- Update to use Trapeze for project configuration (fixes Capacitor 5 Android projects)
 
 ### Version 1.41
 
