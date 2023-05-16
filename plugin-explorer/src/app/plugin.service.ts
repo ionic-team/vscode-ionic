@@ -41,12 +41,22 @@ export class PluginService {
       plugin.tagInfo = this.getTagInfo(plugin);
       plugin.rating = this.calculateRating(scope, plugin, publishedMonths);
       plugin.dailyDownloads = this.calculateDaily(plugin);
-      if (plugin.license?.length > 20) {
-        plugin.license = plugin.license.substring(0, 20) + '...';
-      }
-      //plugin.tags = [...plugin.tags, ...plugin.keywords];
+      plugin.license = this.calculateLicense(plugin);
     }
     this.plugins = plugins;
+  }
+
+  private calculateLicense(plugin: Plugin): string {
+    if (plugin.license?.length > 20) {
+      return plugin.license.substring(0, 20) + '...';
+    }
+    if (plugin.name.startsWith('@ionic-enterprise/')) {
+      return 'Commercial';
+    }
+    if (!plugin.license || plugin.license.length < 1) {
+      return 'Unknown';
+    }
+    return plugin.license;
   }
 
   private getTagInfo(plugin: Plugin) {
@@ -96,7 +106,6 @@ export class PluginService {
 
   public setInstalled(plugins: PluginInfo[]) {
     this.installed = {};
-    console.log(plugins);
     for (const plugin of plugins) {
       this.installed[plugin.name] = plugin.version;
       this.latest[plugin.name] = plugin.latest;
@@ -121,11 +130,11 @@ export class PluginService {
         success: [],
         fails: [],
         version: this.installed[name],
-        ratingInfo: '',
+        ratingInfo: 'This plugin has not been reviewed.',
         tagInfo: '',
         changed: '',
         installed: this.installed[name],
-        license: '',
+        license: 'Unknown',
         versions: [],
         platforms: [],
         title: name,
@@ -150,18 +159,16 @@ export class PluginService {
     any: boolean
   ): Plugin[] {
     let count = 0;
+    const termsWithDash = this.replaceAll(terms, ' ', '-');
 
     const list = this.plugins.filter((plugin) => {
       try {
         let found = true;
         if (filters.includes(PluginFilter.search)) {
           found =
-            plugin.name?.includes(terms) ||
-            plugin.title?.includes(terms) ||
-            plugin.description?.includes(terms) ||
+            this.match(terms, [plugin.name, plugin.title, plugin.description as string]) ||
             plugin.keywords?.includes(terms) ||
             false;
-          console.log(found);
         }
         if (filters.includes(PluginFilter.installed)) {
           found = found && !!this.installed[plugin.name];
@@ -202,8 +209,33 @@ export class PluginService {
     return list.sort((a, b) => this.sortFactor(b) - this.sortFactor(a));
   }
 
+  private match(terms: string, values: string[]): boolean {
+    for (const value of values) {
+      if (!terms.includes(' ')) {
+        return value?.includes(terms);
+      } else {
+        for (const term of terms.split(' ')) {
+          if (value?.includes(term) && term.length > 2) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   private sortFactor(p: Plugin): number {
-    return this.boost(p.name) + p.rating;
+    return this.boost(p.name) + p.rating + this.downloadBoost(p.downloads);
+  }
+
+  private downloadBoost(d: number | undefined): number {
+    if (!d) return 0;
+    const v = d / 100;
+    if (v < 0.9) {
+      return v;
+    } else {
+      return 0.9;
+    }
   }
 
   // Returns an amount of daily downloads: eg (10k, 100)
@@ -260,6 +292,10 @@ export class PluginService {
     } else {
       return info;
     }
+  }
+
+  private replaceAll(str: string, find: string, replace: string): string {
+    return str.replace(new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replace);
   }
 
   private calculateRating(scope: string, plugin: Plugin, publishedMonths: number): number {

@@ -25,7 +25,7 @@ import { vscode } from './utilities/vscode';
           </div>
           <img *ngIf="platformImage" class="ionicon" [src]="platformImage" />
         </div>
-        <p class="subtitle">{{ data.name }} v{{ data.installed }}</p>
+        <p class="subtitle">{{ data.name }} {{ installedVersion }}</p>
         <!-- <div class="tooltip">
           <span class="tooltiptext wide-tip">{{ data.tagInfo }}</span>
           <vscode-badge *ngFor="let tag of data.tags">{{ tag }}</vscode-badge>
@@ -61,11 +61,13 @@ export class PluginComponent {
   _data!: Plugin;
   frameWorkImage: string | undefined;
   platformImage: string | undefined;
+  installedVersion: string | undefined;
 
   @Input() set data(plugin: Plugin) {
     this._data = plugin;
     this.frameWorkImage = this.getFrameworkImage(plugin.framework);
     this.platformImage = plugin.singlePlatform ? this.assetsUri + `/${plugin.singlePlatform}.svg` : undefined;
+    this.installedVersion = plugin.installed ? `v${plugin.installed}` : ``;
   }
   get data(): Plugin {
     return this._data;
