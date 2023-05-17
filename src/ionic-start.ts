@@ -1,8 +1,7 @@
 import { Recommendation } from './recommendation';
 import { Project } from './project';
 import { Tip, TipType } from './tip';
-import { getRunOutput } from './utilities';
-import { ionicState } from './ionic-tree-provider';
+import { getRunOutput, isWindows } from './utilities';
 
 /**
  * Creates ionic start commands
@@ -30,7 +29,7 @@ export async function starterProject(folder: string): Promise<Recommendation[]> 
         'Create Project',
         [
           `npx ionic start @app ${starter.name} --type=${starter.type} --capacitor --package-id=@package-id --no-git`,
-          process.platform === 'win32'
+          isWindows()
             ? `robocopy @app . /MOVE /E /NFL /NDL /NJH /NJS /nc /ns /np`
             : `mv @app/{,.[^.]}* . && rmdir @app`,
         ],

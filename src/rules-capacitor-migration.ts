@@ -4,6 +4,7 @@ import { reviewPluginsWithHooks } from './process-packages';
 import { Project } from './project';
 import { capacitorRecommendations } from './rules-capacitor';
 import { Tip, TipType } from './tip';
+import { isWindows } from './utilities';
 
 export async function capacitorMigrationChecks(packages, project: Project): Promise<void> {
   const tips: Tip[] = [];
@@ -28,7 +29,7 @@ export async function capacitorMigrationChecks(packages, project: Project): Prom
   tips.push(reviewPlugin('newrelic-cordova-plugin'));
 
   if (exists('cordova-ios') || exists('cordova-android') || project.fileExists('config.xml')) {
-    const movecmd = process.platform === 'win32' ? 'rename config.xml config.xml.bak' : 'mv config.xml config.xml.bak';
+    const movecmd = isWindows() ? 'rename config.xml config.xml.bak' : 'mv config.xml config.xml.bak';
     tips.push(
       new Tip(
         'Remove Cordova Project',

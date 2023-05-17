@@ -19,7 +19,7 @@ import {
 import { checkMigrationAngularToolkit } from './rules-angular-toolkit';
 import { Project } from './project';
 import { Tip, TipType } from './tip';
-import { asAppId, getRunOutput, showProgress } from './utilities';
+import { asAppId, getRunOutput, isWindows, showProgress } from './utilities';
 import { capacitorAdd } from './capacitor-add';
 import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall, npx } from './node-commands';
@@ -403,7 +403,7 @@ export async function capacitorRecommendations(project: Project, forMigration: b
     )
   );
 
-  if (process.platform !== 'win32' && exists('@capacitor/ios')) {
+  if (!isWindows() && exists('@capacitor/ios')) {
     const cocoaPods = await getCocoaPodsVersion(project);
     if (cocoaPods && !isVersionGreaterOrEqual(cocoaPods, '1.12.1')) {
       project.add(

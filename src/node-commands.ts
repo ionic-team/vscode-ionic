@@ -59,18 +59,24 @@ export function addCommand(): string {
  */
 export function preflightNPMCheck(project: Project): string {
   const nmf = project.getNodeModulesFolder();
-  let preop = !fs.existsSync(nmf) ? npmInstallAll() + ' && ' : '';
+  const preop = !fs.existsSync(nmf) ? npmInstallAll() + ' && ' : '';
 
   // If not set then set to a default value to prevent failrue
   if (!process.env.ANDROID_SDK_ROOT && !process.env.ANDROID_HOME && process.platform !== 'win32') {
-    preop = preop + 'export ANDROID_HOME=~/Library/Android/sdk && ';
+    process.env.ANDROID_HOME = `~/Library/Android/sdk`;
+    //preop = preop + 'export ANDROID_HOME=~/Library/Android/sdk && ';
   }
 
   return preop;
 }
 
 export async function suggestInstallAll(project: Project) {
+  if (!ionicState || !ionicState.hasPackageJson) {
+    return;
+  }
+
   ionicState.hasNodeModulesNotified = true;
+
   const res = await window.showInformationMessage(
     `Would you like to install node modules for this project?`,
     'Yes',

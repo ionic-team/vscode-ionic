@@ -1,7 +1,7 @@
 import { Project } from './project';
 import * as vscode from 'vscode';
 import { PackageManager } from './node-commands';
-import { getRunOutput, replaceAll } from './utilities';
+import { getRunOutput, isWindows, replaceAll } from './utilities';
 import { writeError, writeIonic } from './logging';
 import { isGreaterOrEqual } from './analyzer';
 import { readAngularJson, writeAngularJson } from './rules-angular-json';
@@ -51,7 +51,8 @@ function migrateToPNPM(): Array<string> {
 }
 
 function reinstallNodeModules(): Array<string> {
-  return ['rm -rf node_modules', 'npm install'];
+  const cmd = isWindows() ? 'del node_modules /S /Q' : 'rm -rf node_modules';
+  return [cmd, 'npm install'];
 }
 
 async function runCommands(commands: Array<string>, title: string, project: Project): Promise<void> {
