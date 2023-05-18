@@ -1,6 +1,6 @@
 import { writeError, writeIonic } from './logging';
 import { Project } from './project';
-import { openUri, run, RunResults, showProgress, stripJSON } from './utilities';
+import { isWindows, openUri, run, RunResults, showProgress, stripJSON } from './utilities';
 import * as vscode from 'vscode';
 import { basename, extname, join } from 'path';
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'fs';
@@ -24,7 +24,7 @@ export async function analyzeSize(project: Project) {
         args = '--configuration=production';
       }
       const cmd = ionicBuild(project, args);
-      const bumpSize = process.platform !== 'win32' ? 'export NODE_OPTIONS="--max-old-space-size=8192" && ' : '';
+      const bumpSize = !isWindows() ? 'export NODE_OPTIONS="--max-old-space-size=8192" && ' : '';
       try {
         await run2(project, `${bumpSize}${cmd}`, undefined);
       } catch (err) {

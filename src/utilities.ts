@@ -36,6 +36,10 @@ export function estimateRunTime(command: string) {
   }
 }
 
+export function isWindows(): boolean {
+  return process.platform === 'win32';
+}
+
 function runOptions(command: string, folder: string, shell?: string) {
   const env = { ...process.env };
   const javaHome: string = getExtSetting(ExtensionSetting.javaHome);
@@ -63,7 +67,7 @@ function runOptions(command: string, folder: string, shell?: string) {
 
   if (javaHome) {
     env.JAVA_HOME = javaHome;
-  } else if (!env.JAVA_HOME && process.platform !== 'win32') {
+  } else if (!env.JAVA_HOME && !isWindows()) {
     const jHome = '/Applications/Android Studio.app/Contents/jre/Contents/Home';
     if (existsSync(jHome)) {
       env.JAVA_HOME = jHome;
@@ -523,7 +527,7 @@ export function getPackageJSON(folder: string): PackageFile {
 }
 
 export function alt(key: string): string {
-  return process.platform === 'win32' ? `Alt+${key}` : `⌥+${key}`;
+  return isWindows() ? `Alt+${key}` : `⌥+${key}`;
 }
 
 export function getStringFrom(data: string, start: string, end: string): string {
