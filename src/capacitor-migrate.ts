@@ -1,7 +1,7 @@
 import { existsSync, lstatSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import * as vscode from 'vscode';
-import { exists, isVersionGreaterOrEqual } from './analyzer';
+import { exists, isLess, isVersionGreaterOrEqual } from './analyzer';
 import { clearOutput, showOutput, write, writeError, writeIonic, writeWarning } from './logging';
 import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
@@ -62,6 +62,21 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
   await showProgress(`Checking plugins in your project...`, async () => {
     report = await checkPeerDependencies(project.folder, '@capacitor/core', versionFull);
   });
+
+  // Set of minimum versions for dependencies
+  const minVersions = [
+    { dep: '@ionic-enterprise/identity-vault', version: '5.10.1' },
+    { dep: '@ionic-enterprise/google-pay', version: '2.0.0' },
+    { dep: '@ionic-enterprise/apple-pay', version: '2.0.0' },
+    { dep: '@ionic-enterprise/zebra-scanner', version: '2.0.0' },
+  ];
+
+  for (const minVersion of minVersions) {
+    if (exists(minVersion.dep) && isLess(minVersion.dep, minVersion.version)) {
+      write(`${minVersion.dep} will be updated to ${minVersion.version}`);
+      report.commands.push(npmInstall(`${minVersion.dep}@${minVersion.version}`, '--force'));
+    }
+  }
 
   if (report.incompatible.length > 0) {
     const result = await vscode.window.showErrorMessage(
