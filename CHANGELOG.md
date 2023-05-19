@@ -4,6 +4,7 @@
 
 - Fix for NX projects when node modules are not installed
 - Fix for the build command when an Angular configuration is selected
+- Fix for Angular project with multiple configurations
 
 ### Version 1.42
 

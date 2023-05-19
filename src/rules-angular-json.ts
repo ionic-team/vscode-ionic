@@ -25,7 +25,9 @@ export function checkAngularJson(project: Project) {
         if (!ionicState.configuration && defaultConfiguration) {
           ionicState.configuration = defaultConfiguration;
         }
-        ionicState.project = projectName == 'app' ? undefined : projectName;
+        if (!ionicState.project) {
+          ionicState.project = projectName;
+        }
         if (angular.projects[projectName].architect?.build?.options?.aot === false) {
           project.add(
             new Tip(
@@ -37,6 +39,9 @@ export function checkAngularJson(project: Project) {
           break;
         }
       }
+    }
+    if (ionicState.project == 'app') {
+      ionicState.project = undefined;
     }
   } catch (e) {
     writeError(e);
