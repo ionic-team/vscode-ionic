@@ -87,7 +87,7 @@ export class Project {
       case MonoRepoType.folder:
         return this.monoRepo ? this.monoRepo.folder : this.folder;
       case MonoRepoType.nx:
-        return this.monoRepo.folder;
+        return this.monoRepo ? this.monoRepo.folder : this.folder;
       default:
         return path.join(this.folder, this.monoRepo.folder);
     }
@@ -274,6 +274,10 @@ export class Project {
 
   public async run2(command: string, suppressOutput?: boolean): Promise<boolean> {
     return await run(this.projectFolder(), command, undefined, [], [], undefined, undefined, undefined, suppressOutput);
+  }
+
+  public async runAtRoot(command: string, suppressOutput?: boolean): Promise<boolean> {
+    return await run(this.folder, command, undefined, [], [], undefined, undefined, undefined, suppressOutput);
   }
 
   public asRecommendation(tip: Tip): Recommendation {

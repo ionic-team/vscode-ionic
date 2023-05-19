@@ -7,6 +7,7 @@ import { InternalCommand } from './command-name';
 import { npx, preflightNPMCheck } from './node-commands';
 import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
+import { getConfigurationArgs } from './build-configuration';
 
 /**
  * Creates the ionic build command
@@ -22,6 +23,10 @@ export function ionicBuild(project: Project, configurationArg?: string, platform
   let args = configurationArg ? configurationArg : '';
   if (ionicState.project) {
     args += ` --project=${ionicState.project}`;
+  }
+  const additionalArgs = getConfigurationArgs(false);
+  if (additionalArgs) {
+    args += additionalArgs;
   }
   switch (project.repoType) {
     case MonoRepoType.none:

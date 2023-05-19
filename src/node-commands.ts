@@ -84,7 +84,7 @@ export async function suggestInstallAll(project: Project) {
   );
   if (res != 'Yes') return;
   showProgress(`Installing....`, async () => {
-    await project.run2(npmInstallAll());
+    await project.runAtRoot(npmInstallAll());
     commands.executeCommand(CommandName.Refresh);
   });
 }
