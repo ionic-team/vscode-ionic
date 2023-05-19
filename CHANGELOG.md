@@ -3,6 +3,7 @@
 ### Version 1.43
 
 - Fix for NX projects when node modules are not installed
+- Fix for the build command when an Angular configuration is selected
 
 ### Version 1.42
 
