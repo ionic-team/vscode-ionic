@@ -69,6 +69,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
     { dep: '@ionic-enterprise/google-pay', version: '2.0.0' },
     { dep: '@ionic-enterprise/apple-pay', version: '2.0.0' },
     { dep: '@ionic-enterprise/zebra-scanner', version: '2.0.0' },
+    { dep: '@capacitor-community/firebase-analytics', version: '5.0.0' },
   ];
 
   for (const minVersion of minVersions) {
