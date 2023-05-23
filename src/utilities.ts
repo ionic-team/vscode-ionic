@@ -57,14 +57,6 @@ function runOptions(command: string, folder: string, shell?: string) {
     env.LANG = 'en_US.UTF-8';
   }
 
-  if (process.env.NODE_TLS_REJECT_UNAUTHORIZED) {
-    if (process.env.NODE_TLS_REJECT_UNAUTHORIZED == '0') {
-      // See https://github.com/cweijan/vscode-database-client/issues/834
-      writeWarning(`Another VS Code extension on this machine has disabled TLS (NODE_TLS_REJECT_UNAUTHORIZED).`);
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
-    }
-  }
-
   if (javaHome) {
     env.JAVA_HOME = javaHome;
   } else if (!env.JAVA_HOME && !isWindows()) {

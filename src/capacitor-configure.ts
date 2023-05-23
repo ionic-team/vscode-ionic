@@ -254,6 +254,7 @@ async function setBundleId(bundleId: string, prj: Project, platform: NativePlatf
       await project.android?.setPackageName(newBundleId);
     } catch (error) {
       writeError(`Unable to setPackageName for android: ${error}`);
+      console.error(error);
       return;
     }
   }

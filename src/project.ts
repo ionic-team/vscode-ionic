@@ -591,14 +591,6 @@ function checkNodeVersion() {
 }
 
 export async function installPackage(extensionPath: string, folder: string) {
-  let items: Array<vscode.QuickPickItem> = [];
-  const filename = path.join(extensionPath, 'resources', 'packages.json');
-  items = JSON.parse(fs.readFileSync(filename) as any);
-  items.map((item) => {
-    item.description = item.detail;
-    item.detail = undefined;
-  });
-  //const selected = await vscode.window.showQuickPick(items, { placeHolder: 'Select a package to install' });
   const selected = await vscode.window.showInputBox({ placeHolder: 'Enter package name to install' });
   if (!selected) return;
 

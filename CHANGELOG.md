@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.44
+
+- Fix to include missing .jar files from Trapeze
+
 ### Version 1.43
 
 - Fix for NX projects when node modules are not installed

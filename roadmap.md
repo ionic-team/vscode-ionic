@@ -2,6 +2,7 @@
 
 - If local address is turned on then show warning on start that Nexus wont work
 - React Vite can write Network: rather than External:
+- (feat) Add Capacitor plugin to the starters
 
 - (feat) if @angular/core >= 14 and no .eslintrc.json or exists(tslint) then recommend eslint migration:
 

@@ -30,4 +30,5 @@ plugin-explorer/src
 .husky
 **/*.ts
 **/*.jar
+!node_modules/@trapezedev/**/*.jar
 **/*.map
