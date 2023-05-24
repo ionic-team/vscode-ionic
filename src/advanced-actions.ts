@@ -71,6 +71,9 @@ function showIgnoredRecommendations(): void {
 
 async function runCommands(commands: Array<string>, title: string, project: Project): Promise<void> {
   try {
+    if (title.includes(')')) {
+      title = title.substring(title.indexOf(')') + 1);
+    }
     await vscode.window.withProgress(
       { location: vscode.ProgressLocation.Notification, title, cancellable: false },
       async () => {

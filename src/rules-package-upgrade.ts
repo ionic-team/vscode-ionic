@@ -40,11 +40,11 @@ export async function packageUpgrade(info: PackageInfo, folder: string): Promise
     }
   }
   const selection: QuickPickItem = await vscode.window.showQuickPick(picks, {
-    placeHolder: `Upgrade to version of ${info.name}`,
+    placeHolder: `Update to version of ${info.name}`,
   });
   if (!selection) return;
 
-  const message = `Upgrade ${info.name} to ${selection.label}`;
+  const message = `Update ${info.name} to ${selection.label}`;
   await fixIssue(
     npmInstall(`${info.name}@${selection.label}`),
     folder,
