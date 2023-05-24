@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.45
+
+- Plugin Search!
+- Show Ignored Recommendations (from Project ... menu)
+
 ### Version 1.44
 
 - Fix to include missing .jar files from Trapeze

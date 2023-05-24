@@ -19,6 +19,10 @@ export enum ExtensionSetting {
   javaHome = 'javaHome',
 }
 
+export enum GlobalSetting {
+  lastTipsShown = 'lastTipsShown',
+}
+
 export function getSetting(key: WorkspaceSetting): any {
   return ionicState.context.workspaceState.get(key);
 }
@@ -29,4 +33,12 @@ export async function setSetting(key: WorkspaceSetting, value: any): Promise<voi
 
 export function getExtSetting(key: ExtensionSetting): any {
   return vscode.workspace.getConfiguration('ionic').get(key);
+}
+
+export function getGlobalSetting(key: GlobalSetting): any {
+  return ionicState.context.globalState.get(key);
+}
+
+export function setGlobalSetting(key: GlobalSetting, value: any): any {
+  return ionicState.context.globalState.update(key, value);
 }
