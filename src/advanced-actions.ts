@@ -7,12 +7,16 @@ import { isGreaterOrEqual } from './analyzer';
 import { readAngularJson, writeAngularJson } from './rules-angular-json';
 import { join } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { ionicState } from './ionic-tree-provider';
+import { clearIgnored } from './ignore';
+import { CommandName } from './command-name';
 
 enum Features {
-  migrateToPNPM = 'Migrate to PNPM',
-  migrateToNX = 'Migrate to NX',
-  reinstallNodeModules = 'Reinstall Node Modules',
-  angularESBuild = 'Switch from WebPack to ESBuild (experimental)',
+  migrateToPNPM = '$(find-replace) Migrate to PNPM',
+  migrateToNX = '$(outline-view-icon) Migrate to NX',
+  reinstallNodeModules = '$(extensions-sync-enabled) Reinstall Node Modules',
+  angularESBuild = '$(test-view-icon) Switch from WebPack to ESBuild (experimental)',
+  showIgnoredRecommendations = '$(checklist) Show Ignored Recommendations',
 }
 
 export async function advancedActions(project: Project) {
@@ -24,6 +28,7 @@ export async function advancedActions(project: Project) {
       picks.push(Features.migrateToNX);
     }
     picks.push(Features.reinstallNodeModules);
+    picks.push(Features.showIgnoredRecommendations);
   }
   if (isGreaterOrEqual('@angular-devkit/build-angular', '14.0.0')) {
     if (!angularUsingESBuild(project)) {
@@ -43,6 +48,10 @@ export async function advancedActions(project: Project) {
       break;
     case Features.angularESBuild:
       switchAngularToESBuild(project);
+      break;
+    case Features.showIgnoredRecommendations:
+      showIgnoredRecommendations();
+      break;
   }
 }
 
@@ -53,6 +62,11 @@ function migrateToPNPM(): Array<string> {
 function reinstallNodeModules(): Array<string> {
   const cmd = isWindows() ? 'del node_modules /S /Q' : 'rm -rf node_modules';
   return [cmd, 'npm install'];
+}
+
+function showIgnoredRecommendations(): void {
+  clearIgnored(ionicState.context);
+  vscode.commands.executeCommand(CommandName.Refresh);
 }
 
 async function runCommands(commands: Array<string>, title: string, project: Project): Promise<void> {

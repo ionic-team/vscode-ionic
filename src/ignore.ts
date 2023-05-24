@@ -35,6 +35,11 @@ export function getIgnored(context: vscode.ExtensionContext): Array<string> {
   }
 }
 
+export function clearIgnored(context: vscode.ExtensionContext) {
+  const key = 'ignoredRecommendations';
+  context.workspaceState.update(key, undefined);
+}
+
 export function excludeIgnoredTips(tips: Array<Tip>, context: vscode.ExtensionContext): Array<Tip> {
   const key = 'ignoredRecommendations';
   const listJSON: string = context.workspaceState.get(key);
