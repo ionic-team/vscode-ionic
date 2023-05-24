@@ -1,5 +1,5 @@
 import { window } from 'vscode';
-import { GlobalSetting, getGlobalSetting, getSetting, setGlobalSetting, setSetting } from './workspace-state';
+import { GlobalSetting, getGlobalSetting, setGlobalSetting } from './workspace-state';
 import { alt } from './utilities';
 
 // Feature Flags for experimental options

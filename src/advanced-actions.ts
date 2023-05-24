@@ -16,7 +16,7 @@ enum Features {
   migrateToNX = '$(outline-view-icon) Migrate to NX',
   reinstallNodeModules = '$(extensions-sync-enabled) Reinstall Node Modules',
   angularESBuild = '$(test-view-icon) Switch from WebPack to ESBuild (experimental)',
-  showIgnoredRecommendations = '$(checklist) Show Ignored Recommendations',
+  showIgnoredRecommendations = '$(light-bulb) Show Ignored Recommendations',
 }
 
 export async function advancedActions(project: Project) {
