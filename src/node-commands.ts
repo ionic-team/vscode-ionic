@@ -16,6 +16,7 @@ export enum PMOperation {
   install,
   installAll,
   uninstall,
+  update,
   run,
 }
 
@@ -100,6 +101,17 @@ export function npmInstallAll(): string {
   }
 }
 
+export function npmUpdate(): string {
+  switch (ionicState.repoType) {
+    case MonoRepoType.pnpm:
+    case MonoRepoType.lerna:
+    case MonoRepoType.folder:
+      return InternalCommand.cwd + pm(PMOperation.update);
+    default:
+      return pm(PMOperation.update);
+  }
+}
+
 function pm(operation: PMOperation, name?: string): string {
   switch (ionicState.packageManager) {
     case PackageManager.npm:
@@ -123,6 +135,8 @@ function yarn(operation: PMOperation, name?: string): string {
       return `yarn remove ${name}`;
     case PMOperation.run:
       return `yarn run ${name}`;
+    case PMOperation.update:
+      return `yarn update`;
   }
 }
 
@@ -136,6 +150,8 @@ function npm(operation: PMOperation, name?: string): string {
       return `npm uninstall ${name}`;
     case PMOperation.run:
       return `npm run ${name}`;
+    case PMOperation.update:
+      return `npm update`;
   }
 }
 
@@ -149,6 +165,8 @@ function pnpm(operation: PMOperation, name?: string): string {
       return `pnpm remove ${name}`;
     case PMOperation.run:
       return `pnpm ${name}`;
+    case PMOperation.update:
+      return `pnpm update`;
   }
 }
 
