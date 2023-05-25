@@ -59,7 +59,7 @@ export const writeConsistentVersionError = (lib1: string, ver1: string, lib2: st
     `Version of ${libString(lib2, ver2)} must match ${libString(lib1, ver1)}`,
     TipType.Error,
     undefined,
-    `${lib2}@${ver1}`,
+    npmInstall(`${lib2}@${ver1}`),
     `Upgrade`,
     `${lib2} successfully updated.`
   ).canIgnore();
