@@ -67,8 +67,8 @@ export class PluginService {
     return msg + `. Version ${plugin.version} is the latest version reviewed.`;
   }
 
-  private getMoreInfoUrl(plugin: Plugin): string {
-    let url = 'https://www.npmjs.com/package/' + plugin.name;
+  public getMoreInfoUrl(plugin: Plugin): string {
+    let url = `https://www.npmjs.com/package/${plugin.name}`;
     if (plugin.name.startsWith('@capacitor/')) {
       url = `https://capacitorjs.com/docs/apis/${plugin.name.replace('@capacitor/', '')}`;
     } else if (plugin.name.startsWith('@ionic-enterprise/')) {
@@ -303,45 +303,47 @@ export class PluginService {
     plugin.ratingInfo = '';
     const official = scope == '@capacitor' || scope == '@ionic-enterprise';
     // Must have github stars, be less than 12 months old, or an official plugin
-    if ((plugin.stars && plugin.stars > 100 && publishedMonths < 13) || official) {
+    if ((plugin.stars && plugin.stars > 100) || official) {
       rating++;
-      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'Popular on Github');
+      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'popular on GitHub');
+    } else {
+      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'not that popular on GitHub');
     }
 
     if (publishedMonths >= 13) {
-      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'Possibly Unmaintained');
+      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'possibly unmaintained');
     }
 
     // Has source in Github that has been updated
     if (plugin.updated && publishedMonths < 13) {
       rating++;
-      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'Updated Frequently');
+      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'updated frequently');
     }
 
     // Has npm downloads of > 1000 per month
     if (plugin.downloads && plugin.downloads > 1000) {
       rating++;
-      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'Regularly Downloaded');
+      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'regularly downloaded');
     } else {
-      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'Infrequently Used');
+      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'infrequently used');
     }
 
     // Has a source repo and isnt  version 0.x
     if (plugin.repo && !plugin.version.startsWith('0')) {
       rating++;
-      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'Is Open Source');
+      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'is open source');
     } else if (!plugin.repo) {
-      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'Is Closed Source / Commercial');
+      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'is closed source / commercial');
     }
 
     if (plugin.version.startsWith('0')) {
-      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'Is A Beta Release');
+      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'is a development release');
     }
 
     // If it doesnt build then rate it 0
     if (plugin.success.length == 0) {
       rating = 0;
-      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'Does not compile');
+      plugin.ratingInfo = this.sentence(plugin.ratingInfo, 'does not compile');
     }
 
     if (official) {

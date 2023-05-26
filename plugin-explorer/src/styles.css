@@ -44,6 +44,11 @@ vscode-text-field {
   z-index: 1;
 }
 
+.small-tooltip {
+  font-size: smaller !important;
+  width: 190px;
+}
+
 .ionicon {
   width: 16px;
   height: 16px;

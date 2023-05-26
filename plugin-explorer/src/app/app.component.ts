@@ -72,6 +72,7 @@ export class AppComponent implements OnInit {
           this.searchedPlugin.title = this.pluginService.getTitle(this.searchedPlugin.name);
           this.searchedPlugin.dailyDownloads = '0';
           this.searchedPlugin.ratingInfo = 'This dependency was found on npmjs.com and has not been tested yet.';
+          this.searchedPlugin.moreInfoUrl = this.pluginService.getMoreInfoUrl(this.searchedPlugin);
           this.plugins.push(this.searchedPlugin);
           if (this.plugins.length == 1) {
             this.listTitle = `Found "${this.searchedPlugin.name}" on npmjs.com`;
