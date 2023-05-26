@@ -1,10 +1,12 @@
 import { Project } from './project';
 import { MonoRepoType } from './monorepo';
-import { exists } from './analyzer';
+import { isGreaterOrEqual } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
 import { InternalCommand } from './command-name';
 import { useIonicCLI } from './capacitor-run';
 import { npx, PackageManager } from './node-commands';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 /**
  * Capacitor open command
@@ -14,6 +16,10 @@ import { npx, PackageManager } from './node-commands';
  */
 export function capacitorOpen(project: Project, platform: CapacitorPlatform): string {
   const ionicCLI = useIonicCLI();
+
+  if (platform == CapacitorPlatform.android) {
+    checkAndroidStudioJDK(project.projectFolder());
+  }
   switch (project.repoType) {
     case MonoRepoType.none:
       return ionicCLI ? ionicCLIOpen(platform, project.packageManager) : capCLIOpen(platform, project.packageManager);
@@ -46,4 +52,25 @@ function nxOpen(project: Project, platform: CapacitorPlatform): string {
     return capCLIOpen(platform, project.packageManager);
   }
   return `${npx(project.packageManager)} nx run ${project.monoRepo.name}:open:${platform}`;
+}
+
+// This will create the default files that specify the JDK version to use for a project that has never been opened in Android Studio
+function checkAndroidStudioJDK(folder: string): void {
+  if (isGreaterOrEqual('@capacitor/android', '5.0.0')) {
+    if (existsSync(join(folder, 'android'))) {
+      const ideaFolder = join(folder, 'android', '.idea');
+      if (!existsSync(ideaFolder)) {
+        mkdirSync(ideaFolder);
+        writeFileSync(
+          join(ideaFolder, 'compiler.xml'),
+          `<?xml version="1.0" encoding="UTF-8"?>
+        <project version="4">
+          <component name="CompilerConfiguration">
+            <bytecodeTargetLevel target="17" />
+          </component>
+        </project>`
+        );
+      }
+    }
+  }
 }

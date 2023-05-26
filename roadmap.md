@@ -4,8 +4,8 @@
 - React Vite can write Network: rather than External:
 - (feat) Add Capacitor plugin to the starters
 - On hover over rating show: star count, forks, watchers, issues and link to explanation of rating.
-- Docs on plugin registry
 - Use HTTPS on windows doesnt work
+- Export Statistics on React v7 projects no longer works due to source maps
 - (feat) if @angular/core >= 14 and no .eslintrc.json or exists(tslint) then recommend eslint migration:
 
 - (feat) Coding standards: Review
