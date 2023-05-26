@@ -59,9 +59,11 @@ function migrateToPNPM(): Array<string> {
   return ['pnpm -v', 'rm -rf node_modules', 'pnpm import', 'pnpm install', 'rm package-lock.json'];
 }
 
+export function removeNodeModules(): string {
+  return isWindows() ? 'del node_modules /S /Q' : 'rm -rf node_modules';
+}
 function reinstallNodeModules(): Array<string> {
-  const cmd = isWindows() ? 'del node_modules /S /Q' : 'rm -rf node_modules';
-  return [cmd, 'npm install'];
+  return [removeNodeModules(), 'npm install'];
 }
 
 function showIgnoredRecommendations(): void {
@@ -71,6 +73,9 @@ function showIgnoredRecommendations(): void {
 
 async function runCommands(commands: Array<string>, title: string, project: Project): Promise<void> {
   try {
+    if (title.includes(')')) {
+      title = title.substring(title.indexOf(')') + 1);
+    }
     await vscode.window.withProgress(
       { location: vscode.ProgressLocation.Notification, title, cancellable: false },
       async () => {

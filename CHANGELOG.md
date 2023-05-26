@@ -1,9 +1,10 @@
 ## Changelog
 
-### Version 1.45
+### Version 1.45.2
 
 - Plugin Search!
 - Show Ignored Recommendations (from Project ... menu)
+- Fix for Capacitor 5 migration with Cordova plugins that require jetifier
 
 ### Version 1.44
 

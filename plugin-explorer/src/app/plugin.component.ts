@@ -44,7 +44,11 @@ import { vscode } from './utilities/vscode';
       </div>
       <div class="side">
         <star class="tooltip" [rating]="data.rating">
-          <span class="tooltiptext">{{ data.ratingInfo }}</span>
+          <span class="tooltiptext small-tooltip"
+            >This plugin was
+            <a href="https://capacitorjs.com/docs/vscode/plugins#plugin-ratings">automatically rated</a> based on being
+            {{ data.ratingInfo }}</span
+          >
         </star>
         <p *ngIf="data.dailyDownloads !== '0'">{{ data.dailyDownloads }} Downloads Daily</p>
         <p>{{ data.changed }}</p>

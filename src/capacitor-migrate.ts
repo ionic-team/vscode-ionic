@@ -3,7 +3,7 @@ import { join } from 'path';
 import * as vscode from 'vscode';
 import { exists, isLess, isVersionGreaterOrEqual } from './analyzer';
 import { clearOutput, showOutput, write, writeError, writeIonic, writeWarning } from './logging';
-import { npmInstall, npmUninstall } from './node-commands';
+import { npmInstall, npmUninstall, npmUpdate } from './node-commands';
 import { Project } from './project';
 import { getRunOutput, getStringFrom, plural, pluralize, run, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
@@ -14,6 +14,7 @@ import { openUri } from './utilities';
 import { capacitorOpen } from './capacitor-open';
 import { CapacitorPlatform } from './capacitor-platform';
 import { checkPeerDependencies, PeerReport } from './peer-dependencies';
+import { removeNodeModules } from './advanced-actions';
 
 export async function migrateCapacitor5(project: Project, currentVersion: string): Promise<ActionResult> {
   const coreVersion = '5';
@@ -50,7 +51,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
         'OK',
         'Continue'
       );
-      if (result != 'Continue') {
+      if (result !== 'Continue') {
         return;
       }
     }
@@ -75,6 +76,16 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
     if (exists(minVersion.dep) && isLess(minVersion.dep, minVersion.version)) {
       write(`${minVersion.dep} will be updated to ${minVersion.version}`);
       report.commands.push(npmInstall(`${minVersion.dep}@${minVersion.version}`, '--force'));
+    }
+  }
+
+  const incompatible = [
+    { name: 'phonegap-plugin-barcodescanner', reason: 'it requires android.enableJetifier=true in gradle.properties' },
+  ];
+  for (const plugin of incompatible) {
+    if (exists(plugin.name)) {
+      writeError(`${plugin.name} is incompatible with Capacitor ${coreVersion} because ${plugin.reason}`);
+      report.incompatible.push(plugin.name);
     }
   }
 
@@ -116,12 +127,21 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
     }
     const cmd = npmInstall(`@capacitor/cli@${coreVersion} --save-dev --force`);
     write(`> ${cmd}`);
-    await project.run2(cmd);
+    await project.run2(cmd, true);
     const manager = getPackageManager(ionicState.packageManager);
-    const cmd2 = `npx cap migrate --noprompt --packagemanager=${manager}`;
-    write(`> ${cmd2}`);
     try {
-      await project.run2(cmd2);
+      const result = await getRunOutput(
+        logCmd(`npx cap migrate --noprompt --packagemanager=${manager}`),
+        project.projectFolder()
+      );
+      write(result);
+      if (result.includes('[error] npm install failed. Try deleting node_modules')) {
+        writeIonic('Attempting to reinstall node modules....');
+        await project.run2(logCmd(removeNodeModules()));
+        await project.run2(logCmd(npmUpdate()));
+        writeIonic('Completed install. You should sync and test your project.');
+      }
+      // await project.run2(cmd2);
     } finally {
       writeIonic(`Capacitor ${versionTitle} Migration Completed.`);
       showOutput();
@@ -142,6 +162,11 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
       openUri(changesLink);
     }
   });
+}
+
+function logCmd(cmd: string): string {
+  write(`> ${cmd}`);
+  return cmd;
 }
 
 async function checkJDK(project: Project): Promise<number> {
