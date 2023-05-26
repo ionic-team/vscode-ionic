@@ -5,6 +5,7 @@
 - Plugin Search!
 - Show Ignored Recommendations (from Project ... menu)
 - Fix for Capacitor 5 migration with Cordova plugins that require jetifier
+- Fix for new projects where a number was used as part of the application name
 
 ### Version 1.44
 

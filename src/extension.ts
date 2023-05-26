@@ -63,6 +63,14 @@ async function requestAppName(tip: Tip, path: string) {
     if (!packageId.includes('.')) {
       packageId = `ionic.${packageId}`;
     }
+
+    const parts = packageId.split('.');
+    for (const part of parts) {
+      if (!isNaN(part as any)) {
+        packageId = packageId.replace(part, `v${part}`);
+      }
+    }
+
     for (const command of tip.command) {
       commands.push(
         command
