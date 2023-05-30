@@ -4,7 +4,7 @@ import * as path from 'path';
 
 import { Recommendation } from './recommendation';
 import { Tip, TipType } from './tip';
-import { load, exists } from './analyzer';
+import { load, exists, isGreaterOrEqual } from './analyzer';
 import { isRunning } from './tasks';
 import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
@@ -43,6 +43,9 @@ export class Project {
   public monoRepo: MonoRepoProject;
 
   public isCapacitorPlugin: boolean;
+
+  // Yarn version from package.json packageManager property
+  public yarnVersion: string;
 
   constructor(_name: string) {
     this.name = _name;
@@ -382,6 +385,10 @@ export class Project {
 
     this.group.children.push(r);
     this.subgroup = r;
+  }
+
+  public isModernYarn() {
+    return !!this.yarnVersion;
   }
 
   private updatePackages(r: Recommendation): string {

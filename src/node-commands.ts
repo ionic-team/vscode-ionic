@@ -78,6 +78,9 @@ export async function suggestInstallAll(project: Project) {
 
   ionicState.hasNodeModulesNotified = true;
 
+  if (project.isModernYarn()) {
+    return;
+  }
   const res = await window.showInformationMessage(
     `Would you like to install node modules for this project?`,
     'Yes',

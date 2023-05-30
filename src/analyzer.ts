@@ -124,6 +124,9 @@ export async function load(fn: string, project: Project, context: vscode.Extensi
     project.name = 'unnamed';
   }
   project.workspaces = packageFile.workspaces;
+  if (!project.yarnVersion) {
+    project.yarnVersion = getYarnVersion(packageFile.packageManager);
+  }
   allDependencies = {
     ...packageFile.dependencies,
     ...packageFile.devDependencies,
@@ -224,6 +227,13 @@ function AddCordovaAndroidPreference(folder: string, preference: string, value: 
   }
   fs.writeFileSync(configXMLFilename, newtxt);
   vscode.window.showInformationMessage(`config.xml has been updated to include the ${preference} preference`, 'OK');
+}
+
+function getYarnVersion(packageManager: string): string {
+  if (packageManager) {
+    return packageManager.replace('yarn@', '');
+  }
+  return packageManager;
 }
 
 export function checkAndroidManifest() {

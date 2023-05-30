@@ -191,16 +191,21 @@ async function getCapacitorProjectState(
   }
 
   if (project.android) {
-    const [androidBundleId, androidVersion, androidBuild, data] = await Promise.all([
-      project.android?.getPackageName(),
-      project.android?.getVersionName(),
-      project.android?.getVersionCode(),
-      project.android?.getResource('values', 'strings.xml'),
-    ]);
-    state.androidBundleId = androidBundleId;
-    state.androidVersion = androidVersion;
-    state.androidBuild = androidBuild;
-    state.androidDisplayName = getStringFrom(data as string, `<string name="app_name">`, `</string`);
+    try {
+      const [androidBundleId, androidVersion, androidBuild, data] = await Promise.all([
+        project.android?.getPackageName(),
+        project.android?.getVersionName(),
+        project.android?.getVersionCode(),
+        project.android?.getResource('values', 'strings.xml'),
+      ]);
+      state.androidBundleId = androidBundleId;
+      state.androidVersion = androidVersion;
+      state.androidBuild = androidBuild;
+      state.androidDisplayName = getStringFrom(data as string, `<string name="app_name">`, `</string`);
+    } catch (error) {
+      console.error('getCapacitorProjectState', error);
+      return undefined;
+    }
   }
 
   if (!project.ios && !project.android) {

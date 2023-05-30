@@ -12,7 +12,7 @@ import { listCommand, outdatedCommand } from './node-commands';
 import { CapProjectCache, PackageCacheList, PackageCacheModified, PackageCacheOutdated } from './context-variables';
 import { join } from 'path';
 import { ionicState } from './ionic-tree-provider';
-import { writeError } from './logging';
+import { writeError, writeWarning } from './logging';
 
 export interface PluginInformation {
   androidPermissions: Array<string>;
@@ -95,8 +95,14 @@ export async function processPackages(
         'OK'
       );
     }
-    writeError(`Unable to run 'npm outdated'. Try reinstalling node modules (npm install)`);
-    console.error(err);
+    if (project.isModernYarn()) {
+      writeWarning(
+        `Modern Yarn does not have a command to review outdated package versions. Most functionality of this extension will be disabled.`
+      );
+    } else {
+      writeError(`Unable to run 'npm outdated'. Try reinstalling node modules (npm install)`);
+      console.error(err);
+    }
   }
 
   // outdated is an array with:
