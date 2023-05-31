@@ -64,11 +64,11 @@ export async function processPackages(
     }
     if (changed || !outdated || !versions) {
       await Promise.all([
-        getRunOutput(outdatedCommand(), folder, undefined, true).then((data) => {
+        getRunOutput(outdatedCommand(project.packageManager), folder, undefined, true).then((data) => {
           outdated = data;
           context.workspaceState.update(PackageCacheOutdated(project), outdated);
         }),
-        getRunOutput(listCommand(), folder, undefined, true).then((data) => {
+        getRunOutput(listCommand(project.packageManager), folder, undefined, true).then((data) => {
           versions = data;
           context.workspaceState.update(PackageCacheList(project), versions);
         }),
@@ -77,12 +77,12 @@ export async function processPackages(
     } else {
       // Use the cached value
       // But also get a copy of the latest packages for updating later
-      getRunOutput(outdatedCommand(), folder, undefined, true).then((outdatedFresh) => {
+      getRunOutput(outdatedCommand(project.packageManager), folder, undefined, true).then((outdatedFresh) => {
         context.workspaceState.update(PackageCacheOutdated(project), outdatedFresh);
         context.workspaceState.update(PackageCacheModified(project), packagesModified.toUTCString());
       });
 
-      getRunOutput(listCommand(), folder, undefined, true).then((versionsFresh) => {
+      getRunOutput(listCommand(project.packageManager), folder, undefined, true).then((versionsFresh) => {
         context.workspaceState.update(PackageCacheList(project), versionsFresh);
       });
     }
@@ -91,7 +91,7 @@ export async function processPackages(
     versions = '{}';
     if (err && err.includes('401')) {
       vscode.window.showInformationMessage(
-        `Unable to run 'npm outdated' due to authentication error. Check .npmrc`,
+        `Unable to run '${outdatedCommand(project.packageManager)}' due to authentication error. Check .npmrc`,
         'OK'
       );
     }
@@ -100,7 +100,7 @@ export async function processPackages(
         `Modern Yarn does not have a command to review outdated package versions. Most functionality of this extension will be disabled.`
       );
     } else {
-      writeError(`Unable to run 'npm outdated'. Try reinstalling node modules (npm install)`);
+      writeError(`Unable to run '${outdatedCommand(project.packageManager)}'. Try reinstalling node modules.`);
       console.error(err);
     }
   }

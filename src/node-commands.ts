@@ -20,12 +20,22 @@ export enum PMOperation {
   run,
 }
 
-export function outdatedCommand(): string {
-  return 'npm outdated --json';
+export function outdatedCommand(packageManager: PackageManager): string {
+  switch (packageManager) {
+    case PackageManager.yarn:
+      return 'yarn outdated --json';
+    default:
+      return 'npm outdated --json';
+  }
 }
 
-export function listCommand(): string {
-  return 'npm list --json';
+export function listCommand(packageManager: PackageManager): string {
+  switch (packageManager) {
+    case PackageManager.yarn:
+      return 'yarn list --json';
+    default:
+      return 'pm list --json';
+  }
 }
 
 export function npmInstall(name: string, ...args): string {

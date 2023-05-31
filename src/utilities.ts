@@ -45,15 +45,7 @@ function runOptions(command: string, folder: string, shell?: string) {
   const javaHome: string = getExtSetting(ExtensionSetting.javaHome);
 
   // Cocoapods required lang set to en_US.UTF-8 (when capacitor sync or run ios is done)
-  if (
-    command.includes('sync') ||
-    command.includes('capacitor init') ||
-    command.includes('cap run ios') ||
-    command.includes('npx nx run') ||
-    command.includes('cap add') ||
-    command.includes('npm run') ||
-    command.includes('cap migrate')
-  ) {
+  if (!env.LANG) {
     env.LANG = 'en_US.UTF-8';
   }
 
