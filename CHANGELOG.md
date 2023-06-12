@@ -1,6 +1,6 @@
 ## Changelog
 
-### Version 1.45.3
+### Version 1.45.4
 
 - Plugin Search!
 - Show Ignored Recommendations (from Project ... menu)
