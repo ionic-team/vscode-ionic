@@ -24,6 +24,8 @@ export function outdatedCommand(packageManager: PackageManager): string {
   switch (packageManager) {
     case PackageManager.yarn:
       return 'yarn outdated --json';
+    case PackageManager.pnpm:
+      return 'pnpm outdated --json';
     default:
       return 'npm outdated --json';
   }
@@ -33,8 +35,10 @@ export function listCommand(packageManager: PackageManager): string {
   switch (packageManager) {
     case PackageManager.yarn:
       return 'yarn list --json';
+    case PackageManager.pnpm:
+      return 'pnpm list --json';
     default:
-      return 'pm list --json';
+      return 'npm list --json';
   }
 }
 
