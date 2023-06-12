@@ -20,7 +20,7 @@ import { ionicState } from './ionic-tree-provider';
 export function checkPackages(project: Project) {
   const nmf = project.getNodeModulesFolder();
   ionicState.hasNodeModules = true;
-  if (!fs.existsSync(nmf)) {
+  if (!fs.existsSync(nmf) && !project.isModernYarn()) {
     ionicState.hasNodeModules = false;
     project.add(
       new Tip(

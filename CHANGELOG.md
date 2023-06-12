@@ -1,10 +1,13 @@
 ## Changelog
 
-### Version 1.45.2
+### Version 1.45.4
 
 - Plugin Search!
 - Show Ignored Recommendations (from Project ... menu)
 - Fix for Capacitor 5 migration with Cordova plugins that require jetifier
+- Fix for new projects where a number was used as part of the application name
+- Fix for Capacitor 5 starter projects to set the default Gradle JDK to 17
+- Fix for pnpm projects running npm outdated instead of pnpm outdated
 
 ### Version 1.44
 
