@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.47
+
+- A new "New Project" experience
+
 ### Version 1.46
 
 - Recommendations for replacement plugins are worded more clearly.
