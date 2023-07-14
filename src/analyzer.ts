@@ -346,7 +346,7 @@ export function notRequiredPlugin(name: string, message?: string): Tip {
 export function replacementPlugin(name: string, replacement: string, url?: string, tipType?: TipType): Tip {
   if (exists(name)) {
     const reason = replacement.startsWith('@capacitor/')
-      ? ' as it has official support from the Capacitor Team.'
+      ? ' as it has official support from the Capacitor team.'
       : ' as it offers equivalent functionality.';
     return new Tip(
       name,

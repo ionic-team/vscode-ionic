@@ -1,0 +1,92 @@
+<main [ngClass]="ready ? 'show' : 'hide'">
+  <ng-template [ngIf]="!creating" [ngIfElse]="isCreating">
+    <h1>New Ionic Project</h1>
+
+    <p>Name</p>
+    <vscode-text-field
+      id="projectName"
+      autofocus
+      [value]="projectName"
+      placeholder="The Name of your project"
+    ></vscode-text-field>
+    <div class="msg">
+      <vscode-tag *ngIf="nameError">Please specify a name for your project</vscode-tag>
+    </div>
+
+    <p>Folder</p>
+    <div class="bar" style="gap: unset">
+      <div (click)="chooseFolder()" class="folder-bar">
+        <p style="padding-left: 0.5rem">{{ projectsFolder }}</p>
+        <p style="opacity: 0.4">/{{ projectFolder }}</p>
+      </div>
+      <vscode-button
+        aria-label="choose folder for projects"
+        style="height: 26px"
+        appearance="icon"
+        (click)="chooseFolder()"
+        >•••</vscode-button
+      >
+    </div>
+
+    <div class="bar">
+      <div>
+        <p>Framework</p>
+        <div class="rows">
+          <div *ngFor="let framework of frameworks" class="gap">
+            <vscode-button appearance="icon" [class]="framework.appearance" (click)="select(framework)">
+              <div class="framework">
+                <img class="ionicon" [src]="assetsUri + '/logo-' + framework.icon + '.svg'" />
+                <p>{{ framework.name }}</p>
+              </div>
+            </vscode-button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p>Targets</p>
+        <div class="rows">
+          <div *ngFor="let target of targets" class="gap">
+            <vscode-button appearance="icon" [class]="target.appearance" (click)="selectTarget(target)">
+              <div class="framework">
+                <img class="ionicon" [src]="assetsUri + '/' + target.icon + '.svg'" />
+                <p>{{ target.name }}</p>
+              </div>
+            </vscode-button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="frameworkTemplates.length > 0">
+      <p>Template</p>
+      <div class="rows">
+        <div *ngFor="let template of frameworkTemplates" class="gap">
+          <vscode-button
+            class="tooltip"
+            appearance="icon"
+            [class]="template.appearance"
+            (click)="selectTemplate(template)"
+          >
+            <div class="framework">
+              <img class="ionicon" [src]="assetsUri + '/' + template.icon + '.svg'" />
+              <p>{{ template.title }}</p>
+            </div>
+            <span class="tooltiptext">{{ template.description }}</span>
+          </vscode-button>
+        </div>
+      </div>
+      <div class="pad-top"></div>
+      <vscode-divider></vscode-divider>
+      <div class="bar-end pad-top">
+        <vscode-button (click)="create()">Create Project</vscode-button>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #isCreating>
+    <div class="flex">
+      <div class="progress">
+        <img class="pulse" [src]="assetsUri + '/ionic.svg'" />
+        <vscode-label>Please Wait</vscode-label>
+      </div>
+    </div>
+  </ng-template>
+</main>

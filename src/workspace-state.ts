@@ -21,6 +21,7 @@ export enum ExtensionSetting {
 
 export enum GlobalSetting {
   lastTipsShown = 'lastTipsShown',
+  projectsFolder = 'projectsFolder',
 }
 
 export function getSetting(key: WorkspaceSetting): any {
@@ -39,6 +40,6 @@ export function getGlobalSetting(key: GlobalSetting): any {
   return ionicState.context.globalState.get(key);
 }
 
-export function setGlobalSetting(key: GlobalSetting, value: any): any {
-  return ionicState.context.globalState.update(key, value);
+export async function setGlobalSetting(key: GlobalSetting, value: any): Promise<void> {
+  return await ionicState.context.globalState.update(key, value);
 }

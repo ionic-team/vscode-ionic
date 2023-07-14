@@ -77,7 +77,7 @@
       },
       {
         "view": "ionic-tree",
-        "contents": "To get started with Ionic open an [empty folder](command:vscode.openFolder) or your projects folder.",
+        "contents": "",
         "when": "noProjectFound == true"
       },
       {

@@ -36,7 +36,7 @@ export async function updateMinorDependencies(project: Project, packages: object
     if (count == 0) {
       const msg = 'All dependencies are on the latest minor update.';
       writeIonic(msg);
-      vscode.window.showInformationMessage(msg, 'Ok');
+      vscode.window.showInformationMessage(msg, 'OK');
       return;
     }
     const result = await vscode.window.showInformationMessage(`Update all ${count} dependencies?`, 'Update', 'Cancel');

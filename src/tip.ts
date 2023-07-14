@@ -11,7 +11,6 @@ export enum TipFeature {
 export class Tip {
   public progressDialog: boolean;
   public doRun: boolean;
-  public doRequestAppName: boolean;
   public doDeviceSelection: boolean;
   public doIpSelection: boolean;
   public cancelRequested: boolean;
@@ -57,11 +56,6 @@ export class Tip {
 
   performRun() {
     this.doRun = true;
-    return this;
-  }
-
-  requestAppName() {
-    this.doRequestAppName = true;
     return this;
   }
 

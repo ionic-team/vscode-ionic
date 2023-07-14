@@ -182,8 +182,12 @@ async function getCapacitorProjectState(
       state.iosBundleId = project.ios.getBundleId(appTarget.name);
       state.iosDisplayName = await project.ios.getDisplayName(appTarget.name);
       for (const buildConfig of project.ios.getBuildConfigurations(appTarget.name)) {
-        state.iosVersion = project.ios?.getVersion(appTarget.name, buildConfig.name);
-        state.iosBuild = await project.ios.getBuild(appTarget.name, buildConfig.name);
+        try {
+          state.iosVersion = project.ios?.getVersion(appTarget.name, buildConfig.name);
+          state.iosBuild = await project.ios.getBuild(appTarget.name, buildConfig.name);
+        } catch (error) {
+          writeError(`Unable to getBuild of ios project ${appTarget.name} ${buildConfig.name}`);
+        }
       }
     } else {
       writeError(`Unable to getAppTarget of ios project ${project.ios.getError().message}`);
