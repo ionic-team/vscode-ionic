@@ -117,7 +117,8 @@ export class IonicStartPanel {
       }
     }
     result = result.filter((project) => {
-      return project.type != 'ionic1' && project.type != 'ionic-angular';
+      // Max doesnt like the my-first-app which is more of a demo and not really good for a new project
+      return project.type != 'ionic1' && project.type != 'ionic-angular' && project.name != 'my-first-app';
     });
     result = result.sort((a, b) => (a.typeName > b.typeName ? 1 : -1));
     return result;
