@@ -17,7 +17,7 @@
   width: 100%;
   cursor: pointer;
   flex-direction: row;
-  justify-content: start;
+  justify-content: flex-start;
   padding: 0.2rem;
   background-color: rgba(255, 255, 255, 0.05);
 }
