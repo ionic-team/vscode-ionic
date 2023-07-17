@@ -627,6 +627,7 @@ export async function reviewProject(
   context: vscode.ExtensionContext,
   selectedProject: string
 ): Promise<ProjectSummary | undefined> {
+  if (!folder) return undefined;
   const summary = await inspectProject(folder, context, selectedProject);
   if (!summary || !summary.project) return undefined;
   return summary;

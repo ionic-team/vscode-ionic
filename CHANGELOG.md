@@ -1,6 +1,14 @@
 ## Changelog
 
-### Version 1.45.4
+### Version 1.47
+
+- A new "New Project" experience
+
+### Version 1.46
+
+- Recommendations for replacement plugins are worded more clearly.
+
+### Version 1.45.5
 
 - Plugin Search!
 - Show Ignored Recommendations (from Project ... menu)

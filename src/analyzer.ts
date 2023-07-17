@@ -345,11 +345,14 @@ export function notRequiredPlugin(name: string, message?: string): Tip {
 
 export function replacementPlugin(name: string, replacement: string, url?: string, tipType?: TipType): Tip {
   if (exists(name)) {
+    const reason = replacement.startsWith('@capacitor/')
+      ? ' as it has official support from the Capacitor team.'
+      : ' as it offers equivalent functionality.';
     return new Tip(
       name,
       `Replace with ${replacement}${url ? ' (' + url + ')' : ''}`,
       tipType ? tipType : TipType.Idea,
-      `The plugin ${name} could be replaced with ${replacement}${url ? ' (' + url + ')' : ''}`,
+      `Optional Recommendation: The plugin ${name} could be replaced with ${replacement}${reason} Replacing the plugin will require manual refactoring in your code.`,
       npmInstall(replacement) + ' && ' + npmUninstall(name),
       'Replace Plugin',
       `${name} replaced with ${replacement}`,

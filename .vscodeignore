@@ -8,6 +8,11 @@ plugin-explorer/src
 plugin-explorer/*.json
 plugin-explorer/*.js
 plugin-explorer/*.md
+ionic-start/**
+!ionic-start/build/**
+plugin-explorer/*.json
+plugin-explorer/*.js
+plugin-explorer/*.md
 node_modules/typescript
 node_modules/chevotrain
 node_modules/esbuild
@@ -24,9 +29,6 @@ node_modules/**/LICENSE
 log-client/node_modules
 log-client/*.ts
 log-client/*.map
-plugin-explorer/.angular
-plugin-explorer/node_modules
-plugin-explorer/src
 .husky
 **/*.ts
 **/*.jar

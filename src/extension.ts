@@ -41,63 +41,7 @@ import {
   waitForOtherActions,
 } from './tasks';
 import { build, debugOnWeb } from './recommend';
-
-async function requestAppName(tip: Tip, path: string) {
-  const suggestion = suggestName(path);
-  let name = await vscode.window.showInputBox({
-    title: 'Internal name of the application',
-    placeHolder: suggestion,
-    value: suggestion,
-    validateInput: (value: string) => {
-      const regexp = /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/;
-      if (!regexp.test(value)) {
-        return 'The name cannot contain spaces, some characters and should be lowercase';
-      }
-      return null;
-    },
-  });
-  if (name && name.length > 1) {
-    const commands = [];
-    name = name.replace(/ /g, '-');
-    let packageId = name.replace(/ /g, '.').replace(/-/g, '.');
-    if (!packageId.includes('.')) {
-      packageId = `ionic.${packageId}`;
-    }
-
-    const parts = packageId.split('.');
-    for (const part of parts) {
-      if (!isNaN(part as any)) {
-        packageId = packageId.replace(part, `v${part}`);
-      }
-    }
-
-    for (const command of tip.command) {
-      commands.push(
-        command
-          .replace(new RegExp('@app', 'g'), `${name.trim()}`)
-          .replace(new RegExp('@package-id', 'g'), `${packageId.trim()}`)
-      );
-    }
-    commands.push('git init');
-    return commands;
-  } else {
-    return undefined;
-  }
-}
-
-function suggestName(path2: string): string {
-  let name = 'my-app';
-  try {
-    const tmp = path2.split(path.sep);
-    if (tmp.length > 0) {
-      name = tmp[tmp.length - 1];
-      name = replaceAll(name, ' ', '-').toLowerCase().trim();
-    }
-  } catch {
-    name = 'my-app';
-  }
-  return name;
-}
+import { IonicStartPanel } from './ionic-start';
 
 /**
  * Runs the command while showing a vscode window that can be cancelled
@@ -251,6 +195,8 @@ export async function activate(context: vscode.ExtensionContext) {
   const ionicProvider = new IonicTreeProvider(rootPath, context);
   const view = vscode.window.createTreeView('ionic-tree', { treeDataProvider: ionicProvider });
 
+  //IonicStartPanel.init(context.extensionUri, this.workspaceRoot, context);
+
   // Project List Panel
   const ionicProjectsProvider = new IonicProjectsreeProvider(rootPath, context);
   const projectsView = vscode.window.createTreeView('ionic-zprojects', { treeDataProvider: ionicProjectsProvider });
@@ -267,6 +213,10 @@ export async function activate(context: vscode.ExtensionContext) {
   ionicState.view = view;
   ionicState.projectsView = projectsView;
   ionicState.context = context;
+
+  if (rootPath == undefined) {
+    IonicStartPanel.init(context.extensionUri, this.workspaceRoot, context);
+  }
 
   ionicState.shell = context.workspaceState.get(Context.shell);
   const shellOverride: string = vscode.workspace.getConfiguration('ionic').get('shellPath');
@@ -479,9 +429,6 @@ async function runAction(tip: Tip, ionicProvider: IonicTreeProvider, rootPath: s
   tip.generateTitle();
   if (tip.command) {
     let command = tip.command;
-    if (tip.doRequestAppName) {
-      command = await requestAppName(tip, rootPath);
-    }
     if (tip.doIpSelection) {
       const host = await selectExternalIPAddress();
       if (host) {

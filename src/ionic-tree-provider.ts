@@ -4,14 +4,14 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { Project, ProjectSummary, reviewProject } from './project';
+import { Project, reviewProject } from './project';
 import { Recommendation } from './recommendation';
 import { Context, VSCommand } from './context-variables';
-import { starterProject } from './ionic-start';
 import { isFolderBasedMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
 import { PackageManager } from './node-commands';
 import { Tip } from './tip';
 import { CapacitorPlatform } from './capacitor-platform';
+import { IonicStartPanel } from './ionic-start';
 
 interface IonicState {
   view: vscode.TreeView<any>;
@@ -134,7 +134,8 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
         if (!summary) return [];
         return summary.project.groups;
       } else {
-        return Promise.resolve(starterProject(this.workspaceRoot));
+        IonicStartPanel.init(ionicState.context.extensionUri, this.workspaceRoot, ionicState.context);
+        return Promise.resolve([]);
       }
     }
   }

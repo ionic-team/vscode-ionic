@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.45.4",
+  "version": "1.47.0",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -77,7 +77,7 @@
       },
       {
         "view": "ionic-tree",
-        "contents": "To get started with Ionic open an [empty folder](command:vscode.openFolder) or your projects folder.",
+        "contents": "",
         "when": "noProjectFound == true"
       },
       {
