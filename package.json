@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.47.1",
+  "version": "1.47.2",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -43,9 +43,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onView:ionic",
-    "onLanguage:json",
-    "onLanguage:jsonc"
+    "onView:ionic"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -54,19 +52,19 @@
         "command": "ionic-official.run",
         "key": "alt+r",
         "mac": "alt+r",
-        "when": "true"
+        "when": "explorerViewletVisible"
       },
       {
         "command": "ionic-official.debug",
         "key": "alt+d",
         "mac": "alt+d",
-        "when": "true"
+        "when": "explorerViewletVisible"
       },
       {
         "command": "ionic-official.build",
         "key": "alt+b",
         "mac": "alt+b",
-        "when": "true"
+        "when": "explorerViewletVisible"
       }
     ],
     "viewsWelcome": [
@@ -493,9 +491,11 @@
     "typescript": "5.0.4"
   },
   "dependencies": {
+    "-": "^0.0.1",
     "@ionic/cli": "7.1.0",
     "@trapezedev/configure": "7.0.10",
     "fast-xml-parser": "^3.21.1",
+    "g": "^2.0.1",
     "globule": "^1.3.3",
     "netmask": "^2.0.2",
     "rimraf": "4.4.1",
