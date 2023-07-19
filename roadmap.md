@@ -1,8 +1,11 @@
 # Roadmap
 
 - If local address is turned on then show warning on start that Nexus wont work
-- React Vite can write Network: rather than External:
+- (feat) Add "Enterprise Ready" and "Capacitor Core" to filters of plugin explorer (per Max)
 - (feat) Add Capacitor plugin to the starters
+- (feat) Add PWA to targets
+- (feat) Add Electron to targets
+- React Vite can write Network: rather than External:
 - On hover over rating show: star count, forks, watchers, issues and link to explanation of rating.
 - Use HTTPS on windows doesnt work
 - Export Statistics on React v7 projects no longer works due to source maps
