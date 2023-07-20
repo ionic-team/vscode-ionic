@@ -13,6 +13,7 @@ import { CapProjectCache, PackageCacheList, PackageCacheModified, PackageCacheOu
 import { join } from 'path';
 import { ionicState } from './ionic-tree-provider';
 import { writeError, writeWarning } from './logging';
+import { fixYarnGarbage } from './monorepo';
 
 export interface PluginInformation {
   androidPermissions: Array<string>;
@@ -65,6 +66,7 @@ export async function processPackages(
     if (changed || !outdated || !versions) {
       await Promise.all([
         getRunOutput(outdatedCommand(project.packageManager), folder, undefined, true).then((data) => {
+          data = fixYarnGarbage(data, project.packageManager);
           outdated = data;
           context.workspaceState.update(PackageCacheOutdated(project), outdated);
         }),

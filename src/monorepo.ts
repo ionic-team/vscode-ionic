@@ -14,6 +14,7 @@ import { PackageManager } from './node-commands';
 import { getLernaWorkspaces } from './monorepos-lerna';
 import { join } from 'path';
 import { writeError } from './logging';
+import { NpmOutdatedDependency } from './npm-model';
 
 export interface MonoRepoProject {
   name: string;
@@ -221,6 +222,40 @@ function getFolderBasedProjects(prj: Project): Array<MonoRepoProject> {
   }
   result = result.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
   return result;
+}
+
+// Yarn outdated returns invalid json in a visual format. This fixes it and returns it in something like npm outdated
+export function fixYarnGarbage(data: string, packageManager: PackageManager): string {
+  if (packageManager !== PackageManager.yarn) {
+    return data;
+  }
+  const tmp = data.split('\n');
+  if (tmp.length > 1) {
+    return parseYarnFormat(tmp[1]);
+  }
+  return data;
+}
+
+function parseYarnFormat(data: string): string {
+  try {
+    const out = JSON.parse(data);
+    const result = {};
+    if (out.data.body) {
+      for (const item of out.data.body) {
+        const dep: NpmOutdatedDependency = {
+          current: item[1],
+          wanted: item[2],
+          latest: item[3],
+          dependent: '',
+          location: '',
+        };
+        result[item[0]] = dep;
+      }
+    }
+    return JSON.stringify(result);
+  } catch {
+    return data;
+  }
 }
 
 enum FolderType {

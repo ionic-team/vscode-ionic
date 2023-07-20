@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.48
+
+- Fix for yarn 1.x projects to correctly show outdated packages and all updates to minor dependencies
+
 ### Version 1.47
 
 - A new "New Project" experience

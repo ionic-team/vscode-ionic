@@ -5,6 +5,7 @@
 - (feat) Add Capacitor plugin to the starters
 - (feat) Add PWA to targets
 - (feat) Add Electron to targets
+- (feat) Migrate from live updates cordova plugin to new plugin
 - React Vite can write Network: rather than External:
 - On hover over rating show: star count, forks, watchers, issues and link to explanation of rating.
 - Use HTTPS on windows doesnt work
