@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.49
+
+- Fix for starting new projects on Windows machines
+
 ### Version 1.48
 
 - Fix for yarn 1.x projects to correctly show outdated packages and all updates to minor dependencies
