@@ -78,6 +78,10 @@ export class AppComponent implements OnInit {
     }, 1000);
   }
 
+  public slash(): string {
+    return navigator.platform && navigator.platform.toLowerCase().includes('mac') ? `/` : `\\`;
+  }
+
   public select(framework: Framework) {
     for (const f of this.frameworks) {
       f.appearance = 'unselected';

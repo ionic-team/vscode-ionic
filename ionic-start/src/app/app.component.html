@@ -17,7 +17,7 @@
     <div class="bar" style="gap: unset">
       <div (click)="chooseFolder()" class="folder-bar">
         <p style="padding-left: 0.5rem">{{ projectsFolder }}</p>
-        <p style="opacity: 0.4">/{{ projectFolder }}</p>
+        <p style="opacity: 0.4">{{ slash() }}{{ projectFolder }}</p>
       </div>
       <vscode-button
         aria-label="choose folder for projects"

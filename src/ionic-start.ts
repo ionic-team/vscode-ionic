@@ -1,10 +1,20 @@
-import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn, ExtensionContext, commands } from 'vscode';
-import { getRunOutput, run } from './utilities';
+import {
+  Disposable,
+  Webview,
+  WebviewPanel,
+  window,
+  Uri,
+  ViewColumn,
+  ExtensionContext,
+  commands,
+  workspace,
+} from 'vscode';
+import { getRunOutput, isWindows, run } from './utilities';
 import { writeIonic } from './logging';
 import { homedir } from 'os';
 import { GlobalSetting, getGlobalSetting, setGlobalSetting } from './workspace-state';
 import { join } from 'path';
-import { existsSync } from 'fs';
+import { existsSync, readdirSync } from 'fs';
 import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall } from './node-commands';
 
@@ -170,13 +180,17 @@ export class IonicStartPanel {
           }
           case MessageType.chooseFolder: {
             const paths = await window.showOpenDialog({
-              defaultUri: Uri.parse(getProjectsFolder()),
+              defaultUri: isWindows() ? undefined : Uri.parse(getProjectsFolder()),
               canSelectFolders: true,
               canSelectFiles: false,
               canSelectMany: false,
             });
             if (paths && paths.length > 0) {
-              setProjectsFolder(paths[0].path);
+              let pth = paths[0].path;
+              if (isWindows() && pth.startsWith('/')) {
+                pth = pth.replace('/', '');
+              }
+              setProjectsFolder(pth);
               webview.postMessage({ command, folder: paths[0].path });
             }
             break;
@@ -193,12 +207,30 @@ export class IonicStartPanel {
   }
 }
 
+function workspaceFolder() {
+  if (workspace.workspaceFolders.length == 0) {
+    return undefined;
+  }
+  return workspace.workspaceFolders[0].uri.fsPath;
+}
+
+function folderEmpty(folder: string) {
+  return readdirSync(folder).length == 0;
+}
+
 function getProjectsFolder() {
   const projectsFolder = getGlobalSetting(GlobalSetting.projectsFolder);
+  if (workspaceFolder() && folderEmpty(workspaceFolder())) {
+    return workspaceFolder(); // Use the users opened folder if it is empty
+  }
   if (!projectsFolder) {
-    return homedir();
+    return isWindows() ? winHomeDir() : homedir();
   }
   return projectsFolder;
+}
+
+function winHomeDir() {
+  return join(process.env.USERPROFILE, 'Documents');
 }
 
 function setProjectsFolder(folder: string) {
@@ -249,8 +281,11 @@ async function createProject(project: Project, webview: Webview, panel: IonicSta
   const name = getProjectName(project.name);
   const packageId = getPackageId(name);
   const cmds: string[] = [];
+  const noGit = !isWindows();
   cmds.push(
-    `npx ionic start '${name}' ${project.template} --type=${project.type} --capacitor --package-id=${packageId} --no-git`
+    `npx ionic start "${name}" ${project.template} --type=${project.type} --capacitor --package-id=${packageId} ${
+      noGit ? '--no-git' : ''
+    }`
   );
 
   const folder = join(getProjectsFolder(), name);
@@ -272,11 +307,13 @@ async function createProject(project: Project, webview: Webview, panel: IonicSta
     cmds.push('npx cap add ios');
   }
 
-  cmds.push('git init');
+  if (noGit) {
+    cmds.push('git init');
+  }
 
   try {
     await runCommands(cmds);
-    const folderPathParsed = folder.split(`\\`).join(`/`);
+    const folderPathParsed = isWindows() ? folder : folder.split(`\\`).join(`/`);
     // Updated Uri.parse to Uri.file
     const folderUri = Uri.file(folderPathParsed);
     commands.executeCommand(`vscode.openFolder`, folderUri);
