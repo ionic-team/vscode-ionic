@@ -6,6 +6,7 @@
 - (feat) Add PWA to targets
 - (feat) Add Electron to targets
 - (feat) Migrate from live updates cordova plugin to new plugin
+- Feature request from user: Issue #124 - configure shortcuts for starting iOS/Android with particular configuration
 - React Vite can write Network: rather than External:
 - On hover over rating show: star count, forks, watchers, issues and link to explanation of rating.
 - Use HTTPS on windows doesnt work

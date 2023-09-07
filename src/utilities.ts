@@ -681,6 +681,14 @@ export function httpRequest(method: string, host: string, path: string, postData
       res.on('data', function (chunk) {
         body.push(chunk);
       });
+      res.on('close', function () {
+        try {
+          body = JSON.parse(Buffer.concat(body).toString());
+        } catch (e) {
+          reject(e);
+        }
+        resolve(body);
+      });
       res.on('end', function () {
         try {
           body = JSON.parse(Buffer.concat(body).toString());

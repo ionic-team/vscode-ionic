@@ -1,8 +1,9 @@
 ## Changelog
 
-### Version 1.49
+### Version 1.49.1
 
 - Fix for starting new projects on Windows machines
+- Fix for plugin explorer not ending response
 
 ### Version 1.48
 
