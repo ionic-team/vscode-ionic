@@ -208,6 +208,9 @@ export class IonicStartPanel {
 }
 
 function workspaceFolder() {
+  if (!workspace.workspaceFolders) {
+    return undefined;
+  }
   if (workspace.workspaceFolders.length == 0) {
     return undefined;
   }
@@ -215,7 +218,13 @@ function workspaceFolder() {
 }
 
 function folderEmpty(folder: string) {
-  return readdirSync(folder).length == 0;
+  try {
+    const files = readdirSync(folder);
+    if (!files) return true;
+    return files.length == 0;
+  } catch {
+    return true;
+  }
 }
 
 function getProjectsFolder() {
