@@ -652,6 +652,14 @@ export async function showMessage(message: string, ms: number) {
   );
 }
 
+export function toTitleCase(text: string) {
+  return text
+    .replace(/\w\S*/g, (txt: string) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    })
+    .trim();
+}
+
 export async function showProgress(message: string, func: () => Promise<any>) {
   return await vscode.window.withProgress(
     {

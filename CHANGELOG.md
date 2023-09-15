@@ -1,6 +1,10 @@
 ## Changelog
 
-### Version 1.49.1
+### Version 1.50
+
+- New Project now has Capacitor Plugin as an option
+
+### Version 1.49.2
 
 - Fix for starting new projects on Windows machines
 - Fix for plugin explorer not ending response

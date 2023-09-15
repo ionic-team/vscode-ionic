@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.49.2",
+  "version": "1.50.0",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -18,7 +18,8 @@
     "install:all": "npm install && cd plugin-explorer && npm install",
     "build:pe": "cd plugin-explorer && npm run build --configuration=production",
     "clean": "find ./node_modules -name '*.md' -delete && find ./node_modules -name '*.ts' -delete && find ./node_modules -name 'LICENSE' -delete && find ./node_modules -name '*.map' -delete",
-    "build": "npm run compile && npm run clean && npm run esbuild && npm run vsix-package",
+    "build": "npm run compile && npm run clean && npm run esbuild && npm run vsix-package && npm run reset",
+    "reset": "rm -rf node_modules && npm install",
     "vsix-package": "vsce package",
     "pre-release": "npm run build && vsce publish --pre-release",
     "vscode:prepublish": "npm run esbuild-base -- --minify",
@@ -492,7 +493,7 @@
   },
   "dependencies": {
     "-": "^0.0.1",
-    "@ionic/cli": "7.1.0",
+    "@ionic/cli": "7.1.1",
     "@trapezedev/configure": "7.0.10",
     "fast-xml-parser": "^3.21.1",
     "g": "^2.0.1",

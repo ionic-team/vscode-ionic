@@ -42,7 +42,7 @@
           </div>
         </div>
       </div>
-      <div>
+      <div [ngClass]="showTargets ? 'show' : 'hide'">
         <p>Targets</p>
         <div class="rows">
           <div *ngFor="let target of targets" class="gap">
@@ -78,6 +78,13 @@
       <vscode-divider></vscode-divider>
       <div class="bar-end pad-top">
         <vscode-button (click)="create()">Create Project</vscode-button>
+      </div>
+    </div>
+    <div *ngIf="!showTargets">
+      <div class="pad-top"></div>
+      <vscode-divider></vscode-divider>
+      <div class="bar-end pad-top">
+        <vscode-button (click)="create()">Create Plugin</vscode-button>
       </div>
     </div>
   </ng-template>
