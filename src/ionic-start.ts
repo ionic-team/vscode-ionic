@@ -9,7 +9,7 @@ import {
   commands,
   workspace,
 } from 'vscode';
-import { getRunOutput, isWindows, run } from './utilities';
+import { getRunOutput, isWindows, replaceAll, run, toTitleCase } from './utilities';
 import { writeIonic } from './logging';
 import { homedir } from 'os';
 import { GlobalSetting, getGlobalSetting, setGlobalSetting } from './workspace-state';
@@ -314,6 +314,13 @@ async function createProject(project: Project, webview: Webview, panel: IonicSta
   if (project.targets.includes(CapacitorPlatform.ios)) {
     cmds.push(npmInstall('@capacitor/ios'));
     cmds.push('npx cap add ios');
+  }
+
+  if (project.type == 'plugin') {
+    const nmt = replaceAll(toTitleCase(replaceAll(name, '-', ' ')), ' ', '');
+    const nm = replaceAll(name, ' ', '').toLowerCase();
+    const nmp = replaceAll(nm, '-', '.');
+    cmds[0] = `npx @capacitor/create-plugin "${nm}" --name "${nm}" --package-id "com.mycompany.${nmp}" --class-name "${nmt}" --author "me" --license MIT --repo https://github.com --description "${nmt} Capacitor Plugin"`;
   }
 
   if (noGit) {

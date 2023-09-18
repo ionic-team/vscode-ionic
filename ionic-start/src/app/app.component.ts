@@ -58,6 +58,7 @@ export class AppComponent implements OnInit {
   assetsUri = '';
   creating = false;
   ready = false;
+  showTargets = true;
   nameError = false;
   projectsFolder = '';
   projectFolder = '';
@@ -83,6 +84,11 @@ export class AppComponent implements OnInit {
   }
 
   public select(framework: Framework) {
+    this.showTargets = framework.type !== 'plugin';
+    if (framework.type === 'plugin' && this.projectName.trim() === '') {
+      this.projectName = 'capacitor-plugin-';
+      document.getElementById('projectName')?.focus();
+    }
     for (const f of this.frameworks) {
       f.appearance = 'unselected';
     }
@@ -107,8 +113,8 @@ export class AppComponent implements OnInit {
   }
 
   public create() {
-    const name = getValue('projectName');
-    if (!name || name.length < 2) {
+    const name = getValue('projectName').trim();
+    if (!name || name.length < 2 || name.endsWith('-') || name.endsWith('.')) {
       document.getElementById('projectName')?.focus();
       this.nameError = true;
       setTimeout(() => {
@@ -117,17 +123,23 @@ export class AppComponent implements OnInit {
       return;
     }
     const targets: string[] = [];
-    this.targets.map((target) => {
-      if (target.appearance == 'selected') {
-        targets.push(target.name.toLowerCase());
+    if (this.showTargets) {
+      this.targets.map((target) => {
+        if (target.appearance == 'selected') {
+          targets.push(target.name.toLowerCase());
+        }
+      });
+
+      const template = this.selectedTemplate();
+      if (!template) {
+        return;
       }
-    });
-    const template = this.selectedTemplate();
-    if (!template) {
-      return;
+      const project = { type: template.type, template: template.name, name, targets };
+      sendMessage(MessageType.createProject, JSON.stringify(project));
+    } else {
+      const project = { type: 'plugin', template: name, name, targets };
+      sendMessage(MessageType.createProject, JSON.stringify(project));
     }
-    const project = { type: template.type, template: template.name, name, targets };
-    sendMessage(MessageType.createProject, JSON.stringify(project));
   }
 
   public chooseFolder() {
@@ -175,6 +187,7 @@ export class AppComponent implements OnInit {
       { name: 'Angular', icon: 'angular', type: 'angular-standalone', appearance: 'unselected' },
       { name: 'React', icon: 'react', type: 'react', appearance: 'unselected' },
       { name: 'Vue', icon: 'vue', type: 'vue', appearance: 'unselected' },
+      { name: 'Plugin', icon: 'capacitor', type: 'plugin', appearance: 'unselected' },
     ];
     this.ready = true;
   }
