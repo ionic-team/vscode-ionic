@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.51
+
+- Detect onesignal-cordova-plugin and @ionic-enterprise/auth conflict
+
 ### Version 1.50
 
 - New Project now has Capacitor Plugin as an option

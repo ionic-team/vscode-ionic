@@ -86,7 +86,7 @@ export class AppComponent implements OnInit {
   public select(framework: Framework) {
     this.showTargets = framework.type !== 'plugin';
     if (framework.type === 'plugin' && this.projectName.trim() === '') {
-      this.projectName = 'capacitor-plugin-';
+      this.projectName = 'capacitor-';
       document.getElementById('projectName')?.focus();
     }
     for (const f of this.frameworks) {
