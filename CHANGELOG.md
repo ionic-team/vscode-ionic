@@ -3,6 +3,7 @@
 ### Version 1.51
 
 - Detect onesignal-cordova-plugin and @ionic-enterprise/auth conflict
+- Recommend Cocoapods update to 1.13.0 to fix issues with building with XCode 15
 
 ### Version 1.50
 
