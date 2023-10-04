@@ -137,6 +137,16 @@ export function checkCapacitorRules(project: Project) {
     );
   }
 
+  if (exists('@ionic-enterprise/auth') && isLessOrEqual('onesignal-cordova-plugin', '5.0.1')) {
+    project.recommendRemove(
+      'onesignal-cordova-plugin',
+      'onesignal-cordova-plugin',
+      'This plugin causes build errors on Android when used with Ionic Auth Connect. Upgrade or removal recommended.',
+      undefined,
+      'https://github.com/OneSignal/OneSignal-Cordova-SDK/issues/928'
+    );
+  }
+
   if (exists('@ionic/cordova-builders')) {
     // This is likely a leftover from a Cordova migration
     project.recommendRemove(
@@ -405,12 +415,14 @@ export async function capacitorRecommendations(project: Project, forMigration: b
 
   if (!isWindows() && exists('@capacitor/ios')) {
     const cocoaPods = await getCocoaPodsVersion(project);
-    if (cocoaPods && !isVersionGreaterOrEqual(cocoaPods, '1.12.1')) {
+    const minVersion = '1.13.0';
+    if (cocoaPods && !isVersionGreaterOrEqual(cocoaPods, minVersion)) {
       project.add(
         new Tip('Update Cocoapods', `Cocoapods requires updating.`, TipType.Error).setAction(
           updateCocoaPods,
           cocoaPods,
-          project
+          project,
+          minVersion
         )
       );
     }
@@ -674,7 +686,7 @@ async function getCocoaPodsVersion(project: Project, avoidCache?: boolean): Prom
   }
 }
 
-async function updateCocoaPods(currentVersion: string, project: Project) {
+async function updateCocoaPods(currentVersion: string, project: Project, minVersion: string) {
   const msg = currentVersion == 'missing' ? 'Install' : 'Update';
   const txt = `${msg} Cocoapods`;
   const data = await getRunOutput('which pod', project.folder);
@@ -684,7 +696,7 @@ async function updateCocoaPods(currentVersion: string, project: Project) {
   }
 
   const res = await window.showInformationMessage(
-    `XCode 14.3+ will fail when using Project > Archive. ${msg} Cocoapods using "${cmd}" to fix the issue?`,
+    `XCode 15 will fail during build with some plugins. ${msg} Cocoapods using "${cmd}" to fix the issue?`,
     txt,
     'Exit'
   );
@@ -698,7 +710,7 @@ async function updateCocoaPods(currentVersion: string, project: Project) {
     const v = await getCocoaPodsVersion(project, true);
     const msg = `Cocoapods Updated to ${v}. Be sure to "Sync" your project.`;
     writeIonic(msg);
-    if (isVersionGreaterOrEqual(v, '1.12.1')) {
+    if (isVersionGreaterOrEqual(v, minVersion)) {
       window.showInformationMessage(msg, 'OK');
     }
   });

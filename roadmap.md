@@ -1,5 +1,9 @@
 # Roadmap
 
+## Important
+
+- Use https://github.com/eric-horodyski/chrome117-custom-scheme-bug and check for custom scheme and add warning
+
 ## Plugin Explorer
 
 - (feat) Add Capacitor plugin to the starters
