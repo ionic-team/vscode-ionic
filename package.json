@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.51.0",
+  "version": "1.52.0",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -165,6 +165,10 @@
       {
         "command": "ionic-official.pluginExplorer",
         "title": "Ionic: Plugins"
+      },
+      {
+        "command": "ionic-official.newProject",
+        "title": "Ionic: New Project"
       },
       {
         "command": "ionic-official.run",
@@ -458,6 +462,12 @@
           "scope": "application",
           "default": false,
           "description": "Whether to avoid using an external IP Address when using Live Reload"
+        },
+        "ionic.manualNewProjects": {
+          "type": "boolean",
+          "scope": "application",
+          "default": false,
+          "description": "Whether to show the new project wizard only when chosen from the command palette"
         },
         "ionic.adbPath": {
           "type": "string",

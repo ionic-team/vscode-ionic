@@ -23,6 +23,7 @@ export enum CommandName {
   SelectAction = 'ionic-official.selectAction',
   DebugMode = 'ionic-official.debugMode',
   PluginExplorer = 'ionic-official.pluginExplorer',
+  NewProject = 'ionic-official.newProject',
   RunMode = 'ionic-official.runMode',
   SelectDevice = 'ionic-official.selectDevice',
   RunIOS = 'ionic-official.run',

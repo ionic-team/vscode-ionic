@@ -3,6 +3,7 @@
 ### Version 1.52
 
 - Fix issue where searching for a dependency will show twice if the dependency is already installed
+- Option added to only manually show the new project wizard (for users who have customized their VS Code view causing it to unwantedly appear)
 
 ### Version 1.51
 
