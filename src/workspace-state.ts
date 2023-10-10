@@ -17,6 +17,7 @@ export enum WorkspaceSetting {
 export enum ExtensionSetting {
   internalAddress = 'internalAddress',
   javaHome = 'javaHome',
+  manualNewProjects = 'manualNewProjects',
 }
 
 export enum GlobalSetting {

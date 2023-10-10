@@ -288,6 +288,10 @@ export async function activate(context: vscode.ExtensionContext) {
     runAction(r.tip, ionicProvider, rootPath);
   });
 
+  vscode.commands.registerCommand(CommandName.NewProject, async () => {
+    IonicStartPanel.init(ionicState.context.extensionUri, this.workspaceRoot, ionicState.context, true);
+  });
+
   vscode.commands.registerCommand(CommandName.PluginExplorer, async () => {
     await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
     PluginExplorerPanel.init(context.extensionUri, rootPath, context, ionicProvider);

@@ -12,7 +12,7 @@ import {
 import { getRunOutput, isWindows, replaceAll, run, toTitleCase } from './utilities';
 import { writeIonic } from './logging';
 import { homedir } from 'os';
-import { GlobalSetting, getGlobalSetting, setGlobalSetting } from './workspace-state';
+import { ExtensionSetting, GlobalSetting, getExtSetting, getGlobalSetting, setGlobalSetting } from './workspace-state';
 import { join } from 'path';
 import { existsSync, readdirSync } from 'fs';
 import { CapacitorPlatform } from './capacitor-platform';
@@ -51,7 +51,9 @@ export class IonicStartPanel {
     this.setWebviewMessageListener(this.panel.webview, extensionUri, path, context);
   }
 
-  public static init(extensionUri: Uri, path: string, context: ExtensionContext) {
+  public static init(extensionUri: Uri, path: string, context: ExtensionContext, force?: boolean) {
+    const manualNewProjects = getExtSetting(ExtensionSetting.manualNewProjects);
+    if (manualNewProjects && !force) return;
     if (IonicStartPanel.currentPanel) {
       // If the webview panel already exists reveal it
       IonicStartPanel.currentPanel.panel.reveal(ViewColumn.One);
