@@ -73,11 +73,13 @@ export class AppComponent implements OnInit {
           this.searchedPlugin.dailyDownloads = '0';
           this.searchedPlugin.ratingInfo = 'This dependency was found on npmjs.com and has not been tested yet.';
           this.searchedPlugin.moreInfoUrl = this.pluginService.getMoreInfoUrl(this.searchedPlugin);
-          this.plugins.push(this.searchedPlugin);
-          if (this.plugins.length == 1) {
-            this.listTitle = `Found "${this.searchedPlugin.name}" on npmjs.com`;
+          if (!this.pluginListed(this.searchedPlugin.name)) {
+            this.plugins.push(this.searchedPlugin);
+            if (this.plugins.length == 1) {
+              this.listTitle = `Found "${this.searchedPlugin.name}" on npmjs.com`;
+            }
+            console.log(`Added plugin from search`, event.data);
           }
-          console.log(`Added plugin from search`, event.data);
         }
         break;
       case MessageType.chooseVersion:
@@ -98,6 +100,10 @@ export class AppComponent implements OnInit {
   changeOfficial() {
     setChecked('installed', false);
     this.change();
+  }
+
+  pluginListed(name: string): boolean {
+    return !!this.plugins.find((p) => p.name == name);
   }
 
   search(): void {

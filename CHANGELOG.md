@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.52
+
+- Fix issue where searching for a dependency will show twice if the dependency is already installed
+
 ### Version 1.51
 
 - Detect onesignal-cordova-plugin and @ionic-enterprise/auth conflict
