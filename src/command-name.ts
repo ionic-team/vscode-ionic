@@ -38,6 +38,7 @@ export enum InternalCommand {
   target = '[@target]', // Used to change the target to the device selected
   removeCordova = 'rem-cordova', // Will remove cordova from the project
   ionicInit = '[@ionic-init]', // Will call ionic init if ionic.config.json is missing
+  publicHost = '[@public-host]', // Will be replaced with --public-host
 }
 
 export enum ActionResult {

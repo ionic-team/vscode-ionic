@@ -1,5 +1,11 @@
 ## Changelog
 
+### Version 1.53
+
+- Fix for when https is used with an external ip address
+- Add support to migrate Angular Standalone projects using https://github.com/ionic-team/ionic-angular-standalone-codemods
+- Fix error with pnpm projects that contain no dependencies
+
 ### Version 1.52
 
 - Fix issue where searching for a dependency will show twice if the dependency is already installed

@@ -433,12 +433,17 @@ async function runAction(tip: Tip, ionicProvider: IonicTreeProvider, rootPath: s
   tip.generateTitle();
   if (tip.command) {
     let command = tip.command;
+    let host = '';
     if (tip.doIpSelection) {
-      const host = await selectExternalIPAddress();
+      host = await selectExternalIPAddress();
       if (host) {
-        command = (tip.command as string) + ` --public-host=${host}`;
+        host = ` --public-host=${host}`;
+      } else {
+        host = '';
       }
     }
+    command = (tip.command as string).replace(InternalCommand.publicHost, host);
+
     if (tip.doDeviceSelection) {
       const target = await selectDevice(tip.secondCommand as string, tip.data, tip, srcCommand);
       if (!target) {

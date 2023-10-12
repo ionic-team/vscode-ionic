@@ -1,9 +1,9 @@
 import { Project } from './project';
 import * as vscode from 'vscode';
-import { PackageManager } from './node-commands';
+import { PackageManager, npmInstall } from './node-commands';
 import { getRunOutput, isWindows, replaceAll } from './utilities';
 import { writeError, writeIonic } from './logging';
-import { isGreaterOrEqual } from './analyzer';
+import { isGreaterOrEqual, isLess } from './analyzer';
 import { readAngularJson, writeAngularJson } from './rules-angular-json';
 import { join } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
@@ -17,6 +17,7 @@ enum Features {
   reinstallNodeModules = '$(extensions-sync-enabled) Reinstall Node Modules',
   angularESBuild = '$(test-view-icon) Switch from WebPack to ESBuild (experimental)',
   showIgnoredRecommendations = '$(light-bulb) Show Ignored Recommendations',
+  migrateAngularStandalone = '$(find-replace) Migrate to Angular Standalone',
 }
 
 export async function advancedActions(project: Project) {
@@ -26,6 +27,9 @@ export async function advancedActions(project: Project) {
 
     if (isGreaterOrEqual('@angular/core', '14.0.0')) {
       picks.push(Features.migrateToNX);
+    }
+    if (isGreaterOrEqual('@angular/core', '14.0.0')) {
+      picks.push(Features.migrateAngularStandalone);
     }
     picks.push(Features.reinstallNodeModules);
     picks.push(Features.showIgnoredRecommendations);
@@ -49,6 +53,9 @@ export async function advancedActions(project: Project) {
     case Features.angularESBuild:
       switchAngularToESBuild(project);
       break;
+    case Features.migrateAngularStandalone:
+      migrateToAngularStandalone(selection, project);
+      break;
     case Features.showIgnoredRecommendations:
       showIgnoredRecommendations();
       break;
@@ -57,6 +64,19 @@ export async function advancedActions(project: Project) {
 
 function migrateToPNPM(): Array<string> {
   return ['pnpm -v', 'rm -rf node_modules', 'pnpm import', 'pnpm install', 'rm package-lock.json'];
+}
+
+async function migrateToAngularStandalone(selection: string, project: Project) {
+  const commands = ['npx @ionic/angular-standalone-codemods'];
+  if (isGreaterOrEqual('@ionic/angular', '7.0.0')) {
+    if (isLess('@ionic/angular', '7.5.0')) {
+      commands.unshift(npmInstall('@ionic/angular'));
+    }
+  } else {
+    writeError('You must be using @ionic/angular version 7 or higher.');
+    return;
+  }
+  await runCommands(commands, selection, project);
 }
 
 export function removeNodeModules(): string {

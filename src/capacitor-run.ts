@@ -120,6 +120,7 @@ function capRun(
 
   capRunFlags += getConfigurationArgs();
 
+  capRunFlags += InternalCommand.publicHost;
   if (httpsForWeb) {
     if (capRunFlags.length >= 0) capRunFlags += ' ';
     capRunFlags += '--ssl';
