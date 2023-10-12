@@ -8,6 +8,7 @@ import { PackageInfo } from './package-info';
 import { generateUUID } from './utilities';
 import { Project } from './project';
 import { PackageType } from './npm-model';
+import { writeWarning } from './logging';
 
 interface TelemetryMetric {
   name: string;
@@ -52,40 +53,46 @@ export function sendTelemetryEvents(folder: string, project: Project, packages: 
   const config = getIonicConfig(folder);
   if (!config.telemetry) return;
 
-  const sent = context.workspaceState.get(`packages-${project.name}`);
-  if (sent != project.modified?.toUTCString()) {
-    const packageList = [];
-    const packageVersions = [];
-    const plugins = [];
-    for (const library of Object.keys(packages)) {
-      const info: PackageInfo = packages[library];
-      packageVersions.push(`${library}@${info.version}`);
-      packageList.push(library);
-      if (info.depType == PackageType.CordovaPlugin || info.depType == PackageType.CapacitorPlugin) {
-        plugins.push(library);
+  try {
+    const sent = context.workspaceState.get(`packages-${project.name}`);
+    if (sent != project.modified?.toUTCString()) {
+      const packageList = [];
+      const packageVersions = [];
+      const plugins = [];
+      if (packages != undefined) {
+        for (const library of Object.keys(packages)) {
+          const info: PackageInfo = packages[library];
+          packageVersions.push(`${library}@${info.version}`);
+          packageList.push(library);
+          if (info.depType == PackageType.CordovaPlugin || info.depType == PackageType.CapacitorPlugin) {
+            plugins.push(library);
+          }
+        }
+        sendTelemetry(config.telemetry, config.sessionId, TelemetryEventType.Packages, {
+          extension: context.extension.packageJSON.version,
+          name: project.name,
+          projectType: project.type,
+          packages: packageList,
+          packageVersions: packageVersions,
+          plugins: plugins,
+        });
       }
+
+      // Store the last time the package.json was modified so that we can send if it changes
+      context.workspaceState.update(`packages-${project.name}`, project.modified?.toUTCString());
     }
-    sendTelemetry(config.telemetry, config.sessionId, TelemetryEventType.Packages, {
-      extension: context.extension.packageJSON.version,
-      name: project.name,
-      projectType: project.type,
-      packages: packageList,
-      packageVersions: packageVersions,
-      plugins: plugins,
-    });
 
-    // Store the last time the package.json was modified so that we can send if it changes
-    context.workspaceState.update(`packages-${project.name}`, project.modified?.toUTCString());
-  }
+    const sentUsage = context.globalState.get(`lastusage`);
+    if (!sentUsage || new Date().toLocaleDateString() !== sentUsage) {
+      sendTelemetry(config.telemetry, config.sessionId, TelemetryEventType.Usage, {
+        extension: context.extension.packageJSON.version,
+      });
 
-  const sentUsage = context.globalState.get(`lastusage`);
-  if (!sentUsage || new Date().toLocaleDateString() !== sentUsage) {
-    sendTelemetry(config.telemetry, config.sessionId, TelemetryEventType.Usage, {
-      extension: context.extension.packageJSON.version,
-    });
-
-    // Store the last time the extension was used so we can report it daily
-    context.globalState.update(`lastusage`, new Date().toLocaleDateString());
+      // Store the last time the extension was used so we can report it daily
+      context.globalState.update(`lastusage`, new Date().toLocaleDateString());
+    }
+  } catch (err) {
+    writeWarning(err);
   }
 }
 
@@ -195,35 +202,35 @@ https://github.com/ionic-team/capacitor/blob/main/cli/src/tasks/telemetry.ts
 https://github.com/ionic-team/stencil/blob/main/src/cli/telemetry/telemetry.ts
 the stencil CLI does something similar to collect a list of ionic (the company) packages: https://github.com/ionic-team/stencil/blob/main/src/cli/telemetry/telemetry.ts#L149-L192
 {
-	"metrics": [
-	  {
-		"name": "vscode_ext",
-		"session_id": "7257a836-8b5c-4250-844d-c9f01f0a0949",
-		"source": "vscode_ext",
-		"timestamp": "2022-02-24T19:56:56.773Z",
-		"value": {
-		  "event_type": "actual_event_name",
-		  "os_name": "darwin",
-		  "os_version": "21.3.0",
+  "metrics": [
+    {
+    "name": "vscode_ext",
+    "session_id": "7257a836-8b5c-4250-844d-c9f01f0a0949",
+    "source": "vscode_ext",
+    "timestamp": "2022-02-24T19:56:56.773Z",
+    "value": {
+      "event_type": "actual_event_name",
+      "os_name": "darwin",
+      "os_version": "21.3.0",
   
-		  "arguments": ["--dev", "--watch", "--serve", "start"],
-		  "build": "20220124181123",
-		  "cpu_model": "Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz",
-		  "duration_ms": 56202,
-		  "has_app_pwa_config": false,
-		  "packages": ["@stencil/core@2.6.0", "@stencil/sass@1.4.1"],
-		  "packages_no_versions": ["@stencil/core", "@stencil/sass"],
-		  "rollup": "2.42.3",
-		  "stencil": "2.13.0",
-		  "system": "node 15.14.0",
-		  "system_major": "node 15",
-		  "targets": ["dist-custom-elements-bundle", "www", "dist-lazy", "copy", "dist-global-styles", "dist", "dist-types", "docs-readme", "angular"],
-		  "task": "build",
-		  "typescript": "4.3.5",
-		  "yarn": true
-		}   
-	  }     
-	],    
-	"sent_at": "2022-02-24T19:56:56.773Z"
+      "arguments": ["--dev", "--watch", "--serve", "start"],
+      "build": "20220124181123",
+      "cpu_model": "Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz",
+      "duration_ms": 56202,
+      "has_app_pwa_config": false,
+      "packages": ["@stencil/core@2.6.0", "@stencil/sass@1.4.1"],
+      "packages_no_versions": ["@stencil/core", "@stencil/sass"],
+      "rollup": "2.42.3",
+      "stencil": "2.13.0",
+      "system": "node 15.14.0",
+      "system_major": "node 15",
+      "targets": ["dist-custom-elements-bundle", "www", "dist-lazy", "copy", "dist-global-styles", "dist", "dist-types", "docs-readme", "angular"],
+      "task": "build",
+      "typescript": "4.3.5",
+      "yarn": true
+    }   
+    }     
+  ],    
+  "sent_at": "2022-02-24T19:56:56.773Z"
   }  
 */
