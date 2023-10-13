@@ -15,7 +15,7 @@ import { getWebConfiguration, WebConfigSetting } from './web-configuration';
 import { Publisher } from './discovery';
 import { join } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { ChildProcess, exec, ExecException } from 'child_process';
+import { ChildProcess, exec, ExecException, ExecOptionsWithStringEncoding } from 'child_process';
 import { startStopLogServer } from './log-server';
 import { qrView } from './nexus-browser';
 
@@ -36,11 +36,16 @@ export function estimateRunTime(command: string) {
   }
 }
 
+export async function confirm(message: string, confirmButton: string): Promise<boolean> {
+  const selection = await vscode.window.showInformationMessage(message, confirmButton, 'Cancel');
+  return selection == confirmButton;
+}
+
 export function isWindows(): boolean {
   return process.platform === 'win32';
 }
 
-function runOptions(command: string, folder: string, shell?: string) {
+function runOptions(command: string, folder: string, shell?: string): ExecOptionsWithStringEncoding {
   const env = { ...process.env };
   const javaHome: string = getExtSetting(ExtensionSetting.javaHome);
 

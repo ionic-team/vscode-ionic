@@ -1,8 +1,8 @@
 import { Project } from './project';
 import * as vscode from 'vscode';
 import { PackageManager, npmInstall } from './node-commands';
-import { getRunOutput, isWindows, replaceAll } from './utilities';
-import { writeError, writeIonic } from './logging';
+import { confirm, getRunOutput, isWindows, replaceAll } from './utilities';
+import { write, writeError, writeIonic } from './logging';
 import { isGreaterOrEqual, isLess } from './analyzer';
 import { readAngularJson, writeAngularJson } from './rules-angular-json';
 import { join } from 'path';
@@ -17,7 +17,7 @@ enum Features {
   reinstallNodeModules = '$(extensions-sync-enabled) Reinstall Node Modules',
   angularESBuild = '$(test-view-icon) Switch from WebPack to ESBuild (experimental)',
   showIgnoredRecommendations = '$(light-bulb) Show Ignored Recommendations',
-  migrateAngularStandalone = '$(find-replace) Migrate to Angular Standalone',
+  migrateAngularStandalone = '$(find-replace) Migrate to Ionic standalone components',
 }
 
 export async function advancedActions(project: Project) {
@@ -67,10 +67,18 @@ function migrateToPNPM(): Array<string> {
 }
 
 async function migrateToAngularStandalone(selection: string, project: Project) {
-  const commands = ['npx @ionic/angular-standalone-codemods'];
+  if (
+    !(await confirm(
+      'This will replace IonicModule with individual Ionic components and icons in your project. Are you sure?',
+      'Continue'
+    ))
+  )
+    return;
+
+  const commands = ['npx @ionic/angular-standalone-codemods --non-interactive'];
   if (isGreaterOrEqual('@ionic/angular', '7.0.0')) {
     if (isLess('@ionic/angular', '7.5.0')) {
-      commands.unshift(npmInstall('@ionic/angular'));
+      commands.unshift(npmInstall('@ionic/angular@7.5.0'));
     }
   } else {
     writeError('You must be using @ionic/angular version 7 or higher.');
@@ -109,11 +117,11 @@ async function runCommands(commands: Array<string>, title: string, project: Proj
   }
 }
 
-async function run(commands: Array<string>, folder: string) {
+async function run(commands: Array<string>, folder: string): Promise<void> {
   for (const command of commands) {
     writeIonic(command);
     try {
-      const result = await getRunOutput(command, folder);
+      write(await getRunOutput(command, folder));
     } catch (err) {
       writeError(err);
       break;

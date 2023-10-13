@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.54
+
+- Fix for support to migrate Angular Standalone projects
+
 ### Version 1.53
 
 - Fix for when https is used with an external ip address
