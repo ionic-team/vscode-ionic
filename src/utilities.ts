@@ -491,7 +491,12 @@ export function channelShow() {
   }
 }
 
-export async function runWithProgress(command: string, title: string, folder: string): Promise<boolean> {
+export async function runWithProgress(
+  command: string,
+  title: string,
+  folder: string,
+  output?: RunResults
+): Promise<boolean> {
   let result = false;
   await vscode.window.withProgress(
     {
@@ -501,7 +506,7 @@ export async function runWithProgress(command: string, title: string, folder: st
     },
     async (progress, token: vscode.CancellationToken) => {
       const cancelObject: CancelObject = { proc: undefined, cancelled: false };
-      result = await run(folder, command, cancelObject, [], [], progress, undefined, undefined, false);
+      result = await run(folder, command, cancelObject, [], [], progress, undefined, output, false);
     }
   );
   return result;
