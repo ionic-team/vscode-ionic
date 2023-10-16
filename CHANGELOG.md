@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.55
+
+- Fix for Angular projects that are missing .browserslistrc
+
 ### Version 1.54
 
 - Fix for support to migrate Angular Standalone projects
