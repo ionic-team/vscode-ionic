@@ -3,6 +3,7 @@
 ### Version 1.55
 
 - When releases are prepared it will now open the folder the ipa/apk/aab file that was generated and may open store portal
+- NX support for project.json with comments
 - Fix for Angular projects that are missing .browserslistrc (fixes webpack error on some Angular projects in iOS 15)
 
 ### Version 1.54

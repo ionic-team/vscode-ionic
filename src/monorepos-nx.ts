@@ -5,6 +5,7 @@ import { writeError } from './logging';
 import { ionicState } from './ionic-tree-provider';
 import { MonoRepoProject } from './monorepo';
 import { Project } from './project';
+import { stripJsonComments } from './strip-json-comments';
 
 export interface NXWorkspace {
   projects: object;
@@ -45,12 +46,12 @@ async function getNXProjectsFromNX(project: Project): Promise<MonoRepoProject[]>
     for (const prj of projects) {
       try {
         const txt = fs.readFileSync(prj, 'utf-8');
-        const p = JSON.parse(txt);
+        const p = JSON.parse(stripJsonComments(txt));
         if (p.name && p.projectType == 'application') {
           result.push({ name: p.name, folder: path.dirname(prj) });
         }
       } catch (err) {
-        writeError(err);
+        writeError(`Error in project ${prj}: ${err}`);
       }
     }
     return result;
@@ -62,15 +63,17 @@ async function getNXProjectsFromNX(project: Project): Promise<MonoRepoProject[]>
 
 function listProjects(folder: string): string[] {
   const result = [];
-  const files = fs.readdirSync(folder);
+  const files = fs.readdirSync(folder, { withFileTypes: true });
   for (const file of files) {
-    const stat = fs.statSync(join(folder, file));
-    if (stat.isDirectory() && file != 'node_modules') {
-      for (const prj of listProjects(join(folder, file))) {
-        result.push(prj);
+    const skip = file.name == 'node_modules' || file.name.startsWith('.') || file.name.endsWith('.ts');
+    if (!skip) {
+      if (file.isDirectory()) {
+        for (const prj of listProjects(join(folder, file.name))) {
+          result.push(prj);
+        }
+      } else if (file.name.toLowerCase() == 'project.json') {
+        result.push(join(folder, file.name));
       }
-    } else if (file.toLowerCase() == 'project.json') {
-      result.push(join(folder, file));
     }
   }
   return result;
