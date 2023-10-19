@@ -3,13 +3,14 @@ import { MonoRepoType } from './monorepo';
 import { CapacitorPlatform } from './capacitor-platform';
 import { InternalCommand } from './command-name';
 import * as vscode from 'vscode';
-import { runWithProgress, getStringFrom, setStringIn } from './utilities';
+import { runWithProgress, getStringFrom, setStringIn, RunResults, openUri } from './utilities';
 import { writeError, writeIonic } from './logging';
 import { exists, isGreaterOrEqual } from './analyzer';
 import { getCapacitorConfigureFilename } from './capacitor-configure';
 import { readFileSync, writeFileSync } from 'fs';
 import { capacitorOpen } from './capacitor-open';
 import { npx, PackageManager } from './node-commands';
+import { exec } from 'child_process';
 
 /**
  * Capacitor build command
@@ -47,10 +48,30 @@ export async function capacitorBuild(project: Project) {
   try {
     const command = capBuildCommand(project, platform, args, settings);
     writeIonic(command);
-    await runWithProgress(command, 'Preparing Release Build...', project.projectFolder());
-    writeConfig(project, settings);
+    const results: RunResults = { output: '', success: false };
+    await runWithProgress(command, 'Preparing Release Build...', project.projectFolder(), results);
+    if (results.success) {
+      writeConfig(project, settings);
+      const tmp = results.output.split('at: ');
+      const folder = tmp[1].replace('\n', '');
+      exec(`open "${folder}"`);
+      openPortal(platform);
+    }
   } catch (err) {
     writeError(err);
+  }
+}
+
+async function openPortal(platform: CapacitorPlatform) {
+  const uri =
+    platform == CapacitorPlatform.android ? 'https://play.google.com/console' : 'https://developer.apple.com/account';
+  const selection = await vscode.window.showInformationMessage(
+    `Do you want to open the ${platform == CapacitorPlatform.ios ? 'Apple Developer Portal?' : 'Google Play Console?'}`,
+    'Open',
+    'Exit'
+  );
+  if (selection == 'Open') {
+    openUri(uri);
   }
 }
 
@@ -149,10 +170,12 @@ function capCLIBuild(
   args: string,
   settings: KeyStoreSettings
 ): string {
-  if (settings.keyAlias) args += ` --keystorealias="${settings.keyAlias}"`;
-  if (settings.keyPassword) args += ` --keystorealiaspass="${settings.keyPassword}"`;
-  if (settings.keyStorePassword) args += ` --keystorepass="${settings.keyStorePassword}"`;
-  if (settings.keyStorePath) args += ` --keystorepath="${settings.keyStorePath}"`;
+  if (platform == CapacitorPlatform.android) {
+    if (settings.keyAlias) args += ` --keystorealias="${settings.keyAlias}"`;
+    if (settings.keyPassword) args += ` --keystorealiaspass="${settings.keyPassword}"`;
+    if (settings.keyStorePassword) args += ` --keystorepass="${settings.keyStorePassword}"`;
+    if (settings.keyStorePath) args += ` --keystorepath="${settings.keyStorePath}"`;
+  }
   return `${npx(packageManager)} cap build ${platform}${args}`;
 }
 

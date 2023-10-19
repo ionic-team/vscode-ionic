@@ -8,6 +8,7 @@ import { writeError } from './logging';
 import { openUri } from './utilities';
 import { ionicState } from './ionic-tree-provider';
 import { ignore } from './ignore';
+import { exists } from './analyzer';
 
 export function checkBrowsersList(project: Project) {
   try {
@@ -16,6 +17,15 @@ export function checkBrowsersList(project: Project) {
     if (!fs.existsSync(filename)) {
       name = '.browserslistrc';
       filename = path.join(project.folder, name);
+    }
+    if (exists('@angular/core') && !fs.existsSync(filename)) {
+      // .browserslistrc is missing
+      const title = 'Fix Browser Support';
+      const message = `${name} is missing from this project. Without this some older devices will not be supported.`;
+      project.add(
+        new Tip(title, message, TipType.Warning).setAction(createFile, name, filename, title, message).canIgnore()
+      );
+      return;
     }
     if (!fs.existsSync(filename)) {
       return;
@@ -60,7 +70,7 @@ async function fixFile(name: string, filename: string, title: string, message: s
     }
     const txt = fs.readFileSync(filename, 'utf8').split(/\r?\n/);
     const lines = txt.map((line) => line.trim());
-    const replace = [];
+    let replace = [];
 
     if (choice == 'Open File') {
       openUri(filename);
@@ -84,16 +94,33 @@ async function fixFile(name: string, filename: string, title: string, message: s
       }
     }
 
-    replace.push('Chrome >=60');
-    replace.push('ChromeAndroid >=60');
-    replace.push('Firefox >=63');
-    replace.push('Firefox ESR');
-    replace.push('Edge >=79');
-    replace.push('Safari >=13');
-    replace.push('iOS >=13');
+    replace = replace.concat(defaultValues);
 
     fs.writeFileSync(filename, replace.join('\n'));
   } catch (err) {
     vscode.window.showErrorMessage(`Failed to fix ${name}: ${err}`);
   }
+}
+
+function defaultValues(): string[] {
+  return ['Chrome >=60', 'ChromeAndroid >=60', 'Firefox >=63', 'Firefox ESR', 'Edge >=79', 'Safari >=13', 'iOS >=13'];
+}
+
+async function createFile(name: string, filename: string, title: string, message: string) {
+  const choice = await vscode.window.showWarningMessage(
+    `${name} is missing. It allows support of older devices (run npx browserslist). Do you want to create this file?`,
+    'Create File',
+    'Ignore'
+  );
+  if (!choice) {
+    return;
+  }
+
+  if (choice == 'Ignore') {
+    ignore(new Tip(title, message), ionicState.context);
+    return;
+  }
+
+  const replace = defaultValues();
+  fs.writeFileSync(filename, replace.join('\n'));
 }

@@ -15,7 +15,7 @@ import { getWebConfiguration, WebConfigSetting } from './web-configuration';
 import { Publisher } from './discovery';
 import { join } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { ChildProcess, exec, ExecException } from 'child_process';
+import { ChildProcess, exec, ExecException, ExecOptionsWithStringEncoding } from 'child_process';
 import { startStopLogServer } from './log-server';
 import { qrView } from './nexus-browser';
 
@@ -36,11 +36,16 @@ export function estimateRunTime(command: string) {
   }
 }
 
+export async function confirm(message: string, confirmButton: string): Promise<boolean> {
+  const selection = await vscode.window.showInformationMessage(message, confirmButton, 'Cancel');
+  return selection == confirmButton;
+}
+
 export function isWindows(): boolean {
   return process.platform === 'win32';
 }
 
-function runOptions(command: string, folder: string, shell?: string) {
+function runOptions(command: string, folder: string, shell?: string): ExecOptionsWithStringEncoding {
   const env = { ...process.env };
   const javaHome: string = getExtSetting(ExtensionSetting.javaHome);
 
@@ -396,7 +401,7 @@ function qualifyCommand(command: string, folder: string): string {
     if (!ionicState.nvm) {
       const nvmrc = join(folder, '.nvmrc');
       if (existsSync(nvmrc)) {
-        const txt = readFileSync(nvmrc, 'utf-8');
+        const txt = readFileSync(nvmrc, 'utf-8').replace('\n', '');
         ionicState.nvm = `source ${process.env.NVM_DIR}/nvm.sh && nvm use`;
         writeIonic(`Detected nvm (${txt}) for this project.`);
       }
@@ -486,7 +491,12 @@ export function channelShow() {
   }
 }
 
-export async function runWithProgress(command: string, title: string, folder: string): Promise<boolean> {
+export async function runWithProgress(
+  command: string,
+  title: string,
+  folder: string,
+  output?: RunResults
+): Promise<boolean> {
   let result = false;
   await vscode.window.withProgress(
     {
@@ -496,7 +506,7 @@ export async function runWithProgress(command: string, title: string, folder: st
     },
     async (progress, token: vscode.CancellationToken) => {
       const cancelObject: CancelObject = { proc: undefined, cancelled: false };
-      result = await run(folder, command, cancelObject, [], [], progress, undefined, undefined, false);
+      result = await run(folder, command, cancelObject, [], [], progress, undefined, output, false);
     }
   );
   return result;

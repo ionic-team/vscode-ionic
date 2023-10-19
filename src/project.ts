@@ -664,6 +664,11 @@ export async function inspectProject(
 
   await checkForMonoRepo(project, selectedProject, context);
 
+  if (project.monoRepo.folder) {
+    // Use the package manager from the monorepo project
+    project.packageManager = getPackageManager(project.monoRepo.folder);
+    ionicState.packageManager = project.packageManager;
+  }
   if (project.monoRepo?.localPackageJson) {
     packages = await load(project.monoRepo.folder, project, context);
   }

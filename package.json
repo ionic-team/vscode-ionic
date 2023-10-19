@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.53.0",
+  "version": "1.55.0",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -17,8 +17,9 @@
     "prepare": "husky install",
     "install:all": "npm install && cd plugin-explorer && npm install",
     "build:pe": "cd plugin-explorer && npm run build --configuration=production",
+    "build:is": "cd ionic-start && npm run build --configuration=production",
     "clean": "find ./node_modules -name '*.md' -delete && find ./node_modules -name '*.ts' -delete && find ./node_modules -name 'LICENSE' -delete && find ./node_modules -name '*.map' -delete",
-    "build": "npm run compile && npm run clean && npm run esbuild && npm run vsix-package && npm run reset",
+    "build": "npm run compile && npm run build:pe && npm run build:is && npm run clean && npm run esbuild && npm run vsix-package && npm run reset",
     "reset": "rm -rf node_modules && npm install",
     "vsix-package": "vsce package",
     "pre-release": "npm run build && vsce publish --pre-release",
@@ -507,10 +508,10 @@
     "@trapezedev/configure": "7.0.10",
     "fast-xml-parser": "^3.21.1",
     "g": "^2.0.1",
-    "globule": "^1.3.3",
-    "netmask": "^2.0.2",
+    "globule": "1.3.4",
+    "netmask": "2.0.2",
     "rimraf": "4.4.1",
-    "semver": "7.5.2"
+    "semver": "7.5.4"
   },
   "volta": {
     "node": "16.13.2",
