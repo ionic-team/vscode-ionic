@@ -77,8 +77,8 @@ async function migrateToAngularStandalone(selection: string, project: Project) {
 
   const commands = ['npx @ionic/angular-standalone-codemods --non-interactive'];
   if (isGreaterOrEqual('@ionic/angular', '7.0.0')) {
-    if (isLess('@ionic/angular', '7.5.0')) {
-      commands.unshift(npmInstall('@ionic/angular@7.5.0'));
+    if (isLess('@ionic/angular', '7.5.1')) {
+      commands.unshift(npmInstall('@ionic/angular@7.5.1'));
     }
   } else {
     writeError('You must be using @ionic/angular version 7 or higher.');
