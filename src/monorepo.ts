@@ -106,7 +106,7 @@ export async function checkForMonoRepo(project: Project, selectedProject: string
   if (projects?.length > 0) {
     const found = projects.find((project) => project.name == selectedProject);
     if (!found) {
-      context.workspaceState.update('SelectedProject', projects[0]);
+      context.workspaceState.update('SelectedProject', projects[0].name);
     }
     project.monoRepo = found ? found : projects[0];
 
@@ -115,6 +115,10 @@ export async function checkForMonoRepo(project: Project, selectedProject: string
       vscode.window.showErrorMessage('No mono repo projects found.');
     } else {
       ionicState.view.title = project.monoRepo.name;
+
+      //  // Switch to pnpm if needed
+      //  const isPnpm = fs.existsSync(path.join(projects[0].folder, 'pnpm-lock.yaml'));
+      //  if (isPnpm)project.repoType = MonoRepoType.pnpm;
 
       project.monoRepo.localPackageJson = [
         MonoRepoType.npm,
