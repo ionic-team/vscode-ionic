@@ -18,6 +18,7 @@ export function getPnpmWorkspaces(project: Project): Array<MonoRepoProject> {
       if (line.trim().startsWith('-')) {
         let folder = line.replace('-', '').trim();
         folder = replaceAll(folder, '"', '');
+        folder = replaceAll(folder, `'`, '');
         list.push(folder);
         // packages/*
         // '.'
