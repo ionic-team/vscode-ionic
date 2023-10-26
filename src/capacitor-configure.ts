@@ -37,16 +37,16 @@ export async function reviewCapacitorConfig(project: Project, context: vscode.Ex
     const bundleId = state.androidBundleId ? state.androidBundleId : state.iosBundleId;
     const tip = new Tip('Bundle Id', bundleId, TipType.None);
 
-    tip.setAction(setBundleId, bundleId, project);
+    tip.setAction(setBundleId, bundleId, project, project.folder);
     project.add(tip);
   } else {
     // Bundle Ids different
     const tip = new Tip('Android Bundle Id', state.androidBundleId, TipType.None);
-    tip.setAction(setBundleId, state.androidBundleId, project, NativePlatform.AndroidOnly);
+    tip.setAction(setBundleId, state.androidBundleId, project, project.folder, NativePlatform.AndroidOnly);
     project.add(tip);
 
     const tip2 = new Tip('iOS Bundle Id', state.iosBundleId, TipType.None);
-    tip2.setAction(setBundleId, state.iosBundleId, project, NativePlatform.iOSOnly);
+    tip2.setAction(setBundleId, state.iosBundleId, project, project.folder, NativePlatform.iOSOnly);
     project.add(tip2);
   }
 
@@ -223,9 +223,10 @@ async function getCapacitorProjectState(
 /**
  * Change the Bundle Id of an App in the iOS and Android projects
  * @param  {string} bundleId The original bundle id / package name
+ * @param  {string} folder Folder for the project
  * @param  {NativePlatform} platform Whether iOS or Android only (default both)
  */
-async function setBundleId(bundleId: string, prj: Project, platform: NativePlatform) {
+async function setBundleId(bundleId: string, prj: Project, folder: string, platform: NativePlatform) {
   const newBundleId = await vscode.window.showInputBox({
     title: 'Application Bundle Id',
     placeHolder: bundleId,
@@ -260,6 +261,8 @@ async function setBundleId(bundleId: string, prj: Project, platform: NativePlatf
   if (project.android && platform != NativePlatform.iOSOnly) {
     write(`Set Android Package Name to ${newBundleId}`);
     try {
+      // This doesnt really work in Trapeze: https://github.com/ionic-team/trapeze/issues/191
+      // So we alter strings.xml afterwards
       await project.android?.setPackageName(newBundleId);
     } catch (error) {
       writeError(`Unable to setPackageName for android: ${error}`);
@@ -268,8 +271,49 @@ async function setBundleId(bundleId: string, prj: Project, platform: NativePlatf
     }
   }
   await project.commit();
+
+  await updateStringsXML(folder, prj, newBundleId);
+  updateCapacitorConfig(prj, newBundleId);
   showOutput();
   clearCapProjectCache();
+}
+
+async function updateStringsXML(folder: string, prj: Project, newBundleId: string) {
+  const project = await getCapacitorProject(prj);
+  let data = await project.android?.getResource('values', 'strings.xml');
+  if (!data) {
+    write(`Unable to set Android display name`);
+  }
+  data = setStringIn(data as string, `<string name="package_name">`, `</string>`, newBundleId);
+  data = setStringIn(data as string, `<string name="custom_url_scheme">`, `</string>`, newBundleId);
+  const filename = path.join(folder, 'android/app/src/main/res/values/strings.xml');
+  if (fs.existsSync(filename)) {
+    fs.writeFileSync(filename, data);
+  }
+}
+
+function setValueIn(data: string, key: string, value: string): string {
+  if (data.includes(`${key}: '`)) {
+    data = setStringIn(data, `${key}: '`, `'`, value);
+  } else if (data.includes(`${key}: "`)) {
+    data = setStringIn(data, `${key}: "`, `"`, value);
+  }
+  return data;
+}
+
+function updateCapacitorConfig(project: Project, bundleId?: string, displayName?: string) {
+  const filename = getCapacitorConfigureFilename(project.projectFolder());
+  if (!filename) {
+    return;
+  }
+  let data = fs.readFileSync(filename, 'utf-8');
+  if (bundleId) {
+    data = setValueIn(data, 'appId', bundleId);
+  }
+  if (displayName) {
+    data = setValueIn(data, 'appName', displayName);
+  }
+  fs.writeFileSync(filename, data);
 }
 
 function clearCapProjectCache() {
@@ -404,6 +448,7 @@ async function setDisplayName(currentDisplayName: string, prj: Project, folder: 
   }
   channelShow();
   project.commit();
+  updateCapacitorConfig(prj, undefined, displayName);
   clearCapProjectCache();
 }
 
