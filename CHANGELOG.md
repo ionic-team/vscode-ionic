@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.57
+
+- Changing the bundle id for Android will now update capacitor.config.js/ts/json and strings.xml
+
 ### Version 1.56
 
 - Fix for pnpm workspaces files that use single quotes with folders
