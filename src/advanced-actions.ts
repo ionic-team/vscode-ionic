@@ -84,6 +84,9 @@ async function migrateToAngularStandalone(selection: string, project: Project) {
     writeError('You must be using @ionic/angular version 7 or higher.');
     return;
   }
+  if (isLess('ionicons', '7.2.1')) {
+    commands.unshift(npmInstall('ionicons@latest'));
+  }
   await runCommands(commands, selection, project);
 }
 
