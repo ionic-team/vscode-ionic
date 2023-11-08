@@ -5,7 +5,7 @@ import { confirm, getRunOutput, isWindows, replaceAll } from './utilities';
 import { write, writeError, writeIonic } from './logging';
 import { isGreaterOrEqual, isLess } from './analyzer';
 import { readAngularJson, writeAngularJson } from './rules-angular-json';
-import { join } from 'path';
+import path, { join } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { ionicState } from './ionic-tree-provider';
 import { clearIgnored } from './ignore';
@@ -16,8 +16,9 @@ enum Features {
   migrateToNX = '$(outline-view-icon) Migrate to NX',
   reinstallNodeModules = '$(extensions-sync-enabled) Reinstall Node Modules',
   angularESBuild = '$(test-view-icon) Switch from WebPack to ESBuild (experimental)',
+  migrateAngularControlFlow = '$(test-view-icon) Migrate to the built-in control flow syntax',
   showIgnoredRecommendations = '$(light-bulb) Show Ignored Recommendations',
-  migrateAngularStandalone = '$(find-replace) Migrate to Ionic standalone components',
+  migrateAngularStandalone = '$(test-view-icon) Migrate to Ionic standalone components',
 }
 
 export async function advancedActions(project: Project) {
@@ -30,6 +31,9 @@ export async function advancedActions(project: Project) {
     }
     if (isGreaterOrEqual('@angular/core', '14.0.0')) {
       picks.push(Features.migrateAngularStandalone);
+    }
+    if (isGreaterOrEqual('@angular/core', '17.0.0')) {
+      picks.push(Features.migrateAngularControlFlow);
     }
     picks.push(Features.reinstallNodeModules);
     picks.push(Features.showIgnoredRecommendations);
@@ -50,6 +54,9 @@ export async function advancedActions(project: Project) {
     case Features.reinstallNodeModules:
       await runCommands(reinstallNodeModules(), selection, project);
       break;
+    case Features.migrateAngularControlFlow:
+      migrateAngularControlFlow(selection, project);
+      break;
     case Features.angularESBuild:
       switchAngularToESBuild(project);
       break;
@@ -64,6 +71,21 @@ export async function advancedActions(project: Project) {
 
 function migrateToPNPM(): Array<string> {
   return ['pnpm -v', 'rm -rf node_modules', 'pnpm import', 'pnpm install', 'rm package-lock.json'];
+}
+
+async function migrateAngularControlFlow(selection: string, project: Project) {
+  if (
+    !(await confirm(
+      'This will change your Angular templates to use the new built-in control flow syntax. Are you sure?',
+      'Continue'
+    ))
+  )
+    return;
+
+  const commands = [
+    `npx ng generate @angular/core:control-flow --interactive=false --defaults=true --path=".${path.sep}"`,
+  ];
+  await runCommands(commands, selection, project);
 }
 
 async function migrateToAngularStandalone(selection: string, project: Project) {

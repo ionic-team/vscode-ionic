@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.59
+
+- Add control flow migration for Angular 17 projects
+
 ### Version 1.58
 
 - Fix to update ionicons to > 7.2.1 when migrating to standalone components
