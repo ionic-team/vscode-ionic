@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.58
+
+- Fix to update ionicons to > 7.2.1 when migrating to standalone components
+- Update Angular Icon
+
 ### Version 1.57
 
 - Changing the bundle id for Android will now update capacitor.config.js/ts/json and strings.xml
