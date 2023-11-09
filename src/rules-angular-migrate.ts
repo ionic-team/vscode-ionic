@@ -3,42 +3,65 @@ import { Tip, TipType } from './tip';
 import { coerce } from 'semver';
 import { npx } from './node-commands';
 import { ionicState } from './ionic-tree-provider';
+import { runCommands } from './advanced-actions';
+import { Project } from './project';
+import { window } from 'vscode';
+import { openUri } from './utilities';
 
-export function angularMigrate(latestVersion: string): Tip {
+// Maximum supported Angular version that we'll suggest migrating to
+export const maxAngularVersion = '17';
+
+export function angularMigrate(project: Project, latestVersion: string): Tip | undefined {
   const current = getPackageVersion('@angular/core');
   let latest = coerce(latestVersion);
   const next = current.major + 1;
   if (!latest) latest = current;
   if (!current) return;
+  return new Tip(`Migrate to Angular ${next}`, '', TipType.Angular).setAction(
+    migrate,
+    project,
+    next,
+    current.major,
+    current
+  );
+}
 
-  const title = latest.major == current.major ? `Update to latest v${latest.major}` : `Update to v${latest.major}`;
-
-  const tip = new Tip(
-    'Update Angular',
-    'Updates your application and its dependencies to the latest version using "ng update". Make sure you have committed your code before trying an upgrade.',
-    TipType.Run,
-    undefined,
-    `${npx(ionicState.packageManager)} ng update @angular/cli @angular/core --allow-dirty --force`,
-    title,
-    undefined,
-    'https://angular.io/cli/update'
-  ).showProgressDialog();
-
-  // Upgrade option to next major
-  if (next == latest.major) {
-    // If we are 1 major version behind then update to latest same major (eg 12.0.1 -> 12.2.6)
-    tip.setSecondCommand(
-      `Update to latest v${current.major}`,
-      `${npx(ionicState.packageManager)} ng update @angular/cli@${current.major} @angular/core@${
-        current.major
-      } --allow-dirty --force`
-    );
-  } else if (next <= latest.major) {
-    // Upgrade to next major
-    tip.setSecondCommand(
-      `Update to v${next}`,
-      `${npx(ionicState.packageManager)} ng update @angular/cli@${next} @angular/core@${next} --allow-dirty --force`
-    );
+async function migrate(project: Project, next: string, current: string, now: string) {
+  const nextButton = `Update to v${next}`;
+  const currentButton = `Update to latest v${current}`;
+  const infoButton = 'Info';
+  const result = await window.showInformationMessage(
+    `Would you like to migrate from Angular ${now} to ${next}? This will use 'ng update': Make sure you have committed your code before you begin.`,
+    infoButton,
+    currentButton,
+    nextButton
+  );
+  if (!result) return;
+  switch (result) {
+    case infoButton:
+      openUri('https://angular.io/cli/update');
+      break;
+    case currentButton:
+      await runCommands(
+        [
+          `${npx(
+            ionicState.packageManager
+          )} ng update @angular/cli@${current} @angular/core@${current} --allow-dirty --force`,
+        ],
+        `Updating to latest Angular ${current}`,
+        project
+      );
+      break;
+    case nextButton:
+      await runCommands(
+        [
+          `${npx(
+            ionicState.packageManager
+          )} ng update @angular/cli@${next} @angular/core@${next} --allow-dirty --force`,
+        ],
+        `Migrating to Angular ${next}`,
+        project
+      );
+      break;
   }
-  return tip;
 }

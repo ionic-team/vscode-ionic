@@ -347,7 +347,7 @@ export class Project {
       if (!latestVersion) {
         return;
       }
-      tip = angularMigrate(latestVersion);
+      tip = angularMigrate(this, latestVersion);
     } else {
       tip = new Tip('Upgrade All Packages', undefined, TipType.Run, undefined, undefined, 'Upgrade');
     }

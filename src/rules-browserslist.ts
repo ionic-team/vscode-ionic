@@ -1,7 +1,3 @@
-import * as vscode from 'vscode';
-import * as path from 'path';
-import * as fs from 'fs';
-
 import { Project } from './project';
 import { Tip, TipType } from './tip';
 import { writeError } from './logging';
@@ -9,16 +5,19 @@ import { openUri } from './utilities';
 import { ionicState } from './ionic-tree-provider';
 import { ignore } from './ignore';
 import { exists } from './analyzer';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { window } from 'vscode';
+import { join } from 'path';
 
 export function checkBrowsersList(project: Project) {
   try {
     let name = 'browserslist';
-    let filename = path.join(project.folder, name);
-    if (!fs.existsSync(filename)) {
+    let filename = join(project.folder, name);
+    if (!existsSync(filename)) {
       name = '.browserslistrc';
-      filename = path.join(project.folder, name);
+      filename = join(project.folder, name);
     }
-    if (exists('@angular/core') && !fs.existsSync(filename)) {
+    if (exists('@angular/core') && !existsSync(filename)) {
       // .browserslistrc is missing
       const title = 'Fix Browser Support';
       const message = `${name} is missing from this project. Without this some older devices will not be supported.`;
@@ -27,10 +26,10 @@ export function checkBrowsersList(project: Project) {
       );
       return;
     }
-    if (!fs.existsSync(filename)) {
+    if (!existsSync(filename)) {
       return;
     }
-    let lines = fs.readFileSync(filename, 'utf8').split(/\r?\n/);
+    let lines = readFileSync(filename, 'utf8').split(/\r?\n/);
     lines = lines.map((line) => line.trim());
 
     if (
@@ -52,11 +51,11 @@ export function checkBrowsersList(project: Project) {
 }
 
 async function fixFile(name: string, filename: string, title: string, message: string) {
-  const choice = await vscode.window.showWarningMessage(
+  const choice = await window.showWarningMessage(
     `${name} contains entries that prevent support on older devices (run npx browserslist). This is typically caused by missed steps during upgrade of an Ionic Project. Do you want to replace with a good set of defaults?`,
+    'Replace with Defaults',
     'Open File',
     'View Coverage',
-    'Replace with Defaults',
     'Ignore'
   );
   if (!choice) {
@@ -68,7 +67,7 @@ async function fixFile(name: string, filename: string, title: string, message: s
       ignore(new Tip(title, message), ionicState.context);
       return;
     }
-    const txt = fs.readFileSync(filename, 'utf8').split(/\r?\n/);
+    const txt = readFileSync(filename, 'utf8').split(/\r?\n/);
     const lines = txt.map((line) => line.trim());
     let replace = [];
 
@@ -94,20 +93,20 @@ async function fixFile(name: string, filename: string, title: string, message: s
       }
     }
 
-    replace = replace.concat(defaultValues);
+    replace = replace.concat(defaultValues());
 
-    fs.writeFileSync(filename, replace.join('\n'));
+    writeFileSync(filename, replace.join('\n'));
   } catch (err) {
-    vscode.window.showErrorMessage(`Failed to fix ${name}: ${err}`);
+    window.showErrorMessage(`Failed to fix ${name}: ${err}`);
   }
 }
 
 function defaultValues(): string[] {
-  return ['Chrome >=60', 'ChromeAndroid >=60', 'Firefox >=63', 'Firefox ESR', 'Edge >=79', 'Safari >=13', 'iOS >=13'];
+  return ['Chrome >=61', 'ChromeAndroid >=61', 'Firefox >=63', 'Firefox ESR', 'Edge >=79', 'Safari >=13', 'iOS >=13'];
 }
 
 async function createFile(name: string, filename: string, title: string, message: string) {
-  const choice = await vscode.window.showWarningMessage(
+  const choice = await window.showWarningMessage(
     `${name} is missing. It allows support of older devices (run npx browserslist). Do you want to create this file?`,
     'Create File',
     'Ignore'
@@ -122,5 +121,5 @@ async function createFile(name: string, filename: string, title: string, message
   }
 
   const replace = defaultValues();
-  fs.writeFileSync(filename, replace.join('\n'));
+  writeFileSync(filename, replace.join('\n'));
 }

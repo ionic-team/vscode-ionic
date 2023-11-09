@@ -4,7 +4,7 @@ import { PackageManager, npmInstall } from './node-commands';
 import { confirm, getRunOutput, isWindows, replaceAll } from './utilities';
 import { write, writeError, writeIonic } from './logging';
 import { isGreaterOrEqual, isLess } from './analyzer';
-import { readAngularJson, writeAngularJson } from './rules-angular-json';
+import { fixGlobalScss, readAngularJson, writeAngularJson } from './rules-angular-json';
 import path, { join } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { ionicState } from './ionic-tree-provider';
@@ -124,7 +124,7 @@ function showIgnoredRecommendations(): void {
   vscode.commands.executeCommand(CommandName.Refresh);
 }
 
-async function runCommands(commands: Array<string>, title: string, project: Project): Promise<void> {
+export async function runCommands(commands: Array<string>, title: string, project: Project): Promise<void> {
   try {
     if (title.includes(')')) {
       title = title.substring(title.indexOf(')') + 1);
@@ -148,7 +148,7 @@ async function run(commands: Array<string>, folder: string): Promise<void> {
     try {
       write(await getRunOutput(command, folder));
     } catch (err) {
-      writeError(err);
+      //writeError(err);
       break;
     }
   }
@@ -182,19 +182,5 @@ function switchAngularToESBuild(project: Project): void {
     fixGlobalScss(project);
     writeAngularJson(project, angular);
     vscode.window.showInformationMessage(`The Angular project has been changed to esbuild. Enjoy faster builds!`, 'OK');
-  }
-}
-
-function fixGlobalScss(project: Project) {
-  try {
-    const filename = join(project.folder, 'src', 'global.scss');
-    if (existsSync(filename)) {
-      let txt = readFileSync(filename, 'utf8');
-      txt = replaceAll(txt, `@import "~@ionic/`, `@import "@ionic/`);
-      txt = replaceAll(txt, `@import '~@ionic/`, `@import '@ionic/`);
-      writeFileSync(filename, txt);
-    }
-  } catch (error) {
-    writeError(`Unable to write global.scss ${error}`);
   }
 }

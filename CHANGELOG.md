@@ -4,6 +4,9 @@
 
 - Add control flow migration for Angular 17 projects
 - Add recommendation to switch to ESBuild for Angular 17 projects
+- Add recommendation for migrations between major Angular versions
+- Fix .browserslistrc getting mangled
+- Fix error output being repeated twice for some commands
 
 ### Version 1.58
 

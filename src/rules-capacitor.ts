@@ -1,6 +1,3 @@
-import * as fs from 'fs';
-import * as path from 'path';
-
 import {
   checkConsistentVersions,
   checkMinVersion,
@@ -33,6 +30,9 @@ import { integratePrettier } from './prettier';
 import { showOutput, write, writeIonic } from './logging';
 import { window } from 'vscode';
 import { WorkspaceSetting, getSetting, setSetting } from './workspace-state';
+import { angularMigrate, maxAngularVersion } from './rules-angular-migrate';
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
 
 /**
  * Check rules for Capacitor projects
@@ -165,6 +165,11 @@ export function checkCapacitorRules(project: Project) {
     if (exists('@capacitor/android') || exists('@capacitor/ios')) {
       checkBrowsersList(project);
     }
+    if (isLess('@angular/core', `${maxAngularVersion}.0.0`)) {
+      const t = angularMigrate(project, maxAngularVersion);
+
+      project.add(t);
+    }
   }
 
   if (isLess('@capacitor/android', '3.2.3')) {
@@ -196,7 +201,7 @@ export function checkCapacitorRules(project: Project) {
     if (ionicState.hasNodeModules && isGreaterOrEqual('@capacitor/core', '3.0.0')) {
       // Recommend migration from 3 to 4
       project.tip(
-        new Tip('Migrate to Capacitor 4', '', TipType.Idea)
+        new Tip('Migrate to Capacitor 4', '', TipType.Capacitor)
           .setAction(migrateCapacitor, project, getPackageVersion('@capacitor/core'))
           .canIgnore()
       );
@@ -206,7 +211,7 @@ export function checkCapacitorRules(project: Project) {
   if (isLess('@capacitor/core', '5.0.0')) {
     if (ionicState.hasNodeModules && isGreaterOrEqual('@capacitor/core', '4.0.0')) {
       project.tip(
-        new Tip('Migrate to Capacitor 5', '', TipType.Idea)
+        new Tip('Migrate to Capacitor 5', '', TipType.Capacitor)
           .setAction(migrateCapacitor5, project, getPackageVersion('@capacitor/core'))
           .canIgnore()
       );
@@ -647,9 +652,9 @@ export async function capacitorRecommendations(project: Project, forMigration: b
 // Get users to upgrade if they turn on minifyEnabled to true
 function checkBuildGradleForMinifyInRelease(project: Project) {
   // Look in android/app/build.gradle for "minifyEnabled true"
-  const filename = path.join(project.folder, 'android', 'app', 'build.gradle');
-  if (fs.existsSync(filename)) {
-    const txt = fs.readFileSync(filename, 'utf8');
+  const filename = join(project.folder, 'android', 'app', 'build.gradle');
+  if (existsSync(filename)) {
+    const txt = readFileSync(filename, 'utf8');
     if (txt.includes('minifyEnabled true')) {
       project.add(
         checkMinVersion(

@@ -7,6 +7,7 @@ import { getCapacitorConfigWebDir, getCapacitorConfigureFilename, writeCapacitor
 import { join, sep } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { window } from 'vscode';
+import { replaceAll } from './utilities';
 
 /**
  * For Capacitor project if @angular/core >= v13 then
@@ -189,6 +190,7 @@ async function switchESBuild(project: Project, filename: string) {
         }
       }
     }
+    fixGlobalScss(project);
     writeFileSync(filename, JSON.stringify(angular, undefined, 2));
     writeIonic(`Your angular.json was modified to use ESBuild.`);
     if (success) {
@@ -196,5 +198,22 @@ async function switchESBuild(project: Project, filename: string) {
     }
   } catch (err) {
     window.showErrorMessage('Failed to fix angular.json: ' + err);
+  }
+}
+
+export function fixGlobalScss(project: Project) {
+  try {
+    const filename = join(project.folder, 'src', 'global.scss');
+    if (existsSync(filename)) {
+      let txt = readFileSync(filename, 'utf8');
+      txt = replaceAll(txt, `@import "~@ionic/`, `@import "@ionic/`);
+      txt = replaceAll(txt, `@import '~@ionic/`, `@import '@ionic/`);
+      txt = replaceAll(txt, `@import "~`, `@import "`);
+      txt = replaceAll(txt, `@import '~`, `@import '`);
+      writeFileSync(filename, txt);
+      writeIonic(`Modified global.scss to use ESBuild compatible imports.`);
+    }
+  } catch (error) {
+    writeError(`Unable to write global.scss ${error}`);
   }
 }
