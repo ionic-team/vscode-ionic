@@ -1,5 +1,15 @@
 # Roadmap
 
+## 1.59
+
+- Recommendations for Angular upgrade to next Major
+- If on Angular 17+ check if builder is not ES Build and provide migration
+- Recommendation for experimental migration to Angular standalone components
+- Recommendation for experimental migration to Angular built-in control flow syntax
+- Remove switch to esbuild from experiments if Angular 17
+- Recommendation of migration to @ionic/angular (major versions) and link to migration doc
+- Recommendation of migration of Capacitor and link to migration docs
+
 ## Important
 
 - Use https://github.com/eric-horodyski/chrome117-custom-scheme-bug and check for custom scheme and add warning

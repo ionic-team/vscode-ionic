@@ -1,7 +1,3 @@
-import * as vscode from 'vscode';
-import * as path from 'path';
-import * as fs from 'fs';
-
 import { MobileProject, MobileProjectConfig } from '@trapezedev/project';
 import { CapacitorProjectState } from './cap-project';
 import { Project } from './project';
@@ -9,7 +5,10 @@ import { Tip, TipType } from './tip';
 import { channelShow, getStringFrom, setStringIn } from './utilities';
 import { CapProjectCache } from './context-variables';
 import { join } from 'path';
+import { getCapacitorConfigureFile, updateCapacitorConfig } from './capacitor-config-file';
 import { showOutput, write, writeError } from './logging';
+import { existsSync, writeFileSync } from 'fs';
+import { ExtensionContext, window } from 'vscode';
 
 enum NativePlatform {
   iOSOnly,
@@ -23,7 +22,7 @@ let useCapProjectCache = true;
  * @param  {Project} project
  * @param  {vscode.ExtensionContext} context
  */
-export async function reviewCapacitorConfig(project: Project, context: vscode.ExtensionContext) {
+export async function reviewCapacitorConfig(project: Project, context: ExtensionContext) {
   const state = await getCapacitorProjectState(project, context);
   if (!state) {
     return;
@@ -118,45 +117,21 @@ export function getCapacitorConfigWebDir(folder: string): string {
 
   if (!result) {
     // No config file take a best guess
-    if (fs.existsSync(join(folder, 'www'))) {
+    if (existsSync(join(folder, 'www'))) {
       result = 'www';
-    } else if (fs.existsSync(join(folder, 'dist'))) {
+    } else if (existsSync(join(folder, 'dist'))) {
       result = 'dist';
-    } else if (fs.existsSync(join(folder, 'build'))) {
+    } else if (existsSync(join(folder, 'build'))) {
       result = 'build';
     }
   }
   if (!result) {
     result = 'www'; // Assume www folder
   }
-  return path.join(folder, result);
+  return join(folder, result);
 }
 
-export function getCapacitorConfigureFilename(folder: string): string {
-  let capConfigFile = path.join(folder, 'capacitor.config.ts');
-  if (!fs.existsSync(capConfigFile)) {
-    // React projects may use .js
-    capConfigFile = path.join(folder, 'capacitor.config.js');
-    if (!fs.existsSync(capConfigFile)) {
-      // might be a json file
-      capConfigFile = path.join(folder, 'capacitor.config.json');
-    }
-  }
-
-  return capConfigFile;
-}
-export function getCapacitorConfigureFile(folder: string): string {
-  const capConfigFile = getCapacitorConfigureFilename(folder);
-  if (capConfigFile && fs.existsSync(capConfigFile)) {
-    return fs.readFileSync(capConfigFile, 'utf-8');
-  }
-  return undefined; // not found
-}
-
-async function getCapacitorProjectState(
-  prj: Project,
-  context: vscode.ExtensionContext
-): Promise<CapacitorProjectState> {
+async function getCapacitorProjectState(prj: Project, context: ExtensionContext): Promise<CapacitorProjectState> {
   let state: CapacitorProjectState = {};
 
   const tmp: string = context.workspaceState.get(CapProjectCache(prj));
@@ -227,7 +202,7 @@ async function getCapacitorProjectState(
  * @param  {NativePlatform} platform Whether iOS or Android only (default both)
  */
 async function setBundleId(bundleId: string, prj: Project, folder: string, platform: NativePlatform) {
-  const newBundleId = await vscode.window.showInputBox({
+  const newBundleId = await window.showInputBox({
     title: 'Application Bundle Id',
     placeHolder: bundleId,
     value: bundleId,
@@ -286,9 +261,9 @@ async function updateStringsXML(folder: string, prj: Project, newBundleId: strin
   }
   data = setStringIn(data as string, `<string name="package_name">`, `</string>`, newBundleId);
   data = setStringIn(data as string, `<string name="custom_url_scheme">`, `</string>`, newBundleId);
-  const filename = path.join(folder, 'android/app/src/main/res/values/strings.xml');
-  if (fs.existsSync(filename)) {
-    fs.writeFileSync(filename, data);
+  const filename = join(folder, 'android/app/src/main/res/values/strings.xml');
+  if (existsSync(filename)) {
+    writeFileSync(filename, data);
   }
 }
 
@@ -301,21 +276,6 @@ function setValueIn(data: string, key: string, value: string): string {
   return data;
 }
 
-function updateCapacitorConfig(project: Project, bundleId?: string, displayName?: string) {
-  const filename = getCapacitorConfigureFilename(project.projectFolder());
-  if (!filename) {
-    return;
-  }
-  let data = fs.readFileSync(filename, 'utf-8');
-  if (bundleId) {
-    data = setValueIn(data, 'appId', bundleId);
-  }
-  if (displayName) {
-    data = setValueIn(data, 'appName', displayName);
-  }
-  fs.writeFileSync(filename, data);
-}
-
 function clearCapProjectCache() {
   useCapProjectCache = false;
 }
@@ -326,7 +286,7 @@ function clearCapProjectCache() {
  * @param  {NativePlatform} platform Whether to apply for iOS only, Android only or both (default)
  */
 async function setVersion(version: string, prj: Project, platform: NativePlatform) {
-  const newVersion = await vscode.window.showInputBox({
+  const newVersion = await window.showInputBox({
     title: 'Application Version Number',
     placeHolder: version,
     value: version,
@@ -368,7 +328,7 @@ async function setVersion(version: string, prj: Project, platform: NativePlatfor
  * @param  {NativePlatform} platform Whether to apply on iOS only, Android Only or both (default)
  */
 async function setBuild(build: string, prj: Project, platform: NativePlatform) {
-  const newBuild = await vscode.window.showInputBox({
+  const newBuild = await window.showInputBox({
     title: 'Application Build Number',
     placeHolder: build,
     value: build,
@@ -410,7 +370,7 @@ async function setBuild(build: string, prj: Project, platform: NativePlatform) {
  * @param  {NativePlatform} platform Whether to apply to iOS only, Android only or both (default)
  */
 async function setDisplayName(currentDisplayName: string, prj: Project, folder: string, platform: NativePlatform) {
-  const displayName = await vscode.window.showInputBox({
+  const displayName = await window.showInputBox({
     title: 'Application Display Name',
     placeHolder: currentDisplayName,
     value: currentDisplayName,
@@ -437,13 +397,13 @@ async function setDisplayName(currentDisplayName: string, prj: Project, folder: 
     }
     data = setStringIn(data as string, `<string name="app_name">`, `</string>`, displayName);
     data = setStringIn(data as string, `<string name="title_activity_main">`, `</string>`, displayName);
-    const filename = path.join(folder, 'android/app/src/main/res/values/strings.xml');
-    if (fs.existsSync(filename)) {
-      fs.writeFileSync(filename, data);
+    const filename = join(folder, 'android/app/src/main/res/values/strings.xml');
+    if (existsSync(filename)) {
+      writeFileSync(filename, data);
       write(`Set Android app_name to ${displayName}`);
       write(`Set Android title_activity_main to ${displayName}`);
     } else {
-      vscode.window.showErrorMessage('Unable to write to ' + filename);
+      window.showErrorMessage('Unable to write to ' + filename);
     }
   }
   channelShow();
@@ -455,10 +415,10 @@ async function setDisplayName(currentDisplayName: string, prj: Project, folder: 
 async function getCapacitorProject(prj: Project): Promise<MobileProject> {
   const capConfig: MobileProjectConfig = {
     ios: {
-      path: path.join(prj.projectFolder(), 'ios', 'App'),
+      path: join(prj.projectFolder(), 'ios', 'App'),
     },
     android: {
-      path: path.join(prj.projectFolder(), 'android'),
+      path: join(prj.projectFolder(), 'android'),
     },
   };
   const project = new MobileProject('', capConfig);

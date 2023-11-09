@@ -2,15 +2,15 @@ import { Project } from './project';
 import { MonoRepoType } from './monorepo';
 import { CapacitorPlatform } from './capacitor-platform';
 import { InternalCommand } from './command-name';
-import * as vscode from 'vscode';
-import { runWithProgress, getStringFrom, setStringIn, RunResults, openUri } from './utilities';
+import { runWithProgress, getStringFrom, RunResults, openUri } from './utilities';
 import { writeError, writeIonic } from './logging';
 import { exists, isGreaterOrEqual } from './analyzer';
-import { getCapacitorConfigureFilename } from './capacitor-configure';
 import { readFileSync, writeFileSync } from 'fs';
 import { capacitorOpen } from './capacitor-open';
 import { npx, PackageManager } from './node-commands';
 import { exec } from 'child_process';
+import { getCapacitorConfigureFilename, writeCapacitorConfig } from './capacitor-config-file';
+import { window } from 'vscode';
 
 /**
  * Capacitor build command
@@ -18,7 +18,7 @@ import { exec } from 'child_process';
  */
 export async function capacitorBuild(project: Project) {
   if (!isGreaterOrEqual('@capacitor/cli', '4.4.0')) {
-    await vscode.window.showErrorMessage('This option is only available in Capacitor version 4.4.0 and above.');
+    await window.showErrorMessage('This option is only available in Capacitor version 4.4.0 and above.');
     return;
   }
   const picks = [];
@@ -28,7 +28,7 @@ export async function capacitorBuild(project: Project) {
   if (exists('@capacitor/android')) {
     picks.push('Android Debug Build (.apk)', 'Android Release Build (.aab)');
   }
-  const selection = await vscode.window.showQuickPick(picks, { placeHolder: 'Create a build to target which format?' });
+  const selection = await window.showQuickPick(picks, { placeHolder: 'Create a build to target which format?' });
   if (!selection) return;
   const platform = selection.includes('ipa') ? CapacitorPlatform.ios : CapacitorPlatform.android;
   let args = '';
@@ -65,7 +65,7 @@ export async function capacitorBuild(project: Project) {
 async function openPortal(platform: CapacitorPlatform) {
   const uri =
     platform == CapacitorPlatform.android ? 'https://play.google.com/console' : 'https://developer.apple.com/account';
-  const selection = await vscode.window.showInformationMessage(
+  const selection = await window.showInformationMessage(
     `Do you want to open the ${platform == CapacitorPlatform.ios ? 'Apple Developer Portal?' : 'Google Play Console?'}`,
     'Open',
     'Exit'
@@ -83,7 +83,7 @@ async function verifySettings(
   if (platform == CapacitorPlatform.ios) return settings;
 
   if (!settings.keyStorePath) {
-    const selection = await vscode.window.showInformationMessage(
+    const selection = await window.showInformationMessage(
       'An Android Keystore file is required. You can create one in Android Studio (Build > Generate Signed Bundle).',
       'Select Keystore File',
       'Open Android Studio',
@@ -96,7 +96,7 @@ async function verifySettings(
       await runWithProgress(capacitorOpen(project, platform), 'Opening Android Studio...', project.projectFolder());
       return undefined;
     }
-    const path = await vscode.window.showOpenDialog({
+    const path = await window.showOpenDialog({
       canSelectFolders: false,
       canSelectFiles: true,
       canSelectMany: false,
@@ -107,7 +107,7 @@ async function verifySettings(
   }
 
   if (!settings.keyStorePassword) {
-    settings.keyStorePassword = await vscode.window.showInputBox({
+    settings.keyStorePassword = await window.showInputBox({
       title: 'Key store password',
       placeHolder: 'Enter key store password',
       password: true,
@@ -116,7 +116,7 @@ async function verifySettings(
   }
 
   if (!settings.keyAlias) {
-    settings.keyAlias = await vscode.window.showInputBox({
+    settings.keyAlias = await window.showInputBox({
       title: 'Key alias',
       placeHolder: 'Enter key alias',
     });
@@ -124,7 +124,7 @@ async function verifySettings(
   }
 
   if (!settings.keyPassword) {
-    settings.keyPassword = await vscode.window.showInputBox({
+    settings.keyPassword = await window.showInputBox({
       title: 'Key password',
       placeHolder: 'Enter key password',
       password: true,
@@ -212,15 +212,6 @@ function getValueFrom(data: string, key: string): string {
   return result;
 }
 
-function setValueIn(data: string, key: string, value: string): string {
-  if (data.includes(`${key}: '`)) {
-    data = setStringIn(data, `${key}: '`, `'`, value);
-  } else if (data.includes(`${key}: "`)) {
-    data = setStringIn(data, `${key}: "`, `"`, value);
-  }
-  return data;
-}
-
 function writeConfig(project: Project, settings: KeyStoreSettings) {
   const filename = getCapacitorConfigureFilename(project.projectFolder());
   if (!filename) {
@@ -241,9 +232,11 @@ function writeConfig(project: Project, settings: KeyStoreSettings) {
   };`
     );
   }
-  data = setValueIn(data, 'keystorePath', settings.keyStorePath);
-  data = setValueIn(data, 'keystorePassword', settings.keyStorePassword);
-  data = setValueIn(data, 'keystoreAlias', settings.keyAlias);
-  data = setValueIn(data, 'keystoreAliasPassword', settings.keyPassword);
   writeFileSync(filename, data);
+  writeCapacitorConfig(project, [
+    { key: 'keystorePath', value: settings.keyStorePath },
+    { key: 'keystorePassword', value: settings.keyStorePassword },
+    { key: 'keystoreAlias', value: settings.keyAlias },
+    { key: 'keystoreAliasPassword', value: settings.keyPassword },
+  ]);
 }

@@ -3,6 +3,7 @@
 ### Version 1.59
 
 - Add control flow migration for Angular 17 projects
+- Add recommendation to switch to ESBuild for Angular 17 projects
 
 ### Version 1.58
 
