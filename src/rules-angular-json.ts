@@ -140,7 +140,7 @@ async function fixAngularJson(filename: string) {
 async function switchESBuild(project: Project, filename: string) {
   if (
     !(await window.showInformationMessage(
-      `Angular 17 projects now default to using ESBuild but your project is using WebPack. Would you like to switch to ESBuild?`,
+      `Angular 17 projects use ESBuild by default but your project is still using WebPack. Would you like to switch to ESBuild?`,
       'Yes, Apply Changes'
     ))
   ) {
@@ -163,6 +163,13 @@ async function switchESBuild(project: Project, filename: string) {
         if (main) {
           angular.projects[projectName].architect.build.options.browser = main;
           delete angular.projects[projectName].architect.build.options.main;
+        }
+
+        if (angular.projects[projectName].architect.build.options.vendorChunk !== undefined) {
+          delete angular.projects[projectName].architect.build.options.vendorChunk;
+        }
+        if (angular.projects[projectName].architect.build.options.buildOptimizer !== undefined) {
+          delete angular.projects[projectName].architect.build.options.buildOptimizer;
         }
 
         // Need to make polyfills an array:

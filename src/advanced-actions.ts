@@ -1,15 +1,14 @@
 import { Project } from './project';
-import * as vscode from 'vscode';
 import { PackageManager, npmInstall } from './node-commands';
-import { confirm, getRunOutput, isWindows, replaceAll } from './utilities';
+import { confirm, getRunOutput, isWindows } from './utilities';
 import { write, writeError, writeIonic } from './logging';
 import { isGreaterOrEqual, isLess } from './analyzer';
 import { fixGlobalScss, readAngularJson, writeAngularJson } from './rules-angular-json';
-import path, { join } from 'path';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { ionicState } from './ionic-tree-provider';
 import { clearIgnored } from './ignore';
 import { CommandName } from './command-name';
+import { ProgressLocation, commands, window } from 'vscode';
+import { sep } from 'path';
 
 enum Features {
   migrateToPNPM = '$(find-replace) Migrate to PNPM',
@@ -39,17 +38,19 @@ export async function advancedActions(project: Project) {
     picks.push(Features.showIgnoredRecommendations);
   }
   if (isGreaterOrEqual('@angular-devkit/build-angular', '14.0.0')) {
-    if (!angularUsingESBuild(project)) {
-      picks.push(Features.angularESBuild);
+    if (!isGreaterOrEqual('@angular/core', '17.0.0')) {
+      if (!angularUsingESBuild(project)) {
+        picks.push(Features.angularESBuild);
+      }
     }
   }
-  const selection = await vscode.window.showQuickPick(picks, {});
+  const selection = await window.showQuickPick(picks, {});
   switch (selection) {
     case Features.migrateToPNPM:
       await runCommands(migrateToPNPM(), selection, project);
       break;
     case Features.migrateToNX:
-      await vscode.window.showInformationMessage('Run the following command: npx nx init', 'OK');
+      await window.showInformationMessage('Run the following command: npx nx init', 'OK');
       break;
     case Features.reinstallNodeModules:
       await runCommands(reinstallNodeModules(), selection, project);
@@ -82,9 +83,7 @@ async function migrateAngularControlFlow(selection: string, project: Project) {
   )
     return;
 
-  const commands = [
-    `npx ng generate @angular/core:control-flow --interactive=false --defaults=true --path=".${path.sep}"`,
-  ];
+  const commands = [`npx ng generate @angular/core:control-flow --interactive=false --defaults=true --path=".${sep}"`];
   await runCommands(commands, selection, project);
 }
 
@@ -121,7 +120,7 @@ function reinstallNodeModules(): Array<string> {
 
 function showIgnoredRecommendations(): void {
   clearIgnored(ionicState.context);
-  vscode.commands.executeCommand(CommandName.Refresh);
+  commands.executeCommand(CommandName.Refresh);
 }
 
 export async function runCommands(commands: Array<string>, title: string, project: Project): Promise<void> {
@@ -129,12 +128,9 @@ export async function runCommands(commands: Array<string>, title: string, projec
     if (title.includes(')')) {
       title = title.substring(title.indexOf(')') + 1);
     }
-    await vscode.window.withProgress(
-      { location: vscode.ProgressLocation.Notification, title, cancellable: false },
-      async () => {
-        await run(commands, project.folder);
-      }
-    );
+    await window.withProgress({ location: ProgressLocation.Notification, title, cancellable: false }, async () => {
+      await run(commands, project.folder);
+    });
 
     writeIonic(`Completed ${title}`);
   } catch (err) {
@@ -181,6 +177,6 @@ function switchAngularToESBuild(project: Project): void {
   if (changes) {
     fixGlobalScss(project);
     writeAngularJson(project, angular);
-    vscode.window.showInformationMessage(`The Angular project has been changed to esbuild. Enjoy faster builds!`, 'OK');
+    window.showInformationMessage(`The Angular project has been changed to esbuild. Enjoy faster builds!`, 'OK');
   }
 }
