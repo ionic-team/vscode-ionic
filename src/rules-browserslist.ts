@@ -12,10 +12,11 @@ import { join } from 'path';
 export function checkBrowsersList(project: Project) {
   try {
     let name = 'browserslist';
-    let filename = join(project.folder, name);
+    const folder = project.projectFolder();
+    let filename = join(folder, name);
     if (!existsSync(filename)) {
       name = '.browserslistrc';
-      filename = join(project.folder, name);
+      filename = join(folder, name);
     }
     if (exists('@angular/core') && !existsSync(filename)) {
       // .browserslistrc is missing

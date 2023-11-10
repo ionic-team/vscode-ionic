@@ -453,6 +453,11 @@ export async function getRunOutput(
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';
+    if (command.includes(InternalCommand.cwd)) {
+      command = replaceAll(command, InternalCommand.cwd, '');
+      // Change the work directory for monorepos as folder is the root folder
+      folder = getMonoRepoFolder(ionicState.workspace, folder);
+    }
     command = qualifyCommand(command, folder);
     console.log(`> ${command}`);
     exec(command, runOptions(command, folder, shell), (error: ExecException, stdout: string, stdError: string) => {
