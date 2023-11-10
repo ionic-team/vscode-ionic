@@ -5,6 +5,7 @@
 - Recommendation for experimental migration to Angular standalone components
 - Recommendation for experimental migration to Angular built-in control flow syntax
 - Recommendation of migration to @ionic/angular (major versions) and link to migration doc
+- As --force is used with Angular migrations there may be peer dependency errors that need resolution afterwards. Need a peer dep resolver.
 
 ## Important
 

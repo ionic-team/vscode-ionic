@@ -73,24 +73,44 @@ async function migrate(project: Project, next: number, current: number, now: str
   function postFixes(project: Project, version: number) {
     if (version == 17) {
       // Fix polyfills.ts
-      replaceInFile(
-        join(project.projectFolder(), 'src', 'polyfills.ts'),
-        `import 'zone.js/dist/zone';`,
-        `import 'zone.js';`
-      );
+      replaceInFile(join(project.projectFolder(), 'src', 'polyfills.ts'), {
+        replacements: [
+          {
+            search: `import 'zone.js/dist/zone';`,
+            replace: `import 'zone.js';`,
+          },
+        ],
+      });
     }
     if (version >= 16) {
-      replaceInFile(join(project.projectFolder(), '.browserslistrc'), `Chrome >=60';`, `Chrome >=61';`);
+      replaceInFile(join(project.projectFolder(), '.browserslistrc'), {
+        replacements: [
+          { search: `Chrome >=60`, replace: `Chrome >=61` },
+          { search: `ChromeAndroid >=60`, replace: `ChromeAndroid >=61` },
+        ],
+      });
     }
   }
 }
 
-function replaceInFile(filename: string, search: string, replace: string): boolean {
+interface Replace {
+  search: string;
+  replace: string;
+}
+
+interface ReplaceOptions {
+  replacements: Replace[];
+}
+
+function replaceInFile(filename: string, options: ReplaceOptions): boolean {
   if (!existsSync(filename)) {
     return false;
   }
   const before = readFileSync(filename, 'utf8');
-  const after = before.replace(search, replace);
+  let after = before;
+  for (const replacement of options.replacements) {
+    after = after.replace(replacement.search, replacement.replace);
+  }
   if (before == after) {
     return false;
   }
