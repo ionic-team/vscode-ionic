@@ -1,10 +1,6 @@
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
-
 import { Recommendation } from './recommendation';
 import { Tip, TipType } from './tip';
-import { load, exists, isGreaterOrEqual } from './analyzer';
+import { load, exists } from './analyzer';
 import { isRunning } from './tasks';
 import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
@@ -16,9 +12,13 @@ import { angularMigrate } from './rules-angular-migrate';
 import { checkForMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
 import { CapacitorPlatform } from './capacitor-platform';
 import { addCommand, npmInstall, npmUninstall, PackageManager } from './node-commands';
-import { getCapacitorConfigWebDir } from './capacitor-configure';
 import { run } from './utilities';
 import { fixIssue } from './extension';
+import { getCapacitorConfigDistFolder } from './capacitor-config-file';
+import { Command, ExtensionContext, TreeItemCollapsibleState, commands, window } from 'vscode';
+import { join } from 'path';
+import { existsSync } from 'fs';
+import { write } from './logging';
 
 export class Project {
   name: string;
@@ -52,21 +52,21 @@ export class Project {
     this.isCapacitorPlugin = false;
   }
 
-  public getIgnored(context: vscode.ExtensionContext) {
+  public getIgnored(context: ExtensionContext) {
     this.ignored = getIgnored(context);
   }
 
   public getNodeModulesFolder(): string {
-    let nmf = path.join(this.folder, 'node_modules');
+    let nmf = join(this.folder, 'node_modules');
     if (this.monoRepo && !this.monoRepo?.nodeModulesAtRoot) {
-      nmf = path.join(this.monoRepo.folder, 'node_modules');
+      nmf = join(this.monoRepo.folder, 'node_modules');
     }
     return nmf;
   }
 
   // Is the capacitor platform installed and does the project folder exists
   public hasCapacitorProject(platform: CapacitorPlatform) {
-    return exists(`@capacitor/${platform}`) && fs.existsSync(path.join(this.projectFolder(), platform));
+    return exists(`@capacitor/${platform}`) && existsSync(join(this.projectFolder(), platform));
   }
 
   public hasACapacitorProject(): boolean {
@@ -92,7 +92,7 @@ export class Project {
       case MonoRepoType.nx:
         return this.monoRepo ? this.monoRepo.folder : this.folder;
       default:
-        return path.join(this.folder, this.monoRepo.folder);
+        return join(this.folder, this.monoRepo.folder);
     }
   }
 
@@ -108,7 +108,7 @@ export class Project {
       message,
       undefined,
       title,
-      expanded ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.Collapsed,
+      expanded ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed,
       undefined,
       tip
     );
@@ -139,7 +139,7 @@ export class Project {
       message,
       '',
       title,
-      expanded ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.Collapsed
+      expanded ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed
     );
     if (contextValue) {
       r.setContext(contextValue);
@@ -158,7 +158,7 @@ export class Project {
       description ? description : message,
       message,
       title,
-      vscode.TreeItemCollapsibleState.None,
+      TreeItemCollapsibleState.None,
       {
         command: CommandName.Fix,
         title: 'Information',
@@ -280,6 +280,7 @@ export class Project {
   }
 
   public async runAtRoot(command: string, suppressOutput?: boolean): Promise<boolean> {
+    write(`> ${command}`);
     return await run(this.folder, command, undefined, [], [], undefined, undefined, undefined, suppressOutput);
   }
 
@@ -287,7 +288,7 @@ export class Project {
     if (this.isIgnored(tip)) return;
 
     let argsIsRecommendation = false;
-    let cmd: vscode.Command = {
+    let cmd: Command = {
       command: CommandName.Fix,
       title: 'Fix',
       arguments: [tip],
@@ -319,15 +320,7 @@ export class Project {
     }
 
     const tooltip = tip.tooltip ? tip.tooltip : tip.message;
-    const r = new Recommendation(
-      tooltip,
-      tip.message,
-      tip.title,
-      vscode.TreeItemCollapsibleState.None,
-      cmd,
-      tip,
-      tip.url
-    );
+    const r = new Recommendation(tooltip, tip.message, tip.title, TreeItemCollapsibleState.None, cmd, tip, tip.url);
     this.setIcon(tip.type, r);
 
     if (argsIsRecommendation) {
@@ -356,25 +349,18 @@ export class Project {
       if (!latestVersion) {
         return;
       }
-      tip = angularMigrate(latestVersion);
+      tip = angularMigrate(this, latestVersion);
     } else {
       tip = new Tip('Upgrade All Packages', undefined, TipType.Run, undefined, undefined, 'Upgrade');
     }
 
-    const command: vscode.Command = {
+    const command: Command = {
       command: CommandName.Idea,
       title: tip.title,
       arguments: [tip],
     };
 
-    const r = new Recommendation(
-      tip.title,
-      undefined,
-      '@' + title,
-      vscode.TreeItemCollapsibleState.Expanded,
-      command,
-      tip
-    );
+    const r = new Recommendation(tip.title, undefined, '@' + title, TreeItemCollapsibleState.Expanded, command, tip);
     r.children = [];
     if (title == 'angular') {
       r.setContext(Context.lightbulb);
@@ -574,11 +560,11 @@ export class Project {
   }
 
   public fileExists(filename: string): boolean {
-    return fs.existsSync(path.join(this.projectFolder(), filename));
+    return existsSync(join(this.projectFolder(), filename));
   }
 
   public getDistFolder(): string {
-    return getCapacitorConfigWebDir(this.projectFolder());
+    return getCapacitorConfigDistFolder(this.projectFolder());
   }
 }
 
@@ -587,7 +573,7 @@ function checkNodeVersion() {
     const v = process.version.split('.');
     const major = parseInt(v[0].substring(1));
     if (major < 13) {
-      vscode.window.showErrorMessage(
+      window.showErrorMessage(
         `This extension requires a minimum version of Node 14. ${process.version} is not supported.`,
         'OK'
       );
@@ -598,7 +584,7 @@ function checkNodeVersion() {
 }
 
 export async function installPackage(extensionPath: string, folder: string) {
-  const selected = await vscode.window.showInputBox({ placeHolder: 'Enter package name to install' });
+  const selected = await window.showInputBox({ placeHolder: 'Enter package name to install' });
   if (!selected) return;
 
   await fixIssue(
@@ -624,7 +610,7 @@ export interface ProjectSummary {
 
 export async function reviewProject(
   folder: string,
-  context: vscode.ExtensionContext,
+  context: ExtensionContext,
   selectedProject: string
 ): Promise<ProjectSummary | undefined> {
   if (!folder) return undefined;
@@ -635,12 +621,12 @@ export async function reviewProject(
 
 export async function inspectProject(
   folder: string,
-  context: vscode.ExtensionContext,
+  context: ExtensionContext,
   selectedProject: string
 ): Promise<ProjectSummary> {
   const startedOp = Date.now();
-  vscode.commands.executeCommand(VSCommand.setContext, Context.inspectedProject, false);
-  vscode.commands.executeCommand(VSCommand.setContext, Context.isLoggingIn, false);
+  commands.executeCommand(VSCommand.setContext, Context.inspectedProject, false);
+  commands.executeCommand(VSCommand.setContext, Context.isLoggingIn, false);
 
   const project: Project = new Project('My Project');
   project.folder = folder;
@@ -656,10 +642,10 @@ export async function inspectProject(
   const gConfig = getGlobalIonicConfig();
 
   if (!gConfig['user.id'] && !ionicState.skipAuth) {
-    vscode.commands.executeCommand(VSCommand.setContext, Context.isAnonymous, true);
+    commands.executeCommand(VSCommand.setContext, Context.isAnonymous, true);
     return undefined;
   } else {
-    vscode.commands.executeCommand(VSCommand.setContext, Context.isAnonymous, false);
+    commands.executeCommand(VSCommand.setContext, Context.isAnonymous, false);
   }
 
   await checkForMonoRepo(project, selectedProject, context);
@@ -680,18 +666,18 @@ export async function inspectProject(
 
   await getRecommendations(project, context, packages);
 
-  vscode.commands.executeCommand(VSCommand.setContext, Context.inspectedProject, true);
+  commands.executeCommand(VSCommand.setContext, Context.inspectedProject, true);
 
   //console.log(`Analyzed Project in ${Date.now() - startedOp}ms`);
   return { project, packages };
 }
 
 function getPackageManager(folder: string): PackageManager {
-  const yarnLock = path.join(folder, 'yarn.lock');
-  const pnpmLock = path.join(folder, 'pnpm-lock.yaml');
-  if (fs.existsSync(yarnLock)) {
+  const yarnLock = join(folder, 'yarn.lock');
+  const pnpmLock = join(folder, 'pnpm-lock.yaml');
+  if (existsSync(yarnLock)) {
     return PackageManager.yarn;
-  } else if (fs.existsSync(pnpmLock)) {
+  } else if (existsSync(pnpmLock) || ionicState.repoType == MonoRepoType.pnpm) {
     return PackageManager.pnpm;
   }
   return PackageManager.npm;

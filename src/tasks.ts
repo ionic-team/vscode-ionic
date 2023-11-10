@@ -4,7 +4,7 @@ import { Context } from './context-variables';
 import { ionicState } from './ionic-tree-provider';
 import { clearOutput, write, writeIonic } from './logging';
 import { Tip } from './tip';
-import { channelShow, stopPublishing } from './utilities';
+import { channelShow, replaceAll, stopPublishing } from './utilities';
 
 let runningOperations = [];
 let runningActions: Array<Tip> = [];
@@ -82,7 +82,7 @@ export function startCommand(tip: Tip, cmd: string, clear?: boolean) {
         write(`> Workspace: ${ionicState.workspace}`);
       }
     }
-    write(`> ${command}`);
+    write(`> ${replaceAll(command, InternalCommand.cwd, '')}`);
     channelShow();
   }
 }

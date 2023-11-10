@@ -1,5 +1,3 @@
-import * as vscode from 'vscode';
-
 import { RunPoint, TipFeature } from './tip';
 import { debugBrowser, viewInEditor } from './editor-preview';
 import { handleError } from './error-handler';
@@ -18,6 +16,7 @@ import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { ChildProcess, exec, ExecException, ExecOptionsWithStringEncoding } from 'child_process';
 import { startStopLogServer } from './log-server';
 import { qrView } from './nexus-browser';
+import { CancellationToken, ProgressLocation, Uri, commands, window, workspace } from 'vscode';
 
 export interface CancelObject {
   proc: ChildProcess;
@@ -37,7 +36,7 @@ export function estimateRunTime(command: string) {
 }
 
 export async function confirm(message: string, confirmButton: string): Promise<boolean> {
-  const selection = await vscode.window.showInformationMessage(message, confirmButton, 'Cancel');
+  const selection = await window.showInformationMessage(message, confirmButton, 'Cancel');
   return selection == confirmButton;
 }
 
@@ -414,13 +413,13 @@ function qualifyCommand(command: string, folder: string): string {
 }
 
 export async function openUri(uri: string): Promise<void> {
-  const ob = uri?.includes('//') ? vscode.Uri.parse(uri) : vscode.Uri.file(uri);
-  await vscode.commands.executeCommand('vscode.open', ob);
+  const ob = uri?.includes('//') ? Uri.parse(uri) : Uri.file(uri);
+  await commands.executeCommand('vscode.open', ob);
 }
 
 export function debugSkipFiles(): string {
   try {
-    let debugSkipFiles: string = vscode.workspace.getConfiguration('ionic').get('debugSkipFiles');
+    let debugSkipFiles: string = workspace.getConfiguration('ionic').get('debugSkipFiles');
     if (!debugSkipFiles) {
       return undefined;
     }
@@ -432,9 +431,7 @@ export function debugSkipFiles(): string {
       throw new Error('debugSkipFiles not a valid array');
     }
   } catch (error) {
-    vscode.window.showErrorMessage(
-      `Unable to parse debugSkipFiles variable. Ensure it is a valid JSON array. ${error}`
-    );
+    window.showErrorMessage(`Unable to parse debugSkipFiles variable. Ensure it is a valid JSON array. ${error}`);
     return undefined;
   }
 }
@@ -456,8 +453,13 @@ export async function getRunOutput(
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';
+    if (command.includes(InternalCommand.cwd)) {
+      command = replaceAll(command, InternalCommand.cwd, '');
+      // Change the work directory for monorepos as folder is the root folder
+      folder = getMonoRepoFolder(ionicState.workspace, folder);
+    }
     command = qualifyCommand(command, folder);
-    console.log(`> ${command}`);
+    console.log(`> ${replaceAll(command, InternalCommand.cwd, '')}`);
     exec(command, runOptions(command, folder, shell), (error: ExecException, stdout: string, stdError: string) => {
       if (stdout) {
         out += stdout;
@@ -498,13 +500,13 @@ export async function runWithProgress(
   output?: RunResults
 ): Promise<boolean> {
   let result = false;
-  await vscode.window.withProgress(
+  await window.withProgress(
     {
-      location: vscode.ProgressLocation.Notification,
+      location: ProgressLocation.Notification,
       title,
       cancellable: true,
     },
-    async (progress, token: vscode.CancellationToken) => {
+    async (progress, token: CancellationToken) => {
       const cancelObject: CancelObject = { proc: undefined, cancelled: false };
       result = await run(folder, command, cancelObject, [], [], progress, undefined, output, false);
     }
@@ -650,9 +652,9 @@ export function pluralize(name: string, count: number): string {
 }
 
 export async function showMessage(message: string, ms: number) {
-  vscode.window.withProgress(
+  window.withProgress(
     {
-      location: vscode.ProgressLocation.Notification,
+      location: ProgressLocation.Notification,
       title: message,
       cancellable: false,
     },
@@ -671,9 +673,9 @@ export function toTitleCase(text: string) {
 }
 
 export async function showProgress(message: string, func: () => Promise<any>) {
-  return await vscode.window.withProgress(
+  return await window.withProgress(
     {
-      location: vscode.ProgressLocation.Notification,
+      location: ProgressLocation.Notification,
       title: `${message}`,
       cancellable: false,
     },

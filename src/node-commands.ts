@@ -190,9 +190,9 @@ function pnpm(operation: PMOperation, name?: string): string {
 export function npx(packageManager: PackageManager): string {
   switch (packageManager) {
     case PackageManager.pnpm:
-      return 'pnpm exec';
+      return `${InternalCommand.cwd}pnpm exec`;
     default:
-      return 'npx';
+      return `${InternalCommand.cwd}npx`;
   }
 }
 
