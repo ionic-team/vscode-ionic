@@ -6,6 +6,7 @@
 - Add recommendation to switch to ESBuild for Angular 17 projects
 - Add recommendation for migrations between major Angular versions
 - Add rrecommendation to switch Angular CLI Package Manager if using pnpm or yarn
+- Ionic CLI updated from 7.1.1 to 7.1.5
 - Fix .browserslistrc getting mangled
 - Fix error output being repeated twice for some commands
 - Fix pnpm install node modules
