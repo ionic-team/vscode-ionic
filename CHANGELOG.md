@@ -7,6 +7,7 @@
 - Add recommendation for migrations between major Angular versions
 - Fix .browserslistrc getting mangled
 - Fix error output being repeated twice for some commands
+- Fix pnpm install node modules
 
 ### Version 1.58
 

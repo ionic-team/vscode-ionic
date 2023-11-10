@@ -18,6 +18,7 @@ import { getCapacitorConfigDistFolder } from './capacitor-config-file';
 import { Command, ExtensionContext, TreeItemCollapsibleState, commands, window } from 'vscode';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { write } from './logging';
 
 export class Project {
   name: string;
@@ -279,6 +280,7 @@ export class Project {
   }
 
   public async runAtRoot(command: string, suppressOutput?: boolean): Promise<boolean> {
+    write(`> ${command}`);
     return await run(this.folder, command, undefined, [], [], undefined, undefined, undefined, suppressOutput);
   }
 
@@ -675,7 +677,7 @@ function getPackageManager(folder: string): PackageManager {
   const pnpmLock = join(folder, 'pnpm-lock.yaml');
   if (existsSync(yarnLock)) {
     return PackageManager.yarn;
-  } else if (existsSync(pnpmLock)) {
+  } else if (existsSync(pnpmLock) || ionicState.repoType == MonoRepoType.pnpm) {
     return PackageManager.pnpm;
   }
   return PackageManager.npm;

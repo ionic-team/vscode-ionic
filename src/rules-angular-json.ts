@@ -19,7 +19,7 @@ import { replaceAll } from './utilities';
 export function checkAngularJson(project: Project) {
   let defaultConfiguration = undefined;
   try {
-    const filename = join(project.folder, 'angular.json');
+    const filename = join(project.projectFolder(), 'angular.json');
     if (existsSync(filename)) {
       const angular = parseAngularJSON(filename);
       for (const projectName of Object.keys(angular.projects)) {
@@ -210,7 +210,7 @@ async function switchESBuild(project: Project, filename: string) {
 
 export function fixGlobalScss(project: Project) {
   try {
-    const filename = join(project.folder, 'src', 'global.scss');
+    const filename = join(project.projectFolder(), 'src', 'global.scss');
     if (existsSync(filename)) {
       let txt = readFileSync(filename, 'utf8');
       txt = replaceAll(txt, `@import "~@ionic/`, `@import "@ionic/`);

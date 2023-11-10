@@ -459,7 +459,7 @@ export async function getRunOutput(
       folder = getMonoRepoFolder(ionicState.workspace, folder);
     }
     command = qualifyCommand(command, folder);
-    console.log(`> ${command}`);
+    console.log(`> ${replaceAll(command, InternalCommand.cwd, '')}`);
     exec(command, runOptions(command, folder, shell), (error: ExecException, stdout: string, stdError: string) => {
       if (stdout) {
         out += stdout;
