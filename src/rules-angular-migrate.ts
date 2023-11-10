@@ -79,6 +79,9 @@ async function migrate(project: Project, next: number, current: number, now: str
         `import 'zone.js';`
       );
     }
+    if (version >= 16) {
+      replaceInFile(join(project.projectFolder(), '.browserslistrc'), `Chrome >=60';`, `Chrome >=61';`);
+    }
   }
 }
 
