@@ -8,6 +8,7 @@ import { join, sep } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { window } from 'vscode';
 import { replaceAll } from './utilities';
+import { MonoRepoType } from './monorepo';
 
 /**
  * For Capacitor project if @angular/core >= v13 then
@@ -33,6 +34,7 @@ export function checkAngularJson(project: Project) {
         checkWebpackToESBuild(angular, project, projectName, filename);
         if (fixAOT(angular, project, projectName, filename)) break;
       }
+      checkPackageManager(angular, project, filename);
     }
     if (ionicState.project == 'app') {
       ionicState.project = undefined;
@@ -56,6 +58,38 @@ function checkWebpackToESBuild(angular: any, project: Project, projectName: stri
     }
   } finally {
     // angular.json may change over time. Dont fail
+  }
+  return true;
+}
+
+function checkPackageManager(angular: any, project: Project, filename: string): boolean {
+  try {
+    // Angular CLI supports yarn and pnpm
+    if (project.repoType == MonoRepoType.pnpm) {
+      if (!angular.cli?.packageManager || angular.cli?.packageManager !== 'pnpm') {
+        project.add(
+          new Tip('Set Angular CLI to pnpm', '', TipType.Idea).setAction(
+            setAngularPackageManager,
+            project,
+            filename,
+            'pnpm'
+          )
+        );
+      }
+    } else if (project.repoType == MonoRepoType.yarn) {
+      if (!angular.cli?.packageManager || angular.cli?.packageManager !== 'pnpm') {
+        project.add(
+          new Tip('Set Angular CLI to yarn', '', TipType.Idea).setAction(
+            setAngularPackageManager,
+            project,
+            filename,
+            'yarn'
+          )
+        );
+      }
+    }
+  } finally {
+    // Dont fail
   }
   return true;
 }
@@ -130,6 +164,29 @@ async function fixAngularJson(filename: string) {
   try {
     for (const project of Object.keys(angular.projects)) {
       delete angular.projects[project].architect?.build?.options?.aot;
+    }
+    writeFileSync(filename, JSON.stringify(angular, undefined, 2));
+  } catch (err) {
+    window.showErrorMessage('Failed to fix angular.json: ' + err);
+  }
+}
+
+async function setAngularPackageManager(project: Project, filename: string, packageMangerName: string) {
+  if (
+    !(await window.showErrorMessage(
+      `It appears you are using ${packageMangerName} but your Angular CLI is set to the default of npm. Would you like to update angular.json to use ${packageMangerName}?`,
+      'Yes, Apply Changes'
+    ))
+  ) {
+    return;
+  }
+  const txt = readFileSync(filename, 'utf8');
+  const angular = JSON.parse(txt);
+  try {
+    if (!angular.cli) {
+      angular.cli = { packageManager: packageMangerName };
+    } else {
+      angular.cli.packageManager = packageMangerName;
     }
     writeFileSync(filename, JSON.stringify(angular, undefined, 2));
   } catch (err) {

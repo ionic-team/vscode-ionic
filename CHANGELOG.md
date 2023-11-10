@@ -5,6 +5,7 @@
 - Add control flow migration for Angular 17 projects
 - Add recommendation to switch to ESBuild for Angular 17 projects
 - Add recommendation for migrations between major Angular versions
+- Add rrecommendation to switch Angular CLI Package Manager if using pnpm or yarn
 - Fix .browserslistrc getting mangled
 - Fix error output being repeated twice for some commands
 - Fix pnpm install node modules
