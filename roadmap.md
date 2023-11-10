@@ -2,6 +2,9 @@
 
 ## 1.59
 
+- Fix pnpm install at base if "Install node modules" is run
+- Show command run when "Install node modules" done
+- Test with https://github.com/ionic-enterprise/tutorials-and-demos-ng.git
 - Recommendation for experimental migration to Angular standalone components
 - Recommendation for experimental migration to Angular built-in control flow syntax
 - Recommendation of migration to @ionic/angular (major versions) and link to migration doc
