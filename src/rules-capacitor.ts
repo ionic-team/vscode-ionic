@@ -137,11 +137,11 @@ export function checkCapacitorRules(project: Project) {
     );
   }
 
-  if (exists('@ionic-enterprise/auth') && isLessOrEqual('onesignal-cordova-plugin', '5.0.1')) {
+  if (exists('@ionic-enterprise/auth') && isLessOrEqual('onesignal-cordova-plugin', '5.0.2')) {
     project.recommendRemove(
       'onesignal-cordova-plugin',
       'onesignal-cordova-plugin',
-      'This plugin causes build errors on Android when used with Ionic Auth Connect. Upgrade or removal recommended.',
+      'This plugin causes build errors on Android when used with Ionic Auth Connect. Upgrade to 5.0.3 or higher.',
       undefined,
       'https://github.com/OneSignal/OneSignal-Cordova-SDK/issues/928'
     );

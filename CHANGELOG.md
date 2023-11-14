@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.60
+
+- Update rule for onesignal-cordova-plugin conflicting with Auth Connect
+
 ### Version 1.59
 
 - Add control flow migration for Angular 17 projects
