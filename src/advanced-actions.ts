@@ -28,15 +28,17 @@ export async function advancedActions(project: Project) {
     if (isGreaterOrEqual('@angular/core', '14.0.0')) {
       picks.push(Features.migrateToNX);
     }
-    if (isGreaterOrEqual('@angular/core', '14.0.0')) {
-      picks.push(Features.migrateAngularStandalone);
-    }
-    if (isGreaterOrEqual('@angular/core', '17.0.0')) {
-      picks.push(Features.migrateAngularControlFlow);
-    }
+
     picks.push(Features.reinstallNodeModules);
-    picks.push(Features.showIgnoredRecommendations);
   }
+  if (isGreaterOrEqual('@angular/core', '14.0.0')) {
+    picks.push(Features.migrateAngularStandalone);
+  }
+  if (isGreaterOrEqual('@angular/core', '17.0.0')) {
+    picks.push(Features.migrateAngularControlFlow);
+  }
+  picks.push(Features.showIgnoredRecommendations);
+
   if (isGreaterOrEqual('@angular-devkit/build-angular', '14.0.0')) {
     if (!isGreaterOrEqual('@angular/core', '17.0.0')) {
       if (!angularUsingESBuild(project)) {
