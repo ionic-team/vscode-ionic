@@ -3,6 +3,7 @@
 ### Version 1.60
 
 - Update rule for onesignal-cordova-plugin conflicting with Auth Connect
+- Recommendation to move browserslist file into package.json to reduce config files in a project
 
 ### Version 1.59
 
