@@ -1,15 +1,13 @@
 # Roadmap
 
-## 1.59
+## 1.60
 
-- Fix pnpm install at base if "Install node modules" is run
-- Show command run when "Install node modules" done
-- Test with https://github.com/ionic-enterprise/tutorials-and-demos-ng.git
+- As --force is used with Angular migrations there may be peer dependency errors that need resolution afterwards. Need a peer dep resolver.
+- Update docs on capacitorjs.com
 - Fix: The bundledWebRuntime configuration option has been deprecated. Can be safely deleted.
 - Recommendation for experimental migration to Angular standalone components
 - Recommendation for experimental migration to Angular built-in control flow syntax
 - Recommendation of migration to @ionic/angular (major versions) and link to migration doc
-- As --force is used with Angular migrations there may be peer dependency errors that need resolution afterwards. Need a peer dep resolver.
 
 ## Important
 

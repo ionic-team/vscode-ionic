@@ -187,6 +187,14 @@ export function remotePackages(): Array<string> {
   return result;
 }
 
+export function browsersList(): Array<string> {
+  try {
+    return JSON.parse(JSON.stringify(packageFile.browserslist));
+  } catch {
+    return [];
+  }
+}
+
 export function deprecatedPackages(packages: any): Array<any> {
   const result = [];
   if (!packages) return result;
