@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.61
+
+- Fix cocoapods version detection (if an project had previously detected an older version)
+- Recommendation to integrate prettier and ESLint using lint-staged and husky
+
 ### Version 1.60
 
 - Update rule for onesignal-cordova-plugin conflicting with Auth Connect

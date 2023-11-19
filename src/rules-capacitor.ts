@@ -343,11 +343,11 @@ export async function capacitorRecommendations(project: Project, forMigration: b
     }
   }
 
-  const TODO = false; // TODO: ALLOW THIS FEATURE
+  const TODO = true; // TODO: ALLOW THIS FEATURE
   if (!exists('husky') && project.isCapacitor && TODO) {
     if (isGreaterOrEqual('typescript', '4.0.0')) {
       const csTip = new Tip(
-        'Enforce Coding Standards',
+        'Lint and Format on Commit',
         '',
         TipType.Idea,
         'Enforce coding standard using Prettier, ESLint and Husky'
@@ -708,6 +708,7 @@ async function updateCocoaPods(currentVersion: string, project: Project, minVers
   if (!res || res != txt) return;
 
   showOutput();
+  setSetting(WorkspaceSetting.cocoaPods, undefined);
   await showProgress(`${msg} Cocoapods...`, async () => {
     write(`> ${cmd}`);
     await project.run2(cmd, false);

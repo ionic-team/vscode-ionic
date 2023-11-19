@@ -1,5 +1,10 @@
 # Roadmap
 
+- Add .husky to .gitignore
+- Move husky/lint to Experiments
+
+- Remove Android Permissions
+
 ## 1.60
 
 - As --force is used with Angular migrations there may be peer dependency errors that need resolution afterwards. Need a peer dep resolver.
@@ -8,6 +13,8 @@
 - Recommendation for experimental migration to Angular standalone components
 - Recommendation for experimental migration to Angular built-in control flow syntax
 - Recommendation of migration to @ionic/angular (major versions) and link to migration doc
+
+- eslint-plugin-unused-imports
 
 ## Important
 
@@ -169,3 +176,23 @@ Alterantive visual web views:
 - Avoid `ionic init` and instead guess best npm run script based on `package.json` having React,Vue,Nuxt etc.
 - Guess `dist` folder based on `package.json`
 - Guess IP Address, Port based on logged output
+
+## Project Config
+
+- Bundle ID
+- Display Name
+- Version Number
+- Build Number
+- Splash (screen, dark, icon, icon background, icon foreground)
+
+- Android Manifest
+- Info.plist
+- Plugins
+- Packages
+- Settings + Advanced Settings
+
+- Security Audit
+- Statistics
+- Export
+
+- Remove "check for minor updates"
