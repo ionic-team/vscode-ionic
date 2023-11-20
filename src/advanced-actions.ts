@@ -2,13 +2,14 @@ import { Project } from './project';
 import { PackageManager, npmInstall } from './node-commands';
 import { confirm, getRunOutput, isWindows, replaceAll } from './utilities';
 import { write, writeError, writeIonic } from './logging';
-import { isGreaterOrEqual, isLess } from './analyzer';
+import { exists, isGreaterOrEqual, isLess } from './analyzer';
 import { fixGlobalScss, readAngularJson, writeAngularJson } from './rules-angular-json';
 import { ionicState } from './ionic-tree-provider';
 import { clearIgnored } from './ignore';
 import { CommandName, InternalCommand } from './command-name';
 import { ProgressLocation, commands, window } from 'vscode';
 import { sep } from 'path';
+import { integratePrettier } from './prettier';
 
 enum Features {
   migrateToPNPM = '$(find-replace) Migrate to PNPM',
@@ -18,6 +19,7 @@ enum Features {
   migrateAngularControlFlow = '$(test-view-icon) Migrate to the built-in control flow syntax',
   showIgnoredRecommendations = '$(light-bulb) Show Ignored Recommendations',
   migrateAngularStandalone = '$(test-view-icon) Migrate to Ionic standalone components',
+  lintAndFormat = '$(test-view-icon) Lint and format on commit',
 }
 
 export async function advancedActions(project: Project) {
@@ -37,6 +39,10 @@ export async function advancedActions(project: Project) {
   if (isGreaterOrEqual('@angular/core', '17.0.0')) {
     picks.push(Features.migrateAngularControlFlow);
   }
+  if (!exists('husky') && project.isCapacitor && isGreaterOrEqual('typescript', '4.0.0')) {
+    picks.push(Features.lintAndFormat);
+  }
+
   picks.push(Features.showIgnoredRecommendations);
 
   if (isGreaterOrEqual('@angular-devkit/build-angular', '14.0.0')) {
@@ -68,6 +74,9 @@ export async function advancedActions(project: Project) {
       break;
     case Features.showIgnoredRecommendations:
       showIgnoredRecommendations();
+      break;
+    case Features.lintAndFormat:
+      integratePrettier(project);
       break;
   }
 }

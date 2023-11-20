@@ -7,17 +7,14 @@ import { writeError, writeIonic } from './logging';
 import { ExtensionContext, window } from 'vscode';
 import { Tip } from './tip';
 
-export async function integratePrettier(project: Project, tip: Tip, context: ExtensionContext) {
+export async function integratePrettier(project: Project) {
   try {
     const question = await window.showInformationMessage(
       'You can enforce coding standards during development using a standard set of ESLint and Prettier rules. Would you like to add this integration to your project?',
       'Yes',
-      'No',
-      'Ignore'
+      'No'
     );
-    if (question == 'Ignore') {
-      ignore(tip, context);
-    }
+
     if (question != 'Yes') return;
 
     await project.run2(npmInstall('husky', '--save-dev', '--save-exact'));

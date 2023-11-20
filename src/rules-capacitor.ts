@@ -343,19 +343,6 @@ export async function capacitorRecommendations(project: Project, forMigration: b
     }
   }
 
-  const TODO = true; // TODO: ALLOW THIS FEATURE
-  if (!exists('husky') && project.isCapacitor && TODO) {
-    if (isGreaterOrEqual('typescript', '4.0.0')) {
-      const csTip = new Tip(
-        'Lint and Format on Commit',
-        '',
-        TipType.Idea,
-        'Enforce coding standard using Prettier, ESLint and Husky'
-      ).canIgnore();
-      tips.push(csTip.setAction(integratePrettier, project, csTip, ionicState.context));
-    }
-  }
-
   // List of incompatible plugins
   tips.push(incompatiblePlugin('cordova-plugin-admobpro', 'https://github.com/ionic-team/capacitor/issues/1101'));
   tips.push(incompatiblePlugin('cordova-plugin-braintree', 'https://github.com/ionic-team/capacitor/issues/1415'));
