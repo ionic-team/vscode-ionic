@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { channelShow, run } from './utilities';
-import { writeIonic } from './logging';
+import { write, writeIonic } from './logging';
 import { Tip, TipType } from './tip';
 import { Project } from './project';
 import { exists } from './analyzer';
@@ -161,6 +161,7 @@ async function runCapacitorAssets(project: Project) {
   const hasCordovaRes = exists('@capacitor/assets');
   const ios = project.hasCapacitorProject(CapacitorPlatform.ios);
   const android = project.hasCapacitorProject(CapacitorPlatform.android);
+  const pwa = exists('@angular/service-worker');
   const folder = project.projectFolder();
   const neededMessage = hasNeededAssets(folder);
   if (neededMessage) {
@@ -178,27 +179,23 @@ async function runCapacitorAssets(project: Project) {
     if (exists('cordova-res')) {
       await run(folder, npmUninstall('cordova-res'), undefined, [], undefined, undefined);
     }
+    let cmd = '';
     if (ios) {
-      await run(
-        folder,
-        `${npx(project.packageManager)} @capacitor/assets generate --ios`,
-        undefined,
-        [],
-        undefined,
-        undefined
-      );
+      cmd = `${npx(project.packageManager)} @capacitor/assets generate --ios`;
+      write(`> ${cmd}`);
+      await run(folder, cmd, undefined, [], undefined, undefined);
       addToGitIgnore(folder, 'resources/ios/**/*');
     }
     if (android) {
-      await run(
-        folder,
-        `${npx(project.packageManager)} @capacitor/assets generate --android`,
-        undefined,
-        [],
-        undefined,
-        undefined
-      );
+      cmd = `${npx(project.packageManager)} @capacitor/assets generate --android`;
+      write(`> ${cmd}`);
+      await run(folder, cmd, undefined, [], undefined, undefined);
       addToGitIgnore(folder, 'resources/android/**/*');
+    }
+    if (pwa) {
+      cmd = `${npx(project.packageManager)} @capacitor/assets generate --pwa --pwaManifestPath 'src'`;
+      write(`> ${cmd}`);
+      await run(folder, cmd, undefined, [], undefined, undefined);
     }
   });
 

@@ -459,7 +459,7 @@ async function runAction(tip: Tip, ionicProvider: IonicTreeProvider, rootPath: s
       return;
     }
   } else {
-    execute(tip, ionicState.context);
+    await execute(tip, ionicState.context);
     if (tip.refresh) {
       ionicProvider.refresh();
     }

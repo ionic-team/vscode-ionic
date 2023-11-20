@@ -26,7 +26,7 @@ import { migrateCapacitor, migrateCapacitor5 } from './capacitor-migrate';
 import { checkAngularJson } from './rules-angular-json';
 import { checkBrowsersList } from './rules-browserslist';
 import { ionicState } from './ionic-tree-provider';
-import { integratePrettier } from './prettier';
+import { integratePWA } from './capacitor-pwa';
 import { showOutput, write, writeIonic } from './logging';
 import { window } from 'vscode';
 import { WorkspaceSetting, getSetting, setSetting } from './workspace-state';
@@ -341,6 +341,16 @@ export async function capacitorRecommendations(project: Project, forMigration: b
           .canIgnore()
       );
     }
+  }
+
+  if (exists('@ionic/angular') && !exists('@angular/service-worker')) {
+    const pwaTip = new Tip(
+      'Add PWA Integration',
+      '',
+      TipType.Edit,
+      'Add @angular/pwa and integrate splash and icon resources'
+    );
+    tips.push(pwaTip.setAction(integratePWA, project, pwaTip).canRefreshAfter());
   }
 
   // List of incompatible plugins
