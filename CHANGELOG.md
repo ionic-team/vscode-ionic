@@ -3,7 +3,9 @@
 ### Version 1.61
 
 - Fix cocoapods version detection (if an project had previously detected an older version)
-- Recommendation to integrate prettier and ESLint using lint-staged and husky
+- Recommendation to integrate prettier and ESLint using lint-staged and husky (`Project > ...`)
+- Add PWA integration (for Angular projects)
+- Generate PWA assets when generating Splash screens and Icons
 
 ### Version 1.60
 
