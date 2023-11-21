@@ -193,7 +193,9 @@ async function runCapacitorAssets(project: Project) {
       addToGitIgnore(folder, 'resources/android/**/*');
     }
     if (pwa) {
-      cmd = `${npx(project.packageManager)} @capacitor/assets generate --pwa --pwaManifestPath 'src'`;
+      cmd = `${npx(
+        project.packageManager
+      )} @capacitor/assets generate --pwa --pwaManifestPath './src/manifest.webmanifest'`;
       write(`> ${cmd}`);
       await run(folder, cmd, undefined, [], undefined, undefined);
     }
