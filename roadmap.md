@@ -1,8 +1,11 @@
 # Roadmap
 
+- Link to ES Build docs in changelog and button
+
+git_depth
+
 - Add .husky to .gitignore
 - Move husky/lint to Experiments
-
 - Remove Android Permissions
 
 ## 1.60

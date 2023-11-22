@@ -15,7 +15,7 @@
 ### Version 1.59
 
 - Add control flow migration for Angular 17 projects
-- Add recommendation to switch to ESBuild for Angular 17 projects
+- Add recommendation to [switch to ESBuild](https://angular.io/guide/esbuild) for Angular 17 projects
 - Add recommendation for migrations between major Angular versions
 - Add rrecommendation to switch Angular CLI Package Manager if using pnpm or yarn
 - Ionic CLI updated from 7.1.1 to 7.1.5

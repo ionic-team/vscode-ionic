@@ -7,7 +7,7 @@ import { getCapacitorConfigWebDir, getCapacitorConfigureFilename, writeCapacitor
 import { join, sep } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { window } from 'vscode';
-import { replaceAll } from './utilities';
+import { openUri, replaceAll } from './utilities';
 import { MonoRepoType } from './monorepo';
 
 /**
@@ -195,12 +195,16 @@ async function setAngularPackageManager(project: Project, filename: string, pack
 }
 
 async function switchESBuild(project: Project, filename: string) {
-  if (
-    !(await window.showInformationMessage(
-      `Angular 17 projects use ESBuild by default but your project is still using WebPack. Would you like to switch to ESBuild?`,
-      'Yes, Apply Changes'
-    ))
-  ) {
+  const response = await window.showInformationMessage(
+    `Angular 17 projects use ESBuild by default but your project is still using WebPack. Would you like to switch to ESBuild?`,
+    'Yes, Apply Changes',
+    'More Information'
+  );
+  if (!response) {
+    return;
+  }
+  if (response == 'More Information') {
+    openUri('https://angular.io/guide/esbuild');
     return;
   }
   const txt = readFileSync(filename, 'utf8');
