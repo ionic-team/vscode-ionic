@@ -1,30 +1,30 @@
 import * as child_process from 'child_process';
 import * as path from 'path';
-import * as vscode from 'vscode';
 
 import { Context, VSCommand } from './context-variables';
 import { ionicState } from './ionic-tree-provider';
 import { sendTelemetryEvent, TelemetryEventType } from './telemetry';
 import { writeAppend } from './logging';
+import { ExtensionContext, commands, window } from 'vscode';
 
 /**
  * ionic login and signup commands
  * @param  {string} folder
  * @param  {vscode.ExtensionContext} context
  */
-export async function ionicLogin(folder: string, context: vscode.ExtensionContext) {
+export async function ionicLogin(folder: string, context: ExtensionContext) {
   const ifolder = path.join(folder, 'node_modules', '@ionic', 'cli', 'bin');
   try {
     await run(`node ionic login --confirm`, ifolder);
     sendTelemetryEvent(folder, TelemetryEventType.Login, context);
   } catch (err) {
-    vscode.window.showErrorMessage(err);
+    window.showErrorMessage(err);
     ionicState.skipAuth = true;
-    await vscode.commands.executeCommand(VSCommand.setContext, Context.isAnonymous, false);
+    await commands.executeCommand(VSCommand.setContext, Context.isAnonymous, false);
   }
 }
 
-export async function ionicSignup(folder: string, context: vscode.ExtensionContext) {
+export async function ionicSignup(folder: string, context: ExtensionContext) {
   const ifolder = path.join(folder, 'node_modules', '@ionic', 'cli', 'bin');
   await run('npx ionic signup', ifolder);
   sendTelemetryEvent(folder, TelemetryEventType.SignUp, context);

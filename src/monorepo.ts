@@ -1,4 +1,3 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -15,6 +14,7 @@ import { getLernaWorkspaces } from './monorepos-lerna';
 import { join } from 'path';
 import { writeError } from './logging';
 import { NpmOutdatedDependency } from './npm-model';
+import { ExtensionContext, commands, window, workspace } from 'vscode';
 
 export interface MonoRepoProject {
   name: string;
@@ -46,7 +46,7 @@ export enum MonoRepoType {
  * Check to see if this is a monorepo and what type.
  * @param  {Project} project
  */
-export async function checkForMonoRepo(project: Project, selectedProject: string, context: vscode.ExtensionContext) {
+export async function checkForMonoRepo(project: Project, selectedProject: string, context: ExtensionContext) {
   project.repoType = MonoRepoType.none;
   if (!selectedProject) {
     selectedProject = context.workspaceState.get('SelectedProject');
@@ -112,7 +112,7 @@ export async function checkForMonoRepo(project: Project, selectedProject: string
 
     if (!project.monoRepo) {
       project.repoType = MonoRepoType.none;
-      vscode.window.showErrorMessage('No mono repo projects found.');
+      window.showErrorMessage('No mono repo projects found.');
     } else {
       ionicState.view.title = project.monoRepo.name;
 
@@ -133,12 +133,12 @@ export async function checkForMonoRepo(project: Project, selectedProject: string
         project.repoType
       );
 
-      vscode.commands.executeCommand(CommandName.ProjectsRefresh, project.monoRepo.name);
+      commands.executeCommand(CommandName.ProjectsRefresh, project.monoRepo.name);
     }
   }
   ionicState.repoType = project.repoType;
 
-  vscode.commands.executeCommand(VSCommand.setContext, Context.isMonoRepo, project.repoType !== MonoRepoType.none);
+  commands.executeCommand(VSCommand.setContext, Context.isMonoRepo, project.repoType !== MonoRepoType.none);
 }
 
 /**
@@ -147,7 +147,7 @@ export async function checkForMonoRepo(project: Project, selectedProject: string
  * @returns boolean
  */
 export function isFolderBasedMonoRepo(rootFolder: string): Array<MonoFolder> {
-  if (vscode.workspace.workspaceFolders.length > 1) {
+  if (workspace.workspaceFolders.length > 1) {
     return vsCodeWorkSpaces();
   }
   const folders = fs
@@ -166,10 +166,10 @@ export function isFolderBasedMonoRepo(rootFolder: string): Array<MonoFolder> {
 
 function vsCodeWorkSpaces(): Array<MonoFolder> {
   const result = [];
-  for (const workspace of vscode.workspace.workspaceFolders) {
-    const packageJson = path.join(workspace.uri.path, 'package.json');
+  for (const ws of workspace.workspaceFolders) {
+    const packageJson = path.join(ws.uri.path, 'package.json');
     if (fs.existsSync(packageJson)) {
-      result.push({ name: workspace.name, packageJson: packageJson, path: workspace.uri.path });
+      result.push({ name: ws.name, packageJson: packageJson, path: ws.uri.path });
     }
   }
   return result;

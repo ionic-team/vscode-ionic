@@ -1,6 +1,5 @@
 'use strict';
 
-import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -12,17 +11,18 @@ import { PackageManager } from './node-commands';
 import { Tip } from './tip';
 import { CapacitorPlatform } from './capacitor-platform';
 import { IonicStartPanel } from './ionic-start';
+import { Event, EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, TreeView, commands } from 'vscode';
 
 interface IonicState {
-  view: vscode.TreeView<any>;
+  view: TreeView<any>;
   skipAuth: boolean;
   projects: Array<MonoRepoProject>;
   repoType: MonoRepoType;
   packageManager: PackageManager;
   workspace: string; // Monorepo workspace name
-  context: vscode.ExtensionContext;
+  context: ExtensionContext;
   shell?: string;
-  projectsView: vscode.TreeView<any>;
+  projectsView: TreeView<any>;
   selectedAndroidDevice?: string;
   selectedIOSDevice?: string;
   selectedAndroidDeviceName?: string;
@@ -82,15 +82,15 @@ interface FolderInfo {
 
 let folderInfoCache: FolderInfo = undefined;
 
-export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation> {
-  private _onDidChangeTreeData: vscode.EventEmitter<Recommendation | undefined | void> = new vscode.EventEmitter<
+export class IonicTreeProvider implements TreeDataProvider<Recommendation> {
+  private _onDidChangeTreeData: EventEmitter<Recommendation | undefined | void> = new EventEmitter<
     Recommendation | undefined | void
   >();
-  readonly onDidChangeTreeData: vscode.Event<Recommendation | undefined | void> = this._onDidChangeTreeData.event;
+  readonly onDidChangeTreeData: Event<Recommendation | undefined | void> = this._onDidChangeTreeData.event;
 
   selectedProject: string;
 
-  constructor(private workspaceRoot: string | undefined, private context: vscode.ExtensionContext) {}
+  constructor(private workspaceRoot: string | undefined, private context: ExtensionContext) {}
 
   refresh(): void {
     this._onDidChangeTreeData.fire();
@@ -100,7 +100,7 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
     return undefined;
   }
 
-  getTreeItem(element: Recommendation): vscode.TreeItem {
+  getTreeItem(element: Recommendation): TreeItem {
     return element;
   }
 
@@ -111,10 +111,10 @@ export class IonicTreeProvider implements vscode.TreeDataProvider<Recommendation
 
   async getChildren(element?: Recommendation): Promise<Recommendation[]> {
     if (!this.workspaceRoot) {
-      vscode.commands.executeCommand(VSCommand.setContext, Context.noProjectFound, true);
+      commands.executeCommand(VSCommand.setContext, Context.noProjectFound, true);
       return Promise.resolve([]);
     }
-    vscode.commands.executeCommand(VSCommand.setContext, Context.noProjectFound, false);
+    commands.executeCommand(VSCommand.setContext, Context.noProjectFound, false);
 
     if (element) {
       if (element.whenExpanded) {

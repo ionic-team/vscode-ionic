@@ -6,8 +6,9 @@ import { PackageManager, npmInstall, npmInstallAll, outdatedCommand } from './no
 import { NpmOutdatedDependency } from './npm-model';
 import { Project } from './project';
 import { getRunOutput, run, RunResults, showProgress } from './utilities';
-import * as vscode from 'vscode';
+
 import { fixYarnGarbage } from './monorepo';
+import { window } from 'vscode';
 
 export async function updateMinorDependencies(project: Project, packages: object): Promise<void> {
   const channel = clearOutput();
@@ -49,10 +50,10 @@ export async function updateMinorDependencies(project: Project, packages: object
     if (count == 0) {
       const msg = 'All dependencies are on the latest minor update.';
       writeIonic(msg);
-      vscode.window.showInformationMessage(msg, 'OK');
+      window.showInformationMessage(msg, 'OK');
       return;
     }
-    const result = await vscode.window.showInformationMessage(`Update all ${count} dependencies?`, 'Update', 'Cancel');
+    const result = await window.showInformationMessage(`Update all ${count} dependencies?`, 'Update', 'Cancel');
     if (!result || result == 'Cancel') return;
 
     let updated = 0;
@@ -67,7 +68,7 @@ export async function updateMinorDependencies(project: Project, packages: object
           updated++;
         }
       }
-      vscode.window.showInformationMessage(`${updated}/${count} Dependencies were updated.`, 'Ok');
+      window.showInformationMessage(`${updated}/${count} Dependencies were updated.`, 'Ok');
     });
   } catch (error) {
     writeError(error);

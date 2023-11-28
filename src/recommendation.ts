@@ -1,8 +1,8 @@
-import * as vscode from 'vscode';
-import * as path from 'path';
+import { join } from 'path';
 import { Tip } from './tip';
+import { Command, TreeItem, TreeItemCollapsibleState } from 'vscode';
 
-export class Recommendation extends vscode.TreeItem {
+export class Recommendation extends TreeItem {
   public children: Recommendation[];
   private iconName: string;
   private data: any;
@@ -12,8 +12,8 @@ export class Recommendation extends vscode.TreeItem {
     public readonly tooltip: string,
     public readonly title: string,
     public readonly label: string,
-    public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-    public readonly command?: vscode.Command,
+    public readonly collapsibleState: TreeItemCollapsibleState,
+    public readonly command?: Command,
     public tip?: Tip,
     public readonly url?: string
   ) {
@@ -26,8 +26,8 @@ export class Recommendation extends vscode.TreeItem {
   public setIcon(name: string) {
     this.iconName = name;
     this.iconPath = {
-      light: path.join(__filename, '..', '..', 'resources', 'light', name + '.svg'),
-      dark: path.join(__filename, '..', '..', 'resources', 'dark', name + '.svg'),
+      light: join(__filename, '..', '..', 'resources', 'light', name + '.svg'),
+      dark: join(__filename, '..', '..', 'resources', 'dark', name + '.svg'),
     };
   }
 

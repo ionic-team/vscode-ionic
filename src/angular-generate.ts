@@ -1,13 +1,14 @@
 import { Project } from './project';
-import * as vscode from 'vscode';
+
 import { getRunOutput, getStringFrom, openUri, replaceAll } from './utilities';
 import { write, writeError, writeIonic } from './logging';
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { isGreaterOrEqual } from './analyzer';
+import { window } from 'vscode';
 
 export async function angularGenerate(project: Project, angularType: string): Promise<void> {
-  let name = await vscode.window.showInputBox({
+  let name = await window.showInputBox({
     title: `New Angular ${angularType}`,
     placeHolder: `Enter name for new ${angularType}`,
   });

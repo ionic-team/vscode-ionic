@@ -1,6 +1,6 @@
 import * as child_process from 'child_process';
 import * as path from 'path';
-import * as vscode from 'vscode';
+
 import * as os from 'os';
 import * as fs from 'fs';
 
@@ -18,6 +18,7 @@ import {
   WebViewType,
 } from './android-debug-models';
 import { ionicState } from './ionic-tree-provider';
+import { workspace } from 'vscode';
 
 const forwardedSockets: ForwardedSocket[] = [];
 
@@ -231,7 +232,7 @@ async function unforward(options: UnforwardOptions): Promise<void> {
 }
 
 function getAdbArguments(): string[] {
-  const adbArgs = vscode.workspace.getConfiguration('ionic').get<string[]>('adbArgs');
+  const adbArgs = workspace.getConfiguration('ionic').get<string[]>('adbArgs');
 
   if (adbArgs) {
     return adbArgs;
@@ -241,7 +242,7 @@ function getAdbArguments(): string[] {
 }
 
 function getAdbExecutable(): string {
-  const adbPath = vscode.workspace.getConfiguration('ionic').get<string>('adbPath');
+  const adbPath = workspace.getConfiguration('ionic').get<string>('adbPath');
   if (adbPath) {
     return resolvePath(adbPath);
   } else {
@@ -265,7 +266,7 @@ function resolvePath(from: string): string {
     // ~/adb -> /Users/<user>/adb
     if (tilde === '~') return os.homedir();
 
-    const fsPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const fsPath = workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!fsPath) return '';
 
     // ./adb -> <workspace>/adb

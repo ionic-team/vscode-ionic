@@ -2,11 +2,12 @@ import { Project } from './project';
 import { getRunOutput, openUri } from './utilities';
 import * as http from 'http';
 import { ionicState } from './ionic-tree-provider';
-import * as vscode from 'vscode';
+
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { writeError, writeIonic } from './logging';
 import * as os from 'os';
 import { basename, extname, join } from 'path';
+import { window } from 'vscode';
 
 export async function liveReloadSSL(project: Project): Promise<void> {
   try {
@@ -28,7 +29,7 @@ export async function liveReloadSSL(project: Project): Promise<void> {
 export async function setupServerCertificate(project: Project): Promise<void> {
   if (!hasRootCA()) {
     if (
-      (await vscode.window.showInformationMessage(
+      (await window.showInformationMessage(
         'A trusted root certificate is required to use HTTPS with Live Reload. Would you like to create one?',
         'Yes'
       )) == 'Yes'

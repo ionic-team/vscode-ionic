@@ -1,5 +1,4 @@
-import * as vscode from 'vscode';
-import { commands } from 'vscode';
+import { Uri, Webview, commands, window } from 'vscode';
 import { Context, VSCommand } from './context-variables';
 import { CommandName } from './command-name';
 import { ionicState } from './ionic-tree-provider';
@@ -17,8 +16,8 @@ export function qrView(externalUrl: string) {
   commands.executeCommand(CommandName.ViewDevServer, externalUrl);
 }
 
-export function qrWebView(webview: vscode.Webview, externalUrl: string): string | undefined {
-  const onDiskPath = vscode.Uri.file(join(ionicState.context.extensionPath, 'resources', 'qrious.min.js'));
+export function qrWebView(webview: Webview, externalUrl: string): string | undefined {
+  const onDiskPath = Uri.file(join(ionicState.context.extensionPath, 'resources', 'qrious.min.js'));
   webview.options = { enableScripts: true };
   const qrSrc = webview.asWebviewUri(onDiskPath);
   if (getSetting(WorkspaceSetting.pluginDrift) !== 'shown') {
@@ -48,7 +47,7 @@ export function qrWebView(webview: vscode.Webview, externalUrl: string): string 
         //stop(panel);
         break;
       default:
-        vscode.window.showInformationMessage(message);
+        window.showInformationMessage(message);
     }
   });
   return shortUrl;
@@ -96,7 +95,7 @@ export async function troubleshootPlugins() {
       }
     }
     if (problems == 1) {
-      vscode.window.showWarningMessage(
+      window.showWarningMessage(
         `Your project uses the plugin ${problem} which is not in the Nexus Browser app, so you may have issues related to its functionality.`,
         'Dismiss'
       );
@@ -106,7 +105,7 @@ export async function troubleshootPlugins() {
           ', '
         )} but Nexus Browser does not. You can suggest adding these here: https://github.com/ionic-team/vscode-extension/issues/91`
       );
-      vscode.window.showWarningMessage(
+      window.showWarningMessage(
         `Your project has ${problems} plugins that are not in the Nexus Browser app, so you may have issues related to functionality that relies on those plugins.`,
         'Dismiss'
       );
@@ -118,7 +117,7 @@ export async function troubleshootPlugins() {
   }
 }
 
-function getWebviewQR(shortUrl: string, externalUrl: string, qrSrc: vscode.Uri): string {
+function getWebviewQR(shortUrl: string, externalUrl: string, qrSrc: Uri): string {
   externalUrl = `https://nexusbrowser.com/` + encodeURIComponent(shortUrl);
   return `
 	<!DOCTYPE html>

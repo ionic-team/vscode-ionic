@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import { Command, TreeItemCollapsibleState } from 'vscode';
 import { debugAndroid } from './android-debug';
 import { findDevices, findWebViews } from './android-debug-bridge';
 import { Device, WebView } from './android-debug-models';
@@ -27,7 +27,7 @@ export async function getAndroidWebViewList(
         `Debug ${webview.packageName} ${webview.versionName} on running Android device ${device.product}`,
         `(${device.product})`,
         `${webview.packageName}`,
-        vscode.TreeItemCollapsibleState.None,
+        TreeItemCollapsibleState.None,
         getCommand(),
         undefined
       );
@@ -41,7 +41,7 @@ export async function getAndroidWebViewList(
         'test',
         'No Web View',
         device.product,
-        vscode.TreeItemCollapsibleState.None,
+        TreeItemCollapsibleState.None,
         getCommand(),
         undefined
       );
@@ -57,7 +57,7 @@ async function debug(device: Device, webview: WebView, wwwfolder: string): Promi
   return;
 }
 
-function getCommand(): vscode.Command {
+function getCommand(): Command {
   return {
     command: CommandName.Function,
     title: 'Open',

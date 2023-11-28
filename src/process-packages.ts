@@ -1,7 +1,6 @@
 import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as vscode from 'vscode';
 
 import { coerce } from 'semver';
 import { Command, Tip, TipType } from './tip';
@@ -14,6 +13,7 @@ import { join } from 'path';
 import { ionicState } from './ionic-tree-provider';
 import { writeError, writeWarning } from './logging';
 import { fixYarnGarbage } from './monorepo';
+import { ExtensionContext, window } from 'vscode';
 
 export interface PluginInformation {
   androidPermissions: Array<string>;
@@ -22,7 +22,7 @@ export interface PluginInformation {
   hasHooks: boolean;
 }
 
-export function clearRefreshCache(context: vscode.ExtensionContext) {
+export function clearRefreshCache(context: ExtensionContext) {
   if (context) {
     for (const key of context.workspaceState.keys()) {
       if (key.startsWith(PackageCacheOutdated(undefined))) {
@@ -44,7 +44,7 @@ export async function processPackages(
   folder: string,
   allDependencies: object,
   devDependencies: object,
-  context: vscode.ExtensionContext,
+  context: ExtensionContext,
   project: Project
 ): Promise<any> {
   if (!fs.lstatSync(folder).isDirectory()) {
@@ -92,7 +92,7 @@ export async function processPackages(
     outdated = '[]';
     versions = '{}';
     if (err && err.includes('401')) {
-      vscode.window.showInformationMessage(
+      window.showInformationMessage(
         `Unable to run '${outdatedCommand(project.packageManager)}' due to authentication error. Check .npmrc`,
         'OK'
       );

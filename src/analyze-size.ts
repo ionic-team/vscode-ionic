@@ -1,11 +1,12 @@
 import { writeError, writeIonic } from './logging';
 import { Project } from './project';
 import { isWindows, openUri, run, RunResults, showProgress, stripJSON } from './utilities';
-import * as vscode from 'vscode';
+
 import { basename, extname, join } from 'path';
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'fs';
 import { ionicBuild } from './ionic-build';
 import { MonoRepoType } from './monorepo';
+import { ViewColumn, window } from 'vscode';
 
 /**
  * Generates a readable analysis of Javascript bundle sizes
@@ -36,7 +37,7 @@ export async function analyzeSize(project: Project) {
       try {
         await run2(project, `npx source-map-explorer "${dist}/**/*.js" --json --exclude-source-map`, result);
       } catch (err) {
-        vscode.window.showErrorMessage('Unable to analyze source maps: ' + err, 'OK');
+        window.showErrorMessage('Unable to analyze source maps: ' + err, 'OK');
       }
 
       const html =
@@ -270,7 +271,7 @@ function analyzeResults(files: Array<FileInfo>, title: string, blurb: string): s
 }
 
 function showWindow(folder: string, html: string) {
-  const panel = vscode.window.createWebviewPanel('viewApp', 'Project Statistics', vscode.ViewColumn.Active, {
+  const panel = window.createWebviewPanel('viewApp', 'Project Statistics', ViewColumn.Active, {
     enableScripts: true,
   });
   panel.webview.onDidReceiveMessage(async (filename) => {

@@ -2,13 +2,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import * as http from 'https';
-import * as vscode from 'vscode';
 
 import { PackageInfo } from './package-info';
 import { generateUUID } from './utilities';
 import { Project } from './project';
 import { PackageType } from './npm-model';
 import { writeWarning } from './logging';
+import { ExtensionContext } from 'vscode';
 
 interface TelemetryMetric {
   name: string;
@@ -41,7 +41,7 @@ export interface IonicConfig {
   sessionId: string; // Generated
 }
 
-export function sendTelemetryEvent(folder: string, name: string, context: vscode.ExtensionContext) {
+export function sendTelemetryEvent(folder: string, name: string, context: ExtensionContext) {
   const config = getIonicConfig(folder);
   if (!config.telemetry) return;
   sendTelemetry(config.telemetry, config.sessionId, name, {
@@ -49,7 +49,7 @@ export function sendTelemetryEvent(folder: string, name: string, context: vscode
   });
 }
 
-export function sendTelemetryEvents(folder: string, project: Project, packages: any, context: vscode.ExtensionContext) {
+export function sendTelemetryEvents(folder: string, project: Project, packages: any, context: ExtensionContext) {
   const config = getIonicConfig(folder);
   if (!config.telemetry) return;
 

@@ -1,5 +1,3 @@
-import * as vscode from 'vscode';
-
 import { deprecatedPackages, exists, isGreaterOrEqual } from './analyzer';
 import { reviewCapacitorConfig } from './capacitor-configure';
 import { ionicBuild } from './ionic-build';
@@ -40,12 +38,9 @@ import { LoggingSettings } from './log-settings';
 import { writeIonic } from './logging';
 import { cancelLastOperation } from './tasks';
 import { CommandName } from './command-name';
+import { ExtensionContext, Uri, commands, env } from 'vscode';
 
-export async function getRecommendations(
-  project: Project,
-  context: vscode.ExtensionContext,
-  packages: any
-): Promise<void> {
+export async function getRecommendations(project: Project, context: ExtensionContext, packages: any): Promise<void> {
   if (project.isCapacitor) {
     project.setGroup(`Run`, `Press ${alt('R')} to run the last chosen platform or Web.`, TipType.Ionic, true);
 
@@ -363,11 +358,11 @@ export async function getRecommendations(
 async function supportTicket(project: Project): Promise<void> {
   const url =
     'https://ionic.zendesk.com/hc/en-us/requests/new?tf_subject=blar&tf_description=desc&tf_anonymous_requester_email=blar@blar.com';
-  await vscode.env.openExternal(vscode.Uri.parse(url));
+  await env.openExternal(Uri.parse(url));
 }
 
 async function settings() {
-  await vscode.commands.executeCommand('workbench.action.openSettings', "Ionic'");
+  await commands.executeCommand('workbench.action.openSettings', "Ionic'");
 }
 
 export function debugOnWeb(project: Project): Tip {

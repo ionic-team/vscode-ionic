@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import { window } from 'vscode';
 import { Project } from './project';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 
@@ -27,7 +27,7 @@ export async function webConfiguration(project: Project): Promise<string | undef
     check(WebConfigSetting.editor, setting),
   ];
 
-  const selection = await vscode.window.showQuickPick(configs, {
+  const selection = await window.showQuickPick(configs, {
     placeHolder: 'Select the default action when running for web',
   });
   if (selection) {

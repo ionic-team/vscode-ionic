@@ -1,6 +1,5 @@
 'use strict';
 
-import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { Context, VSCommand } from './context-variables';
 import { ionicLogin, ionicSignup } from './ionic-auth';
@@ -42,6 +41,16 @@ import {
 } from './tasks';
 import { build, debugOnWeb } from './recommend';
 import { IonicStartPanel } from './ionic-start';
+import {
+  CancellationToken,
+  ProgressLocation,
+  window,
+  commands,
+  ExtensionContext,
+  workspace,
+  debug,
+  TextDocument,
+} from 'vscode';
 
 /**
  * Runs the command while showing a vscode window that can be cancelled
@@ -75,14 +84,14 @@ export async function fixIssue(
   let msg = tip.commandProgress ? tip.commandProgress : tip.commandTitle ? tip.commandTitle : command;
   if (title) msg = title;
   let failed = false;
-  await vscode.window.withProgress(
+  await window.withProgress(
     {
-      location: tip.progressDialog ? vscode.ProgressLocation.Notification : vscode.ProgressLocation.Window,
+      location: tip.progressDialog ? ProgressLocation.Notification : ProgressLocation.Window,
       title: `${msg}`,
       cancellable: true,
     },
 
-    async (progress, token: vscode.CancellationToken) => {
+    async (progress, token: CancellationToken) => {
       const cancelObject: CancelObject = { proc: undefined, cancelled: false };
       let increment = undefined;
       let percentage = undefined;
@@ -93,7 +102,7 @@ export async function fixIssue(
           tip.cancelRequested = false;
           writeIonic(`Stopped "${tip.title}"`);
           if (tip.features.includes(TipFeature.welcome)) {
-            vscode.commands.executeCommand(CommandName.hideDevServer);
+            commands.executeCommand(CommandName.hideDevServer);
           }
 
           if (tip.title.toLowerCase() == CapacitorPlatform.ios) {
@@ -122,10 +131,10 @@ export async function fixIssue(
         }
       }, 1000);
 
-      const commands = Array.isArray(command) ? command : [command];
+      const commandList = Array.isArray(command) ? command : [command];
 
       let clear = true;
-      for (const cmd of commands) {
+      for (const cmd of commandList) {
         startCommand(tip, cmd, clear);
         clear = false;
         const secondsTotal = estimateRunTime(cmd);
@@ -185,27 +194,27 @@ export async function fixIssue(
   }
 }
 
-export async function activate(context: vscode.ExtensionContext) {
+export async function activate(context: ExtensionContext) {
   const rootPath =
-    vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0
-      ? vscode.workspace.workspaceFolders[0].uri.fsPath
+    workspace.workspaceFolders && workspace.workspaceFolders.length > 0
+      ? workspace.workspaceFolders[0].uri.fsPath
       : undefined;
 
   // Ionic Tree View
   const ionicProvider = new IonicTreeProvider(rootPath, context);
-  const view = vscode.window.createTreeView('ionic-tree', { treeDataProvider: ionicProvider });
+  const view = window.createTreeView('ionic-tree', { treeDataProvider: ionicProvider });
 
   //IonicStartPanel.init(context.extensionUri, this.workspaceRoot, context);
 
   // Project List Panel
   const ionicProjectsProvider = new IonicProjectsreeProvider(rootPath, context);
-  const projectsView = vscode.window.createTreeView('ionic-zprojects', { treeDataProvider: ionicProjectsProvider });
+  const projectsView = window.createTreeView('ionic-zprojects', { treeDataProvider: ionicProjectsProvider });
 
   // Dev Server Running Panel
   const ionicDevServerProvider = new IonicDevServerProvider(rootPath, context);
 
   context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider('ionic-devserver', ionicDevServerProvider, {
+    window.registerWebviewViewProvider('ionic-devserver', ionicDevServerProvider, {
       webviewOptions: { retainContextWhenHidden: false },
     })
   );
@@ -219,19 +228,19 @@ export async function activate(context: vscode.ExtensionContext) {
   }
 
   ionicState.shell = context.workspaceState.get(Context.shell);
-  const shellOverride: string = vscode.workspace.getConfiguration('ionic').get('shellPath');
+  const shellOverride: string = workspace.getConfiguration('ionic').get('shellPath');
   if (shellOverride && shellOverride.length > 0) {
     ionicState.shell = shellOverride;
   }
 
   trackProjectChange();
 
-  vscode.commands.registerCommand(CommandName.Refresh, () => {
+  commands.registerCommand(CommandName.Refresh, () => {
     clearRefreshCache(context);
     ionicProvider.refresh();
   });
 
-  vscode.commands.registerCommand(CommandName.Add, async () => {
+  commands.registerCommand(CommandName.Add, async () => {
     if (features.pluginExplorer) {
       PluginExplorerPanel.init(context.extensionUri, rootPath, context, ionicProvider);
     } else {
@@ -242,43 +251,43 @@ export async function activate(context: vscode.ExtensionContext) {
     }
   });
 
-  vscode.commands.registerCommand(CommandName.Stop, async (recommendation: Recommendation) => {
+  commands.registerCommand(CommandName.Stop, async (recommendation: Recommendation) => {
     recommendation.tip.data = Context.stop;
     await fixIssue(undefined, context.extensionPath, ionicProvider, recommendation.tip);
     recommendation.setContext(undefined);
   });
 
-  vscode.commands.registerCommand(CommandName.SignUp, async () => {
+  commands.registerCommand(CommandName.SignUp, async () => {
     await ionicSignup(context.extensionPath, context);
     ionicProvider.refresh();
   });
 
-  vscode.commands.registerCommand(CommandName.Upgrade, async (recommendation: Recommendation) => {
+  commands.registerCommand(CommandName.Upgrade, async (recommendation: Recommendation) => {
     await packageUpgrade(recommendation.tip.data, getLocalFolder(rootPath));
     ionicProvider.refresh();
   });
 
-  vscode.commands.registerCommand(CommandName.Login, async () => {
-    await vscode.commands.executeCommand(VSCommand.setContext, Context.isLoggingIn, true);
+  commands.registerCommand(CommandName.Login, async () => {
+    await commands.executeCommand(VSCommand.setContext, Context.isLoggingIn, true);
     await ionicLogin(context.extensionPath, context);
     ionicProvider.refresh();
   });
 
-  vscode.commands.registerCommand(CommandName.RefreshDebug, async () => {
+  commands.registerCommand(CommandName.RefreshDebug, async () => {
     ionicState.refreshDebugDevices = true;
     ionicProvider.refresh();
   });
 
-  vscode.commands.registerCommand(CommandName.SelectAction, async (r: Recommendation) => {
+  commands.registerCommand(CommandName.SelectAction, async (r: Recommendation) => {
     await advancedActions(r.getData());
     ionicProvider.refresh();
   });
 
-  vscode.commands.registerCommand(CommandName.WebConfig, async (r: Recommendation) => {
+  commands.registerCommand(CommandName.WebConfig, async (r: Recommendation) => {
     webConfiguration(r.tip.actionArg(0));
   });
 
-  vscode.commands.registerCommand(CommandName.BuildConfig, async (r: Recommendation) => {
+  commands.registerCommand(CommandName.BuildConfig, async (r: Recommendation) => {
     const config = await buildConfiguration(context.extensionPath, context, r.tip.actionArg(0));
     if (!config) return;
     if (config != 'default') {
@@ -288,81 +297,81 @@ export async function activate(context: vscode.ExtensionContext) {
     runAction(r.tip, ionicProvider, rootPath);
   });
 
-  vscode.commands.registerCommand(CommandName.NewProject, async () => {
+  commands.registerCommand(CommandName.NewProject, async () => {
     IonicStartPanel.init(ionicState.context.extensionUri, this.workspaceRoot, ionicState.context, true);
   });
 
-  vscode.commands.registerCommand(CommandName.PluginExplorer, async () => {
+  commands.registerCommand(CommandName.PluginExplorer, async () => {
     await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
     PluginExplorerPanel.init(context.extensionUri, rootPath, context, ionicProvider);
   });
 
-  vscode.commands.registerCommand(CommandName.SkipLogin, async () => {
+  commands.registerCommand(CommandName.SkipLogin, async () => {
     ionicState.skipAuth = true;
-    await vscode.commands.executeCommand(VSCommand.setContext, Context.inspectedProject, false);
-    await vscode.commands.executeCommand(VSCommand.setContext, Context.isAnonymous, false);
+    await commands.executeCommand(VSCommand.setContext, Context.inspectedProject, false);
+    await commands.executeCommand(VSCommand.setContext, Context.isAnonymous, false);
     ionicProvider.refresh();
   });
 
-  vscode.commands.registerCommand(CommandName.Open, async (recommendation: Recommendation) => {
+  commands.registerCommand(CommandName.Open, async (recommendation: Recommendation) => {
     if (fs.existsSync(recommendation.tip.secondCommand)) {
       openUri(recommendation.tip.secondCommand);
     }
   });
 
-  vscode.commands.registerCommand(CommandName.RunIOS, async (recommendation: Recommendation) => {
+  commands.registerCommand(CommandName.RunIOS, async (recommendation: Recommendation) => {
     runAgain(ionicProvider, rootPath);
   });
 
-  vscode.commands.registerCommand(CommandName.Rebuild, async (recommendation: Recommendation) => {
+  commands.registerCommand(CommandName.Rebuild, async (recommendation: Recommendation) => {
     await recommendation.tip.executeAction();
     ionicProvider.refresh();
   });
 
-  vscode.commands.registerCommand(CommandName.Function, async (recommendation: Recommendation) => {
+  commands.registerCommand(CommandName.Function, async (recommendation: Recommendation) => {
     await recommendation.tip.executeAction();
   });
 
-  vscode.commands.registerCommand(CommandName.WebDebugConfig, async (recommendation: Recommendation) => {
+  commands.registerCommand(CommandName.WebDebugConfig, async (recommendation: Recommendation) => {
     await webDebugSetting();
     ionicProvider.refresh();
   });
 
-  vscode.commands.registerCommand(CommandName.Fix, async (tip: Tip) => {
+  commands.registerCommand(CommandName.Fix, async (tip: Tip) => {
     await fix(tip, rootPath, ionicProvider, context);
   });
 
   // The project list panel needs refreshing
-  vscode.commands.registerCommand(CommandName.ProjectsRefresh, async (project: string) => {
+  commands.registerCommand(CommandName.ProjectsRefresh, async (project: string) => {
     ionicProjectsProvider.refresh(project);
   });
 
   // User selected a project from the list (monorepo)
-  vscode.commands.registerCommand(CommandName.ProjectSelect, async (project: string) => {
+  commands.registerCommand(CommandName.ProjectSelect, async (project: string) => {
     context.workspaceState.update('SelectedProject', project);
     ionicProvider.selectProject(project);
   });
 
-  vscode.commands.registerCommand(CommandName.Idea, async (t: Tip | Recommendation) => {
+  commands.registerCommand(CommandName.Idea, async (t: Tip | Recommendation) => {
     if (!t) return;
     // If the user clicks the light bulb it is a Tip, if they click the item it is a recommendation
     const tip: Tip = (t as Recommendation).tip ? (t as Recommendation).tip : (t as Tip);
     await fix(tip, rootPath, ionicProvider, context);
   });
 
-  vscode.commands.registerCommand(CommandName.Run, async (r: Recommendation) => {
+  commands.registerCommand(CommandName.Run, async (r: Recommendation) => {
     runAction(r.tip, ionicProvider, rootPath);
   });
 
-  vscode.commands.registerCommand(CommandName.Debug, async () => {
+  commands.registerCommand(CommandName.Debug, async () => {
     runAction(debugOnWeb(ionicState.projectRef), ionicProvider, rootPath);
   });
 
-  vscode.commands.registerCommand(CommandName.Build, async () => {
+  commands.registerCommand(CommandName.Build, async () => {
     runAction(build(ionicState.projectRef), ionicProvider, rootPath);
   });
 
-  vscode.commands.registerCommand(CommandName.SelectDevice, async (r: Recommendation) => {
+  commands.registerCommand(CommandName.SelectDevice, async (r: Recommendation) => {
     if (r.tip.actionArg(1) == CapacitorPlatform.android) {
       ionicState.selectedAndroidDevice = undefined;
       ionicState.selectedAndroidDeviceName = undefined;
@@ -373,14 +382,12 @@ export async function activate(context: vscode.ExtensionContext) {
     runAction(r.tip, ionicProvider, rootPath, CommandName.SelectDevice);
   });
 
-  vscode.commands.registerCommand(CommandName.Link, async (tip: Tip) => {
+  commands.registerCommand(CommandName.Link, async (tip: Tip) => {
     await openUri(tip.url);
   });
 
-  context.subscriptions.push(
-    vscode.debug.registerDebugConfigurationProvider(AndroidDebugType, new AndroidDebugProvider())
-  );
-  context.subscriptions.push(vscode.debug.onDidTerminateDebugSession(androidDebugUnforward));
+  context.subscriptions.push(debug.registerDebugConfigurationProvider(AndroidDebugType, new AndroidDebugProvider()));
+  context.subscriptions.push(debug.onDidTerminateDebugSession(androidDebugUnforward));
 
   if (!ionicState.runWeb) {
     const summary = await reviewProject(rootPath, context, context.workspaceState.get('SelectedProject'));
@@ -406,11 +413,11 @@ async function runAgain(ionicProvider: IonicTreeProvider, rootPath: string) {
 }
 
 function trackProjectChange() {
-  vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
+  workspace.onDidSaveTextDocument((document: TextDocument) => {
     ionicState.projectDirty = true;
   });
 
-  vscode.window.onDidChangeVisibleTextEditors((e: Array<any>) => {
+  window.onDidChangeVisibleTextEditors((e: Array<any>) => {
     let outputIsFocused = false;
     for (const d of e) {
       if ((d as any)?.document?.uri?.scheme == 'output') {
@@ -470,7 +477,7 @@ async function fix(
   tip: Tip,
   rootPath: string,
   ionicProvider: IonicTreeProvider,
-  context: vscode.ExtensionContext
+  context: ExtensionContext
 ): Promise<void> {
   if (await waitForOtherActions(tip)) {
     return; // Canceled
@@ -482,13 +489,7 @@ async function fix(
     const msg = tip.message ? `: ${tip.message}` : '';
     const info = tip.description ? tip.description : `${tip.title}${msg}`;
     const ignoreTitle = tip.ignorable ? 'Ignore' : undefined;
-    const selection = await vscode.window.showInformationMessage(
-      info,
-      urlBtn,
-      ignoreTitle,
-      tip.secondTitle,
-      tip.commandTitle
-    );
+    const selection = await window.showInformationMessage(info, urlBtn, ignoreTitle, tip.secondTitle, tip.commandTitle);
     if (selection && selection == tip.commandTitle) {
       fixIssue(tip.command, rootPath, ionicProvider, tip, tip.commandSuccess);
     }
@@ -513,7 +514,7 @@ async function fix(
   }
 }
 
-async function execute(tip: Tip, context: vscode.ExtensionContext): Promise<void> {
+async function execute(tip: Tip, context: ExtensionContext): Promise<void> {
   const result: ActionResult = (await tip.executeAction()) as ActionResult;
   if (result == ActionResult.Ignore) {
     ignore(tip, context);

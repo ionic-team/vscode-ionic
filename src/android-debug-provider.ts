@@ -1,14 +1,20 @@
-import * as vscode from 'vscode';
-
+import {
+  CancellationToken,
+  DebugConfiguration,
+  DebugConfigurationProvider,
+  ProgressLocation,
+  WorkspaceFolder,
+  window,
+} from 'vscode';
 import { findDevices, findWebViews, forwardDebugger, verifyAndroidDebugBridge } from './android-debug-bridge';
 import { Device, WebView } from './android-debug-models';
 
-export class AndroidDebugProvider implements vscode.DebugConfigurationProvider {
+export class AndroidDebugProvider implements DebugConfigurationProvider {
   public async resolveDebugConfiguration?(
-    folder: vscode.WorkspaceFolder | undefined,
-    debugConfiguration: vscode.DebugConfiguration,
-    token?: vscode.CancellationToken
-  ): Promise<vscode.DebugConfiguration | null | undefined> {
+    folder: WorkspaceFolder | undefined,
+    debugConfiguration: DebugConfiguration,
+    token?: CancellationToken
+  ): Promise<DebugConfiguration | null | undefined> {
     if (!debugConfiguration.type || !debugConfiguration.request || debugConfiguration.request !== 'attach') {
       return null;
     }
@@ -17,9 +23,9 @@ export class AndroidDebugProvider implements vscode.DebugConfigurationProvider {
 
     await verifyAndroidDebugBridge();
 
-    return await vscode.window.withProgress(
+    return await window.withProgress(
       {
-        location: vscode.ProgressLocation.Window,
+        location: ProgressLocation.Window,
       },
       async (progress) => {
         let device: Device | undefined;
@@ -30,7 +36,7 @@ export class AndroidDebugProvider implements vscode.DebugConfigurationProvider {
         // Find the connected devices
         const devices = await findDevices();
         if (devices.length < 1) {
-          vscode.window.showErrorMessage(`No devices found`);
+          window.showErrorMessage(`No devices found`);
           return undefined;
         }
 
@@ -39,7 +45,7 @@ export class AndroidDebugProvider implements vscode.DebugConfigurationProvider {
             // Find all devices that have the application running
             const promises = devices.map(async (dev) => {
               const webViews = await findWebViews(dev).catch((err: Error): WebView[] => {
-                vscode.window.showWarningMessage(err.message);
+                window.showWarningMessage(err.message);
                 return [];
               });
               return webViews.find((el) => el.packageName === debugConfiguration.packageName);
@@ -55,7 +61,7 @@ export class AndroidDebugProvider implements vscode.DebugConfigurationProvider {
           });
 
           if (!webViews || webViews.length < 1) {
-            vscode.window.showErrorMessage(`Webview is not running on a device`);
+            window.showErrorMessage(`Webview is not running on a device`);
             return undefined;
           }
 
@@ -91,7 +97,7 @@ export class AndroidDebugProvider implements vscode.DebugConfigurationProvider {
           });
 
           if (!webViews || webViews.length < 1) {
-            vscode.window.showErrorMessage(`WebView not found`);
+            window.showErrorMessage(`WebView not found`);
             return undefined;
           }
           return undefined;

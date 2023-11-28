@@ -1,4 +1,3 @@
-import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -11,6 +10,7 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall, npmUninstall, npx } from './node-commands';
 import { Context } from './context-variables';
 import { join } from 'path';
+import { ProgressLocation, window } from 'vscode';
 
 export enum AssetType {
   splash = 'splash.png',
@@ -94,26 +94,26 @@ async function setAssetResource(project: Project, filename: AssetType) {
   const folder = project.projectFolder();
   const title = getAssetTooltip(folder, filename);
   const buttonTitle = getAssetTipType(folder, filename) == TipType.Warning ? `Select File` : `Update File`;
-  const selected = await vscode.window.showInformationMessage(title, buttonTitle);
+  const selected = await window.showInformationMessage(title, buttonTitle);
   if (!selected) return;
 
   try {
     // Copy newfilename to resources/splash.png
     const resourceFolder = getResourceFolder(folder, filename, true);
 
-    const files = await vscode.window.showOpenDialog({ canSelectFiles: true, canSelectMany: false });
+    const files = await window.showOpenDialog({ canSelectFiles: true, canSelectMany: false });
     if (!files || files.length !== 1) return;
     const copyfilename = files[0].fsPath;
 
     if (path.extname(copyfilename) !== '.png') {
-      vscode.window.showErrorMessage('The file must be a png');
+      window.showErrorMessage('The file must be a png');
       return;
     }
 
     const newfilename = path.join(resourceFolder, filename);
     fs.copyFileSync(copyfilename, newfilename);
     if (!fs.existsSync(newfilename)) {
-      await vscode.window.showErrorMessage(`Unable to create ${newfilename}`);
+      await window.showErrorMessage(`Unable to create ${newfilename}`);
       return;
     }
 
@@ -137,7 +137,7 @@ async function setAssetResource(project: Project, filename: AssetType) {
 
     await runCapacitorAssets(project);
   } catch (err) {
-    vscode.window.showErrorMessage(`Operation failed ${err}`);
+    window.showErrorMessage(`Operation failed ${err}`);
   }
 }
 
@@ -165,7 +165,7 @@ async function runCapacitorAssets(project: Project) {
   const folder = project.projectFolder();
   const neededMessage = hasNeededAssets(folder);
   if (neededMessage) {
-    await vscode.window.showInformationMessage(neededMessage, 'OK');
+    await window.showInformationMessage(neededMessage, 'OK');
     return;
   }
 
@@ -221,9 +221,9 @@ function addToGitIgnore(folder: string, ignoreGlob: string) {
 }
 
 async function showProgress(message: string, func: () => Promise<any>) {
-  await vscode.window.withProgress(
+  await window.withProgress(
     {
-      location: vscode.ProgressLocation.Notification,
+      location: ProgressLocation.Notification,
       title: `${message}`,
       cancellable: false,
     },

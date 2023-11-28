@@ -1,9 +1,9 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 
 import { Project } from './project';
 import { Tip, TipType } from './tip';
+import { window } from 'vscode';
 
 /**
  * For Capacitor project if @ionic/angular-toolkit >= v6 then
@@ -29,7 +29,7 @@ export function checkMigrationAngularToolkit(project: Project) {
 
 async function fixAngularJson(filename: string) {
   if (
-    !(await vscode.window.showErrorMessage(
+    !(await window.showErrorMessage(
       'When using @ionic/angular-toolkit v6+ the ionic-cordova-build and ionic-cordova-serve sections in angular.json can be removed.',
       'Fix angular.json'
     ))
@@ -43,8 +43,8 @@ async function fixAngularJson(filename: string) {
       delete angular.projects[project].architect['ionic-cordova-serve'];
     }
     fs.writeFileSync(filename, JSON.stringify(angular, undefined, 2));
-    vscode.window.showInformationMessage('angular.json has been migrated');
+    window.showInformationMessage('angular.json has been migrated');
   } catch (err) {
-    vscode.window.showErrorMessage('Failed to fix angular.json: ' + err);
+    window.showErrorMessage('Failed to fix angular.json: ' + err);
   }
 }

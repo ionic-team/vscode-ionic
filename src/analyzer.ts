@@ -3,7 +3,6 @@
 import { coerce, compare, lt, gte, lte } from 'semver';
 import * as fs from 'fs';
 import { parse } from 'fast-xml-parser';
-import * as vscode from 'vscode';
 
 import {
   writeConsistentVersionError,
@@ -18,6 +17,7 @@ import { Project } from './project';
 import { setStringIn } from './utilities';
 import { npmInstall, npmUninstall } from './node-commands';
 import { ionicState } from './ionic-tree-provider';
+import { ExtensionContext, window } from 'vscode';
 
 let packageFile;
 let allDependencies = {};
@@ -96,7 +96,7 @@ function getAndroidManifestIntent(actionName) {
   return undefined;
 }
 
-export async function load(fn: string, project: Project, context: vscode.ExtensionContext): Promise<any> {
+export async function load(fn: string, project: Project, context: ExtensionContext): Promise<any> {
   let packageJsonFilename = fn;
   if (fs.lstatSync(fn).isDirectory()) {
     packageJsonFilename = fn + '/package.json';
@@ -234,7 +234,7 @@ function AddCordovaAndroidPreference(folder: string, preference: string, value: 
     );
   }
   fs.writeFileSync(configXMLFilename, newtxt);
-  vscode.window.showInformationMessage(`config.xml has been updated to include the ${preference} preference`, 'OK');
+  window.showInformationMessage(`config.xml has been updated to include the ${preference} preference`, 'OK');
 }
 
 function getYarnVersion(packageManager: string): string {

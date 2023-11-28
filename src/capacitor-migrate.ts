@@ -1,6 +1,6 @@
 import { existsSync, lstatSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import * as vscode from 'vscode';
+
 import { exists, isLess, isVersionGreaterOrEqual } from './analyzer';
 import { clearOutput, showOutput, write, writeError, writeIonic, writeWarning } from './logging';
 import { npmInstall, npmUninstall, npmUpdate } from './node-commands';
@@ -15,6 +15,7 @@ import { capacitorOpen } from './capacitor-open';
 import { CapacitorPlatform } from './capacitor-platform';
 import { checkPeerDependencies, PeerReport } from './peer-dependencies';
 import { removeNodeModules } from './advanced-actions';
+import { window } from 'vscode';
 
 export async function migrateCapacitor5(project: Project, currentVersion: string): Promise<ActionResult> {
   const coreVersion = '5';
@@ -25,7 +26,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
   const openStudio = 'Open Android Studio';
   if (exists('@capacitor/android')) {
     if (!checkAndroidStudio('222.4459.24')) {
-      const res = await vscode.window.showInformationMessage(
+      const res = await window.showInformationMessage(
         `Android Studio Flamingo (2022.2.1) is the minimum version needed for Capacitor ${versionTitle} (It comes with Java 17 and Gradle 8). Choose Android Studio > Check for Updates.`,
         openStudio,
         'Continue...'
@@ -46,7 +47,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
 
     const version = await checkJDK(project);
     if (version < 17) {
-      const result = await vscode.window.showInformationMessage(
+      const result = await window.showInformationMessage(
         `Your version of Java is ${version} but version 17 is the minimum required. Please check your JAVA_HOME path and ensure it is using JDK Version 17. You may need to restart VS Code after making this change.`,
         'OK',
         'Continue'
@@ -90,7 +91,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
   }
 
   if (report.incompatible.length > 0) {
-    const result = await vscode.window.showErrorMessage(
+    const result = await window.showErrorMessage(
       `There ${plural('are', report.incompatible.length)} ${pluralize(
         'plugin',
         report.incompatible.length
@@ -103,7 +104,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
     }
   }
 
-  const result = await vscode.window.showInformationMessage(
+  const result = await window.showInformationMessage(
     `Capacitor ${versionTitle} sets a deployment target of iOS 13 and Android 13 (SDK 33).`,
     `Migrate to v${versionTitle}`,
     'Ignore'
@@ -157,7 +158,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
     }
   });
 
-  vscode.window.showInformationMessage(message, changesTitle, 'OK').then((res) => {
+  window.showInformationMessage(message, changesTitle, 'OK').then((res) => {
     if (res == changesTitle) {
       openUri(changesLink);
     }
@@ -220,7 +221,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
   if (daysLeft > 0) {
     warning += ` (${daysLeft} days left)`;
   }
-  const result = await vscode.window.showInformationMessage(
+  const result = await window.showInformationMessage(
     `Capacitor 4 sets a deployment target of iOS 13 and Android 12 (SDK 32). ${warning}`,
     'Migrate to v4',
     'Ignore'
@@ -414,7 +415,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
       showOutput();
       const message = `Migration to Capacitor ${coreVersion} is complete. Run and test your app!`;
 
-      vscode.window.showInformationMessage(message, 'OK');
+      window.showInformationMessage(message, 'OK');
     } catch (err) {
       writeError(`Failed to migrate: ${err}`);
     }
