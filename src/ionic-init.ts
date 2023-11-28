@@ -1,5 +1,3 @@
-import * as path from 'path';
-
 // The project is non-ionic:
 // Run ionic init using the project name of the package.json and type of custom
 // Create ionic:build if there is a build script
@@ -7,17 +5,18 @@ import * as path from 'path';
 import { getRunOutput } from './utilities';
 import { write, writeError, writeIonic } from './logging';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 // Create ionic:serve if there is a serve script
 export async function ionicInit(folder: string): Promise<boolean> {
   write('[Ionic] Creating Ionic project...');
   try {
-    const filename = path.join(folder, 'package.json');
+    const filename = join(folder, 'package.json');
     const packageFile = JSON.parse(readFileSync(filename, 'utf8'));
     verifyValidPackageJson(filename, packageFile);
     const name = packageFile.name;
 
-    const cfg = path.join(folder, 'ionic.config.json');
+    const cfg = join(folder, 'ionic.config.json');
     if (!existsSync(cfg)) {
       const result = await getRunOutput(`npx ionic init "${name}" --type=custom`, folder);
     }
@@ -65,7 +64,7 @@ function addIonicConfigCapacitor(folder: string) {
   // This will add capacitor to integrations object of ionic.config.json
   // "capacitor": {}
   try {
-    const filename = path.join(folder, 'ionic.config.json');
+    const filename = join(folder, 'ionic.config.json');
     if (existsSync(filename)) {
       const ionicConfig = JSON.parse(readFileSync(filename, 'utf8'));
       ionicConfig.integrations.capacitor = new Object();

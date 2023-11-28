@@ -1,4 +1,3 @@
-import * as path from 'path';
 import * as os from 'os';
 import * as http from 'https';
 
@@ -9,6 +8,7 @@ import { PackageType } from './npm-model';
 import { writeWarning } from './logging';
 import { ExtensionContext } from 'vscode';
 import { existsSync, readFileSync } from 'fs';
+import { join, resolve } from 'path';
 
 interface TelemetryMetric {
   name: string;
@@ -159,7 +159,7 @@ function sendTelemetry(telemetry: boolean, sessionId: string, event_type: string
  */
 export function getIonicConfig(folder: string): IonicConfig {
   const config = getGlobalIonicConfig();
-  const configFile = path.join(folder, 'ionic.config.json');
+  const configFile = join(folder, 'ionic.config.json');
   if (existsSync(configFile)) {
     const json: any = readFileSync(configFile);
     const data: IonicConfig = JSON.parse(json);
@@ -179,8 +179,8 @@ export function getIonicConfig(folder: string): IonicConfig {
  * @returns IonicConfig
  */
 export function getGlobalIonicConfig(): IonicConfig {
-  const configPath = path.resolve(os.homedir(), '.ionic');
-  const configFile = path.join(configPath, 'config.json');
+  const configPath = resolve(os.homedir(), '.ionic');
+  const configFile = join(configPath, 'config.json');
 
   if (existsSync(configFile)) {
     const json: any = readFileSync(configFile);

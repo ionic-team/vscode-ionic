@@ -1,5 +1,3 @@
-import * as path from 'path';
-
 import { exists } from './analyzer';
 import { CommandName } from './command-name';
 import { ionicState } from './ionic-tree-provider';
@@ -53,7 +51,7 @@ export async function checkForMonoRepo(project: Project, selectedProject: string
   }
   let projects: Array<MonoRepoProject> = undefined;
   // Might be pnpm based
-  const pw = path.join(project.folder, 'pnpm-workspace.yaml');
+  const pw = join(project.folder, 'pnpm-workspace.yaml');
   const isPnpm = existsSync(pw);
 
   if (exists('@nrwl/cli') || existsSync(join(project.folder, 'nx.json'))) {
@@ -92,7 +90,7 @@ export async function checkForMonoRepo(project: Project, selectedProject: string
         ionicState.projectsView.title = 'Workspaces';
       } else {
         // Might be lerna based
-        const lerna = path.join(project.folder, 'lerna.json');
+        const lerna = join(project.folder, 'lerna.json');
         if (existsSync(lerna)) {
           project.repoType = MonoRepoType.lerna;
           projects = getLernaWorkspaces(project);
@@ -155,9 +153,9 @@ export function isFolderBasedMonoRepo(rootFolder: string): Array<MonoFolder> {
     .map((dir) => dir.name);
   const result = [];
   for (const folder of folders) {
-    const packageJson = path.join(rootFolder, folder, 'package.json');
+    const packageJson = join(rootFolder, folder, 'package.json');
     if (existsSync(packageJson)) {
-      result.push({ name: folder, packageJson: packageJson, path: path.join(rootFolder, folder) });
+      result.push({ name: folder, packageJson: packageJson, path: join(rootFolder, folder) });
     }
   }
   return result;
@@ -166,7 +164,7 @@ export function isFolderBasedMonoRepo(rootFolder: string): Array<MonoFolder> {
 function vsCodeWorkSpaces(): Array<MonoFolder> {
   const result = [];
   for (const ws of workspace.workspaceFolders) {
-    const packageJson = path.join(ws.uri.path, 'package.json');
+    const packageJson = join(ws.uri.path, 'package.json');
     if (existsSync(packageJson)) {
       result.push({ name: ws.name, packageJson: packageJson, path: ws.uri.path });
     }
@@ -183,7 +181,7 @@ export function getMonoRepoFolder(name: string, defaultFolder: string): string {
 }
 
 export function getPackageJSONFilename(rootFolder: string): string {
-  return path.join(getLocalFolder(rootFolder), 'package.json');
+  return join(getLocalFolder(rootFolder), 'package.json');
 }
 
 export function getLocalFolder(rootFolder: string): string {

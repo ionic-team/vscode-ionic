@@ -1,11 +1,11 @@
 import * as child_process from 'child_process';
-import * as path from 'path';
 
 import { Context, VSCommand } from './context-variables';
 import { ionicState } from './ionic-tree-provider';
 import { sendTelemetryEvent, TelemetryEventType } from './telemetry';
 import { writeAppend } from './logging';
 import { ExtensionContext, commands, window } from 'vscode';
+import { join } from 'path';
 
 /**
  * ionic login and signup commands
@@ -13,7 +13,7 @@ import { ExtensionContext, commands, window } from 'vscode';
  * @param  {vscode.ExtensionContext} context
  */
 export async function ionicLogin(folder: string, context: ExtensionContext) {
-  const ifolder = path.join(folder, 'node_modules', '@ionic', 'cli', 'bin');
+  const ifolder = join(folder, 'node_modules', '@ionic', 'cli', 'bin');
   try {
     await run(`node ionic login --confirm`, ifolder);
     sendTelemetryEvent(folder, TelemetryEventType.Login, context);
@@ -25,7 +25,7 @@ export async function ionicLogin(folder: string, context: ExtensionContext) {
 }
 
 export async function ionicSignup(folder: string, context: ExtensionContext) {
-  const ifolder = path.join(folder, 'node_modules', '@ionic', 'cli', 'bin');
+  const ifolder = join(folder, 'node_modules', '@ionic', 'cli', 'bin');
   await run('npx ionic signup', ifolder);
   sendTelemetryEvent(folder, TelemetryEventType.SignUp, context);
 }

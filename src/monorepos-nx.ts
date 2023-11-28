@@ -1,5 +1,4 @@
-import * as path from 'path';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import { writeError } from './logging';
 import { ionicState } from './ionic-tree-provider';
 import { MonoRepoProject } from './monorepo';
@@ -24,7 +23,7 @@ export async function getNXProjects(project: Project): Promise<Array<MonoRepoPro
     return ionicState.projects;
   }
 
-  const filename = path.join(project.folder, 'workspace.json');
+  const filename = join(project.folder, 'workspace.json');
   let result: Array<MonoRepoProject> = [];
   if (existsSync(filename)) {
     result = getNXProjectFromWorkspaceJson(filename);
@@ -48,7 +47,7 @@ async function getNXProjectsFromNX(project: Project): Promise<MonoRepoProject[]>
         const txt = readFileSync(prj, 'utf-8');
         const p = JSON.parse(stripJsonComments(txt));
         if (p.name && p.projectType == 'application') {
-          result.push({ name: p.name, folder: path.dirname(prj) });
+          result.push({ name: p.name, folder: dirname(prj) });
         }
       } catch (err) {
         writeError(`Error in project ${prj}: ${err}`);
@@ -97,7 +96,7 @@ function getNXProjectFromWorkspaceJson(filename: string): MonoRepoProject[] {
 function getNXProjectsByFolder(project: Project): MonoRepoProject[] {
   const result: Array<MonoRepoProject> = [];
   // workspace.json is optional. Just iterate through apps folder
-  const folder = path.join(project.folder, 'apps');
+  const folder = join(project.folder, 'apps');
   if (existsSync(folder)) {
     const list = readdirSync(folder, { withFileTypes: true });
     for (const item of list) {

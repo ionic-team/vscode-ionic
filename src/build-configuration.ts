@@ -1,10 +1,9 @@
-import * as path from 'path';
-
 import { Project } from './project';
 import { ionicState } from './ionic-tree-provider';
 import { exists } from './analyzer';
 import { ExtensionContext, window } from 'vscode';
 import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
 
 export function getConfigurationName(): string {
   if (!ionicState.configuration || ionicState.configuration == 'default') {
@@ -32,7 +31,7 @@ export function getConfigurationArgs(isDebugging?: boolean): string {
 
 export async function buildConfiguration(folder: string, context: ExtensionContext, project: Project): Promise<string> {
   let configs = [];
-  const filename = path.join(project.projectFolder(), 'angular.json');
+  const filename = join(project.projectFolder(), 'angular.json');
   if (existsSync(filename)) {
     configs = getAngularBuildConfigs(filename);
   }

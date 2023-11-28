@@ -1,4 +1,3 @@
-import * as path from 'path';
 import { CommandName } from './command-name';
 import { openUri, showMessage } from './utilities';
 import { ionicInit } from './ionic-init';
@@ -8,6 +7,7 @@ import { Project } from './project';
 import { getLastOperation } from './tasks';
 import { Disposable, Position, Selection, TextDocument, Uri, commands, window, workspace } from 'vscode';
 import { existsSync, lstatSync } from 'fs';
+import { join } from 'path';
 
 interface ErrorLine {
   uri: string;
@@ -311,8 +311,8 @@ async function handleErrorLine(number: number, errors: Array<ErrorLine>, folder:
   let uri = errors[number].uri;
   if (!existsSync(uri)) {
     // Might be a relative path
-    if (existsSync(path.join(folder, uri))) {
-      uri = path.join(folder, uri);
+    if (existsSync(join(folder, uri))) {
+      uri = join(folder, uri);
     }
   }
   currentErrorFilename = uri;

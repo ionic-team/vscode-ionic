@@ -1,9 +1,8 @@
-import * as path from 'path';
-
 import { Project } from './project';
 import { Tip, TipType } from './tip';
 import { window } from 'vscode';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 /**
  * For Capacitor project if @ionic/angular-toolkit >= v6 then
@@ -13,7 +12,7 @@ import { existsSync, readFileSync, writeFileSync } from 'fs';
  */
 export function checkMigrationAngularToolkit(project: Project) {
   // v6 removed the "ionic-cordova-build" / "ionic-cordova-serve" sections in Angular.json
-  const filename = path.join(project.folder, 'angular.json');
+  const filename = join(project.folder, 'angular.json');
   if (existsSync(filename)) {
     const txt = readFileSync(filename, 'utf8');
     if (txt && txt.includes('ionic-cordova-build')) {

@@ -1,7 +1,5 @@
 import * as child_process from 'child_process';
 
-import * as path from 'path';
-
 import { coerce } from 'semver';
 import { Command, Tip, TipType } from './tip';
 import { Project } from './project';
@@ -278,7 +276,7 @@ function olderThan(d1: Date, d2: Date, days: number): boolean {
 }
 
 function markIfPlugin(folder: string): boolean {
-  const pkg = path.join(folder, 'package.json');
+  const pkg = join(folder, 'package.json');
   if (existsSync(pkg)) {
     try {
       const packages = JSON.parse(readFileSync(pkg, 'utf8'));
@@ -312,7 +310,7 @@ function markDeprecated(lockFile: string, packages) {
 
 function inspectPackages(folder: string, packages) {
   // Use package-lock.json for deprecated packages
-  const lockFile = path.join(folder, 'package-lock.json');
+  const lockFile = join(folder, 'package-lock.json');
   if (existsSync(lockFile)) {
     markDeprecated(lockFile, packages);
   }
@@ -337,7 +335,7 @@ function inspectPackages(folder: string, packages) {
       readdirSync(nmFolder, { withFileTypes: true })
         .filter((dirent) => dirent.isDirectory())
         .map((dirent) => {
-          const hasPlugin = markIfPlugin(path.join(nmFolder, dirent.name));
+          const hasPlugin = markIfPlugin(join(nmFolder, dirent.name));
           if (hasPlugin) {
             isPlugin = true;
           }

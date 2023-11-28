@@ -1,5 +1,4 @@
 import * as child_process from 'child_process';
-import * as path from 'path';
 
 import * as os from 'os';
 
@@ -19,6 +18,7 @@ import {
 import { ionicState } from './ionic-tree-provider';
 import { workspace } from 'vscode';
 import { existsSync } from 'fs';
+import { resolve } from 'path';
 
 const forwardedSockets: ForwardedSocket[] = [];
 
@@ -280,7 +280,7 @@ function resolvePath(from: string): string {
 
   if (substituted.includes('/')) {
     // Resolve path if it has a path seperator.
-    return path.resolve(substituted);
+    return resolve(substituted);
   } else {
     // Its a command that exists in PATH.
     return substituted;

@@ -1,5 +1,3 @@
-import * as path from 'path';
-
 import { channelShow, run } from './utilities';
 import { write, writeIonic } from './logging';
 import { Tip, TipType } from './tip';
@@ -8,7 +6,7 @@ import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall, npmUninstall, npx } from './node-commands';
 import { Context } from './context-variables';
-import { join } from 'path';
+import { extname, join } from 'path';
 import { ProgressLocation, window } from 'vscode';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 
@@ -38,7 +36,7 @@ export function addSplashAndIconFeatures(project: Project) {
 }
 
 function getAssetTipType(folder: string, filename: AssetType): TipType {
-  const assetfilename = path.join(getResourceFolder(folder, filename), filename);
+  const assetfilename = join(getResourceFolder(folder, filename), filename);
   if (existsSync(assetfilename)) {
     return TipType.CheckMark;
   } else {
@@ -50,19 +48,19 @@ function createFeature(title: string, assetType: AssetType, project: Project): T
   const tip = new Tip(title, undefined, getAssetTipType(project.projectFolder(), assetType));
   tip.setAction(setAssetResource, project, assetType);
   tip.setContextValue(Context.asset);
-  const filename = path.join(getResourceFolder(project.projectFolder(), assetType), assetType);
+  const filename = join(getResourceFolder(project.projectFolder(), assetType), assetType);
   tip.setSecondCommand('Open Asset', filename);
   tip.tooltip = getAssetTooltip(project.projectFolder(), assetType);
   return tip;
 }
 
 function getResourceFolder(folder: string, filename: AssetType, createIfMissing?: boolean): string {
-  let resourceFolder = path.join(folder, 'resources');
+  let resourceFolder = join(folder, 'resources');
   if (createIfMissing && !existsSync(resourceFolder)) {
     mkdirSync(resourceFolder);
   }
   if (filename == AssetType.adaptiveBackground || filename == AssetType.adaptiveForeground) {
-    resourceFolder = path.join(resourceFolder, 'android');
+    resourceFolder = join(resourceFolder, 'android');
     if (createIfMissing && !existsSync(resourceFolder)) {
       mkdirSync(resourceFolder);
     }
@@ -105,12 +103,12 @@ async function setAssetResource(project: Project, filename: AssetType) {
     if (!files || files.length !== 1) return;
     const copyfilename = files[0].fsPath;
 
-    if (path.extname(copyfilename) !== '.png') {
+    if (extname(copyfilename) !== '.png') {
       window.showErrorMessage('The file must be a png');
       return;
     }
 
-    const newfilename = path.join(resourceFolder, filename);
+    const newfilename = join(resourceFolder, filename);
     copyFileSync(copyfilename, newfilename);
     if (!existsSync(newfilename)) {
       await window.showErrorMessage(`Unable to create ${newfilename}`);
@@ -119,11 +117,11 @@ async function setAssetResource(project: Project, filename: AssetType) {
 
     // If its an icon file and no adaptive icons then use the icon
     if (filename == AssetType.icon) {
-      const adaptiveBackground = path.join(
+      const adaptiveBackground = join(
         getResourceFolder(folder, AssetType.adaptiveBackground, true),
         AssetType.adaptiveBackground
       );
-      const adaptiveForeground = path.join(
+      const adaptiveForeground = join(
         getResourceFolder(folder, AssetType.adaptiveForeground, true),
         AssetType.adaptiveForeground
       );
@@ -142,9 +140,9 @@ async function setAssetResource(project: Project, filename: AssetType) {
 }
 
 function hasNeededAssets(folder: string): string {
-  const icon = path.join(getResourceFolder(folder, AssetType.icon), AssetType.icon);
-  const splash = path.join(getResourceFolder(folder, AssetType.splash), AssetType.splash);
-  const splashDark = path.join(getResourceFolder(folder, AssetType.splashDark), AssetType.splashDark);
+  const icon = join(getResourceFolder(folder, AssetType.icon), AssetType.icon);
+  const splash = join(getResourceFolder(folder, AssetType.splash), AssetType.splash);
+  const splashDark = join(getResourceFolder(folder, AssetType.splashDark), AssetType.splashDark);
 
   if (!existsSync(icon)) {
     return 'An icon needs to be specified next.';

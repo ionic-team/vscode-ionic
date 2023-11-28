@@ -1,7 +1,5 @@
 'use strict';
 
-import * as path from 'path';
-
 import { Project, reviewProject } from './project';
 import { Recommendation } from './recommendation';
 import { Context, VSCommand } from './context-variables';
@@ -12,6 +10,7 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { IonicStartPanel } from './ionic-start';
 import { Event, EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, TreeView, commands } from 'vscode';
 import { accessSync } from 'fs';
+import { join } from 'path';
 
 interface IonicState {
   view: TreeView<any>;
@@ -141,7 +140,7 @@ export class IonicTreeProvider implements TreeDataProvider<Recommendation> {
   }
 
   private getFolderInfo(folder: string): FolderInfo {
-    const packageJsonPath = path.join(this.workspaceRoot, 'package.json');
+    const packageJsonPath = join(this.workspaceRoot, 'package.json');
     const folders = isFolderBasedMonoRepo(this.workspaceRoot);
     const packageJsonExists = this.pathExists(packageJsonPath);
     const folderBased = folders.length > 0 && !packageJsonExists;
