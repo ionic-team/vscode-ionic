@@ -1,8 +1,6 @@
 # Roadmap
 
-- Link to ES Build docs in changelog and button
-
-git_depth
+- Fix queuing issue when user waits for a prompt
 
 - Add .husky to .gitignore
 - Move husky/lint to Experiments
