@@ -1,11 +1,10 @@
-import * as child_process from 'child_process';
-
 import { Context, VSCommand } from './context-variables';
 import { ionicState } from './ionic-tree-provider';
 import { sendTelemetryEvent, TelemetryEventType } from './telemetry';
 import { writeAppend } from './logging';
 import { ExtensionContext, commands, window } from 'vscode';
 import { join } from 'path';
+import { ExecException, exec } from 'child_process';
 
 /**
  * ionic login and signup commands
@@ -33,26 +32,22 @@ export async function ionicSignup(folder: string, context: ExtensionContext) {
 async function run(command: string, folder: string): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';
-    const cmd = child_process.exec(
-      command,
-      { cwd: folder },
-      (error: child_process.ExecException, stdout: string, stderror: string) => {
-        if (stdout) {
-          out += stdout;
-          writeAppend(out);
-        }
-        if (!error) {
-          writeAppend(out);
-          resolve(out);
+    const cmd = exec(command, { cwd: folder }, (error: ExecException, stdout: string, stderror: string) => {
+      if (stdout) {
+        out += stdout;
+        writeAppend(out);
+      }
+      if (!error) {
+        writeAppend(out);
+        resolve(out);
+      } else {
+        if (stderror) {
+          reject(stderror);
         } else {
-          if (stderror) {
-            reject(stderror);
-          } else {
-            resolve(out);
-          }
+          resolve(out);
         }
       }
-    );
+    });
     cmd.stdin.pipe(process.stdin);
   });
 }

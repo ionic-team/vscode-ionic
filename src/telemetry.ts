@@ -1,6 +1,3 @@
-import * as os from 'os';
-import * as http from 'https';
-
 import { PackageInfo } from './package-info';
 import { generateUUID } from './utilities';
 import { Project } from './project';
@@ -9,6 +6,8 @@ import { writeWarning } from './logging';
 import { ExtensionContext } from 'vscode';
 import { existsSync, readFileSync } from 'fs';
 import { join, resolve } from 'path';
+import { request } from 'http';
+import { homedir, platform, release } from 'os';
 
 interface TelemetryMetric {
   name: string;
@@ -108,8 +107,8 @@ function sendTelemetry(telemetry: boolean, sessionId: string, event_type: string
 
   try {
     payload.event_type = event_type;
-    payload.os_name = os.platform();
-    payload.os_version = os.release();
+    payload.os_name = platform();
+    payload.os_version = release();
 
     // Call POST https://api.ionicjs.com/events/metrics
     const now = new Date().toISOString();
@@ -137,7 +136,7 @@ function sendTelemetry(telemetry: boolean, sessionId: string, event_type: string
       },
     };
 
-    const req = http.request(options, (res) => {
+    const req = request(options, (res) => {
       res.on('data', (d) => {
         console.log(d.toString());
       });
@@ -179,7 +178,7 @@ export function getIonicConfig(folder: string): IonicConfig {
  * @returns IonicConfig
  */
 export function getGlobalIonicConfig(): IonicConfig {
-  const configPath = resolve(os.homedir(), '.ionic');
+  const configPath = resolve(homedir(), '.ionic');
   const configFile = join(configPath, 'config.json');
 
   if (existsSync(configFile)) {

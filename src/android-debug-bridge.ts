@@ -1,7 +1,3 @@
-import * as child_process from 'child_process';
-
-import * as os from 'os';
-
 import {
   AdbOptions,
   Device,
@@ -19,6 +15,8 @@ import { ionicState } from './ionic-tree-provider';
 import { workspace } from 'vscode';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
+import { homedir } from 'os';
+import { spawn } from 'child_process';
 
 const forwardedSockets: ForwardedSocket[] = [];
 
@@ -104,7 +102,7 @@ function adb(options: AdbOptions, ...args: string[]): Promise<string> {
     let outBuff = Buffer.alloc(0);
     let errBuff = Buffer.alloc(0);
 
-    const process = child_process.spawn(options.executable, [...options.arguments, ...args]);
+    const process = spawn(options.executable, [...options.arguments, ...args]);
 
     process.stdout.on('data', (data) => {
       outBuff = Buffer.concat([outBuff, Buffer.from(data)]);
@@ -264,7 +262,7 @@ function resolvePath(from: string): string {
     if (env) return process.env[env] ?? '';
 
     // ~/adb -> /Users/<user>/adb
-    if (tilde === '~') return os.homedir();
+    if (tilde === '~') return homedir();
 
     const fsPath = workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!fsPath) return '';

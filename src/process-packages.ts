@@ -1,5 +1,3 @@
-import * as child_process from 'child_process';
-
 import { coerce } from 'semver';
 import { Command, Tip, TipType } from './tip';
 import { Project } from './project';
@@ -13,6 +11,7 @@ import { writeError, writeWarning } from './logging';
 import { fixYarnGarbage } from './monorepo';
 import { ExtensionContext, window } from 'vscode';
 import { existsSync, lstatSync, readFileSync, readdirSync } from 'fs';
+import { execSync } from 'child_process';
 
 export interface PluginInformation {
   androidPermissions: Array<string>;
@@ -364,7 +363,7 @@ function inspectPackages(folder: string, packages) {
         packages[library].isOld = true;
       } else {
         if (!quick) {
-          const json = child_process.execSync(`npm show ${library} --json`, { cwd: folder }).toString();
+          const json = execSync(`npm show ${library} --json`, { cwd: folder }).toString();
           const info = JSON.parse(json);
 
           const modified = new Date(info.time.modified);

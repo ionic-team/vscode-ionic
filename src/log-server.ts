@@ -1,5 +1,3 @@
-import * as http from 'http';
-import * as os from 'os';
 import { ionicState } from './ionic-tree-provider';
 import { injectScript, removeScript } from './log-server-scripts';
 import { extname, join } from 'path';
@@ -7,8 +5,10 @@ import { readFile } from 'fs';
 import { passesFilter, replaceAll } from './utilities';
 import { getSetting, WorkspaceSetting } from './workspace-state';
 import { writeIonic, write, writeError, showOutput } from './logging';
+import { networkInterfaces } from 'os';
+import { Server, createServer } from 'http';
 
-let logServer: http.Server;
+let logServer: Server;
 
 export async function startStopLogServer(folder: string): Promise<boolean> {
   if (logServer && !folder) {
@@ -24,63 +24,61 @@ export async function startStopLogServer(folder: string): Promise<boolean> {
 
   const port = 8942;
   const basePath = join(ionicState.context.extensionPath, 'log-client');
-  logServer = http
-    .createServer((request, response) => {
-      let body = '';
+  logServer = createServer((request, response) => {
+    let body = '';
 
-      response.setHeader('Access-Control-Allow-Origin', '*');
-      response.setHeader('Access-Control-Request-Method', '*');
-      response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
-      response.setHeader('Access-Control-Allow-Headers', '*');
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader('Access-Control-Request-Method', '*');
+    response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
+    response.setHeader('Access-Control-Allow-Headers', '*');
 
-      if (request.method == 'OPTIONS') {
+    if (request.method == 'OPTIONS') {
+      response.writeHead(200);
+      response.end();
+      return;
+    }
+    if (request.method == 'POST') {
+      request.on('data', (chunk) => {
+        body += chunk.toString();
+      });
+      request.on('end', () => {
+        if (request.url == '/log') {
+          writeLog(body);
+        } else if (request.url == '/devices') {
+          writeDevices(body);
+        } else {
+          writeIonic(body);
+        }
         response.writeHead(200);
         response.end();
-        return;
-      }
-      if (request.method == 'POST') {
-        request.on('data', (chunk) => {
-          body += chunk.toString();
-        });
-        request.on('end', () => {
-          if (request.url == '/log') {
-            writeLog(body);
-          } else if (request.url == '/devices') {
-            writeDevices(body);
-          } else {
-            writeIonic(body);
-          }
-          response.writeHead(200);
-          response.end();
-        });
-        // logging
-        //        response.writeHead(200);
-        //        response.end();
-        return;
-      }
-
-      const name = request.url.includes('?') ? request.url.split('?')[0] : request.url;
-      const filePath = join(basePath, name);
-      const contentType = getMimeType(extname(filePath));
-      readFile(filePath, (error, content) => {
-        if (error) {
-          if (error.code == 'ENOENT') {
-            readFile('./404.html', function (error, content) {
-              response.writeHead(200, { 'Content-Type': contentType });
-              response.end(content, 'utf-8');
-            });
-          } else {
-            response.writeHead(500);
-            response.end('Oh bummer error: ' + error.code + ' ..\n');
-            response.end();
-          }
-        } else {
-          response.writeHead(200, { 'Content-Type': contentType });
-          response.end(content, 'utf-8');
-        }
       });
-    })
-    .listen(port);
+      // logging
+      //        response.writeHead(200);
+      //        response.end();
+      return;
+    }
+
+    const name = request.url.includes('?') ? request.url.split('?')[0] : request.url;
+    const filePath = join(basePath, name);
+    const contentType = getMimeType(extname(filePath));
+    readFile(filePath, (error, content) => {
+      if (error) {
+        if (error.code == 'ENOENT') {
+          readFile('./404.html', function (error, content) {
+            response.writeHead(200, { 'Content-Type': contentType });
+            response.end(content, 'utf-8');
+          });
+        } else {
+          response.writeHead(500);
+          response.end('Oh bummer error: ' + error.code + ' ..\n');
+          response.end();
+        }
+      } else {
+        response.writeHead(200, { 'Content-Type': contentType });
+        response.end(content, 'utf-8');
+      }
+    });
+  }).listen(port);
 
   const addressInfo = getAddress();
   writeIonic(`Remote logging service has started at http://${addressInfo}:${port}`);
@@ -94,7 +92,7 @@ export async function startStopLogServer(folder: string): Promise<boolean> {
 }
 
 function getAddress(): string {
-  const nets = os.networkInterfaces();
+  const nets = networkInterfaces();
   for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
       // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
