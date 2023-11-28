@@ -2,9 +2,9 @@
 
 ### Version 1.61
 
-- Fix cocoapods version detection (if an project had previously detected an older version)
+- Fix cocoapods version detection (if a project had previously detected an older version)
 - Recommendation to integrate prettier and ESLint using lint-staged and husky (`Project > ...`)
-- Update @angular/pwa and @angular/cdk when migrating Angular versions
+- Update `@angular/pwa` and `@angular/cdk` when migrating Angular versions
 - Fix service worker configuration when switching to ES Build
 - Add PWA integration (for Angular projects)
 - Generate PWA assets when generating Splash screens and Icons
