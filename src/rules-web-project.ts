@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import * as path from 'path';
 import { exists } from './analyzer';
 import { InternalCommand } from './command-name';
@@ -9,6 +8,7 @@ import { Project } from './project';
 import { Tip, TipType } from './tip';
 import { asAppId } from './utilities';
 import { checkCapacitorPluginMigration } from './rules-capacitor-plugins';
+import { existsSync } from 'fs';
 
 /**
  * Web projects are not using Capacitor or Cordova
@@ -18,10 +18,10 @@ export function webProject(project: Project) {
   let outFolder = 'www';
 
   // If there is a build folder and not a www folder then...
-  if (!fs.existsSync(path.join(project.projectFolder(), 'www'))) {
-    if (fs.existsSync(path.join(project.projectFolder(), 'build')) || exists('react')) {
+  if (!existsSync(path.join(project.projectFolder(), 'www'))) {
+    if (existsSync(path.join(project.projectFolder(), 'build')) || exists('react')) {
       outFolder = 'build'; // use build folder (usually react)
-    } else if (fs.existsSync(path.join(project.projectFolder(), 'dist')) || exists('vue')) {
+    } else if (existsSync(path.join(project.projectFolder(), 'dist')) || exists('vue')) {
       outFolder = 'dist'; /// use dist folder (usually vue)
     }
   }

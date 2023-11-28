@@ -1,6 +1,5 @@
 'use strict';
 
-import * as fs from 'fs';
 import * as path from 'path';
 
 import { Project, reviewProject } from './project';
@@ -12,6 +11,7 @@ import { Tip } from './tip';
 import { CapacitorPlatform } from './capacitor-platform';
 import { IonicStartPanel } from './ionic-start';
 import { Event, EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, TreeView, commands } from 'vscode';
+import { accessSync } from 'fs';
 
 interface IonicState {
   view: TreeView<any>;
@@ -155,7 +155,7 @@ export class IonicTreeProvider implements TreeDataProvider<Recommendation> {
 
   private pathExists(p: string): boolean {
     try {
-      fs.accessSync(p);
+      accessSync(p);
     } catch (err) {
       return false;
     }

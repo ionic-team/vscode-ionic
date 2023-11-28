@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import * as http from 'https';
@@ -9,6 +8,7 @@ import { Project } from './project';
 import { PackageType } from './npm-model';
 import { writeWarning } from './logging';
 import { ExtensionContext } from 'vscode';
+import { existsSync, readFileSync } from 'fs';
 
 interface TelemetryMetric {
   name: string;
@@ -160,8 +160,8 @@ function sendTelemetry(telemetry: boolean, sessionId: string, event_type: string
 export function getIonicConfig(folder: string): IonicConfig {
   const config = getGlobalIonicConfig();
   const configFile = path.join(folder, 'ionic.config.json');
-  if (fs.existsSync(configFile)) {
-    const json: any = fs.readFileSync(configFile);
+  if (existsSync(configFile)) {
+    const json: any = readFileSync(configFile);
     const data: IonicConfig = JSON.parse(json);
     if (data.telemetry) {
       config.telemetry = data.telemetry; // Override global with local setting
@@ -182,8 +182,8 @@ export function getGlobalIonicConfig(): IonicConfig {
   const configPath = path.resolve(os.homedir(), '.ionic');
   const configFile = path.join(configPath, 'config.json');
 
-  if (fs.existsSync(configFile)) {
-    const json: any = fs.readFileSync(configFile);
+  if (existsSync(configFile)) {
+    const json: any = readFileSync(configFile);
     const data: IonicConfig = JSON.parse(json);
     if (!data.telemetry) {
       data.telemetry = true; // Default is true for telemetry

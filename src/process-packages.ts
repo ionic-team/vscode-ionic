@@ -1,5 +1,5 @@
 import * as child_process from 'child_process';
-import * as fs from 'fs';
+
 import * as path from 'path';
 
 import { coerce } from 'semver';
@@ -14,6 +14,7 @@ import { ionicState } from './ionic-tree-provider';
 import { writeError, writeWarning } from './logging';
 import { fixYarnGarbage } from './monorepo';
 import { ExtensionContext, window } from 'vscode';
+import { existsSync, lstatSync, readFileSync, readdirSync } from 'fs';
 
 export interface PluginInformation {
   androidPermissions: Array<string>;
@@ -47,7 +48,7 @@ export async function processPackages(
   context: ExtensionContext,
   project: Project
 ): Promise<any> {
-  if (!fs.lstatSync(folder).isDirectory()) {
+  if (!lstatSync(folder).isDirectory()) {
     return {};
   }
 
@@ -278,9 +279,9 @@ function olderThan(d1: Date, d2: Date, days: number): boolean {
 
 function markIfPlugin(folder: string): boolean {
   const pkg = path.join(folder, 'package.json');
-  if (fs.existsSync(pkg)) {
+  if (existsSync(pkg)) {
     try {
-      const packages = JSON.parse(fs.readFileSync(pkg, 'utf8'));
+      const packages = JSON.parse(readFileSync(pkg, 'utf8'));
       if (packages.capacitor?.ios || packages.capacitor?.android) {
         return true;
       }
@@ -293,7 +294,7 @@ function markIfPlugin(folder: string): boolean {
 }
 
 function markDeprecated(lockFile: string, packages) {
-  const txt = fs.readFileSync(lockFile, { encoding: 'utf8' });
+  const txt = readFileSync(lockFile, { encoding: 'utf8' });
   const data = JSON.parse(txt);
   if (!data.packages) {
     return;
@@ -312,16 +313,16 @@ function markDeprecated(lockFile: string, packages) {
 function inspectPackages(folder: string, packages) {
   // Use package-lock.json for deprecated packages
   const lockFile = path.join(folder, 'package-lock.json');
-  if (fs.existsSync(lockFile)) {
+  if (existsSync(lockFile)) {
     markDeprecated(lockFile, packages);
   }
 
   // plugins
   for (const library of Object.keys(packages)) {
     const plugin = join(folder, 'node_modules', library, 'plugin.xml');
-    if (fs.existsSync(plugin)) {
+    if (existsSync(plugin)) {
       // Cordova based
-      const content = fs.readFileSync(plugin, 'utf8');
+      const content = readFileSync(plugin, 'utf8');
       packages[library].depType = PackageType.CordovaPlugin;
       packages[library].plugin = processPlugin(content);
     }
@@ -330,10 +331,10 @@ function inspectPackages(folder: string, packages) {
 
     let isPlugin = false;
 
-    if (fs.existsSync(nmFolder)) {
+    if (existsSync(nmFolder)) {
       isPlugin = markIfPlugin(nmFolder);
 
-      fs.readdirSync(nmFolder, { withFileTypes: true })
+      readdirSync(nmFolder, { withFileTypes: true })
         .filter((dirent) => dirent.isDirectory())
         .map((dirent) => {
           const hasPlugin = markIfPlugin(path.join(nmFolder, dirent.name));

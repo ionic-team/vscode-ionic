@@ -2,7 +2,6 @@ import * as child_process from 'child_process';
 import * as path from 'path';
 
 import * as os from 'os';
-import * as fs from 'fs';
 
 import {
   AdbOptions,
@@ -19,6 +18,7 @@ import {
 } from './android-debug-models';
 import { ionicState } from './ionic-tree-provider';
 import { workspace } from 'vscode';
+import { existsSync } from 'fs';
 
 const forwardedSockets: ForwardedSocket[] = [];
 
@@ -249,7 +249,7 @@ function getAdbExecutable(): string {
     // Tries a default location for the default android debugger bridge
     if (process.platform !== 'win32') {
       const adbDefault = '~/Library/Android/sdk/platform-tools/adb';
-      if (fs.existsSync(resolvePath(adbDefault))) {
+      if (existsSync(resolvePath(adbDefault))) {
         return resolvePath(adbDefault);
       }
     }

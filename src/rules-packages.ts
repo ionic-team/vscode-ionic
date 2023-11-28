@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-
 import { Project } from './project';
 import { Command, Tip, TipType } from './tip';
 import {
@@ -12,6 +10,7 @@ import {
 } from './analyzer';
 import { npmInstallAll, suggestInstallAll } from './node-commands';
 import { ionicState } from './ionic-tree-provider';
+import { existsSync } from 'fs';
 
 /**
  * General Rules for packages like momentjs, jquery, etc
@@ -20,7 +19,7 @@ import { ionicState } from './ionic-tree-provider';
 export function checkPackages(project: Project) {
   const nmf = project.getNodeModulesFolder();
   ionicState.hasNodeModules = true;
-  if (!fs.existsSync(nmf) && !project.isModernYarn()) {
+  if (!existsSync(nmf) && !project.isModernYarn()) {
     ionicState.hasNodeModules = false;
     project.add(
       new Tip(

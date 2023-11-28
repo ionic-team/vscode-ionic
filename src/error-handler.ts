@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import * as path from 'path';
 import { CommandName } from './command-name';
 import { openUri, showMessage } from './utilities';
@@ -8,6 +7,7 @@ import { ionicState } from './ionic-tree-provider';
 import { Project } from './project';
 import { getLastOperation } from './tasks';
 import { Disposable, Position, Selection, TextDocument, Uri, commands, window, workspace } from 'vscode';
+import { existsSync, lstatSync } from 'fs';
 
 interface ErrorLine {
   uri: string;
@@ -309,14 +309,14 @@ async function handleErrorLine(number: number, errors: Array<ErrorLine>, folder:
     }
   });
   let uri = errors[number].uri;
-  if (!fs.existsSync(uri)) {
+  if (!existsSync(uri)) {
     // Might be a relative path
-    if (fs.existsSync(path.join(folder, uri))) {
+    if (existsSync(path.join(folder, uri))) {
       uri = path.join(folder, uri);
     }
   }
   currentErrorFilename = uri;
-  if (fs.existsSync(uri) && !fs.lstatSync(uri).isDirectory()) {
+  if (existsSync(uri) && !lstatSync(uri).isDirectory()) {
     await openUri(uri);
     const myPos = new Position(errors[number].line, errors[number].position);
     window.activeTextEditor.selection = new Selection(myPos, myPos);

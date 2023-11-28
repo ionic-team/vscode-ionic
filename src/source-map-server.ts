@@ -1,7 +1,8 @@
 import * as http from 'http';
-import * as fs from 'fs';
+
 import * as path from 'path';
 import { writeIonic } from './logging';
+import { readFile } from 'fs';
 
 export function startSourceMapServer(folder: string) {
   writeIonic('Starting source map server on port 80....');
@@ -13,10 +14,10 @@ export function startSourceMapServer(folder: string) {
       const extname = path.extname(filePath);
       const contentType = getMimeType(extname);
 
-      fs.readFile(filePath, (error, content) => {
+      readFile(filePath, (error, content) => {
         if (error) {
           if (error.code == 'ENOENT') {
-            fs.readFile('./404.html', function (error, content) {
+            readFile('./404.html', function (error, content) {
               response.writeHead(200, { 'Content-Type': contentType });
               response.end(content, 'utf-8');
             });

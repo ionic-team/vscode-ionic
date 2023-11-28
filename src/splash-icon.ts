@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import * as path from 'path';
 
 import { channelShow, run } from './utilities';
@@ -11,6 +10,7 @@ import { npmInstall, npmUninstall, npx } from './node-commands';
 import { Context } from './context-variables';
 import { join } from 'path';
 import { ProgressLocation, window } from 'vscode';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 
 export enum AssetType {
   splash = 'splash.png',
@@ -39,7 +39,7 @@ export function addSplashAndIconFeatures(project: Project) {
 
 function getAssetTipType(folder: string, filename: AssetType): TipType {
   const assetfilename = path.join(getResourceFolder(folder, filename), filename);
-  if (fs.existsSync(assetfilename)) {
+  if (existsSync(assetfilename)) {
     return TipType.CheckMark;
   } else {
     return TipType.Warning;
@@ -58,13 +58,13 @@ function createFeature(title: string, assetType: AssetType, project: Project): T
 
 function getResourceFolder(folder: string, filename: AssetType, createIfMissing?: boolean): string {
   let resourceFolder = path.join(folder, 'resources');
-  if (createIfMissing && !fs.existsSync(resourceFolder)) {
-    fs.mkdirSync(resourceFolder);
+  if (createIfMissing && !existsSync(resourceFolder)) {
+    mkdirSync(resourceFolder);
   }
   if (filename == AssetType.adaptiveBackground || filename == AssetType.adaptiveForeground) {
     resourceFolder = path.join(resourceFolder, 'android');
-    if (createIfMissing && !fs.existsSync(resourceFolder)) {
-      fs.mkdirSync(resourceFolder);
+    if (createIfMissing && !existsSync(resourceFolder)) {
+      mkdirSync(resourceFolder);
     }
   }
   return resourceFolder;
@@ -111,8 +111,8 @@ async function setAssetResource(project: Project, filename: AssetType) {
     }
 
     const newfilename = path.join(resourceFolder, filename);
-    fs.copyFileSync(copyfilename, newfilename);
-    if (!fs.existsSync(newfilename)) {
+    copyFileSync(copyfilename, newfilename);
+    if (!existsSync(newfilename)) {
       await window.showErrorMessage(`Unable to create ${newfilename}`);
       return;
     }
@@ -127,11 +127,11 @@ async function setAssetResource(project: Project, filename: AssetType) {
         getResourceFolder(folder, AssetType.adaptiveForeground, true),
         AssetType.adaptiveForeground
       );
-      if (!fs.existsSync(adaptiveBackground)) {
-        fs.copyFileSync(copyfilename, adaptiveBackground);
+      if (!existsSync(adaptiveBackground)) {
+        copyFileSync(copyfilename, adaptiveBackground);
       }
-      if (!fs.existsSync(adaptiveForeground)) {
-        fs.copyFileSync(copyfilename, adaptiveForeground);
+      if (!existsSync(adaptiveForeground)) {
+        copyFileSync(copyfilename, adaptiveForeground);
       }
     }
 
@@ -146,13 +146,13 @@ function hasNeededAssets(folder: string): string {
   const splash = path.join(getResourceFolder(folder, AssetType.splash), AssetType.splash);
   const splashDark = path.join(getResourceFolder(folder, AssetType.splashDark), AssetType.splashDark);
 
-  if (!fs.existsSync(icon)) {
+  if (!existsSync(icon)) {
     return 'An icon needs to be specified next.';
   }
-  if (!fs.existsSync(splash)) {
+  if (!existsSync(splash)) {
     return 'A splash screen needs to be specified next.';
   }
-  if (!fs.existsSync(splashDark)) {
+  if (!existsSync(splashDark)) {
     return 'A dark mode splash screen needs to be specified next.';
   }
 }
@@ -210,12 +210,12 @@ async function runCapacitorAssets(project: Project) {
 
 function addToGitIgnore(folder: string, ignoreGlob: string) {
   const filename = join(folder, '.gitignore');
-  if (fs.existsSync(filename)) {
-    let txt = fs.readFileSync(filename, { encoding: 'utf-8' });
+  if (existsSync(filename)) {
+    let txt = readFileSync(filename, { encoding: 'utf-8' });
     const lines = txt.split('\n');
     if (!txt.includes(ignoreGlob)) {
       txt = txt + `\n${ignoreGlob}`;
-      fs.writeFileSync(filename, txt);
+      writeFileSync(filename, txt);
     }
   }
 }

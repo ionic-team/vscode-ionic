@@ -1,5 +1,4 @@
 import * as path from 'path';
-import * as fs from 'fs';
 
 import { exists } from './analyzer';
 import { CommandName } from './command-name';
@@ -15,6 +14,7 @@ import { join } from 'path';
 import { writeError } from './logging';
 import { NpmOutdatedDependency } from './npm-model';
 import { ExtensionContext, commands, window, workspace } from 'vscode';
+import { existsSync, readFileSync, readdirSync } from 'fs';
 
 export interface MonoRepoProject {
   name: string;
@@ -54,9 +54,9 @@ export async function checkForMonoRepo(project: Project, selectedProject: string
   let projects: Array<MonoRepoProject> = undefined;
   // Might be pnpm based
   const pw = path.join(project.folder, 'pnpm-workspace.yaml');
-  const isPnpm = fs.existsSync(pw);
+  const isPnpm = existsSync(pw);
 
-  if (exists('@nrwl/cli') || fs.existsSync(join(project.folder, 'nx.json'))) {
+  if (exists('@nrwl/cli') || existsSync(join(project.folder, 'nx.json'))) {
     project.repoType = MonoRepoType.nx;
     projects = await getNXProjects(project);
     if (!projects) {
@@ -93,7 +93,7 @@ export async function checkForMonoRepo(project: Project, selectedProject: string
       } else {
         // Might be lerna based
         const lerna = path.join(project.folder, 'lerna.json');
-        if (fs.existsSync(lerna)) {
+        if (existsSync(lerna)) {
           project.repoType = MonoRepoType.lerna;
           projects = getLernaWorkspaces(project);
           ionicState.projects = projects;
@@ -150,14 +150,13 @@ export function isFolderBasedMonoRepo(rootFolder: string): Array<MonoFolder> {
   if (workspace.workspaceFolders.length > 1) {
     return vsCodeWorkSpaces();
   }
-  const folders = fs
-    .readdirSync(rootFolder, { withFileTypes: true })
+  const folders = readdirSync(rootFolder, { withFileTypes: true })
     .filter((dir) => dir.isDirectory())
     .map((dir) => dir.name);
   const result = [];
   for (const folder of folders) {
     const packageJson = path.join(rootFolder, folder, 'package.json');
-    if (fs.existsSync(packageJson)) {
+    if (existsSync(packageJson)) {
       result.push({ name: folder, packageJson: packageJson, path: path.join(rootFolder, folder) });
     }
   }
@@ -168,7 +167,7 @@ function vsCodeWorkSpaces(): Array<MonoFolder> {
   const result = [];
   for (const ws of workspace.workspaceFolders) {
     const packageJson = path.join(ws.uri.path, 'package.json');
-    if (fs.existsSync(packageJson)) {
+    if (existsSync(packageJson)) {
       result.push({ name: ws.name, packageJson: packageJson, path: ws.uri.path });
     }
   }
@@ -270,10 +269,10 @@ enum FolderType {
 
 function checkFolder(filename: string): FolderType {
   try {
-    if (!fs.existsSync(filename)) {
+    if (!existsSync(filename)) {
       return FolderType.unknown;
     }
-    const pck = JSON.parse(fs.readFileSync(filename, 'utf8'));
+    const pck = JSON.parse(readFileSync(filename, 'utf8'));
     const isIonic = !!(
       pck?.dependencies?.['@ionic/vue'] ||
       pck?.dependencies?.['@ionic/angular'] ||

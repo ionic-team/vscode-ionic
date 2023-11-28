@@ -1,6 +1,5 @@
 'use strict';
 
-import * as fs from 'fs';
 import { Context, VSCommand } from './context-variables';
 import { ionicLogin, ionicSignup } from './ionic-auth';
 import { ionicState, IonicTreeProvider } from './ionic-tree-provider';
@@ -51,6 +50,7 @@ import {
   debug,
   TextDocument,
 } from 'vscode';
+import { existsSync } from 'fs';
 
 /**
  * Runs the command while showing a vscode window that can be cancelled
@@ -314,7 +314,7 @@ export async function activate(context: ExtensionContext) {
   });
 
   commands.registerCommand(CommandName.Open, async (recommendation: Recommendation) => {
-    if (fs.existsSync(recommendation.tip.secondCommand)) {
+    if (existsSync(recommendation.tip.secondCommand)) {
       openUri(recommendation.tip.secondCommand);
     }
   });
