@@ -1,6 +1,7 @@
 # Roadmap
 
 - Fix queuing issue when user waits for a prompt
+- TODO: add pwa integration
 
 - Add .husky to .gitignore
 - Move husky/lint to Experiments

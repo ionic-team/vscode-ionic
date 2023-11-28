@@ -226,11 +226,36 @@ async function switchESBuild(project: Project, filename: string) {
           delete angular.projects[projectName].architect.build.options.main;
         }
 
+        if (angular.projects[projectName].architect.serve?.configurations?.ci?.progress) {
+          delete angular.projects[projectName].architect.serve.configurations.ci.progress;
+        }
+
         if (angular.projects[projectName].architect.build.options.vendorChunk !== undefined) {
           delete angular.projects[projectName].architect.build.options.vendorChunk;
         }
         if (angular.projects[projectName].architect.build.options.buildOptimizer !== undefined) {
           delete angular.projects[projectName].architect.build.options.buildOptimizer;
+        }
+        if (angular.projects[projectName].architect.build.configurations) {
+          for (const projectConfig of Object.keys(angular.projects[projectName].architect.build.configurations)) {
+            if (angular.projects[projectName].architect.build.configurations[projectConfig].vendorChunk !== undefined) {
+              delete angular.projects[projectName].architect.build.configurations[projectConfig].vendorChunk;
+            }
+            if (
+              angular.projects[projectName].architect.build.configurations[projectConfig].buildOptimizer !== undefined
+            ) {
+              delete angular.projects[projectName].architect.build.configurations[projectConfig].buildOptimizer;
+            }
+            // Migrate service worker path
+            if (
+              angular.projects[projectName].architect.build.configurations[projectConfig].ngswConfigPath !== undefined
+            ) {
+              const ngswPath =
+                angular.projects[projectName].architect.build.configurations[projectConfig].ngswConfigPath;
+              angular.projects[projectName].architect.build.configurations[projectConfig].serviceWorker = ngswPath;
+              delete angular.projects[projectName].architect.build.configurations[projectConfig].ngswConfigPath;
+            }
+          }
         }
 
         // Need to make polyfills an array:
