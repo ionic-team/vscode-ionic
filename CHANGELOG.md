@@ -7,7 +7,6 @@
 - Update `@angular/pwa` and `@angular/cdk` when migrating Angular versions
 - Fix checking for minor updates in a yarn based project
 - Fix service worker configuration when switching to ES Build
-- Add PWA integration (for Angular projects)
 - Generate PWA assets when generating Splash screens and Icons
 
 ### Version 1.60
