@@ -2,10 +2,23 @@
 
 - Fix queuing issue when user waits for a prompt
 - TODO: add pwa integration
+- Angular projects that use IonicModule (eg `import { IonicModule } from '@ionic/angular';`) and `@ionic/angular/standalone` or `import { send } from 'ionicons/icons';` will break. Check code for it?
+- Angular standalone templates when a component is added (eg `ion-header`) will error until imported correctly. Add an auto-import feature?
 
-- Add .husky to .gitignore
-- Move husky/lint to Experiments
-- Remove Android Permissions
+- Find: Search for all pages, components, routes etc and put in a search box to speed up opens
+- Alt+T: Toggle between html/scss and ts
+
+- Starters for Angular add `settings.json` in `.vscode` with {
+
+```json
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "@ionic/angular/common",
+    "@ionic/angular"
+  ],
+```
+
+}
+Check `main.ts` for `provideIonicAngular` and apply this if missing
 
 ## 1.60
 

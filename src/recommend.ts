@@ -6,7 +6,7 @@ import { Project } from './project';
 import { addSplashAndIconFeatures } from './splash-icon';
 import { RunPoint, Tip, TipFeature, TipType } from './tip';
 import { capacitorMigrationChecks as checkCapacitorMigrationRules } from './rules-capacitor-migration';
-import { reviewPackages, reviewPluginProperties } from './process-packages';
+import { reviewPackages } from './process-packages';
 import { capacitorDevicesCommand, capacitorRun } from './capacitor-run';
 import { capacitorRecommendations, checkCapacitorRules } from './rules-capacitor';
 import { checkCordovaPlugins, checkCordovaRules } from './rules-cordova';
@@ -236,7 +236,8 @@ export async function getRecommendations(project: Project, context: ExtensionCon
     // Splash Screen and Icon Features
     addSplashAndIconFeatures(project);
 
-    reviewPluginProperties(packages, project);
+    // Not needed: only shows Android permissions and features used
+    //reviewPluginProperties(packages, project);
 
     project.add(
       new Tip('Check for Minor Updates', '', TipType.Dependency)
