@@ -1,12 +1,13 @@
 import { inspectProject, Project, ProjectSummary } from './project';
-import * as vscode from 'vscode';
+
 import { writeFileSync, readdirSync, statSync, existsSync } from 'fs';
 import { join } from 'path';
 import { PackageInfo } from './package-info';
 import { getStringFrom, plural } from './utilities';
 import { Recommendation } from './recommendation';
+import { ExtensionContext, window } from 'vscode';
 
-export async function ionicExport(project: Project, context: vscode.ExtensionContext): Promise<void> {
+export async function ionicExport(project: Project, context: ExtensionContext): Promise<void> {
   let folder = project.projectFolder();
   if (project.monoRepo?.nodeModulesAtRoot) {
     folder = project.folder;
@@ -42,7 +43,7 @@ export async function ionicExport(project: Project, context: vscode.ExtensionCon
 
   const filename = join(summary.project.projectFolder(), 'project-summary.md');
   writeFileSync(filename, txt);
-  vscode.window.showInformationMessage(`Exported ${filename}`);
+  window.showInformationMessage(`Exported ${filename}`);
 }
 
 function exportNamingStyles(folder: string): string {

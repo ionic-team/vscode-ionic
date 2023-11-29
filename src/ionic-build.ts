@@ -1,5 +1,3 @@
-import * as vscode from 'vscode';
-
 import { Project } from './project';
 import { MonoRepoType } from './monorepo';
 import { ionicState } from './ionic-tree-provider';
@@ -8,6 +6,7 @@ import { npx, preflightNPMCheck } from './node-commands';
 import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
 import { getConfigurationArgs } from './build-configuration';
+import { workspace } from 'vscode';
 
 /**
  * Creates the ionic build command
@@ -19,7 +18,7 @@ export function ionicBuild(project: Project, configurationArg?: string, platform
 
   ionicState.projectDirty = false;
 
-  const prod: boolean = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
+  const prod: boolean = workspace.getConfiguration('ionic').get('buildForProduction');
   let args = configurationArg ? configurationArg : '';
   if (ionicState.project) {
     args += ` --project=${ionicState.project}`;

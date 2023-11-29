@@ -1,31 +1,30 @@
-import * as child_process from 'child_process';
-import * as path from 'path';
-import * as vscode from 'vscode';
-
 import { Context, VSCommand } from './context-variables';
 import { ionicState } from './ionic-tree-provider';
 import { sendTelemetryEvent, TelemetryEventType } from './telemetry';
 import { writeAppend } from './logging';
+import { ExtensionContext, commands, window } from 'vscode';
+import { join } from 'path';
+import { ExecException, exec } from 'child_process';
 
 /**
  * ionic login and signup commands
  * @param  {string} folder
  * @param  {vscode.ExtensionContext} context
  */
-export async function ionicLogin(folder: string, context: vscode.ExtensionContext) {
-  const ifolder = path.join(folder, 'node_modules', '@ionic', 'cli', 'bin');
+export async function ionicLogin(folder: string, context: ExtensionContext) {
+  const ifolder = join(folder, 'node_modules', '@ionic', 'cli', 'bin');
   try {
     await run(`node ionic login --confirm`, ifolder);
     sendTelemetryEvent(folder, TelemetryEventType.Login, context);
   } catch (err) {
-    vscode.window.showErrorMessage(err);
+    window.showErrorMessage(err);
     ionicState.skipAuth = true;
-    await vscode.commands.executeCommand(VSCommand.setContext, Context.isAnonymous, false);
+    await commands.executeCommand(VSCommand.setContext, Context.isAnonymous, false);
   }
 }
 
-export async function ionicSignup(folder: string, context: vscode.ExtensionContext) {
-  const ifolder = path.join(folder, 'node_modules', '@ionic', 'cli', 'bin');
+export async function ionicSignup(folder: string, context: ExtensionContext) {
+  const ifolder = join(folder, 'node_modules', '@ionic', 'cli', 'bin');
   await run('npx ionic signup', ifolder);
   sendTelemetryEvent(folder, TelemetryEventType.SignUp, context);
 }
@@ -33,26 +32,22 @@ export async function ionicSignup(folder: string, context: vscode.ExtensionConte
 async function run(command: string, folder: string): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';
-    const cmd = child_process.exec(
-      command,
-      { cwd: folder },
-      (error: child_process.ExecException, stdout: string, stderror: string) => {
-        if (stdout) {
-          out += stdout;
-          writeAppend(out);
-        }
-        if (!error) {
-          writeAppend(out);
-          resolve(out);
+    const cmd = exec(command, { cwd: folder }, (error: ExecException, stdout: string, stderror: string) => {
+      if (stdout) {
+        out += stdout;
+        writeAppend(out);
+      }
+      if (!error) {
+        writeAppend(out);
+        resolve(out);
+      } else {
+        if (stderror) {
+          reject(stderror);
         } else {
-          if (stderror) {
-            reject(stderror);
-          } else {
-            resolve(out);
-          }
+          resolve(out);
         }
       }
-    );
+    });
     cmd.stdin.pipe(process.stdin);
   });
 }

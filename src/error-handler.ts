@@ -1,6 +1,3 @@
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
 import { CommandName } from './command-name';
 import { openUri, showMessage } from './utilities';
 import { ionicInit } from './ionic-init';
@@ -8,6 +5,9 @@ import { Context } from './context-variables';
 import { ionicState } from './ionic-tree-provider';
 import { Project } from './project';
 import { getLastOperation } from './tasks';
+import { Disposable, Position, Selection, TextDocument, Uri, commands, window, workspace } from 'vscode';
+import { existsSync, lstatSync } from 'fs';
+import { join } from 'path';
 
 interface ErrorLine {
   uri: string;
@@ -19,17 +19,17 @@ interface ErrorLine {
 let currentErrorFilename: string;
 
 // On Save Document event (singleton)
-let onSave: vscode.Disposable;
+let onSave: Disposable;
 
 export async function handleError(error: string, logs: Array<string>, folder: string): Promise<boolean> {
   if (error && error.includes('ionic: command not found')) {
-    await vscode.window.showErrorMessage(
+    await window.showErrorMessage(
       'The Ionic CLI is not installed. Get started by running npm install -g @ionic/cli at the terminal.',
       'More Information'
     );
-    vscode.commands.executeCommand(
+    commands.executeCommand(
       'vscode.open',
-      vscode.Uri.parse('https://ionicframework.com/docs/intro/cli#install-the-ionic-cli')
+      Uri.parse('https://ionicframework.com/docs/intro/cli#install-the-ionic-cli')
     );
     return;
   }
@@ -49,7 +49,7 @@ export async function handleError(error: string, logs: Array<string>, folder: st
       'It looks like node was not found with the default shell so it has been switched to ' +
       zsh +
       '. Please try the operation again.';
-    await vscode.window.showErrorMessage(msg, 'OK');
+    await window.showErrorMessage(msg, 'OK');
     return;
   }
   let errorMessage = error;
@@ -68,7 +68,7 @@ export async function handleError(error: string, logs: Array<string>, folder: st
     errorMessage = `The Ionic CLI thinks your project is malformed. This can happen if your ionic.config.json is misconfigured. Try deleting ionic.config.json and let the extension recreate it.`;
   }
   if (errors.length == 0 && errorMessage) {
-    vscode.window.showErrorMessage(errorMessage, 'Ok');
+    window.showErrorMessage(errorMessage, 'Ok');
   } else {
     handleErrorLine(0, errors, folder);
     // When the user fixes the error and saves the file then re-run
@@ -76,13 +76,13 @@ export async function handleError(error: string, logs: Array<string>, folder: st
       if (onSave) {
         onSave.dispose();
       }
-      onSave = vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
+      onSave = workspace.onDidSaveTextDocument((document: TextDocument) => {
         if (document.fileName == currentErrorFilename) {
           onSave.dispose();
           const lastOp = getLastOperation();
           const title = lastOp.title;
           const r = new Project('').asRecommendation(lastOp);
-          vscode.commands.executeCommand(CommandName.Run, r);
+          commands.executeCommand(CommandName.Run, r);
           showMessage(`Lets try to ${title} again...`, 3000);
         }
       });
@@ -298,7 +298,7 @@ async function handleErrorLine(number: number, errors: Array<ErrorLine>, folder:
   const nextButton = number + 1 == errors.length ? undefined : 'Next';
   const prevButton = number == 0 ? undefined : 'Previous';
   const title = errors.length > 1 ? `Error ${number + 1} of ${errors.length}: ` : '';
-  vscode.window.showErrorMessage(`${title}${errors[number].error}`, prevButton, nextButton, 'Ok').then((result) => {
+  window.showErrorMessage(`${title}${errors[number].error}`, prevButton, nextButton, 'Ok').then((result) => {
     if (result == 'Next') {
       handleErrorLine(number + 1, errors, folder);
       return;
@@ -309,18 +309,18 @@ async function handleErrorLine(number: number, errors: Array<ErrorLine>, folder:
     }
   });
   let uri = errors[number].uri;
-  if (!fs.existsSync(uri)) {
+  if (!existsSync(uri)) {
     // Might be a relative path
-    if (fs.existsSync(path.join(folder, uri))) {
-      uri = path.join(folder, uri);
+    if (existsSync(join(folder, uri))) {
+      uri = join(folder, uri);
     }
   }
   currentErrorFilename = uri;
-  if (fs.existsSync(uri) && !fs.lstatSync(uri).isDirectory()) {
+  if (existsSync(uri) && !lstatSync(uri).isDirectory()) {
     await openUri(uri);
-    const myPos = new vscode.Position(errors[number].line, errors[number].position);
-    vscode.window.activeTextEditor.selection = new vscode.Selection(myPos, myPos);
-    vscode.commands.executeCommand('revealLine', { lineNumber: myPos.line, at: 'bottom' });
+    const myPos = new Position(errors[number].line, errors[number].position);
+    window.activeTextEditor.selection = new Selection(myPos, myPos);
+    commands.executeCommand('revealLine', { lineNumber: myPos.line, at: 'bottom' });
   } else {
     console.warn(`${uri} not found`);
   }
@@ -350,20 +350,20 @@ function extractErrorMessage(msg: string): string {
 }
 
 // Given "  13:1  error blar" return positon 12, 0
-function parsePosition(msg: string): vscode.Position {
+function parsePosition(msg: string): Position {
   msg = msg.trim();
   if (msg.indexOf('  ') > -1) {
     const pos = msg.substring(0, msg.indexOf('  '));
     if (pos.indexOf(':') > -1) {
       try {
         const args = pos.split(':');
-        return new vscode.Position(parseInt(args[0]) - 1, parseInt(args[1]) - 1);
+        return new Position(parseInt(args[0]) - 1, parseInt(args[1]) - 1);
       } catch {
-        return new vscode.Position(0, 0);
+        return new Position(0, 0);
       }
     }
   }
-  return new vscode.Position(0, 0);
+  return new Position(0, 0);
 }
 
 // Extract code filename, line number, position

@@ -1,5 +1,5 @@
+import { workspace } from 'vscode';
 import { ionicState } from './ionic-tree-provider';
-import * as vscode from 'vscode';
 
 export enum WorkspaceSetting {
   liveReload = 'liveReload',
@@ -34,7 +34,7 @@ export async function setSetting(key: WorkspaceSetting, value: any): Promise<voi
 }
 
 export function getExtSetting(key: ExtensionSetting): any {
-  return vscode.workspace.getConfiguration('ionic').get(key);
+  return workspace.getConfiguration('ionic').get(key);
 }
 
 export function getGlobalSetting(key: GlobalSetting): any {

@@ -1,5 +1,25 @@
 # Roadmap
 
+- Fix queuing issue when user waits for a prompt
+- TODO: add pwa integration
+- Angular projects that use IonicModule (eg `import { IonicModule } from '@ionic/angular';`) and `@ionic/angular/standalone` or `import { send } from 'ionicons/icons';` will break. Check code for it?
+- Angular standalone templates when a component is added (eg `ion-header`) will error until imported correctly. Add an auto-import feature?
+
+- Find: Search for all pages, components, routes etc and put in a search box to speed up opens
+- Alt+T: Toggle between html/scss and ts
+
+- Starters for Angular add `settings.json` in `.vscode` with {
+
+```json
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "@ionic/angular/common",
+    "@ionic/angular"
+  ],
+```
+
+}
+Check `main.ts` for `provideIonicAngular` and apply this if missing
+
 ## 1.60
 
 - As --force is used with Angular migrations there may be peer dependency errors that need resolution afterwards. Need a peer dep resolver.
@@ -8,6 +28,8 @@
 - Recommendation for experimental migration to Angular standalone components
 - Recommendation for experimental migration to Angular built-in control flow syntax
 - Recommendation of migration to @ionic/angular (major versions) and link to migration doc
+
+- eslint-plugin-unused-imports
 
 ## Important
 
@@ -169,3 +191,23 @@ Alterantive visual web views:
 - Avoid `ionic init` and instead guess best npm run script based on `package.json` having React,Vue,Nuxt etc.
 - Guess `dist` folder based on `package.json`
 - Guess IP Address, Port based on logged output
+
+## Project Config
+
+- Bundle ID
+- Display Name
+- Version Number
+- Build Number
+- Splash (screen, dark, icon, icon background, icon foreground)
+
+- Android Manifest
+- Info.plist
+- Plugins
+- Packages
+- Settings + Advanced Settings
+
+- Security Audit
+- Statistics
+- Export
+
+- Remove "check for minor updates"

@@ -1,6 +1,6 @@
 import { existsSync } from 'fs';
 import { networkInterfaces } from 'os';
-import * as vscode from 'vscode';
+
 import { getConfigurationArgs } from './build-configuration';
 import { InternalCommand } from './command-name';
 import { ionicState } from './ionic-tree-provider';
@@ -11,6 +11,7 @@ import { Project } from './project';
 import { liveReloadSSL } from './live-reload';
 import { ExtensionSetting, getExtSetting, getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 import { getWebConfiguration, WebConfigSetting } from './web-configuration';
+import { window, workspace } from 'vscode';
 
 /**
  * Create the ionic serve command
@@ -39,7 +40,7 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
   const httpsForWeb = getSetting(WorkspaceSetting.httpsForWeb);
   const webConfig: WebConfigSetting = getWebConfiguration();
   const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
-  const defaultPort = vscode.workspace.getConfiguration('ionic').get('defaultPort');
+  const defaultPort = workspace.getConfiguration('ionic').get('defaultPort');
   let serveFlags = '';
   if (webConfig == WebConfigSetting.editor || webConfig == WebConfigSetting.welcomeNoBrowser || dontOpenBrowser) {
     serveFlags += ' --no-open';
@@ -101,7 +102,7 @@ export async function selectExternalIPAddress(): Promise<string> {
       return lastIPAddress;
     }
   }
-  const selected = await vscode.window.showQuickPick(list, {
+  const selected = await window.showQuickPick(list, {
     placeHolder: 'Select the external network address to use',
   });
   if (selected) {

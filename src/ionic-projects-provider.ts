@@ -1,14 +1,14 @@
-import * as vscode from 'vscode';
+import { Event, EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, TreeItemCollapsibleState } from 'vscode';
 import { CommandName } from './command-name';
 import { ionicState } from './ionic-tree-provider';
 import { Recommendation } from './recommendation';
 
-export class IonicProjectsreeProvider implements vscode.TreeDataProvider<Recommendation> {
-  private _onDidChangeTreeData: vscode.EventEmitter<Recommendation | undefined | void> = new vscode.EventEmitter<
+export class IonicProjectsreeProvider implements TreeDataProvider<Recommendation> {
+  private _onDidChangeTreeData: EventEmitter<Recommendation | undefined | void> = new EventEmitter<
     Recommendation | undefined | void
   >();
-  readonly onDidChangeTreeData: vscode.Event<Recommendation | undefined | void> = this._onDidChangeTreeData.event;
-  constructor(private workspaceRoot: string | undefined, private context: vscode.ExtensionContext) {}
+  readonly onDidChangeTreeData: Event<Recommendation | undefined | void> = this._onDidChangeTreeData.event;
+  constructor(private workspaceRoot: string | undefined, private context: ExtensionContext) {}
 
   selectedProject: string;
 
@@ -18,7 +18,7 @@ export class IonicProjectsreeProvider implements vscode.TreeDataProvider<Recomme
     this._onDidChangeTreeData.fire();
   }
 
-  getTreeItem(element: Recommendation): vscode.TreeItem {
+  getTreeItem(element: Recommendation): TreeItem {
     return element;
   }
 
@@ -34,7 +34,7 @@ export class IonicProjectsreeProvider implements vscode.TreeDataProvider<Recomme
         title: 'Open',
         arguments: [project.name],
       };
-      const r = new Recommendation(undefined, undefined, project.name, vscode.TreeItemCollapsibleState.None, cmd);
+      const r = new Recommendation(undefined, undefined, project.name, TreeItemCollapsibleState.None, cmd);
       const icon = project.name == this.selectedProject ? 'circle-filled' : 'none';
       r.setIcon(icon);
       list.push(r);

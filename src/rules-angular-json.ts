@@ -7,7 +7,7 @@ import { getCapacitorConfigWebDir, getCapacitorConfigureFilename, writeCapacitor
 import { join, sep } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { window } from 'vscode';
-import { replaceAll } from './utilities';
+import { openUri, replaceAll } from './utilities';
 import { MonoRepoType } from './monorepo';
 
 /**
@@ -195,12 +195,16 @@ async function setAngularPackageManager(project: Project, filename: string, pack
 }
 
 async function switchESBuild(project: Project, filename: string) {
-  if (
-    !(await window.showInformationMessage(
-      `Angular 17 projects use ESBuild by default but your project is still using WebPack. Would you like to switch to ESBuild?`,
-      'Yes, Apply Changes'
-    ))
-  ) {
+  const response = await window.showInformationMessage(
+    `Angular 17 projects use ESBuild by default but your project is still using WebPack. Would you like to switch to ESBuild?`,
+    'Yes, Apply Changes',
+    'More Information'
+  );
+  if (!response) {
+    return;
+  }
+  if (response == 'More Information') {
+    openUri('https://angular.io/guide/esbuild');
     return;
   }
   const txt = readFileSync(filename, 'utf8');
@@ -222,11 +226,36 @@ async function switchESBuild(project: Project, filename: string) {
           delete angular.projects[projectName].architect.build.options.main;
         }
 
+        if (angular.projects[projectName].architect.serve?.configurations?.ci?.progress) {
+          delete angular.projects[projectName].architect.serve.configurations.ci.progress;
+        }
+
         if (angular.projects[projectName].architect.build.options.vendorChunk !== undefined) {
           delete angular.projects[projectName].architect.build.options.vendorChunk;
         }
         if (angular.projects[projectName].architect.build.options.buildOptimizer !== undefined) {
           delete angular.projects[projectName].architect.build.options.buildOptimizer;
+        }
+        if (angular.projects[projectName].architect.build.configurations) {
+          for (const projectConfig of Object.keys(angular.projects[projectName].architect.build.configurations)) {
+            if (angular.projects[projectName].architect.build.configurations[projectConfig].vendorChunk !== undefined) {
+              delete angular.projects[projectName].architect.build.configurations[projectConfig].vendorChunk;
+            }
+            if (
+              angular.projects[projectName].architect.build.configurations[projectConfig].buildOptimizer !== undefined
+            ) {
+              delete angular.projects[projectName].architect.build.configurations[projectConfig].buildOptimizer;
+            }
+            // Migrate service worker path
+            if (
+              angular.projects[projectName].architect.build.configurations[projectConfig].ngswConfigPath !== undefined
+            ) {
+              const ngswPath =
+                angular.projects[projectName].architect.build.configurations[projectConfig].ngswConfigPath;
+              angular.projects[projectName].architect.build.configurations[projectConfig].serviceWorker = ngswPath;
+              delete angular.projects[projectName].architect.build.configurations[projectConfig].ngswConfigPath;
+            }
+          }
         }
 
         // Need to make polyfills an array:

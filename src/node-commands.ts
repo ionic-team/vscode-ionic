@@ -1,10 +1,10 @@
-import * as fs from 'fs';
 import { window, commands } from 'vscode';
 import { CommandName, InternalCommand } from './command-name';
 import { ionicState } from './ionic-tree-provider';
 import { getMonoRepoFolder, MonoRepoType } from './monorepo';
 import { Project } from './project';
 import { showProgress } from './utilities';
+import { existsSync } from 'fs';
 
 export enum PackageManager {
   npm,
@@ -74,7 +74,7 @@ export function addCommand(): string {
  */
 export function preflightNPMCheck(project: Project): string {
   const nmf = project.getNodeModulesFolder();
-  const preop = !fs.existsSync(nmf) ? npmInstallAll() + ' && ' : '';
+  const preop = !existsSync(nmf) ? npmInstallAll() + ' && ' : '';
 
   // If not set then set to a default value to prevent failrue
   if (!process.env.ANDROID_SDK_ROOT && !process.env.ANDROID_HOME && process.platform !== 'win32') {

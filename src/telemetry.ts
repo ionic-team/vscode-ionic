@@ -1,14 +1,13 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
-import * as http from 'https';
-import * as vscode from 'vscode';
-
 import { PackageInfo } from './package-info';
 import { generateUUID } from './utilities';
 import { Project } from './project';
 import { PackageType } from './npm-model';
 import { writeWarning } from './logging';
+import { ExtensionContext } from 'vscode';
+import { existsSync, readFileSync } from 'fs';
+import { join, resolve } from 'path';
+import { request } from 'http';
+import { homedir, platform, release } from 'os';
 
 interface TelemetryMetric {
   name: string;
@@ -41,7 +40,7 @@ export interface IonicConfig {
   sessionId: string; // Generated
 }
 
-export function sendTelemetryEvent(folder: string, name: string, context: vscode.ExtensionContext) {
+export function sendTelemetryEvent(folder: string, name: string, context: ExtensionContext) {
   const config = getIonicConfig(folder);
   if (!config.telemetry) return;
   sendTelemetry(config.telemetry, config.sessionId, name, {
@@ -49,7 +48,7 @@ export function sendTelemetryEvent(folder: string, name: string, context: vscode
   });
 }
 
-export function sendTelemetryEvents(folder: string, project: Project, packages: any, context: vscode.ExtensionContext) {
+export function sendTelemetryEvents(folder: string, project: Project, packages: any, context: ExtensionContext) {
   const config = getIonicConfig(folder);
   if (!config.telemetry) return;
 
@@ -108,8 +107,8 @@ function sendTelemetry(telemetry: boolean, sessionId: string, event_type: string
 
   try {
     payload.event_type = event_type;
-    payload.os_name = os.platform();
-    payload.os_version = os.release();
+    payload.os_name = platform();
+    payload.os_version = release();
 
     // Call POST https://api.ionicjs.com/events/metrics
     const now = new Date().toISOString();
@@ -137,7 +136,7 @@ function sendTelemetry(telemetry: boolean, sessionId: string, event_type: string
       },
     };
 
-    const req = http.request(options, (res) => {
+    const req = request(options, (res) => {
       res.on('data', (d) => {
         console.log(d.toString());
       });
@@ -159,9 +158,9 @@ function sendTelemetry(telemetry: boolean, sessionId: string, event_type: string
  */
 export function getIonicConfig(folder: string): IonicConfig {
   const config = getGlobalIonicConfig();
-  const configFile = path.join(folder, 'ionic.config.json');
-  if (fs.existsSync(configFile)) {
-    const json: any = fs.readFileSync(configFile);
+  const configFile = join(folder, 'ionic.config.json');
+  if (existsSync(configFile)) {
+    const json: any = readFileSync(configFile);
     const data: IonicConfig = JSON.parse(json);
     if (data.telemetry) {
       config.telemetry = data.telemetry; // Override global with local setting
@@ -179,11 +178,11 @@ export function getIonicConfig(folder: string): IonicConfig {
  * @returns IonicConfig
  */
 export function getGlobalIonicConfig(): IonicConfig {
-  const configPath = path.resolve(os.homedir(), '.ionic');
-  const configFile = path.join(configPath, 'config.json');
+  const configPath = resolve(homedir(), '.ionic');
+  const configFile = join(configPath, 'config.json');
 
-  if (fs.existsSync(configFile)) {
-    const json: any = fs.readFileSync(configFile);
+  if (existsSync(configFile)) {
+    const json: any = readFileSync(configFile);
     const data: IonicConfig = JSON.parse(json);
     if (!data.telemetry) {
       data.telemetry = true; // Default is true for telemetry

@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import { ProgressLocation, window } from 'vscode';
 import { CommandName } from './command-name';
 import { handleError } from './error-handler';
 import { ionicState } from './ionic-tree-provider';
@@ -48,7 +48,7 @@ export async function selectDevice(
     // Auto select the device if it is not an emulator and the user did not choose the ... for device selection
     selected = realDevices[0].title;
   } else {
-    selected = await vscode.window.showQuickPick(names, { placeHolder: 'Select a device to run application on' });
+    selected = await window.showQuickPick(names, { placeHolder: 'Select a device to run application on' });
     userChosen = true;
   }
   const device = devices.find((device) => device.title == selected);
@@ -133,7 +133,7 @@ async function getDevices(command: string, rootPath: string) {
       }
     }
     if (devices.length == 0) {
-      vscode.window.showErrorMessage(`Unable to find any devices: ${result}`, 'OK');
+      window.showErrorMessage(`Unable to find any devices: ${result}`, 'OK');
     }
     return devices;
   } catch (error) {
@@ -181,9 +181,9 @@ function replaceSDKLevel(sdk: string): string {
 }
 
 async function showProgress(message: string, func: () => Promise<any>) {
-  await vscode.window.withProgress(
+  await window.withProgress(
     {
-      location: vscode.ProgressLocation.Window,
+      location: ProgressLocation.Window,
       title: `${message}`,
       cancellable: true,
     },

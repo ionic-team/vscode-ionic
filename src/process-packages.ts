@@ -1,8 +1,3 @@
-import * as child_process from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as vscode from 'vscode';
-
 import { coerce } from 'semver';
 import { Command, Tip, TipType } from './tip';
 import { Project } from './project';
@@ -14,6 +9,9 @@ import { join } from 'path';
 import { ionicState } from './ionic-tree-provider';
 import { writeError, writeWarning } from './logging';
 import { fixYarnGarbage } from './monorepo';
+import { ExtensionContext, window } from 'vscode';
+import { existsSync, lstatSync, readFileSync, readdirSync } from 'fs';
+import { execSync } from 'child_process';
 
 export interface PluginInformation {
   androidPermissions: Array<string>;
@@ -22,7 +20,7 @@ export interface PluginInformation {
   hasHooks: boolean;
 }
 
-export function clearRefreshCache(context: vscode.ExtensionContext) {
+export function clearRefreshCache(context: ExtensionContext) {
   if (context) {
     for (const key of context.workspaceState.keys()) {
       if (key.startsWith(PackageCacheOutdated(undefined))) {
@@ -44,10 +42,10 @@ export async function processPackages(
   folder: string,
   allDependencies: object,
   devDependencies: object,
-  context: vscode.ExtensionContext,
+  context: ExtensionContext,
   project: Project
 ): Promise<any> {
-  if (!fs.lstatSync(folder).isDirectory()) {
+  if (!lstatSync(folder).isDirectory()) {
     return {};
   }
 
@@ -92,7 +90,7 @@ export async function processPackages(
     outdated = '[]';
     versions = '{}';
     if (err && err.includes('401')) {
-      vscode.window.showInformationMessage(
+      window.showInformationMessage(
         `Unable to run '${outdatedCommand(project.packageManager)}' due to authentication error. Check .npmrc`,
         'OK'
       );
@@ -211,49 +209,49 @@ export function reviewPluginsWithHooks(packages: object): Tip[] {
   return tips;
 }
 
-export function reviewPluginProperties(packages, project: Project) {
-  if (Object.keys(packages).length == 0) return;
+// export function reviewPluginProperties(packages, project: Project) {
+//   if (Object.keys(packages).length == 0) return;
 
-  // Process features and permissions
-  const features = {};
-  const permissions = {};
-  for (const library of Object.keys(packages)) {
-    if (packages[library].depType == 'Plugin') {
-      for (const permission of packages[library].plugin.androidPermissions) {
-        if (!permissions[permission]) {
-          permissions[permission] = [];
-        }
-        permissions[permission].push(library);
-      }
-      for (const feature of packages[library].plugin.androidFeatures) {
-        if (!features[feature]) {
-          features[feature] = [];
-        }
-        features[feature].push(library);
-      }
-    }
-  }
+//   // Process features and permissions
+//   const features = {};
+//   const permissions = {};
+//   for (const library of Object.keys(packages)) {
+//     if (packages[library].depType == 'Plugin') {
+//       for (const permission of packages[library].plugin.androidPermissions) {
+//         if (!permissions[permission]) {
+//           permissions[permission] = [];
+//         }
+//         permissions[permission].push(library);
+//       }
+//       for (const feature of packages[library].plugin.androidFeatures) {
+//         if (!features[feature]) {
+//           features[feature] = [];
+//         }
+//         features[feature].push(library);
+//       }
+//     }
+//   }
 
-  if (Object.keys(permissions).length > 0) {
-    project.setSubGroup(
-      `Android Permissions`,
-      TipType.Android,
-      'The following Android permissions are used by plugins.'
-    );
-    for (const permission of Object.keys(permissions)) {
-      project.add(new Tip(permission, permissions[permission].join(', ')));
-    }
-    project.clearSubgroup();
-  }
+//   if (Object.keys(permissions).length > 0) {
+//     project.setSubGroup(
+//       `Android Permissions`,
+//       TipType.Android,
+//       'The following Android permissions are used by plugins.'
+//     );
+//     for (const permission of Object.keys(permissions)) {
+//       project.add(new Tip(permission, permissions[permission].join(', ')));
+//     }
+//     project.clearSubgroup();
+//   }
 
-  if (Object.keys(features).length > 0) {
-    project.setSubGroup(`Android Features`, TipType.Android, 'The following Android features are used by plugins.');
-    for (const feature of Object.keys(features)) {
-      project.add(new Tip(feature, features[feature].join(', ')));
-    }
-    project.clearSubgroup();
-  }
-}
+//   if (Object.keys(features).length > 0) {
+//     project.setSubGroup(`Android Features`, TipType.Android, 'The following Android features are used by plugins.');
+//     for (const feature of Object.keys(features)) {
+//       project.add(new Tip(feature, features[feature].join(', ')));
+//     }
+//     project.clearSubgroup();
+//   }
+// }
 
 function dateDiff(d1: Date, d2: Date): string {
   let months;
@@ -277,10 +275,10 @@ function olderThan(d1: Date, d2: Date, days: number): boolean {
 }
 
 function markIfPlugin(folder: string): boolean {
-  const pkg = path.join(folder, 'package.json');
-  if (fs.existsSync(pkg)) {
+  const pkg = join(folder, 'package.json');
+  if (existsSync(pkg)) {
     try {
-      const packages = JSON.parse(fs.readFileSync(pkg, 'utf8'));
+      const packages = JSON.parse(readFileSync(pkg, 'utf8'));
       if (packages.capacitor?.ios || packages.capacitor?.android) {
         return true;
       }
@@ -293,7 +291,7 @@ function markIfPlugin(folder: string): boolean {
 }
 
 function markDeprecated(lockFile: string, packages) {
-  const txt = fs.readFileSync(lockFile, { encoding: 'utf8' });
+  const txt = readFileSync(lockFile, { encoding: 'utf8' });
   const data = JSON.parse(txt);
   if (!data.packages) {
     return;
@@ -311,17 +309,17 @@ function markDeprecated(lockFile: string, packages) {
 
 function inspectPackages(folder: string, packages) {
   // Use package-lock.json for deprecated packages
-  const lockFile = path.join(folder, 'package-lock.json');
-  if (fs.existsSync(lockFile)) {
+  const lockFile = join(folder, 'package-lock.json');
+  if (existsSync(lockFile)) {
     markDeprecated(lockFile, packages);
   }
 
   // plugins
   for (const library of Object.keys(packages)) {
     const plugin = join(folder, 'node_modules', library, 'plugin.xml');
-    if (fs.existsSync(plugin)) {
+    if (existsSync(plugin)) {
       // Cordova based
-      const content = fs.readFileSync(plugin, 'utf8');
+      const content = readFileSync(plugin, 'utf8');
       packages[library].depType = PackageType.CordovaPlugin;
       packages[library].plugin = processPlugin(content);
     }
@@ -330,13 +328,13 @@ function inspectPackages(folder: string, packages) {
 
     let isPlugin = false;
 
-    if (fs.existsSync(nmFolder)) {
+    if (existsSync(nmFolder)) {
       isPlugin = markIfPlugin(nmFolder);
 
-      fs.readdirSync(nmFolder, { withFileTypes: true })
+      readdirSync(nmFolder, { withFileTypes: true })
         .filter((dirent) => dirent.isDirectory())
         .map((dirent) => {
-          const hasPlugin = markIfPlugin(path.join(nmFolder, dirent.name));
+          const hasPlugin = markIfPlugin(join(nmFolder, dirent.name));
           if (hasPlugin) {
             isPlugin = true;
           }
@@ -365,7 +363,7 @@ function inspectPackages(folder: string, packages) {
         packages[library].isOld = true;
       } else {
         if (!quick) {
-          const json = child_process.execSync(`npm show ${library} --json`, { cwd: folder }).toString();
+          const json = execSync(`npm show ${library} --json`, { cwd: folder }).toString();
           const info = JSON.parse(json);
 
           const modified = new Date(info.time.modified);

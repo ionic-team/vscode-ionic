@@ -1,12 +1,12 @@
 import { Project } from './project';
 import { getRunOutput, openUri } from './utilities';
-import * as http from 'http';
 import { ionicState } from './ionic-tree-provider';
-import * as vscode from 'vscode';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { writeError, writeIonic } from './logging';
-import * as os from 'os';
 import { basename, extname, join } from 'path';
+import { window } from 'vscode';
+import { Server, createServer } from 'http';
+import { networkInterfaces } from 'os';
 
 export async function liveReloadSSL(project: Project): Promise<void> {
   try {
@@ -28,7 +28,7 @@ export async function liveReloadSSL(project: Project): Promise<void> {
 export async function setupServerCertificate(project: Project): Promise<void> {
   if (!hasRootCA()) {
     if (
-      (await vscode.window.showInformationMessage(
+      (await window.showInformationMessage(
         'A trusted root certificate is required to use HTTPS with Live Reload. Would you like to create one?',
         'Yes'
       )) == 'Yes'
@@ -224,7 +224,7 @@ async function createRootCAKey(): Promise<string> {
   return filename;
 }
 
-let certServer: http.Server;
+let certServer: Server;
 
 function servePage(certFilename: string): string {
   if (certServer) {
@@ -235,33 +235,31 @@ function servePage(certFilename: string): string {
   }
   const port = 8942;
   const basePath = join(ionicState.context.extensionPath, 'certificates');
-  certServer = http
-    .createServer((request, response) => {
-      response.setHeader('Access-Control-Allow-Origin', '*');
-      response.setHeader('Access-Control-Request-Method', '*');
-      response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
-      response.setHeader('Access-Control-Allow-Headers', '*');
+  certServer = createServer((request, response) => {
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader('Access-Control-Request-Method', '*');
+    response.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET');
+    response.setHeader('Access-Control-Allow-Headers', '*');
 
-      if (request.method == 'OPTIONS') {
-        response.writeHead(200);
-        response.end();
-        return;
-      }
+    if (request.method == 'OPTIONS') {
+      response.writeHead(200);
+      response.end();
+      return;
+    }
 
-      let name = request.url.includes('?') ? request.url.split('?')[0] : request.url;
-      name = name == '/' ? 'index.html' : name;
-      name = name == '/favicon.ico' ? '/favicon.png' : name;
-      let filePath = join(basePath, name);
-      if (name.endsWith('.crt')) {
-        filePath = certFilename;
-      }
-      const ext = extname(filePath);
-      const contentType = getMimeType(ext);
-      const content = readFileSync(filePath);
-      response.writeHead(200, { 'Content-Type': contentType });
-      response.end(content, 'utf-8');
-    })
-    .listen(port);
+    let name = request.url.includes('?') ? request.url.split('?')[0] : request.url;
+    name = name == '/' ? 'index.html' : name;
+    name = name == '/favicon.ico' ? '/favicon.png' : name;
+    let filePath = join(basePath, name);
+    if (name.endsWith('.crt')) {
+      filePath = certFilename;
+    }
+    const ext = extname(filePath);
+    const contentType = getMimeType(ext);
+    const content = readFileSync(filePath);
+    response.writeHead(200, { 'Content-Type': contentType });
+    response.end(content, 'utf-8');
+  }).listen(port);
 
   const address = getAddress();
   const url = `http://${address}:${port}`;
@@ -270,7 +268,7 @@ function servePage(certFilename: string): string {
 }
 
 function getAddress(): string {
-  const nets = os.networkInterfaces();
+  const nets = networkInterfaces();
   for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
       // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
@@ -283,7 +281,7 @@ function getAddress(): string {
 
 function getAddresses(): Array<string> {
   const result = [];
-  const nets = os.networkInterfaces();
+  const nets = networkInterfaces();
   for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
       // Skip over non-IPv4 addresses

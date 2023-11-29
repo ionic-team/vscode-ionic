@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.60.0",
+  "version": "1.61.0",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -18,7 +18,7 @@
     "install:all": "npm install && cd plugin-explorer && npm install",
     "build:pe": "cd plugin-explorer && npm run build --configuration=production",
     "build:is": "cd ionic-start && npm run build --configuration=production",
-    "clean": "find ./node_modules -name '*.md' -delete && find ./node_modules -name '*.ts' -delete && find ./node_modules -name 'LICENSE' -delete && find ./node_modules -name '*.map' -delete",
+    "clean": "find ./node_modules -name '*.md' -delete && find ./node_modules -name '*.ts' -delete && find ./node_modules -iname 'LICENSE' -delete && find ./node_modules -name '*.map' -delete && find ./node_modules -name '*.txt' -delete",
     "build": "npm run compile && npm run build:pe && npm run build:is && npm run clean && npm run esbuild && npm run vsix-package && npm run reset",
     "reset": "rm -rf node_modules && npm install",
     "vsix-package": "vsce package",
@@ -491,8 +491,9 @@
   "prettier": "@ionic/prettier-config",
   "devDependencies": {
     "@ionic/eslint-config": "^0.3.0",
-    "@ionic/prettier-config": "^2.0.0",
+    "@ionic/prettier-config": "4.0.0",
     "@types/glob": "7.2.0",
+    "@types/netmask": "^2.0.5",
     "@types/node": "^14.18.42",
     "@types/vscode": "1.65.0",
     "@typescript-eslint/eslint-plugin": "5.12.1",

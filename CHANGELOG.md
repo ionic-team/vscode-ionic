@@ -1,5 +1,14 @@
 ## Changelog
 
+### Version 1.61
+
+- Fix cocoapods version detection (if a project had previously detected an older version)
+- Recommendation to integrate prettier and ESLint using lint-staged and husky (`Project > ...`)
+- Update `@angular/pwa` and `@angular/cdk` when migrating Angular versions
+- Fix checking for minor updates in a yarn based project
+- Fix service worker configuration when switching to ES Build
+- Generate PWA assets when generating Splash screens and Icons
+
 ### Version 1.60
 
 - Update rule for onesignal-cordova-plugin conflicting with Auth Connect
@@ -8,7 +17,7 @@
 ### Version 1.59
 
 - Add control flow migration for Angular 17 projects
-- Add recommendation to switch to ESBuild for Angular 17 projects
+- Add recommendation to [switch to ESBuild](https://angular.io/guide/esbuild) for Angular 17 projects
 - Add recommendation for migrations between major Angular versions
 - Add rrecommendation to switch Angular CLI Package Manager if using pnpm or yarn
 - Ionic CLI updated from 7.1.1 to 7.1.5

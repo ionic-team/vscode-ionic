@@ -1,9 +1,3 @@
-import * as child_process from 'child_process';
-import * as path from 'path';
-import * as vscode from 'vscode';
-import * as os from 'os';
-import * as fs from 'fs';
-
 import {
   AdbOptions,
   Device,
@@ -18,6 +12,11 @@ import {
   WebViewType,
 } from './android-debug-models';
 import { ionicState } from './ionic-tree-provider';
+import { workspace } from 'vscode';
+import { existsSync } from 'fs';
+import { resolve } from 'path';
+import { homedir } from 'os';
+import { spawn } from 'child_process';
 
 const forwardedSockets: ForwardedSocket[] = [];
 
@@ -103,7 +102,7 @@ function adb(options: AdbOptions, ...args: string[]): Promise<string> {
     let outBuff = Buffer.alloc(0);
     let errBuff = Buffer.alloc(0);
 
-    const process = child_process.spawn(options.executable, [...options.arguments, ...args]);
+    const process = spawn(options.executable, [...options.arguments, ...args]);
 
     process.stdout.on('data', (data) => {
       outBuff = Buffer.concat([outBuff, Buffer.from(data)]);
@@ -231,7 +230,7 @@ async function unforward(options: UnforwardOptions): Promise<void> {
 }
 
 function getAdbArguments(): string[] {
-  const adbArgs = vscode.workspace.getConfiguration('ionic').get<string[]>('adbArgs');
+  const adbArgs = workspace.getConfiguration('ionic').get<string[]>('adbArgs');
 
   if (adbArgs) {
     return adbArgs;
@@ -241,14 +240,14 @@ function getAdbArguments(): string[] {
 }
 
 function getAdbExecutable(): string {
-  const adbPath = vscode.workspace.getConfiguration('ionic').get<string>('adbPath');
+  const adbPath = workspace.getConfiguration('ionic').get<string>('adbPath');
   if (adbPath) {
     return resolvePath(adbPath);
   } else {
     // Tries a default location for the default android debugger bridge
     if (process.platform !== 'win32') {
       const adbDefault = '~/Library/Android/sdk/platform-tools/adb';
-      if (fs.existsSync(resolvePath(adbDefault))) {
+      if (existsSync(resolvePath(adbDefault))) {
         return resolvePath(adbDefault);
       }
     }
@@ -263,9 +262,9 @@ function resolvePath(from: string): string {
     if (env) return process.env[env] ?? '';
 
     // ~/adb -> /Users/<user>/adb
-    if (tilde === '~') return os.homedir();
+    if (tilde === '~') return homedir();
 
-    const fsPath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+    const fsPath = workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!fsPath) return '';
 
     // ./adb -> <workspace>/adb
@@ -279,7 +278,7 @@ function resolvePath(from: string): string {
 
   if (substituted.includes('/')) {
     // Resolve path if it has a path seperator.
-    return path.resolve(substituted);
+    return resolve(substituted);
   } else {
     // Its a command that exists in PATH.
     return substituted;

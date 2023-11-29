@@ -1,9 +1,8 @@
-import * as vscode from 'vscode';
 import { fixIssue } from './extension';
 import { npmInstall } from './node-commands';
 import { Tip } from './tip';
 import { getRunOutput, showProgress } from './utilities';
-import { QuickPickItem } from 'vscode';
+import { QuickPickItem, window } from 'vscode';
 import { QuickPickItemKind } from 'vscode';
 
 interface PackageInfo {
@@ -39,7 +38,7 @@ export async function packageUpgrade(info: PackageInfo, folder: string): Promise
       picks.push({ label: version });
     }
   }
-  const selection: QuickPickItem = await vscode.window.showQuickPick(picks, {
+  const selection: QuickPickItem = await window.showQuickPick(picks, {
     placeHolder: `Update to version of ${info.name}`,
   });
   if (!selection) return;

@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import { debug, workspace } from 'vscode';
 import { startSourceMapServer } from './source-map-server';
 import { debugSkipFiles } from './utilities';
 
@@ -20,7 +20,7 @@ export function debugAndroid(packageName: string, wwwFolder: string) {
 
   // Note: options here include sourceMapPathOverrides and resolveSourceMapLocations both dont fix the
   // problem with source maps not being accessible to the debugger
-  vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], {
+  debug.startDebugging(workspace.workspaceFolders[0], {
     type: AndroidDebugType,
     name: 'Debug Android',
     request: 'attach',

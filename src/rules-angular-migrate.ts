@@ -1,7 +1,7 @@
-import { getPackageVersion } from './analyzer';
+import { exists, getPackageVersion } from './analyzer';
 import { Tip, TipType } from './tip';
 import { coerce } from 'semver';
-import { npx } from './node-commands';
+import { npmInstall, npx } from './node-commands';
 import { ionicState } from './ionic-tree-provider';
 import { runCommands } from './advanced-actions';
 import { Project } from './project';
@@ -45,29 +45,27 @@ async function migrate(project: Project, next: number, current: number, now: str
       openUri('https://angular.io/cli/update');
       break;
     case currentButton:
-      await runCommands(
-        [
-          `${npx(
-            ionicState.packageManager
-          )} ng update @angular/cli@${current} @angular/core@${current} --allow-dirty --force`,
-        ],
-        `Updating to latest Angular ${current}`,
-        project
-      );
-      postFixes(project, current);
+      await migrateTo(current, project);
       break;
     case nextButton:
-      await runCommands(
-        [
-          `${npx(
-            ionicState.packageManager
-          )} ng update @angular/cli@${next} @angular/core@${next} --allow-dirty --force`,
-        ],
-        `Migrating to Angular ${next}`,
-        project
-      );
-      postFixes(project, next);
+      await migrateTo(next, project);
       break;
+  }
+
+  async function migrateTo(version: number, project: Project) {
+    const commands = [
+      `${npx(
+        ionicState.packageManager
+      )} ng update @angular/cli@${version} @angular/core@${version} --allow-dirty --force`,
+    ];
+    if (exists('@angular/cdk')) {
+      commands.push(npmInstall(`@angular/cdk@${version}`, '--force'));
+    }
+    if (exists('@angular/pwa')) {
+      commands.push(npmInstall(`@angular/pwa@${version}`, '--force'));
+    }
+    await runCommands(commands, `Migrating to Angular ${version}`, project);
+    postFixes(project, next);
   }
 
   function postFixes(project: Project, version: number) {

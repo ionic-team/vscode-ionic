@@ -1,5 +1,4 @@
 import { existsSync } from 'fs';
-import * as vscode from 'vscode';
 
 import { exists, isLess } from './analyzer';
 import { getConfigurationArgs } from './build-configuration';
@@ -13,6 +12,7 @@ import { MonoRepoType } from './monorepo';
 import { npx, PackageManager, preflightNPMCheck } from './node-commands';
 import { Project } from './project';
 import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
+import { workspace } from 'vscode';
 
 /**
  * Creates the command line to run for Capacitor
@@ -76,7 +76,7 @@ function capRun(
   let liveReload = getSetting(WorkspaceSetting.liveReload);
   const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
   const httpsForWeb = getSetting(WorkspaceSetting.httpsForWeb);
-  const prod: boolean = vscode.workspace.getConfiguration('ionic').get('buildForProduction');
+  const prod: boolean = workspace.getConfiguration('ionic').get('buildForProduction');
 
   if (liveReload && project.repoType == MonoRepoType.npm) {
     writeError('Live Reload is not supported with npm workspaces. Ignoring the live reload option');

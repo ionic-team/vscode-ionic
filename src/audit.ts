@@ -1,7 +1,7 @@
+import { window } from 'vscode';
 import { clearOutput, write, writeError, writeIonic } from './logging';
 import { Project } from './project';
 import { getRunOutput, run, showProgress, stripJSON } from './utilities';
-import * as vscode from 'vscode';
 
 export async function audit(project: Project): Promise<void> {
   try {
@@ -57,7 +57,7 @@ async function completeAudit(project: Project, audit: Audit) {
   }
 
   if (audit.metadata.vulnerabilities.total > 0) {
-    const response = await vscode.window.showWarningMessage(
+    const response = await window.showWarningMessage(
       `${audit.metadata.vulnerabilities.total} security vulnerabilities were found in your project. Do you want to attempt to fix them?`,
       'Yes',
       'Cancel'

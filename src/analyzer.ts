@@ -1,9 +1,8 @@
 'use strict';
 
 import { coerce, compare, lt, gte, lte } from 'semver';
-import * as fs from 'fs';
+
 import { parse } from 'fast-xml-parser';
-import * as vscode from 'vscode';
 
 import {
   writeConsistentVersionError,
@@ -18,6 +17,8 @@ import { Project } from './project';
 import { setStringIn } from './utilities';
 import { npmInstall, npmUninstall } from './node-commands';
 import { ionicState } from './ionic-tree-provider';
+import { ExtensionContext, window } from 'vscode';
+import { existsSync, lstatSync, readFileSync, statSync, writeFileSync } from 'fs';
 
 let packageFile;
 let allDependencies = {};
@@ -27,8 +28,8 @@ let androidManifest;
 function processConfigXML(folder: string) {
   const configXMLFilename = `${folder}/config.xml`;
   const config = { preferences: {}, androidPreferences: {}, iosPreferences: {}, plugins: {} };
-  if (fs.existsSync(configXMLFilename)) {
-    const xml = fs.readFileSync(configXMLFilename, 'utf8');
+  if (existsSync(configXMLFilename)) {
+    const xml = readFileSync(configXMLFilename, 'utf8');
     const json = parse(xml, {
       ignoreNameSpace: true,
       arrayMode: true,
@@ -69,10 +70,10 @@ function processConfigXML(folder: string) {
 function processAndroidXML(folder: string) {
   const androidXMLFilename = `${folder}/android/app/src/main/AndroidManifest.xml`;
   const config = undefined;
-  if (!fs.existsSync(androidXMLFilename)) {
+  if (!existsSync(androidXMLFilename)) {
     return config;
   }
-  const xml = fs.readFileSync(androidXMLFilename, 'utf8');
+  const xml = readFileSync(androidXMLFilename, 'utf8');
   return parse(xml, {
     ignoreNameSpace: true,
     arrayMode: true,
@@ -96,23 +97,23 @@ function getAndroidManifestIntent(actionName) {
   return undefined;
 }
 
-export async function load(fn: string, project: Project, context: vscode.ExtensionContext): Promise<any> {
+export async function load(fn: string, project: Project, context: ExtensionContext): Promise<any> {
   let packageJsonFilename = fn;
-  if (fs.lstatSync(fn).isDirectory()) {
+  if (lstatSync(fn).isDirectory()) {
     packageJsonFilename = fn + '/package.json';
     cordovaConfig = processConfigXML(fn);
     androidManifest = processAndroidXML(fn);
   }
-  ionicState.hasPackageJson = fs.existsSync(packageJsonFilename);
+  ionicState.hasPackageJson = existsSync(packageJsonFilename);
   if (!ionicState.hasPackageJson) {
     error('package.json', 'This folder does not contain an Ionic application (its missing package.json)');
     allDependencies = [];
     packageFile = {};
     return undefined;
   }
-  project.modified = fs.statSync(packageJsonFilename).mtime;
+  project.modified = statSync(packageJsonFilename).mtime;
   try {
-    packageFile = JSON.parse(fs.readFileSync(packageJsonFilename, 'utf8'));
+    packageFile = JSON.parse(readFileSync(packageJsonFilename, 'utf8'));
   } catch (err) {
     throw new Error(`The package.json is malformed: ` + err);
   }
@@ -221,8 +222,8 @@ export function checkCordovaAndroidPreference(project: Project, preference: stri
 
 function AddCordovaAndroidPreference(folder: string, preference: string, value: string | boolean): Promise<void> {
   const configXMLFilename = `${folder}/config.xml`;
-  if (!fs.existsSync(configXMLFilename)) return;
-  const txt = fs.readFileSync(configXMLFilename, 'utf8');
+  if (!existsSync(configXMLFilename)) return;
+  const txt = readFileSync(configXMLFilename, 'utf8');
   let newtxt = txt;
   // Quick and dirty insertion of the preference or replace of value
   if (newtxt.includes(`<preference name="${preference}"`)) {
@@ -233,8 +234,8 @@ function AddCordovaAndroidPreference(folder: string, preference: string, value: 
       `<platform name="android">\n        <preference name="${preference}" value="${value}" />`
     );
   }
-  fs.writeFileSync(configXMLFilename, newtxt);
-  vscode.window.showInformationMessage(`config.xml has been updated to include the ${preference} preference`, 'OK');
+  writeFileSync(configXMLFilename, newtxt);
+  window.showInformationMessage(`config.xml has been updated to include the ${preference} preference`, 'OK');
 }
 
 function getYarnVersion(packageManager: string): string {

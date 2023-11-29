@@ -1,8 +1,8 @@
-import * as os from 'os';
 import * as dgram from 'dgram';
 import * as events from 'events';
 
 import { Netmask } from 'netmask';
+import { hostname, networkInterfaces } from 'os';
 
 const PREFIX = 'ION_DP';
 const PORT = 41234;
@@ -92,7 +92,7 @@ export class Publisher extends events.EventEmitter implements IPublisher {
       id: this.id,
       nspace: this.namespace,
       name: this.name,
-      host: os.hostname(),
+      host: hostname(),
       ip: ip,
       port: this.port,
       path: this.path,
@@ -102,7 +102,7 @@ export class Publisher extends events.EventEmitter implements IPublisher {
   }
 
   getInterfaces(): Interface[] {
-    return prepareInterfaces(os.networkInterfaces());
+    return prepareInterfaces(networkInterfaces());
   }
 
   private sayHello() {

@@ -1,16 +1,14 @@
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
-
 import { channelShow, run } from './utilities';
-import { writeIonic } from './logging';
+import { write, writeIonic } from './logging';
 import { Tip, TipType } from './tip';
 import { Project } from './project';
 import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall, npmUninstall, npx } from './node-commands';
 import { Context } from './context-variables';
-import { join } from 'path';
+import { extname, join } from 'path';
+import { ProgressLocation, window } from 'vscode';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 
 export enum AssetType {
   splash = 'splash.png',
@@ -38,8 +36,8 @@ export function addSplashAndIconFeatures(project: Project) {
 }
 
 function getAssetTipType(folder: string, filename: AssetType): TipType {
-  const assetfilename = path.join(getResourceFolder(folder, filename), filename);
-  if (fs.existsSync(assetfilename)) {
+  const assetfilename = join(getResourceFolder(folder, filename), filename);
+  if (existsSync(assetfilename)) {
     return TipType.CheckMark;
   } else {
     return TipType.Warning;
@@ -50,21 +48,21 @@ function createFeature(title: string, assetType: AssetType, project: Project): T
   const tip = new Tip(title, undefined, getAssetTipType(project.projectFolder(), assetType));
   tip.setAction(setAssetResource, project, assetType);
   tip.setContextValue(Context.asset);
-  const filename = path.join(getResourceFolder(project.projectFolder(), assetType), assetType);
+  const filename = join(getResourceFolder(project.projectFolder(), assetType), assetType);
   tip.setSecondCommand('Open Asset', filename);
   tip.tooltip = getAssetTooltip(project.projectFolder(), assetType);
   return tip;
 }
 
 function getResourceFolder(folder: string, filename: AssetType, createIfMissing?: boolean): string {
-  let resourceFolder = path.join(folder, 'resources');
-  if (createIfMissing && !fs.existsSync(resourceFolder)) {
-    fs.mkdirSync(resourceFolder);
+  let resourceFolder = join(folder, 'resources');
+  if (createIfMissing && !existsSync(resourceFolder)) {
+    mkdirSync(resourceFolder);
   }
   if (filename == AssetType.adaptiveBackground || filename == AssetType.adaptiveForeground) {
-    resourceFolder = path.join(resourceFolder, 'android');
-    if (createIfMissing && !fs.existsSync(resourceFolder)) {
-      fs.mkdirSync(resourceFolder);
+    resourceFolder = join(resourceFolder, 'android');
+    if (createIfMissing && !existsSync(resourceFolder)) {
+      mkdirSync(resourceFolder);
     }
   }
   return resourceFolder;
@@ -94,65 +92,65 @@ async function setAssetResource(project: Project, filename: AssetType) {
   const folder = project.projectFolder();
   const title = getAssetTooltip(folder, filename);
   const buttonTitle = getAssetTipType(folder, filename) == TipType.Warning ? `Select File` : `Update File`;
-  const selected = await vscode.window.showInformationMessage(title, buttonTitle);
+  const selected = await window.showInformationMessage(title, buttonTitle);
   if (!selected) return;
 
   try {
     // Copy newfilename to resources/splash.png
     const resourceFolder = getResourceFolder(folder, filename, true);
 
-    const files = await vscode.window.showOpenDialog({ canSelectFiles: true, canSelectMany: false });
+    const files = await window.showOpenDialog({ canSelectFiles: true, canSelectMany: false });
     if (!files || files.length !== 1) return;
     const copyfilename = files[0].fsPath;
 
-    if (path.extname(copyfilename) !== '.png') {
-      vscode.window.showErrorMessage('The file must be a png');
+    if (extname(copyfilename) !== '.png') {
+      window.showErrorMessage('The file must be a png');
       return;
     }
 
-    const newfilename = path.join(resourceFolder, filename);
-    fs.copyFileSync(copyfilename, newfilename);
-    if (!fs.existsSync(newfilename)) {
-      await vscode.window.showErrorMessage(`Unable to create ${newfilename}`);
+    const newfilename = join(resourceFolder, filename);
+    copyFileSync(copyfilename, newfilename);
+    if (!existsSync(newfilename)) {
+      await window.showErrorMessage(`Unable to create ${newfilename}`);
       return;
     }
 
     // If its an icon file and no adaptive icons then use the icon
     if (filename == AssetType.icon) {
-      const adaptiveBackground = path.join(
+      const adaptiveBackground = join(
         getResourceFolder(folder, AssetType.adaptiveBackground, true),
         AssetType.adaptiveBackground
       );
-      const adaptiveForeground = path.join(
+      const adaptiveForeground = join(
         getResourceFolder(folder, AssetType.adaptiveForeground, true),
         AssetType.adaptiveForeground
       );
-      if (!fs.existsSync(adaptiveBackground)) {
-        fs.copyFileSync(copyfilename, adaptiveBackground);
+      if (!existsSync(adaptiveBackground)) {
+        copyFileSync(copyfilename, adaptiveBackground);
       }
-      if (!fs.existsSync(adaptiveForeground)) {
-        fs.copyFileSync(copyfilename, adaptiveForeground);
+      if (!existsSync(adaptiveForeground)) {
+        copyFileSync(copyfilename, adaptiveForeground);
       }
     }
 
     await runCapacitorAssets(project);
   } catch (err) {
-    vscode.window.showErrorMessage(`Operation failed ${err}`);
+    window.showErrorMessage(`Operation failed ${err}`);
   }
 }
 
 function hasNeededAssets(folder: string): string {
-  const icon = path.join(getResourceFolder(folder, AssetType.icon), AssetType.icon);
-  const splash = path.join(getResourceFolder(folder, AssetType.splash), AssetType.splash);
-  const splashDark = path.join(getResourceFolder(folder, AssetType.splashDark), AssetType.splashDark);
+  const icon = join(getResourceFolder(folder, AssetType.icon), AssetType.icon);
+  const splash = join(getResourceFolder(folder, AssetType.splash), AssetType.splash);
+  const splashDark = join(getResourceFolder(folder, AssetType.splashDark), AssetType.splashDark);
 
-  if (!fs.existsSync(icon)) {
+  if (!existsSync(icon)) {
     return 'An icon needs to be specified next.';
   }
-  if (!fs.existsSync(splash)) {
+  if (!existsSync(splash)) {
     return 'A splash screen needs to be specified next.';
   }
-  if (!fs.existsSync(splashDark)) {
+  if (!existsSync(splashDark)) {
     return 'A dark mode splash screen needs to be specified next.';
   }
 }
@@ -161,10 +159,11 @@ async function runCapacitorAssets(project: Project) {
   const hasCordovaRes = exists('@capacitor/assets');
   const ios = project.hasCapacitorProject(CapacitorPlatform.ios);
   const android = project.hasCapacitorProject(CapacitorPlatform.android);
+  const pwa = exists('@angular/service-worker');
   const folder = project.projectFolder();
   const neededMessage = hasNeededAssets(folder);
   if (neededMessage) {
-    await vscode.window.showInformationMessage(neededMessage, 'OK');
+    await window.showInformationMessage(neededMessage, 'OK');
     return;
   }
 
@@ -178,27 +177,25 @@ async function runCapacitorAssets(project: Project) {
     if (exists('cordova-res')) {
       await run(folder, npmUninstall('cordova-res'), undefined, [], undefined, undefined);
     }
+    let cmd = '';
     if (ios) {
-      await run(
-        folder,
-        `${npx(project.packageManager)} @capacitor/assets generate --ios`,
-        undefined,
-        [],
-        undefined,
-        undefined
-      );
+      cmd = `${npx(project.packageManager)} @capacitor/assets generate --ios`;
+      write(`> ${cmd}`);
+      await run(folder, cmd, undefined, [], undefined, undefined);
       addToGitIgnore(folder, 'resources/ios/**/*');
     }
     if (android) {
-      await run(
-        folder,
-        `${npx(project.packageManager)} @capacitor/assets generate --android`,
-        undefined,
-        [],
-        undefined,
-        undefined
-      );
+      cmd = `${npx(project.packageManager)} @capacitor/assets generate --android`;
+      write(`> ${cmd}`);
+      await run(folder, cmd, undefined, [], undefined, undefined);
       addToGitIgnore(folder, 'resources/android/**/*');
+    }
+    if (pwa) {
+      cmd = `${npx(
+        project.packageManager
+      )} @capacitor/assets generate --pwa --pwaManifestPath './src/manifest.webmanifest'`;
+      write(`> ${cmd}`);
+      await run(folder, cmd, undefined, [], undefined, undefined);
     }
   });
 
@@ -211,20 +208,20 @@ async function runCapacitorAssets(project: Project) {
 
 function addToGitIgnore(folder: string, ignoreGlob: string) {
   const filename = join(folder, '.gitignore');
-  if (fs.existsSync(filename)) {
-    let txt = fs.readFileSync(filename, { encoding: 'utf-8' });
+  if (existsSync(filename)) {
+    let txt = readFileSync(filename, { encoding: 'utf-8' });
     const lines = txt.split('\n');
     if (!txt.includes(ignoreGlob)) {
       txt = txt + `\n${ignoreGlob}`;
-      fs.writeFileSync(filename, txt);
+      writeFileSync(filename, txt);
     }
   }
 }
 
 async function showProgress(message: string, func: () => Promise<any>) {
-  await vscode.window.withProgress(
+  await window.withProgress(
     {
-      location: vscode.ProgressLocation.Notification,
+      location: ProgressLocation.Notification,
       title: `${message}`,
       cancellable: false,
     },
