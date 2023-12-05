@@ -26,6 +26,14 @@ export interface CancelObject {
 const opTiming = {};
 let pub: Publisher;
 
+// Any logged lines that start with these are filtered out
+const filteredLines = [
+  '▲ [WARNING] The glob pattern import("./**/*.entry.js*") ',
+  '  :host-context([dir=rtl])',
+  '  .ion-float-start:dir(rtl)',
+  '▲ [WARNING] 20 rules skipped',
+];
+
 export function estimateRunTime(command: string) {
   const idx = command.replace(InternalCommand.cwd, '');
   if (opTiming[idx]) {
@@ -82,6 +90,12 @@ export function passesRemoteFilter(msg: string, logFilters: string[]): boolean {
 
 export function passesFilter(msg: string, logFilters: string[], isRemote: boolean): boolean {
   if (!logFilters) return true;
+  for (const filteredLine of filteredLines) {
+    if (msg.startsWith(filteredLine)) {
+      return false;
+    }
+  }
+
   for (const logFilter of logFilters) {
     if (logFilter == '' && !isRemote) {
       // If we're filtering out most logs then provide exception
@@ -116,7 +130,7 @@ export async function run(
   ionicProvider?: IonicTreeProvider,
   output?: RunResults,
   suppressInfo?: boolean,
-  auxData?: string
+  auxData?: string,
 ): Promise<boolean> {
   if (command == InternalCommand.removeCordova) {
     return await removeCordovaFromPackageJSON(folder);
@@ -245,7 +259,7 @@ export async function run(
             reject(`${command} Failed`);
           }
         }
-      }
+      },
     );
 
     proc.stdout.on('data', (data) => {
@@ -308,7 +322,7 @@ export async function run(
           } else if (logLine && !suppressInfo) {
             const uncolored = logLine.replace(
               /[\033\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
-              ''
+              '',
             );
             if (passesFilter(uncolored, logFilters, false)) {
               write(uncolored);
@@ -449,7 +463,7 @@ export async function getRunOutput(
   command: string,
   folder: string,
   shell?: string,
-  hideErrors?: boolean
+  hideErrors?: boolean,
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';
@@ -497,7 +511,7 @@ export async function runWithProgress(
   command: string,
   title: string,
   folder: string,
-  output?: RunResults
+  output?: RunResults,
 ): Promise<boolean> {
   let result = false;
   await window.withProgress(
@@ -509,7 +523,7 @@ export async function runWithProgress(
     async (progress, token: CancellationToken) => {
       const cancelObject: CancelObject = { proc: undefined, cancelled: false };
       result = await run(folder, command, cancelObject, [], [], progress, undefined, output, false);
-    }
+    },
   );
   return result;
 }
@@ -660,7 +674,7 @@ export async function showMessage(message: string, ms: number) {
     },
     async () => {
       await timeout(ms); // Show the message for 3 seconds
-    }
+    },
   );
 }
 
@@ -681,7 +695,7 @@ export async function showProgress(message: string, func: () => Promise<any>) {
     },
     async (progress, token) => {
       return await func();
-    }
+    },
   );
 }
 
