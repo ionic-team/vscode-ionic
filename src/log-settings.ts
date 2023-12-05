@@ -1,14 +1,16 @@
 import { QuickPickItem, QuickPickItemKind, window } from 'vscode';
 import { Project } from './project';
 import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
+import { QueueFunction } from './tip';
 
-export async function LoggingSettings(project: Project) {
+export async function LoggingSettings(queueFunction: QueueFunction, project: Project) {
   const items: QuickPickItem[] = selectedOptions();
   const result = await window.showQuickPick(items, {
     placeHolder: 'Select log types to report to the output window',
     canPickMany: true,
   });
   if (!result) return;
+  queueFunction();
   const list = result.map((item: any) => item.value);
   const selections = [];
   for (const option of getOptions()) {

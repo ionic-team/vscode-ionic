@@ -1,5 +1,5 @@
 import { Project } from './project';
-import { Tip, TipType } from './tip';
+import { QueueFunction, Tip, TipType } from './tip';
 import { window } from 'vscode';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
@@ -17,23 +17,24 @@ export function checkMigrationAngularToolkit(project: Project) {
     const txt = readFileSync(filename, 'utf8');
     if (txt && txt.includes('ionic-cordova-build')) {
       project.add(
-        new Tip('Migrate angular.json', 'Remove Cordova configurations', TipType.Error).setAction(
+        new Tip('Migrate angular.json', 'Remove Cordova configurations', TipType.Error).setQueuedAction(
           fixAngularJson,
-          filename
-        )
+          filename,
+        ),
       );
     }
   }
 }
 
-async function fixAngularJson(filename: string) {
+async function fixAngularJson(queueFunction: QueueFunction, filename: string) {
   if (
     !(await window.showErrorMessage(
       'When using @ionic/angular-toolkit v6+ the ionic-cordova-build and ionic-cordova-serve sections in angular.json can be removed.',
-      'Fix angular.json'
+      'Fix angular.json',
     ))
   )
     return;
+  queueFunction();
   const txt = readFileSync(filename, 'utf8');
   const angular = JSON.parse(txt);
   try {

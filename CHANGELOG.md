@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.62
+
+- Fix task queueing issue when a dialog is left to timeout
+
 ### Version 1.61
 
 - Fix cocoapods version detection (if a project had previously detected an older version)

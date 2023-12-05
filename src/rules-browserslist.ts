@@ -1,5 +1,5 @@
 import { Project } from './project';
-import { Tip, TipType } from './tip';
+import { QueueFunction, Tip, TipType } from './tip';
 import { writeError } from './logging';
 import { openUri } from './utilities';
 import { ionicState } from './ionic-tree-provider';
@@ -19,7 +19,9 @@ export function checkBrowsersList(project: Project) {
         const title = 'Fix browserslist';
         const message =
           'The browserslist in package.json may cause some older devices to show a white screen due to missing polyfills.';
-        project.add(new Tip(title, '', TipType.Idea).setAction(setBrowsersList, project, title, message).canIgnore());
+        project.add(
+          new Tip(title, '', TipType.Idea).setQueuedAction(setBrowsersList, project, title, message).canIgnore(),
+        );
         return;
       }
       return;
@@ -40,14 +42,16 @@ export function checkBrowsersList(project: Project) {
         const title = 'Reduce Config Files';
         const message = `${name} can be moved into your package.json`;
         project.add(
-          new Tip(title, message, TipType.Idea).setAction(moveFile, project, name, filename, title, message).canIgnore()
+          new Tip(title, message, TipType.Idea)
+            .setQueuedAction(moveFile, project, name, filename, title, message)
+            .canIgnore(),
         );
         return;
       } else {
         const title = 'Set Browser Support';
         const message = `Some older devices will not be supported. Updating your package.json to include browserslist will fix this.`;
         project.add(
-          new Tip(title, message, TipType.Idea).setAction(setBrowsersList, project, title, message).canIgnore()
+          new Tip(title, message, TipType.Idea).setQueuedAction(setBrowsersList, project, title, message).canIgnore(),
         );
       }
     }
@@ -68,12 +72,12 @@ function fixPackageJson(project: Project, browsersList: string[]): void {
   }
 }
 
-async function setBrowsersList(project: Project, title: string, message: string) {
+async function setBrowsersList(queueFunction: QueueFunction, project: Project, title: string, message: string) {
   const choice = await window.showWarningMessage(
     `${message} This is typically caused by missed steps during upgrade of an Ionic Project. Do you want to replace with a good set of defaults?`,
     'Yes, Apply Changes',
     'Info',
-    'Ignore'
+    'Ignore',
   );
   if (!choice) {
     return;
@@ -90,18 +94,25 @@ async function setBrowsersList(project: Project, title: string, message: string)
       openUri(`https://browsersl.ist/#q=${encodeURIComponent(list.join(','))}`);
       return;
     }
-
+    queueFunction();
     fixPackageJson(project, defaultValues());
   } catch (err) {
     window.showErrorMessage(`Failed to fix browserslist: ${err}`);
   }
 }
 
-async function moveFile(project: Project, name: string, filename: string, title: string, message) {
+async function moveFile(
+  queueFunction: QueueFunction,
+  project: Project,
+  name: string,
+  filename: string,
+  title: string,
+  message,
+) {
   const choice = await window.showInformationMessage(
     `The file ${name} can be moved into package.json to reduce the number of config files in your project. Would you like to do this?`,
     'Yes, Apply Changes',
-    'Ignore'
+    'Ignore',
   );
   if (!choice) {
     return;
@@ -112,6 +123,7 @@ async function moveFile(project: Project, name: string, filename: string, title:
       ignore(new Tip(title, message), ionicState.context);
       return;
     }
+    queueFunction();
     const txt = readFileSync(filename, 'utf8').split(/\r?\n/);
     const lines = txt.map((line) => line.trim());
     const list = [];

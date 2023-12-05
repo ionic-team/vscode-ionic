@@ -1,6 +1,6 @@
 import { channelShow, run } from './utilities';
 import { write, writeIonic } from './logging';
-import { Tip, TipType } from './tip';
+import { QueueFunction, Tip, TipType } from './tip';
 import { Project } from './project';
 import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
@@ -23,10 +23,8 @@ export function addSplashAndIconFeatures(project: Project) {
     `Splash Screen & Icon`,
     TipType.Media,
     'Allows setting of the Splash Screen and Icon. Clicking Rebuild will create assets for your iOS and Android native projects.',
-    Context.rebuild
-  ).tip = new Tip('Rebuild Assets', undefined).setAction(async () => {
-    await runCapacitorAssets(project);
-  });
+    Context.rebuild,
+  ).tip = new Tip('Rebuild Assets', undefined).setQueuedAction(runCapacitorAssets, project);
   project.add(createFeature('Splash Screen', AssetType.splash, project));
   project.add(createFeature('Splash Screen Dark', AssetType.splashDark, project));
   project.add(createFeature('Icon', AssetType.icon, project));
@@ -46,7 +44,7 @@ function getAssetTipType(folder: string, filename: AssetType): TipType {
 
 function createFeature(title: string, assetType: AssetType, project: Project): Tip {
   const tip = new Tip(title, undefined, getAssetTipType(project.projectFolder(), assetType));
-  tip.setAction(setAssetResource, project, assetType);
+  tip.setQueuedAction(setAssetResource, project, assetType);
   tip.setContextValue(Context.asset);
   const filename = join(getResourceFolder(project.projectFolder(), assetType), assetType);
   tip.setSecondCommand('Open Asset', filename);
@@ -88,7 +86,7 @@ function getAssetTooltip(folder: string, filename: AssetType): string {
   }
 }
 
-async function setAssetResource(project: Project, filename: AssetType) {
+async function setAssetResource(queueFunction: QueueFunction, project: Project, filename: AssetType) {
   const folder = project.projectFolder();
   const title = getAssetTooltip(folder, filename);
   const buttonTitle = getAssetTipType(folder, filename) == TipType.Warning ? `Select File` : `Update File`;
@@ -96,6 +94,7 @@ async function setAssetResource(project: Project, filename: AssetType) {
   if (!selected) return;
 
   try {
+    queueFunction();
     // Copy newfilename to resources/splash.png
     const resourceFolder = getResourceFolder(folder, filename, true);
 
@@ -119,11 +118,11 @@ async function setAssetResource(project: Project, filename: AssetType) {
     if (filename == AssetType.icon) {
       const adaptiveBackground = join(
         getResourceFolder(folder, AssetType.adaptiveBackground, true),
-        AssetType.adaptiveBackground
+        AssetType.adaptiveBackground,
       );
       const adaptiveForeground = join(
         getResourceFolder(folder, AssetType.adaptiveForeground, true),
-        AssetType.adaptiveForeground
+        AssetType.adaptiveForeground,
       );
       if (!existsSync(adaptiveBackground)) {
         copyFileSync(copyfilename, adaptiveBackground);
@@ -133,7 +132,7 @@ async function setAssetResource(project: Project, filename: AssetType) {
       }
     }
 
-    await runCapacitorAssets(project);
+    await runCapacitorAssets(undefined, project);
   } catch (err) {
     window.showErrorMessage(`Operation failed ${err}`);
   }
@@ -155,7 +154,7 @@ function hasNeededAssets(folder: string): string {
   }
 }
 
-async function runCapacitorAssets(project: Project) {
+async function runCapacitorAssets(queueFunction: QueueFunction | undefined, project: Project) {
   const hasCordovaRes = exists('@capacitor/assets');
   const ios = project.hasCapacitorProject(CapacitorPlatform.ios);
   const android = project.hasCapacitorProject(CapacitorPlatform.android);
@@ -167,6 +166,9 @@ async function runCapacitorAssets(project: Project) {
     return;
   }
 
+  if (queueFunction) {
+    queueFunction();
+  }
   writeIonic('Generating Splash Screen and Icon Assets...');
   channelShow();
   await showProgress('Generating Splash Screen and Icon Assets', async () => {
@@ -192,7 +194,7 @@ async function runCapacitorAssets(project: Project) {
     }
     if (pwa) {
       cmd = `${npx(
-        project.packageManager
+        project.packageManager,
       )} @capacitor/assets generate --pwa --pwaManifestPath './src/manifest.webmanifest'`;
       write(`> ${cmd}`);
       await run(folder, cmd, undefined, [], undefined, undefined);
@@ -227,6 +229,6 @@ async function showProgress(message: string, func: () => Promise<any>) {
     },
     async (progress, token) => {
       await func();
-    }
+    },
   );
 }

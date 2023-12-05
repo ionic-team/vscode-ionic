@@ -7,14 +7,16 @@ import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from '
 import { ionicBuild } from './ionic-build';
 import { MonoRepoType } from './monorepo';
 import { ViewColumn, window } from 'vscode';
+import { QueueFunction } from './tip';
 
 /**
  * Generates a readable analysis of Javascript bundle sizes
  * Uses source-map-explorer on a production build of the app with source maps turned on
  * @param  {Project} project
  */
-export async function analyzeSize(project: Project) {
+export async function analyzeSize(queueFunction: QueueFunction, project: Project) {
   const dist = project.getDistFolder();
+  queueFunction();
   await showProgress('Generating Project Statistics', async () => {
     let previousValue;
     try {
@@ -44,12 +46,12 @@ export async function analyzeSize(project: Project) {
         analyzeResults(
           analyzeBundles(stripJSON(result.output, '{')),
           'Bundle Analysis',
-          'Size of Javascript bundles for your code and 3rd party packages.'
+          'Size of Javascript bundles for your code and 3rd party packages.',
         ) +
         analyzeResults(
           analyzeAssets(dist, project.projectFolder()),
           'Asset Analysis',
-          'Size of assets in your distribution folder.'
+          'Size of assets in your distribution folder.',
         );
       showWindow(project.projectFolder(), html);
       writeIonic('Launched project statistics window.');

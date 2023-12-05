@@ -1,7 +1,7 @@
 import { isGreaterOrEqual, isLess } from './analyzer';
 import { showOutput, writeIonic } from './logging';
 import { Project } from './project';
-import { Tip, TipType } from './tip';
+import { QueueFunction, Tip, TipType } from './tip';
 import { window } from 'vscode';
 import { PackageFile, getPackageJSON, replaceStringIn, showProgress } from './utilities';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
@@ -13,20 +13,24 @@ export function checkCapacitorPluginMigration(project: Project) {
   if (isGreaterOrEqual('@capacitor/core', '4.0.0') && isLess('@capacitor/core', '5.0.0')) {
     // Capacitor 4 to 5 plugin migration
     project.add(
-      new Tip('Migrate Plugin to Capacitor 5', undefined, TipType.Error).setAction(migratePluginToCapacitor5, project)
+      new Tip('Migrate Plugin to Capacitor 5', undefined, TipType.Error).setQueuedAction(
+        migratePluginToCapacitor5,
+        project,
+      ),
     );
   }
 }
 
-async function migratePluginToCapacitor5(project: Project) {
+async function migratePluginToCapacitor5(queueFunction: QueueFunction, project: Project) {
   const txt = 'Migrate Plugin';
   const res = await window.showInformationMessage(
     `Your Capacitor 4 plugin can be migrated to Capacitor 5.`,
     txt,
-    'Exit'
+    'Exit',
   );
   if (!res || res != txt) return;
 
+  queueFunction();
   showOutput();
 
   await showProgress('Migrating Plugin...', async () => {

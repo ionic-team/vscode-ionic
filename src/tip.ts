@@ -8,6 +8,8 @@ export enum TipFeature {
   welcome,
 }
 
+export type QueueFunction = () => void;
+
 export class Tip {
   public progressDialog: boolean;
   public doRun: boolean;
@@ -32,6 +34,7 @@ export class Tip {
   public relatedDependency: string;
 
   private onAction: (...args) => Promise<ActionResult> | Promise<void>;
+  private onQueuedAction: (...args) => Promise<ActionResult> | Promise<void>;
   private onCommand: (...args) => string;
   private onTitle: (...args) => string;
   private actionArgs: any[];
@@ -46,7 +49,7 @@ export class Tip {
     public commandTitle?: string,
     public readonly commandSuccess?: string,
     public url?: string,
-    public commandProgress?: string
+    public commandProgress?: string,
   ) {}
 
   showProgressDialog() {
@@ -155,6 +158,13 @@ export class Tip {
     return this;
   }
 
+  // The action is executed when the user clicks the item in the treeview
+  setQueuedAction(func: (queueFunction: () => void, ...argsIn) => Promise<ActionResult> | Promise<void>, ...args) {
+    this.onQueuedAction = func;
+    this.actionArgs = args;
+    return this;
+  }
+
   // The action is executed when the user clicks the button called title
   setAfterClickAction(title: string, func: (...argsIn) => Promise<ActionResult> | Promise<void>, ...args) {
     this.commandTitle = title;
@@ -226,6 +236,21 @@ export class Tip {
       try {
         markActionAsRunning(this);
         return await this.onAction(...this.actionArgs);
+      } finally {
+        finishCommand(this);
+      }
+      return;
+    }
+
+    // This only marks an action as queued when it starts
+    if (this.onQueuedAction) {
+      if (await waitForOtherActions(this)) {
+        return;
+      }
+      try {
+        return await this.onQueuedAction(() => {
+          markActionAsRunning(this);
+        }, ...this.actionArgs);
       } finally {
         finishCommand(this);
       }

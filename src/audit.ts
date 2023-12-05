@@ -2,9 +2,11 @@ import { window } from 'vscode';
 import { clearOutput, write, writeError, writeIonic } from './logging';
 import { Project } from './project';
 import { getRunOutput, run, showProgress, stripJSON } from './utilities';
+import { QueueFunction } from './tip';
 
-export async function audit(project: Project): Promise<void> {
+export async function audit(queueFunction: QueueFunction, project: Project): Promise<void> {
   try {
+    queueFunction();
     clearOutput();
     await showProgress('Auditing project dependencies...', async () => {
       let folder = project.projectFolder();
@@ -30,7 +32,7 @@ async function completeAudit(project: Project, audit: Audit) {
   const severities = ['critical', 'high', 'moderate', 'low'];
   const types = ['direct', 'indirect'];
   writeIonic(
-    `There are ${audit.metadata.vulnerabilities.total} security vulnerabilities in your projects ${audit.metadata.dependencies.total} dependencies`
+    `There are ${audit.metadata.vulnerabilities.total} security vulnerabilities in your projects ${audit.metadata.dependencies.total} dependencies`,
   );
   for (const type of types) {
     if (type == 'indirect' && audit.metadata.vulnerabilities.total > 0) {
@@ -60,7 +62,7 @@ async function completeAudit(project: Project, audit: Audit) {
     const response = await window.showWarningMessage(
       `${audit.metadata.vulnerabilities.total} security vulnerabilities were found in your project. Do you want to attempt to fix them?`,
       'Yes',
-      'Cancel'
+      'Cancel',
     );
     if (response === 'Yes') {
       clearOutput();

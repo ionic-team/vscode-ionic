@@ -6,8 +6,14 @@ import { PackageInfo } from './package-info';
 import { getStringFrom, plural } from './utilities';
 import { Recommendation } from './recommendation';
 import { ExtensionContext, window } from 'vscode';
+import { QueueFunction } from './tip';
 
-export async function ionicExport(project: Project, context: ExtensionContext): Promise<void> {
+export async function ionicExport(
+  queueFunction: QueueFunction,
+  project: Project,
+  context: ExtensionContext,
+): Promise<void> {
+  queueFunction();
   let folder = project.projectFolder();
   if (project.monoRepo?.nodeModulesAtRoot) {
     folder = project.folder;

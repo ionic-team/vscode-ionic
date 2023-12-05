@@ -4,7 +4,7 @@ import { ionicBuild } from './ionic-build';
 import { ionicServe } from './ionic-serve';
 import { Project } from './project';
 import { addSplashAndIconFeatures } from './splash-icon';
-import { RunPoint, Tip, TipFeature, TipType } from './tip';
+import { QueueFunction, RunPoint, Tip, TipFeature, TipType } from './tip';
 import { capacitorMigrationChecks as checkCapacitorMigrationRules } from './rules-capacitor-migration';
 import { reviewPackages } from './process-packages';
 import { capacitorDevicesCommand, capacitorRun } from './capacitor-run';
@@ -83,7 +83,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
         'Run',
         undefined,
         'Running',
-        'Project is running'
+        'Project is running',
       )
         .requestDeviceSelection()
         .requestIPSelection()
@@ -109,7 +109,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
         'Run',
         undefined,
         'Running',
-        'Project is running'
+        'Project is running',
       )
         .requestDeviceSelection()
         .requestIPSelection()
@@ -132,7 +132,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
       `Running Ionic applications you can debug (${alt('D')})`,
       TipType.Ionic,
       ionicState.refreshDebugDevices,
-      Context.refreshDebug
+      Context.refreshDebug,
     );
 
     r.whenExpanded = async () => {
@@ -153,9 +153,9 @@ export async function getRecommendations(project: Project, context: ExtensionCon
         ['Page', 'Component', 'Service', 'Module', 'Class', 'Directive'].forEach((item) => {
           project.add(
             new Tip(item, '', TipType.Angular)
-              .setAction(angularGenerate, project, item.toLowerCase())
+              .setQueuedAction(angularGenerate, project, item.toLowerCase())
               .setTooltip(`Create a new Angular ${item.toLowerCase()}`)
-              .canRefreshAfter()
+              .canRefreshAfter(),
           );
         });
         project.clearSubgroup();
@@ -171,8 +171,8 @@ export async function getRecommendations(project: Project, context: ExtensionCon
           .canStop()
           .canAnimate()
           .setTooltip(
-            'Capacitor Sync copies the web app build assets to the native projects and updates native plugins and dependencies.'
-          )
+            'Capacitor Sync copies the web app build assets to the native projects and updates native plugins and dependencies.',
+          ),
       );
     }
     if (hasCapIos) {
@@ -180,7 +180,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
         new Tip('Open in Xcode', '', TipType.Edit, 'Opening Project in Xcode', undefined, 'Open Project in Xcode')
           .showProgressDialog()
           .setDynamicCommand(capacitorOpen, project, CapacitorPlatform.ios)
-          .setTooltip('Opens the native iOS project in XCode')
+          .setTooltip('Opens the native iOS project in XCode'),
       );
     }
     if (hasCapAndroid) {
@@ -191,11 +191,11 @@ export async function getRecommendations(project: Project, context: ExtensionCon
           TipType.Edit,
           'Opening Project in Android Studio',
           undefined,
-          'Open Android Studio'
+          'Open Android Studio',
         )
           .showProgressDialog()
           .setDynamicCommand(capacitorOpen, project, CapacitorPlatform.android)
-          .setTooltip('Opens the native Android project in Android Studio')
+          .setTooltip('Opens the native Android project in Android Studio'),
       );
     }
     if (hasCapAndroid || hasCapIos) {
@@ -209,11 +209,11 @@ export async function getRecommendations(project: Project, context: ExtensionCon
             'Capacitor Build',
             undefined,
             'Preparing Release Build',
-            undefined
+            undefined,
           )
-            .setAction(capacitorBuild, project)
+            .setQueuedAction(capacitorBuild, project)
             .canAnimate()
-            .setTooltip('Prepares native binaries suitable for uploading to the App Store or Play Store.')
+            .setTooltip('Prepares native binaries suitable for uploading to the App Store or Play Store.'),
         );
       }
     }
@@ -228,7 +228,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
       `Configuration`,
       'Configurations for native project. Changes made apply to both the iOS and Android projects',
       TipType.Capacitor,
-      false
+      false,
     );
 
     await reviewCapacitorConfig(project, context);
@@ -241,25 +241,25 @@ export async function getRecommendations(project: Project, context: ExtensionCon
 
     project.add(
       new Tip('Check for Minor Updates', '', TipType.Dependency)
-        .setAction(updateMinorDependencies, project, packages)
-        .setTooltip('Find minor updates for project dependencies')
+        .setQueuedAction(updateMinorDependencies, project, packages)
+        .setTooltip('Find minor updates for project dependencies'),
     );
     if (project.packageManager == PackageManager.npm) {
       project.add(
         new Tip('Security Audit', '', TipType.Files)
-          .setAction(audit, project)
-          .setTooltip('Analyze dependencies using npm audit for security vulnerabilities')
+          .setQueuedAction(audit, project)
+          .setTooltip('Analyze dependencies using npm audit for security vulnerabilities'),
       );
     }
     project.add(
       new Tip('Statistics', '', TipType.Files)
-        .setAction(analyzeSize, project)
-        .setTooltip('Analyze the built project assets and Javascript bundles')
+        .setQueuedAction(analyzeSize, project)
+        .setTooltip('Analyze the built project assets and Javascript bundles'),
     );
     project.add(
       new Tip('Export', '', TipType.Media)
-        .setAction(ionicExport, project, ionicState.context)
-        .setTooltip('Export a markdown file with all project dependencies and plugins')
+        .setQueuedAction(ionicExport, project, ionicState.context)
+        .setTooltip('Export a markdown file with all project dependencies and plugins'),
     );
   }
 
@@ -267,7 +267,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
     `Recommendations`,
     `The following recommendations were made by analyzing the package.json file of your ${project.type} app.`,
     TipType.Idea,
-    true
+    true,
   );
 
   // General Rules around node modules (eg Jquery)
@@ -278,7 +278,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
     project.recommendRemove(
       deprecated.name,
       deprecated.name,
-      `${deprecated.name} is deprecated: ${deprecated.message}`
+      `${deprecated.name} is deprecated: ${deprecated.message}`,
     );
   }
 
@@ -318,11 +318,11 @@ export async function getRecommendations(project: Project, context: ExtensionCon
     project.add(
       new Tip('Logging', undefined, TipType.Settings, undefined)
         .setTooltip('Settings for logging displayed in the output window')
-        .setAction(LoggingSettings, project)
+        .setQueuedAction(LoggingSettings, project),
     );
   }
 
-  project.add(new Tip('Advanced', '', TipType.Settings).setAction(settings));
+  project.add(new Tip('Advanced', '', TipType.Settings).setQueuedAction(settings));
 
   // Support and Feedback
   project.setGroup(`Support`, 'Feature requests and bug fixes', TipType.Ionic, false);
@@ -335,8 +335,8 @@ export async function getRecommendations(project: Project, context: ExtensionCon
       undefined,
       undefined,
       undefined,
-      `https://github.com/ionic-team/vscode-extension/issues`
-    )
+      `https://github.com/ionic-team/vscode-extension/issues`,
+    ),
   );
 
   project.add(
@@ -348,21 +348,13 @@ export async function getRecommendations(project: Project, context: ExtensionCon
       undefined,
       undefined,
       undefined,
-      `https://ionicframework.com`
-    )
+      `https://ionicframework.com`,
+    ),
   );
-
-  // Support tickets require Zendesk integration
-  //project.add(new Tip('Ionic Support', '', TipType.Ionic).setAction(supportTicket, project));
 }
 
-async function supportTicket(project: Project): Promise<void> {
-  const url =
-    'https://ionic.zendesk.com/hc/en-us/requests/new?tf_subject=blar&tf_description=desc&tf_anonymous_requester_email=blar@blar.com';
-  await env.openExternal(Uri.parse(url));
-}
-
-async function settings() {
+async function settings(queueFunction: QueueFunction) {
+  queueFunction();
   await commands.executeCommand('workbench.action.openSettings', "Ionic'");
 }
 
@@ -392,17 +384,11 @@ export function build(project: Project) {
     .setTooltip('Builds the web project (and copies to native platforms)');
 }
 
-function remoteLogging(project: Project): Tip {
-  return new Tip('Remote Logging', undefined, ionicState.remoteLogging ? TipType.Check : TipType.Box, undefined)
-    .setTooltip('Captures console logs from the device and displays in the output window')
-    .setAction(toggleRemoteLogging, project, ionicState.remoteLogging);
-}
-
 function liveReload(): Tip {
   const liveReload = getSetting(WorkspaceSetting.liveReload);
   return new Tip('Live Reload', undefined, liveReload ? TipType.Check : TipType.Box, undefined)
     .setTooltip('Live reload will refresh the app whenever source code is changed.')
-    .setAction(toggleLiveReload, liveReload)
+    .setQueuedAction(toggleLiveReload, liveReload)
     .canRefreshAfter();
 }
 
@@ -411,7 +397,7 @@ function useHttps(project: Project): Tip {
   const useHttps = getSetting(WorkspaceSetting.httpsForWeb);
   return new Tip('Use HTTPS', undefined, useHttps ? TipType.Check : TipType.Box, undefined)
     .setTooltip('Use HTTPS when running with web or Live Reload.')
-    .setAction(toggleHttps, useHttps, project)
+    .setQueuedAction(toggleHttps, useHttps, project)
     .canRefreshAfter();
 }
 
@@ -423,11 +409,13 @@ async function toggleRemoteLogging(project: Project, current: boolean): Promise<
   return Promise.resolve();
 }
 
-async function toggleLiveReload(current: boolean) {
+async function toggleLiveReload(queueFunction: QueueFunction, current: boolean) {
+  queueFunction();
   await setSetting(WorkspaceSetting.liveReload, !current);
 }
 
-async function toggleHttps(current: boolean, project: Project) {
+async function toggleHttps(queueFunction: QueueFunction, current: boolean, project: Project) {
+  queueFunction();
   await setSetting(WorkspaceSetting.httpsForWeb, !current);
   if (!current) {
     await showProgress('Enabling HTTPS', async () => {
