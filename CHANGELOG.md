@@ -3,6 +3,7 @@
 ### Version 1.62
 
 - Fix task queueing issue when a dialog is left to timeout
+- Improve output of a security audit
 
 ### Version 1.61
 
