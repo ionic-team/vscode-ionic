@@ -1,7 +1,6 @@
 # Roadmap
 
 - TODO: add pwa integration
-- Fix "undefined" tooltip on Android
 - Fix: The bundledWebRuntime configuration option has been deprecated. Can be safely deleted.
 - Improve security audit to show which direct dependencies are affected by indirect vunerabilities
 - Generate twitter and og metatags

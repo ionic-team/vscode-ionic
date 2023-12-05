@@ -78,7 +78,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
     if (hasCapAndroid) {
       const runAndroid = new Tip(
         'Android',
-        ionicState.selectedAndroidDeviceName,
+        ionicState.selectedAndroidDeviceName ?? '',
         TipType.Run,
         'Run',
         undefined,
@@ -104,7 +104,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
     if (hasCapIos) {
       const runIos = new Tip(
         'iOS',
-        ionicState.selectedIOSDeviceName,
+        ionicState.selectedIOSDeviceName ?? '',
         TipType.Run,
         'Run',
         undefined,
