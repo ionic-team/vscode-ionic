@@ -96,7 +96,6 @@ Check `main.ts` for `provideIonicAngular` and apply this if missing
 - Show git remote url somewhere (`git config --get remote.origin.url`)
 - (feat) Debugger for iOS (add breakpoints, inspection etc)
 - (feat) info.plist editing
-- (feat) Twitter to RSS feed - pull news into plugin ??
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
 - (2) If you sync but the build didn't work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand
