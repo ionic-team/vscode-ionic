@@ -6,6 +6,8 @@
 - Generate twitter and og metatags
 - Generate social and favicon
 - Avoid sharp and @capacitor/assets
+- Show the root package for projects - ie scripts etc
+- Strip extraneous angular warnings on a build
 - Angular projects that use IonicModule (eg `import { IonicModule } from '@ionic/angular';`) and `@ionic/angular/standalone` or `import { send } from 'ionicons/icons';` will break. Check code for it?
 - Customers dont really understand the upgrade process in packages/plugins - looking in the "plugins" windows:
 - Need to recommend upgrading minor versions of Capacitor on a regular basis (eg monthly)
