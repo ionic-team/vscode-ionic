@@ -128,7 +128,7 @@ export async function checkForMonoRepo(project: Project, selectedProject: string
 
       // Is the node_modules folder kept only at the root of the mono repo
       project.monoRepo.nodeModulesAtRoot = [MonoRepoType.npm, MonoRepoType.nx, MonoRepoType.yarn].includes(
-        project.repoType
+        project.repoType,
       );
 
       commands.executeCommand(CommandName.ProjectsRefresh, project.monoRepo.name);
@@ -214,14 +214,18 @@ function getFolderBasedProjects(prj: Project): Array<MonoRepoProject> {
   if (!likelyFolderBasedMonoRepo) {
     return [];
   }
-  if (checkFolder(join(prj.folder, 'package.json')) == FolderType.hasIonic) {
+  const rootFolderType = checkFolder(join(prj.folder, 'package.json'));
+  if (rootFolderType == FolderType.hasIonic) {
     // Its definitely an Ionic or Capacitor project in the root but we have sub folders that look like Ionic projects so throw error
     writeError(
-      `This folder has Capacitor/Ionic dependencies but there are subfolders that do too which will be ignored (eg ${exampleFolder})`
+      `This folder has Capacitor/Ionic dependencies but there are subfolders that do too which will be ignored (eg ${exampleFolder})`,
     );
     return [];
   }
   result = result.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
+  if (rootFolderType == FolderType.hasDependencies) {
+    result.unshift({ name: 'root', folder: prj.folder, isIonic: false });
+  }
   return result;
 }
 

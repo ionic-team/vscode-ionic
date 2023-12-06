@@ -5,6 +5,7 @@
 - Fix task queueing issue when a dialog is left to timeout
 - Improve output of a security audit
 - Strip extraneous angular warnings on a build
+- Root folder is also listed as a project for folder based mono-repos
 
 ### Version 1.61
 
