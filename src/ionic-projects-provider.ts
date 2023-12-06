@@ -34,7 +34,7 @@ export class IonicProjectsreeProvider implements TreeDataProvider<Recommendation
         title: 'Open',
         arguments: [project.name],
       };
-      const r = new Recommendation(undefined, undefined, project.name, TreeItemCollapsibleState.None, cmd);
+      const r = new Recommendation(project.folder, undefined, project.name, TreeItemCollapsibleState.None, cmd);
       const icon = project.name == this.selectedProject ? 'circle-filled' : 'none';
       r.setIcon(icon);
       list.push(r);

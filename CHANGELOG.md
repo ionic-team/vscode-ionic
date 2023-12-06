@@ -6,6 +6,7 @@
 - Improve output of a security audit
 - Strip extraneous angular warnings on a build
 - Root folder is also listed as a project for folder based mono-repos
+- Tooltips for mono-repo projects are now the path for the project
 
 ### Version 1.61
 
