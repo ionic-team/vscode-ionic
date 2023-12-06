@@ -1,4 +1,4 @@
-import { exists, getPackageVersion } from './analyzer';
+import { exists, getAllPackageNames, getPackageVersion } from './analyzer';
 import { QueueFunction, Tip, TipType } from './tip';
 import { coerce } from 'semver';
 import { npmInstall, npx } from './node-commands';
@@ -64,6 +64,12 @@ async function migrate(queueFunction: QueueFunction, project: Project, next: num
     }
     if (exists('@angular/pwa')) {
       commands.push(npmInstall(`@angular/pwa@${version}`, '--force'));
+    }
+    const dependencies = getAllPackageNames();
+    for (const dependency of dependencies) {
+      if (dependency.startsWith('@angular-eslint/')) {
+        commands.push(npmInstall(`${dependency}@${version}`, '--force'));
+      }
     }
     await runCommands(commands, `Migrating to Angular ${version}`, project);
     postFixes(project, next);

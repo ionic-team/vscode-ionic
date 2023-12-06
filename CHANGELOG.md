@@ -3,10 +3,11 @@
 ### Version 1.62
 
 - Fix task queueing issue when a dialog is left to timeout
-- Improve output of a security audit
+- Improved output of a security audit (`Configuration` > `Security Audit`)
 - Strip extraneous angular warnings on a build
 - Root folder is also listed as a project for folder based mono-repos
 - Tooltips for mono-repo projects are now the path for the project
+- Update `@angular-eslint/*` packages when an Angular migration is done
 
 ### Version 1.61
 
@@ -19,7 +20,7 @@
 
 ### Version 1.60
 
-- Update rule for onesignal-cordova-plugin conflicting with Auth Connect
+- Update rule for `onesignal-cordova-plugin` conflicting with Auth Connect
 - Recommendation to move browserslist file into package.json to reduce config files in a project
 
 ### Version 1.59
