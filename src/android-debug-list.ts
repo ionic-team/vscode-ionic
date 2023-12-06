@@ -5,11 +5,11 @@ import { Device, WebView } from './android-debug-models';
 import { CommandName } from './command-name';
 import { ionicState } from './ionic-tree-provider';
 import { Recommendation } from './recommendation';
-import { Tip, TipType } from './tip';
+import { QueueFunction, Tip, TipType } from './tip';
 
 export async function getAndroidWebViewList(
   hasCapacitorAndroid: boolean,
-  wwwFolder: string
+  wwwFolder: string,
 ): Promise<Recommendation[]> {
   if (ionicState.refreshDebugDevices) {
     ionicState.refreshDebugDevices = false;
@@ -29,10 +29,10 @@ export async function getAndroidWebViewList(
         `${webview.packageName}`,
         TreeItemCollapsibleState.None,
         getCommand(),
-        undefined
+        undefined,
       );
       r.setIcon('debug');
-      r.tip = new Tip(undefined, undefined, TipType.Run).setAction(debug, device, webview, wwwFolder).doNotWait();
+      r.tip = new Tip(undefined, undefined, TipType.Run).setQueuedAction(debug, device, webview, wwwFolder).doNotWait();
       r.command.arguments = [r];
       result.push(r);
     }
@@ -43,7 +43,7 @@ export async function getAndroidWebViewList(
         device.product,
         TreeItemCollapsibleState.None,
         getCommand(),
-        undefined
+        undefined,
       );
       r.setIcon('android');
       result.push(r);
@@ -52,7 +52,8 @@ export async function getAndroidWebViewList(
   return result;
 }
 
-async function debug(device: Device, webview: WebView, wwwfolder: string): Promise<void> {
+async function debug(queueFunction: QueueFunction, device: Device, webview: WebView, wwwfolder: string): Promise<void> {
+  queueFunction();
   debugAndroid(webview.packageName, wwwfolder);
   return;
 }

@@ -15,7 +15,7 @@ import {
 } from './analyzer';
 import { checkMigrationAngularToolkit } from './rules-angular-toolkit';
 import { Project } from './project';
-import { Tip, TipType } from './tip';
+import { QueueFunction, Tip, TipType } from './tip';
 import { asAppId, getRunOutput, isWindows, showProgress } from './utilities';
 import { capacitorAdd } from './capacitor-add';
 import { CapacitorPlatform } from './capacitor-platform';
@@ -54,7 +54,7 @@ export function checkCapacitorRules(project: Project) {
       '@capacitor/cli',
       'Install @capacitor/cli',
       'The Capacitor CLI should be installed locally in your project',
-      true
+      true,
     );
   }
 
@@ -65,7 +65,7 @@ export function checkCapacitorRules(project: Project) {
     'cordova-plugin-appsflyer-sdk',
     `Replace with appsflyer-capacitor-plugin.`,
     `The plugin cordova-plugin-appsflyer-sdk should be replaced with appsflyer-capacitor-plugin.`,
-    'appsflyer-capacitor-plugin'
+    'appsflyer-capacitor-plugin',
   );
 
   project.recommendReplace(
@@ -73,7 +73,7 @@ export function checkCapacitorRules(project: Project) {
     '@ionic-enterprise/dialogs',
     `Replace with @capacitor/dialog due to official support`,
     `The plugin @ionic-enterprise/dialogs should be replaced with @capacitor/dialog as it is an officially supported Capacitor plugin`,
-    '@capacitor/dialog'
+    '@capacitor/dialog',
   );
 
   project.recommendReplace(
@@ -81,7 +81,7 @@ export function checkCapacitorRules(project: Project) {
     '@ionic-enterprise/app-rate',
     `Replace with capacitor-rate-app due to Capacitor support`,
     `The plugin @ionic-enterprise/app-rate should be replaced with capacitor-rate-app as designed to work with Capacitor`,
-    'capacitor-rate-app'
+    'capacitor-rate-app',
   );
 
   project.recommendReplace(
@@ -89,7 +89,7 @@ export function checkCapacitorRules(project: Project) {
     '@ionic-enterprise/nativestorage',
     `Replace with @ionic/storage due to support`,
     `The plugin @ionic-enterprise/nativestorage should be replaced with @ionic/storage. Consider @ionic-enterprise/secure-storage if encryption is required`,
-    '@ionic/storage'
+    '@ionic/storage',
   );
 
   project.recommendReplace(
@@ -97,13 +97,13 @@ export function checkCapacitorRules(project: Project) {
     'cordova-plugin-advanced-http',
     `Replace with @capacitor/http due to official support`,
     `The plugin cordova-plugin-advanced-http should be replaced with @capacitor/http. Capacitor now provides the equivalent native http functionality built in.`,
-    '@capacitor/core'
+    '@capacitor/core',
   );
 
   project.recommendRemove(
     '@ionic-enterprise/promise',
     '@ionic-enterprise/promise',
-    'This plugin should no longer be required in projects.'
+    'This plugin should no longer be required in projects.',
   );
 
   project.recommendRemove(
@@ -111,19 +111,19 @@ export function checkCapacitorRules(project: Project) {
     'cordova-plugin-appminimize',
     'This plugin is not required and can be replaced with the minimizeApp method of @capacitor/app',
     undefined,
-    'https://capacitorjs.com/docs/apis/app#minimizeapp'
+    'https://capacitorjs.com/docs/apis/app#minimizeapp',
   );
 
   project.recommendRemove(
     'cordova-plugin-datepicker',
     'cordova-plugin-datepicker',
-    'This plugin appears to have been abandoned in 2015. Consider using ion-datetime.'
+    'This plugin appears to have been abandoned in 2015. Consider using ion-datetime.',
   );
 
   project.recommendRemove(
     '@jcesarmobile/ssl-skip',
     '@jcesarmobile/ssl-skip',
-    'This plugin should only be used during development. Submitting an app with it included will cause it to be rejected.'
+    'This plugin should only be used during development. Submitting an app with it included will cause it to be rejected.',
   );
 
   if (exists('cordova-plugin-file-transfer') && !exists('cordova-plugin-whitelist')) {
@@ -133,7 +133,7 @@ export function checkCapacitorRules(project: Project) {
       'cordova-plugin-file-transfer',
       'Install cordova-plugin-whitelist for compatibility',
       'The plugin cordova-plugin-file-transfer has a dependency on cordova-plugin-whitelist when used with a Capacitor project',
-      false
+      false,
     );
   }
 
@@ -143,7 +143,7 @@ export function checkCapacitorRules(project: Project) {
       'onesignal-cordova-plugin',
       'This plugin causes build errors on Android when used with Ionic Auth Connect. Upgrade to 5.0.3 or higher.',
       undefined,
-      'https://github.com/OneSignal/OneSignal-Cordova-SDK/issues/928'
+      'https://github.com/OneSignal/OneSignal-Cordova-SDK/issues/928',
     );
   }
 
@@ -152,7 +152,7 @@ export function checkCapacitorRules(project: Project) {
     project.recommendRemove(
       '@ionic/cordova-builders',
       '@ionic/cordova-builders',
-      'This package is only required for Cordova projects.'
+      'This package is only required for Cordova projects.',
     );
   }
 
@@ -187,12 +187,12 @@ export function checkCapacitorRules(project: Project) {
         undefined,
         undefined,
         undefined,
-        'https://capacitorjs.com/docs/updating/3-0'
+        'https://capacitorjs.com/docs/updating/3-0',
       ).setTooltip(
         `Capacitor ${getPackageVersion(
-          '@capacitor/core'
-        )} must be migrated to Capacitor 4 to meet Play Store requirements of minimum target of SDK 31. Migration to Capacitor 3 is required. Click for more information.`
-      )
+          '@capacitor/core',
+        )} must be migrated to Capacitor 4 to meet Play Store requirements of minimum target of SDK 31. Migration to Capacitor 3 is required. Click for more information.`,
+      ),
     );
   }
 
@@ -202,8 +202,8 @@ export function checkCapacitorRules(project: Project) {
       // Recommend migration from 3 to 4
       project.tip(
         new Tip('Migrate to Capacitor 4', '', TipType.Capacitor)
-          .setAction(migrateCapacitor, project, getPackageVersion('@capacitor/core'))
-          .canIgnore()
+          .setQueuedAction(migrateCapacitor, project, getPackageVersion('@capacitor/core'))
+          .canIgnore(),
       );
     }
   }
@@ -212,8 +212,8 @@ export function checkCapacitorRules(project: Project) {
     if (ionicState.hasNodeModules && isGreaterOrEqual('@capacitor/core', '4.0.0')) {
       project.tip(
         new Tip('Migrate to Capacitor 5', '', TipType.Capacitor)
-          .setAction(migrateCapacitor5, project, getPackageVersion('@capacitor/core'))
-          .canIgnore()
+          .setQueuedAction(migrateCapacitor5, project, getPackageVersion('@capacitor/core'))
+          .canIgnore(),
       );
     }
   }
@@ -224,14 +224,14 @@ export function checkCapacitorRules(project: Project) {
         '@ionic-enterprise/identity-vault',
         '5.1.0',
         'as the current version is missing important security fixes.',
-        'https://ionic.io/docs/identity-vault'
-      )
+        'https://ionic.io/docs/identity-vault',
+      ),
     );
   }
 
   if (isLessOrEqual('@ionic/angular-toolkit', '8.1.0') && isGreaterOrEqual('@angular/core', '15.0.0')) {
     project.tip(
-      checkMinVersion('@ionic/angular-toolkit', '8.1.0', 'as the current version is missing Angular 15 support.')
+      checkMinVersion('@ionic/angular-toolkit', '8.1.0', 'as the current version is missing Angular 15 support.'),
     );
   }
 }
@@ -270,10 +270,10 @@ export async function capacitorRecommendations(project: Project, forMigration: b
         'Add Capacitor NX',
         'NX Support added for your project',
         'https://nxext.dev/docs/capacitor/overview.html',
-        'Adding NX Support...'
+        'Adding NX Support...',
       )
         .showProgressDialog()
-        .canIgnore()
+        .canIgnore(),
     );
   }
 
@@ -296,14 +296,14 @@ export async function capacitorRecommendations(project: Project, forMigration: b
           npmInstall('@capacitor/cli@latest', '-D', '-E'),
           npmInstall(`@capacitor/app @capacitor/core @capacitor/haptics @capacitor/keyboard @capacitor/status-bar`),
           `${local}${npx(project.packageManager)} capacitor init "${project.name}" "${asAppId(
-            project.name
+            project.name,
           )}" --web-dir www`,
         ],
         'Add Capacitor',
         'Capacitor added to this project',
         'https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor',
-        'Adding Capacitor to the project...'
-      ).showProgressDialog()
+        'Adding Capacitor to the project...',
+      ).showProgressDialog(),
     );
   } else {
     if (!project.hasCapacitorProject(CapacitorPlatform.android) && ionicState.hasNodeModules) {
@@ -317,10 +317,10 @@ export async function capacitorRecommendations(project: Project, forMigration: b
           'Add Android',
           'Android support added to your project',
           undefined,
-          'Adding Native Android Project...'
+          'Adding Native Android Project...',
         )
           .showProgressDialog()
-          .canIgnore()
+          .canIgnore(),
       );
     }
 
@@ -335,10 +335,10 @@ export async function capacitorRecommendations(project: Project, forMigration: b
           'Add iOS',
           'iOS support added to your project',
           undefined,
-          'Adding Native iOS Project...'
+          'Adding Native iOS Project...',
         )
           .showProgressDialog()
-          .canIgnore()
+          .canIgnore(),
       );
     }
   }
@@ -349,9 +349,9 @@ export async function capacitorRecommendations(project: Project, forMigration: b
       'Add PWA Integration',
       '',
       TipType.Edit,
-      'Add @angular/pwa and integrate splash and icon resources'
+      'Add @angular/pwa and integrate splash and icon resources',
     );
-    tips.push(pwaTip.setAction(integratePWA, project, pwaTip).canRefreshAfter());
+    tips.push(pwaTip.setQueuedAction(integratePWA, project, pwaTip).canRefreshAfter());
   }
 
   // List of incompatible plugins
@@ -369,15 +369,15 @@ export async function capacitorRecommendations(project: Project, forMigration: b
     project.recommendRemove(
       'cordova-sqlite-storage',
       'Conflict with Secure Storage',
-      'cordova-sqlite-storage cannot be used with Secure Storage (@ionic-enterprise/secure-storage) as it will cause compilation errors. cordova-sqlite-storage should be removed.'
+      'cordova-sqlite-storage cannot be used with Secure Storage (@ionic-enterprise/secure-storage) as it will cause compilation errors. cordova-sqlite-storage should be removed.',
     );
   }
 
   tips.push(
     incompatiblePlugin(
       'cordova-plugin-firebasex',
-      'https://github.com/dpa99c/cordova-plugin-firebasex/issues/610#issuecomment-810236545'
-    )
+      'https://github.com/dpa99c/cordova-plugin-firebasex/issues/610#issuecomment-810236545',
+    ),
   );
 
   tips.push(incompatiblePlugin('cordova-plugin-music-controls', 'It causes build failures, skipped'));
@@ -390,30 +390,30 @@ export async function capacitorRecommendations(project: Project, forMigration: b
       'cordova-plugin-googlemaps',
       '@capacitor/google-maps',
       'It causes build failures on iOS but can be replaced with @capacitor/google-maps and will require code refactoring.',
-      TipType.Error
-    )
+      TipType.Error,
+    ),
   );
 
   tips.push(
     incompatiblePlugin(
       'newrelic-cordova-plugin',
-      'It relies on Cordova hooks. https://github.com/newrelic/newrelic-cordova-plugin/issues/15'
-    )
+      'It relies on Cordova hooks. https://github.com/newrelic/newrelic-cordova-plugin/issues/15',
+    ),
   );
   //tips.push(incompatiblePlugin('phonegap-plugin-push', 'It will not compile but can be replaced with the plugin cordova-plugin-push'));
   tips.push(
     replacementPlugin(
       'phonegap-plugin-push',
       '@havesource/cordova-plugin-push',
-      'It will not compile but can be replaced with the plugin cordova-plugin-push'
-    )
+      'It will not compile but can be replaced with the plugin cordova-plugin-push',
+    ),
   );
 
   tips.push(
     incompatiblePlugin(
       'cordova-plugin-appsflyer-sdk',
-      'It will not compile but can be replaced with the plugin appsflyer-capacitor-plugin'
-    )
+      'It will not compile but can be replaced with the plugin appsflyer-capacitor-plugin',
+    ),
   );
 
   if (!isWindows() && exists('@capacitor/ios')) {
@@ -421,12 +421,12 @@ export async function capacitorRecommendations(project: Project, forMigration: b
     const minVersion = '1.13.0';
     if (cocoaPods && !isVersionGreaterOrEqual(cocoaPods, minVersion)) {
       project.add(
-        new Tip('Update Cocoapods', `Cocoapods requires updating.`, TipType.Error).setAction(
+        new Tip('Update Cocoapods', `Cocoapods requires updating.`, TipType.Error).setQueuedAction(
           updateCocoaPods,
           cocoaPods,
           project,
-          minVersion
-        )
+          minVersion,
+        ),
       );
     }
   }
@@ -436,43 +436,43 @@ export async function capacitorRecommendations(project: Project, forMigration: b
   if (!exists('cordova-plugin-file-transfer')) {
     // Note: If you still use cordova-plugin-file-transfer it requires the whitelist plugin (https://github.com/ionic-team/capacitor/issues/1199)
     tips.push(
-      notRequiredPlugin('cordova-plugin-whitelist', 'The functionality is built into Capacitors configuration file')
+      notRequiredPlugin('cordova-plugin-whitelist', 'The functionality is built into Capacitors configuration file'),
     );
   }
   tips.push(notRequiredPlugin('cordova-plugin-crosswalk-webview', 'Capacitor doesn’t allow to change the webview'));
   tips.push(
-    notRequiredPlugin('cordova-plugin-ionic-webview', 'An App store compliant Webview is built into Capacitor')
+    notRequiredPlugin('cordova-plugin-ionic-webview', 'An App store compliant Webview is built into Capacitor'),
   );
   tips.push(
-    notRequiredPlugin('cordova-plugin-wkwebview-engine', 'An App store compliant Webview is built into Capacitor')
+    notRequiredPlugin('cordova-plugin-wkwebview-engine', 'An App store compliant Webview is built into Capacitor'),
   );
   tips.push(
     notRequiredPlugin(
       'cordova-plugin-androidx',
-      'This was required for Cordova Android 10 support but is not required by Capacitor'
-    )
+      'This was required for Cordova Android 10 support but is not required by Capacitor',
+    ),
   );
   tips.push(
-    notRequiredPlugin('cordova-android-support-gradle-release', 'Capacitor provides control to set library versions')
+    notRequiredPlugin('cordova-android-support-gradle-release', 'Capacitor provides control to set library versions'),
   );
   tips.push(notRequiredPlugin('cordova-plugin-add-swift-support', 'Swift is supported out-of-the-box with Capacitor'));
   tips.push(
     notRequiredPlugin(
       'cordova-plugin-enable-multidex',
-      'Multidex is handled by Android Studio and does not require a plugin'
-    )
+      'Multidex is handled by Android Studio and does not require a plugin',
+    ),
   );
   tips.push(
     notRequiredPlugin(
       'cordova-support-android-plugin',
-      'This plugin is used to simplify Cordova plugin development and is not required for Capacitor'
-    )
+      'This plugin is used to simplify Cordova plugin development and is not required for Capacitor',
+    ),
   );
   tips.push(
     notRequiredPlugin(
       'cordova-plugin-androidx-adapter',
-      'Android Studio patches plugins for AndroidX without requiring this plugin'
-    )
+      'Android Studio patches plugins for AndroidX without requiring this plugin',
+    ),
   );
   tips.push(notRequiredPlugin('cordova-custom-config', 'Configuration achieved through native projects'));
   tips.push(notRequiredPlugin('cordova-plugin-cocoapod-support', 'Pod dependencies supported in Capacitor'));
@@ -489,8 +489,8 @@ export async function capacitorRecommendations(project: Project, forMigration: b
     checkMinVersion(
       'branch-cordova-sdk',
       '4.0.0',
-      'Requires update. See: https://help.branch.io/developers-hub/docs/capacitor'
-    )
+      'Requires update. See: https://help.branch.io/developers-hub/docs/capacitor',
+    ),
   );
 
   // Plugins to recommend replacement with a Capacitor equivalent
@@ -499,71 +499,75 @@ export async function capacitorRecommendations(project: Project, forMigration: b
     replacementPlugin(
       'cordova-plugin-actionsheet',
       '@capacitor/action-sheet',
-      'https://capacitorjs.com/docs/apis/action-sheet'
-    )
+      'https://capacitorjs.com/docs/apis/action-sheet',
+    ),
   );
   addOptional(
-    replacementPlugin('cordova-plugin-camera', '@capacitor/camera', 'https://capacitorjs.com/docs/apis/camera')
+    replacementPlugin('cordova-plugin-camera', '@capacitor/camera', 'https://capacitorjs.com/docs/apis/camera'),
   );
   addOptional(
-    replacementPlugin('ionic-plugin-deeplinks', '@capacitor/app', 'https://capacitorjs.com/docs/guides/deep-links')
+    replacementPlugin('ionic-plugin-deeplinks', '@capacitor/app', 'https://capacitorjs.com/docs/guides/deep-links'),
   );
   addOptional(
     replacementPlugin(
       'cordova-plugin-customurlscheme',
       '@capacitor/app',
-      'https://capacitorjs.com/docs/guides/deep-links'
-    )
+      'https://capacitorjs.com/docs/guides/deep-links',
+    ),
   );
   addOptional(
     replacementPlugin(
       '@ionic-enterprise/clipboard',
       '@capacitor/clipboard',
-      'https://capacitorjs.com/docs/apis/clipboard'
-    )
+      'https://capacitorjs.com/docs/apis/clipboard',
+    ),
   );
   addOptional(
-    replacementPlugin('@ionic-enterprise/deeplinks', '@capacitor/app', 'https://capacitorjs.com/docs/guides/deep-links')
+    replacementPlugin(
+      '@ionic-enterprise/deeplinks',
+      '@capacitor/app',
+      'https://capacitorjs.com/docs/guides/deep-links',
+    ),
   );
   addOptional(
     replacementPlugin(
       '@ionic-enterprise/statusbar',
       '@capacitor/status-bar',
-      'https://capacitorjs.com/docs/apis/status-bar'
-    )
+      'https://capacitorjs.com/docs/apis/status-bar',
+    ),
   );
   addOptional(
     replacementPlugin(
       'cordova-plugin-firebase',
       '@capacitor-community/fcm',
-      'https://github.com/capacitor-community/fcm'
-    )
+      'https://github.com/capacitor-community/fcm',
+    ),
   );
   addOptional(
     replacementPlugin(
       'cordova-plugin-firebase-messaging',
       '@capacitor/push-notifications',
-      'https://capacitorjs.com/docs/apis/push-notifications'
-    )
+      'https://capacitorjs.com/docs/apis/push-notifications',
+    ),
   );
   addOptional(
     replacementPlugin(
       'cordova-plugin-firebase-analytics',
       '@capacitor-community/firebase-analytics',
-      'https://github.com/capacitor-community/firebase-analytics'
-    )
+      'https://github.com/capacitor-community/firebase-analytics',
+    ),
   );
   addOptional(
-    replacementPlugin('cordova-plugin-app-version', '@capacitor/device', 'https://capacitorjs.com/docs/apis/device')
+    replacementPlugin('cordova-plugin-app-version', '@capacitor/device', 'https://capacitorjs.com/docs/apis/device'),
   );
   addOptional(
-    replacementPlugin('cordova-plugin-dialogs', '@capacitor/dialog', 'https://capacitorjs.com/docs/apis/dialog')
+    replacementPlugin('cordova-plugin-dialogs', '@capacitor/dialog', 'https://capacitorjs.com/docs/apis/dialog'),
   );
 
   // cordova-plugin-advanced-http required cordova-plugin-file
   if (!exists('cordova-plugin-advanced-http')) {
     addOptional(
-      replacementPlugin('cordova-plugin-file', '@capacitor/filesystem', 'https://capacitorjs.com/docs/apis/filesystem')
+      replacementPlugin('cordova-plugin-file', '@capacitor/filesystem', 'https://capacitorjs.com/docs/apis/filesystem'),
     );
   }
 
@@ -571,77 +575,77 @@ export async function capacitorRecommendations(project: Project, forMigration: b
     replacementPlugin(
       'cordova-plugin-file-transfer',
       '@capacitor/filesystem',
-      'https://capacitorjs.com/docs/apis/filesystem'
-    )
+      'https://capacitorjs.com/docs/apis/filesystem',
+    ),
   );
   addOptional(
     replacementPlugin(
       'cordova-plugin-datepicker',
       '@capacitor-community/date-picker',
-      'https://github.com/capacitor-community/date-picker'
-    )
+      'https://github.com/capacitor-community/date-picker',
+    ),
   );
   addOptional(
     replacementPlugin(
       'cordova-plugin-geolocation',
       '@capacitor/geolocation',
-      'https://capacitorjs.com/docs/apis/geolocation'
-    )
+      'https://capacitorjs.com/docs/apis/geolocation',
+    ),
   );
   addOptional(
     replacementPlugin(
       'cordova-sqlite-storage',
       '@capacitor-community/sqlite',
-      'https://github.com/capacitor-community/sqlite'
-    )
+      'https://github.com/capacitor-community/sqlite',
+    ),
   );
   addOptional(
     replacementPlugin(
       'cordova-plugin-safariviewcontroller',
       '@capacitor/browser',
-      'https://capacitorjs.com/docs/apis/browser'
-    )
+      'https://capacitorjs.com/docs/apis/browser',
+    ),
   );
   addOptional(
-    replacementPlugin('cordova-plugin-appavailability', '@capacitor/app', 'https://capacitorjs.com/docs/apis/app')
+    replacementPlugin('cordova-plugin-appavailability', '@capacitor/app', 'https://capacitorjs.com/docs/apis/app'),
   );
   addOptional(
     replacementPlugin(
       'cordova-plugin-network-information',
       '@capacitor/network',
-      'https://capacitorjs.com/docs/apis/network'
-    )
+      'https://capacitorjs.com/docs/apis/network',
+    ),
   );
   addOptional(
-    replacementPlugin('cordova-plugin-device', '@capacitor/device', 'https://capacitorjs.com/docs/apis/device')
+    replacementPlugin('cordova-plugin-device', '@capacitor/device', 'https://capacitorjs.com/docs/apis/device'),
   );
   addOptional(
     replacementPlugin(
       'cordova-plugin-ionic-keyboard',
       '@capacitor/keyboard',
-      'https://capacitorjs.com/docs/apis/keyboard'
-    )
+      'https://capacitorjs.com/docs/apis/keyboard',
+    ),
   );
   addOptional(
     replacementPlugin(
       'cordova-plugin-splashscreen',
       '@capacitor/splash-screen',
-      'https://capacitorjs.com/docs/apis/splash-screen'
-    )
+      'https://capacitorjs.com/docs/apis/splash-screen',
+    ),
   );
   addOptional(
     replacementPlugin(
       'cordova-plugin-statusbar',
       '@capacitor/status-bar',
-      'https://capacitorjs.com/docs/apis/status-bar'
-    )
+      'https://capacitorjs.com/docs/apis/status-bar',
+    ),
   );
   addOptional(
     replacementPlugin(
       'phonegap-plugin-push',
       '@capacitor/push-notifications',
-      'https://capacitorjs.com/docs/apis/push-notifications'
-    )
+      'https://capacitorjs.com/docs/apis/push-notifications',
+    ),
   );
   return tips;
 }
@@ -659,8 +663,8 @@ function checkBuildGradleForMinifyInRelease(project: Project) {
           '@capacitor/android',
           '3.2.3',
           'to ensure Android release builds work when minifyEnabled is true',
-          'https://developer.android.com/studio/build/shrink-code'
-        )
+          'https://developer.android.com/studio/build/shrink-code',
+        ),
       );
     }
   }
@@ -689,7 +693,12 @@ async function getCocoaPodsVersion(project: Project, avoidCache?: boolean): Prom
   }
 }
 
-async function updateCocoaPods(currentVersion: string, project: Project, minVersion: string) {
+async function updateCocoaPods(
+  queueFunction: QueueFunction,
+  currentVersion: string,
+  project: Project,
+  minVersion: string,
+) {
   const msg = currentVersion == 'missing' ? 'Install' : 'Update';
   const txt = `${msg} Cocoapods`;
   const data = await getRunOutput('which pod', project.folder);
@@ -701,10 +710,11 @@ async function updateCocoaPods(currentVersion: string, project: Project, minVers
   const res = await window.showInformationMessage(
     `XCode 15 will fail during build with some plugins. ${msg} Cocoapods using "${cmd}" to fix the issue?`,
     txt,
-    'Exit'
+    'Exit',
   );
   if (!res || res != txt) return;
 
+  queueFunction();
   showOutput();
   setSetting(WorkspaceSetting.cocoaPods, undefined);
   await showProgress(`${msg} Cocoapods...`, async () => {

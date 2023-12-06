@@ -1,10 +1,17 @@
 # Roadmap
 
-- Fix queuing issue when user waits for a prompt
 - TODO: add pwa integration
+- Fix: The bundledWebRuntime configuration option has been deprecated. Can be safely deleted.
+- Generate twitter and og metatags
+- Generate social and favicon
+- Avoid sharp and @capacitor/assets
+- Show the root package for projects - ie scripts etc
 - Angular projects that use IonicModule (eg `import { IonicModule } from '@ionic/angular';`) and `@ionic/angular/standalone` or `import { send } from 'ionicons/icons';` will break. Check code for it?
+- Customers dont really understand the upgrade process in packages/plugins - looking in the "plugins" windows:
+- Need to recommend upgrading minor versions of Capacitor on a regular basis (eg monthly)
+- Need to recommend upgrading minor versions of Capacitor plugins on a regular basis (eg monthly)
 - Angular standalone templates when a component is added (eg `ion-header`) will error until imported correctly. Add an auto-import feature?
-
+- For Capacitor 5 check deployment target is ios >= 13
 - Find: Search for all pages, components, routes etc and put in a search box to speed up opens
 - Alt+T: Toggle between html/scss and ts
 
@@ -24,7 +31,6 @@ Check `main.ts` for `provideIonicAngular` and apply this if missing
 
 - As --force is used with Angular migrations there may be peer dependency errors that need resolution afterwards. Need a peer dep resolver.
 - Update docs on capacitorjs.com
-- Fix: The bundledWebRuntime configuration option has been deprecated. Can be safely deleted.
 - Recommendation for experimental migration to Angular standalone components
 - Recommendation for experimental migration to Angular built-in control flow syntax
 - Recommendation of migration to @ionic/angular (major versions) and link to migration doc
@@ -90,7 +96,6 @@ Check `main.ts` for `provideIonicAngular` and apply this if missing
 - Show git remote url somewhere (`git config --get remote.origin.url`)
 - (feat) Debugger for iOS (add breakpoints, inspection etc)
 - (feat) info.plist editing
-- (feat) Twitter to RSS feed - pull news into plugin ??
 - (1) Getting devices takes some time to run the first time. Make sure logging goes to Output window and if taking > 5 seconds then give user feedback that it may take time
 - (2) If you sync but the build didn't work then show suitable error (or trigger build)
 - (2) If a project has not been built and you try running on ios/android it could build for you beforehand

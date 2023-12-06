@@ -11,12 +11,13 @@ import { npx, PackageManager } from './node-commands';
 import { exec } from 'child_process';
 import { getCapacitorConfigureFilename, writeCapacitorConfig } from './capacitor-config-file';
 import { window } from 'vscode';
+import { QueueFunction } from './tip';
 
 /**
  * Capacitor build command
  * @param  {Project} project
  */
-export async function capacitorBuild(project: Project) {
+export async function capacitorBuild(queueFunction: QueueFunction, project: Project) {
   if (!isGreaterOrEqual('@capacitor/cli', '4.4.0')) {
     await window.showErrorMessage('This option is only available in Capacitor version 4.4.0 and above.');
     return;
@@ -46,6 +47,7 @@ export async function capacitorBuild(project: Project) {
   }
 
   try {
+    queueFunction();
     const command = capBuildCommand(project, platform, args, settings);
     writeIonic(command);
     const results: RunResults = { output: '', success: false };
@@ -68,7 +70,7 @@ async function openPortal(platform: CapacitorPlatform) {
   const selection = await window.showInformationMessage(
     `Do you want to open the ${platform == CapacitorPlatform.ios ? 'Apple Developer Portal?' : 'Google Play Console?'}`,
     'Open',
-    'Exit'
+    'Exit',
   );
   if (selection == 'Open') {
     openUri(uri);
@@ -78,7 +80,7 @@ async function openPortal(platform: CapacitorPlatform) {
 async function verifySettings(
   project: Project,
   platform: CapacitorPlatform,
-  settings: KeyStoreSettings
+  settings: KeyStoreSettings,
 ): Promise<KeyStoreSettings> {
   if (platform == CapacitorPlatform.ios) return settings;
 
@@ -87,7 +89,7 @@ async function verifySettings(
       'An Android Keystore file is required. You can create one in Android Studio (Build > Generate Signed Bundle).',
       'Select Keystore File',
       'Open Android Studio',
-      'Exit'
+      'Exit',
     );
     if (!selection || selection == 'Exit') {
       return undefined;
@@ -146,7 +148,7 @@ function capBuildCommand(
   project: Project,
   platform: CapacitorPlatform,
   args: string,
-  settings: KeyStoreSettings
+  settings: KeyStoreSettings,
 ): string {
   switch (project.repoType) {
     case MonoRepoType.none:
@@ -168,7 +170,7 @@ function capCLIBuild(
   platform: CapacitorPlatform,
   packageManager: PackageManager,
   args: string,
-  settings: KeyStoreSettings
+  settings: KeyStoreSettings,
 ): string {
   if (platform == CapacitorPlatform.android) {
     if (settings.keyAlias) args += ` --keystorealias="${settings.keyAlias}"`;
@@ -229,7 +231,7 @@ function writeConfig(project: Project, settings: KeyStoreSettings) {
           keystoreAlias: '',
        }
     }
-  };`
+  };`,
     );
   }
   writeFileSync(filename, data);

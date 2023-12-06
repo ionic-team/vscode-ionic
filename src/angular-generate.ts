@@ -6,14 +6,20 @@ import { join } from 'path';
 import { existsSync } from 'fs';
 import { isGreaterOrEqual } from './analyzer';
 import { window } from 'vscode';
+import { QueueFunction } from './tip';
 
-export async function angularGenerate(project: Project, angularType: string): Promise<void> {
+export async function angularGenerate(
+  queueFunction: QueueFunction,
+  project: Project,
+  angularType: string,
+): Promise<void> {
   let name = await window.showInputBox({
     title: `New Angular ${angularType}`,
     placeHolder: `Enter name for new ${angularType}`,
   });
 
   if (!name || name.length < 1) return;
+  queueFunction();
 
   // CREATE src/app/test2/test2.component.ts
   try {

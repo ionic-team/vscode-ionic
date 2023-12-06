@@ -1,7 +1,7 @@
 import { MobileProject, MobileProjectConfig } from '@trapezedev/project';
 import { CapacitorProjectState } from './cap-project';
 import { Project } from './project';
-import { Tip, TipType } from './tip';
+import { QueueFunction, Tip, TipType } from './tip';
 import { channelShow, getStringFrom, setStringIn } from './utilities';
 import { CapProjectCache } from './context-variables';
 import { join } from 'path';
@@ -36,16 +36,16 @@ export async function reviewCapacitorConfig(project: Project, context: Extension
     const bundleId = state.androidBundleId ? state.androidBundleId : state.iosBundleId;
     const tip = new Tip('Bundle Id', bundleId, TipType.None);
 
-    tip.setAction(setBundleId, bundleId, project, project.folder);
+    tip.setQueuedAction(setBundleId, bundleId, project, project.folder);
     project.add(tip);
   } else {
     // Bundle Ids different
     const tip = new Tip('Android Bundle Id', state.androidBundleId, TipType.None);
-    tip.setAction(setBundleId, state.androidBundleId, project, project.folder, NativePlatform.AndroidOnly);
+    tip.setQueuedAction(setBundleId, state.androidBundleId, project, project.folder, NativePlatform.AndroidOnly);
     project.add(tip);
 
     const tip2 = new Tip('iOS Bundle Id', state.iosBundleId, TipType.None);
-    tip2.setAction(setBundleId, state.iosBundleId, project, project.folder, NativePlatform.iOSOnly);
+    tip2.setQueuedAction(setBundleId, state.iosBundleId, project, project.folder, NativePlatform.iOSOnly);
     project.add(tip2);
   }
 
@@ -53,15 +53,15 @@ export async function reviewCapacitorConfig(project: Project, context: Extension
   if (state.androidDisplayName == state.iosDisplayName || !state.iosDisplayName || !state.androidDisplayName) {
     const displayName = state.androidDisplayName ? state.androidDisplayName : state.iosDisplayName;
     const tip = new Tip('Display Name', displayName, TipType.None);
-    tip.setAction(setDisplayName, displayName, project, project.folder);
+    tip.setQueuedAction(setDisplayName, displayName, project, project.folder);
     project.add(tip);
   } else {
     const tip = new Tip('Android Display Name', state.androidDisplayName, TipType.None);
-    tip.setAction(setDisplayName, state.androidDisplayName, project, project.folder, NativePlatform.AndroidOnly);
+    tip.setQueuedAction(setDisplayName, state.androidDisplayName, project, project.folder, NativePlatform.AndroidOnly);
     project.add(tip);
 
     const tip2 = new Tip('iOS Display Name', state.iosDisplayName, TipType.None);
-    tip2.setAction(setDisplayName, state.iosDisplayName, project, project.folder, NativePlatform.iOSOnly);
+    tip2.setQueuedAction(setDisplayName, state.iosDisplayName, project, project.folder, NativePlatform.iOSOnly);
     project.add(tip2);
   }
 
@@ -69,15 +69,15 @@ export async function reviewCapacitorConfig(project: Project, context: Extension
   if (state.androidVersion == state.iosVersion || !state.iosVersion || !state.androidVersion) {
     const version = state.androidVersion ? state.androidVersion : state.iosVersion;
     const tip = new Tip('Version Number', version?.toString(), TipType.None);
-    tip.setAction(setVersion, version, project);
+    tip.setQueuedAction(setVersion, version, project);
     project.add(tip);
   } else {
     const tip = new Tip('Android Version Number', state.androidVersion, TipType.None);
-    tip.setAction(setVersion, state.androidVersion, project, NativePlatform.AndroidOnly);
+    tip.setQueuedAction(setVersion, state.androidVersion, project, NativePlatform.AndroidOnly);
     project.add(tip);
 
     const tip2 = new Tip('iOS Version Number', state.iosVersion, TipType.None);
-    tip2.setAction(setVersion, state.iosVersion, project, NativePlatform.iOSOnly);
+    tip2.setQueuedAction(setVersion, state.iosVersion, project, NativePlatform.iOSOnly);
     project.add(tip2);
   }
 
@@ -85,15 +85,15 @@ export async function reviewCapacitorConfig(project: Project, context: Extension
   if (state.androidBuild == state.iosBuild || !state.iosBuild || !state.androidBuild) {
     const build = state.androidBuild ? state.androidBuild : state.iosBuild;
     const tip = new Tip('Build Number', build?.toString(), TipType.None);
-    tip.setAction(setBuild, build, project);
+    tip.setQueuedAction(setBuild, build, project);
     project.add(tip);
   } else {
     const tip = new Tip('Android Build Number', state.androidBuild?.toString(), TipType.None);
-    tip.setAction(setBuild, state.androidBuild, project, NativePlatform.AndroidOnly);
+    tip.setQueuedAction(setBuild, state.androidBuild, project, NativePlatform.AndroidOnly);
     project.add(tip);
 
     const tip2 = new Tip('iOS Build Number', state.iosBuild?.toString(), TipType.None);
-    tip2.setAction(setBuild, state.iosBuild, project, NativePlatform.iOSOnly);
+    tip2.setQueuedAction(setBuild, state.iosBuild, project, NativePlatform.iOSOnly);
     project.add(tip2);
   }
 
@@ -201,7 +201,13 @@ async function getCapacitorProjectState(prj: Project, context: ExtensionContext)
  * @param  {string} folder Folder for the project
  * @param  {NativePlatform} platform Whether iOS or Android only (default both)
  */
-async function setBundleId(bundleId: string, prj: Project, folder: string, platform: NativePlatform) {
+async function setBundleId(
+  queueFunction: QueueFunction,
+  bundleId: string,
+  prj: Project,
+  folder: string,
+  platform: NativePlatform,
+) {
   const newBundleId = await window.showInputBox({
     title: 'Application Bundle Id',
     placeHolder: bundleId,
@@ -218,7 +224,7 @@ async function setBundleId(bundleId: string, prj: Project, folder: string, platf
   if (!newBundleId) {
     return; // User cancelled
   }
-
+  queueFunction();
   const project = await getCapacitorProject(prj);
 
   if (project?.ios && platform != NativePlatform.AndroidOnly) {
@@ -285,7 +291,7 @@ function clearCapProjectCache() {
  * @param  {string} version
  * @param  {NativePlatform} platform Whether to apply for iOS only, Android only or both (default)
  */
-async function setVersion(version: string, prj: Project, platform: NativePlatform) {
+async function setVersion(queueFunction: QueueFunction, version: string, prj: Project, platform: NativePlatform) {
   const newVersion = await window.showInputBox({
     title: 'Application Version Number',
     placeHolder: version,
@@ -303,6 +309,7 @@ async function setVersion(version: string, prj: Project, platform: NativePlatfor
     return; // User cancelled
   }
 
+  queueFunction();
   const project = await getCapacitorProject(prj);
 
   if (project?.ios && platform != NativePlatform.AndroidOnly) {
@@ -327,7 +334,7 @@ async function setVersion(version: string, prj: Project, platform: NativePlatfor
  * @param  {CapacitorProject} project The Capacitor project
  * @param  {NativePlatform} platform Whether to apply on iOS only, Android Only or both (default)
  */
-async function setBuild(build: string, prj: Project, platform: NativePlatform) {
+async function setBuild(queueFunction: QueueFunction, build: string, prj: Project, platform: NativePlatform) {
   const newBuild = await window.showInputBox({
     title: 'Application Build Number',
     placeHolder: build,
@@ -345,6 +352,7 @@ async function setBuild(build: string, prj: Project, platform: NativePlatform) {
     return; // User cancelled
   }
 
+  queueFunction();
   const project = await getCapacitorProject(prj);
 
   if (project?.ios && platform != NativePlatform.AndroidOnly) {
@@ -369,7 +377,13 @@ async function setBuild(build: string, prj: Project, platform: NativePlatform) {
  * @param  {string} folder Folder for the project
  * @param  {NativePlatform} platform Whether to apply to iOS only, Android only or both (default)
  */
-async function setDisplayName(currentDisplayName: string, prj: Project, folder: string, platform: NativePlatform) {
+async function setDisplayName(
+  queueFunction: QueueFunction,
+  currentDisplayName: string,
+  prj: Project,
+  folder: string,
+  platform: NativePlatform,
+) {
   const displayName = await window.showInputBox({
     title: 'Application Display Name',
     placeHolder: currentDisplayName,
@@ -380,6 +394,7 @@ async function setDisplayName(currentDisplayName: string, prj: Project, folder: 
     return; // User cancelled
   }
 
+  queueFunction();
   const project = await getCapacitorProject(prj);
 
   console.log(`Display name changed to ${displayName}`);

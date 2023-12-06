@@ -1,5 +1,5 @@
 import { Project } from './project';
-import { Tip, TipType } from './tip';
+import { QueueFunction, Tip, TipType } from './tip';
 import { writeError, writeIonic } from './logging';
 import { ionicState } from './ionic-tree-provider';
 import { isGreaterOrEqual } from './analyzer';
@@ -53,7 +53,7 @@ function checkWebpackToESBuild(angular: any, project: Project, projectName: stri
     ) {
       // Stable in Angular 17+
       if (isGreaterOrEqual('@angular/core', '17.0.0')) {
-        project.add(new Tip('Switch to ESBuild', '', TipType.Idea).setAction(switchESBuild, project, filename));
+        project.add(new Tip('Switch to ESBuild', '', TipType.Idea).setQueuedAction(switchESBuild, project, filename));
       }
     }
   } finally {
@@ -68,23 +68,23 @@ function checkPackageManager(angular: any, project: Project, filename: string): 
     if (project.repoType == MonoRepoType.pnpm) {
       if (!angular.cli?.packageManager || angular.cli?.packageManager !== 'pnpm') {
         project.add(
-          new Tip('Set Angular CLI to pnpm', '', TipType.Idea).setAction(
+          new Tip('Set Angular CLI to pnpm', '', TipType.Idea).setQueuedAction(
             setAngularPackageManager,
             project,
             filename,
-            'pnpm'
-          )
+            'pnpm',
+          ),
         );
       }
     } else if (project.repoType == MonoRepoType.yarn) {
       if (!angular.cli?.packageManager || angular.cli?.packageManager !== 'pnpm') {
         project.add(
-          new Tip('Set Angular CLI to yarn', '', TipType.Idea).setAction(
+          new Tip('Set Angular CLI to yarn', '', TipType.Idea).setQueuedAction(
             setAngularPackageManager,
             project,
             filename,
-            'yarn'
-          )
+            'yarn',
+          ),
         );
       }
     }
@@ -100,8 +100,8 @@ function fixAOT(angular: any, project: Project, projectName: string, filename: s
       new Tip(
         'Use Default Angular Compilation',
         `Use Angular's recommended AOT (Ahead of Time) compilation`,
-        TipType.Error
-      ).setAction(fixAngularJson, filename)
+        TipType.Error,
+      ).setQueuedAction(fixAngularJson, filename),
     );
     return true;
   }
@@ -150,15 +150,16 @@ function parseAngularJSON(filename: string): any {
   }
 }
 
-async function fixAngularJson(filename: string) {
+async function fixAngularJson(queueFunction: QueueFunction, filename: string) {
   if (
     !(await window.showErrorMessage(
       `Use Angular's recommended AOT (Ahead of Time) compilation? (this will find additional errors in your templates by switching from JIT to AOT compilation during development)`,
-      'Yes, Apply Changes'
+      'Yes, Apply Changes',
     ))
   ) {
     return;
   }
+  queueFunction();
   const txt = readFileSync(filename, 'utf8');
   const angular = JSON.parse(txt);
   try {
@@ -171,15 +172,21 @@ async function fixAngularJson(filename: string) {
   }
 }
 
-async function setAngularPackageManager(project: Project, filename: string, packageMangerName: string) {
+async function setAngularPackageManager(
+  queueFunction: QueueFunction,
+  project: Project,
+  filename: string,
+  packageMangerName: string,
+) {
   if (
     !(await window.showErrorMessage(
       `It appears you are using ${packageMangerName} but your Angular CLI is set to the default of npm. Would you like to update angular.json to use ${packageMangerName}?`,
-      'Yes, Apply Changes'
+      'Yes, Apply Changes',
     ))
   ) {
     return;
   }
+  queueFunction();
   const txt = readFileSync(filename, 'utf8');
   const angular = JSON.parse(txt);
   try {
@@ -194,11 +201,11 @@ async function setAngularPackageManager(project: Project, filename: string, pack
   }
 }
 
-async function switchESBuild(project: Project, filename: string) {
+async function switchESBuild(queueFunction: QueueFunction, project: Project, filename: string) {
   const response = await window.showInformationMessage(
     `Angular 17 projects use ESBuild by default but your project is still using WebPack. Would you like to switch to ESBuild?`,
     'Yes, Apply Changes',
-    'More Information'
+    'More Information',
   );
   if (!response) {
     return;
@@ -207,6 +214,7 @@ async function switchESBuild(project: Project, filename: string) {
     openUri('https://angular.io/guide/esbuild');
     return;
   }
+  queueFunction();
   const txt = readFileSync(filename, 'utf8');
   const angular = JSON.parse(txt);
   let success = false;

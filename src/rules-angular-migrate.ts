@@ -1,5 +1,5 @@
-import { exists, getPackageVersion } from './analyzer';
-import { Tip, TipType } from './tip';
+import { exists, getAllPackageNames, getPackageVersion } from './analyzer';
+import { QueueFunction, Tip, TipType } from './tip';
 import { coerce } from 'semver';
 import { npmInstall, npx } from './node-commands';
 import { ionicState } from './ionic-tree-provider';
@@ -20,16 +20,16 @@ export function angularMigrate(project: Project, latestVersion: string): Tip | u
   const next = current.major + 1;
   if (!latest) latest = current;
   if (!current) return;
-  return new Tip(`Migrate to Angular ${next}`, '', TipType.Angular).setAction(
+  return new Tip(`Migrate to Angular ${next}`, '', TipType.Angular).setQueuedAction(
     migrate,
     project,
     next,
     current.major,
-    current
+    current,
   );
 }
 
-async function migrate(project: Project, next: number, current: number, now: string) {
+async function migrate(queueFunction: QueueFunction, project: Project, next: number, current: number, now: string) {
   const nextButton = `Update to v${next}`;
   const currentButton = `Update to latest v${current}`;
   const infoButton = 'Info';
@@ -37,7 +37,7 @@ async function migrate(project: Project, next: number, current: number, now: str
     `Would you like to migrate from Angular ${now} to ${next}? This will use 'ng update': Make sure you have committed your code before you begin.`,
     infoButton,
     currentButton,
-    nextButton
+    nextButton,
   );
   if (!result) return;
   switch (result) {
@@ -45,17 +45,18 @@ async function migrate(project: Project, next: number, current: number, now: str
       openUri('https://angular.io/cli/update');
       break;
     case currentButton:
-      await migrateTo(current, project);
+      await migrateTo(queueFunction, current, project);
       break;
     case nextButton:
-      await migrateTo(next, project);
+      await migrateTo(queueFunction, next, project);
       break;
   }
 
-  async function migrateTo(version: number, project: Project) {
+  async function migrateTo(queueFunction: QueueFunction, version: number, project: Project) {
+    queueFunction();
     const commands = [
       `${npx(
-        ionicState.packageManager
+        ionicState.packageManager,
       )} ng update @angular/cli@${version} @angular/core@${version} --allow-dirty --force`,
     ];
     if (exists('@angular/cdk')) {
@@ -63,6 +64,12 @@ async function migrate(project: Project, next: number, current: number, now: str
     }
     if (exists('@angular/pwa')) {
       commands.push(npmInstall(`@angular/pwa@${version}`, '--force'));
+    }
+    const dependencies = getAllPackageNames();
+    for (const dependency of dependencies) {
+      if (dependency.startsWith('@angular-eslint/')) {
+        commands.push(npmInstall(`${dependency}@${version}`, '--force'));
+      }
     }
     await runCommands(commands, `Migrating to Angular ${version}`, project);
     postFixes(project, next);

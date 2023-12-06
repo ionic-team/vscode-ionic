@@ -9,8 +9,13 @@ import { getRunOutput, run, RunResults, showProgress } from './utilities';
 
 import { fixYarnGarbage } from './monorepo';
 import { OutputChannel, window } from 'vscode';
+import { QueueFunction } from './tip';
 
-export async function updateMinorDependencies(project: Project, packages: object): Promise<void> {
+export async function updateMinorDependencies(
+  queueFunction: QueueFunction,
+  project: Project,
+  packages: object,
+): Promise<void> {
   const channel = clearOutput();
   try {
     writeIonic(`Checking for minor updates for ${Object.keys(packages).length} dependencies`);
@@ -45,6 +50,7 @@ export async function updateMinorDependencies(project: Project, packages: object
 
     let updated = 0;
     await showProgress('Updating Dependencies', async () => {
+      queueFunction();
       for (const update of updates) {
         const cmd = npmInstall(`${update}`);
         channel.appendLine(`> ${cmd}`);
@@ -66,7 +72,7 @@ async function addForPackageManager(
   project: Project,
   packages: object,
   tmpDir: string,
-  channel: OutputChannel
+  channel: OutputChannel,
 ): Promise<string[]> {
   let data = await getRunOutput(outdatedCommand(project.packageManager), tmpDir, undefined, true);
   data = fixYarnGarbage(data, project.packageManager);

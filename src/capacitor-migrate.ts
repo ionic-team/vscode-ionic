@@ -16,8 +16,13 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { checkPeerDependencies, PeerReport } from './peer-dependencies';
 import { removeNodeModules } from './advanced-actions';
 import { window } from 'vscode';
+import { QueueFunction } from './tip';
 
-export async function migrateCapacitor5(project: Project, currentVersion: string): Promise<ActionResult> {
+export async function migrateCapacitor5(
+  queueFunction: QueueFunction,
+  project: Project,
+  currentVersion: string,
+): Promise<ActionResult> {
   const coreVersion = '5';
   const versionTitle = '5';
   const versionFull = '5.0.0';
@@ -29,7 +34,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
       const res = await window.showInformationMessage(
         `Android Studio Flamingo (2022.2.1) is the minimum version needed for Capacitor ${versionTitle} (It comes with Java 17 and Gradle 8). Choose Android Studio > Check for Updates.`,
         openStudio,
-        'Continue...'
+        'Continue...',
       );
       if (res === openStudio) {
         await run(
@@ -38,7 +43,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
           undefined,
           [],
           undefined,
-          undefined
+          undefined,
         );
         return;
       }
@@ -50,7 +55,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
       const result = await window.showInformationMessage(
         `Your version of Java is ${version} but version 17 is the minimum required. Please check your JAVA_HOME path and ensure it is using JDK Version 17. You may need to restart VS Code after making this change.`,
         'OK',
-        'Continue'
+        'Continue',
       );
       if (result !== 'Continue') {
         return;
@@ -60,6 +65,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
 
   clearOutput();
   showOutput();
+  queueFunction();
   let report: PeerReport;
   await showProgress(`Checking plugins in your project...`, async () => {
     report = await checkPeerDependencies(project.folder, '@capacitor/core', versionFull);
@@ -94,10 +100,10 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
     const result = await window.showErrorMessage(
       `There ${plural('are', report.incompatible.length)} ${pluralize(
         'plugin',
-        report.incompatible.length
+        report.incompatible.length,
       )} in your project that does not work with Capacitor ${versionTitle}. Filing an issue with the author is recommended.`,
       `Continue`,
-      'Exit'
+      'Exit',
     );
     if (result != 'Continue') {
       return;
@@ -107,7 +113,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
   const result = await window.showInformationMessage(
     `Capacitor ${versionTitle} sets a deployment target of iOS 13 and Android 13 (SDK 33).`,
     `Migrate to v${versionTitle}`,
-    'Ignore'
+    'Ignore',
   );
   if (result == 'Ignore') {
     return ActionResult.Ignore;
@@ -133,7 +139,7 @@ export async function migrateCapacitor5(project: Project, currentVersion: string
     try {
       const result = await getRunOutput(
         logCmd(`npx cap migrate --noprompt --packagemanager=${manager}`),
-        project.projectFolder()
+        project.projectFolder(),
       );
       write(result);
       if (result.includes('[error] npm install failed. Try deleting node_modules')) {
@@ -212,7 +218,11 @@ export interface AndroidStudioInfo {
   version: string;
 }
 
-export async function migrateCapacitor(project: Project, currentVersion: string): Promise<ActionResult> {
+export async function migrateCapacitor(
+  queueFunction: QueueFunction,
+  project: Project,
+  currentVersion: string,
+): Promise<ActionResult> {
   const coreVersion = '^4.0.1';
   const pluginVersion = '^4.0.1';
 
@@ -224,7 +234,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
   const result = await window.showInformationMessage(
     `Capacitor 4 sets a deployment target of iOS 13 and Android 12 (SDK 32). ${warning}`,
     'Migrate to v4',
-    'Ignore'
+    'Ignore',
   );
   if (result == 'Ignore') {
     return ActionResult.Ignore;
@@ -232,7 +242,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
   if (!result) {
     return;
   }
-
+  queueFunction();
   await showProgress(`Migrating to Capacitor 4`, async () => {
     try {
       let replaceStorage = false;
@@ -272,8 +282,8 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
             '@capacitor/toast',
           ],
           coreVersion,
-          pluginVersion
-        )
+          pluginVersion,
+        ),
       );
 
       if (replaceStorage) {
@@ -288,7 +298,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
           join('ios', 'App', 'App.xcodeproj', 'project.pbxproj'),
           'IPHONEOS_DEPLOYMENT_TARGET = ',
           ';',
-          '13.0'
+          '13.0',
         );
 
         // Update Podfile to 13.0
@@ -371,7 +381,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
               `${variable} = '`,
               `'`,
               variables[variable].toString(),
-              true
+              true,
             )
           ) {
             if (
@@ -381,7 +391,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
                 `${variable} = `,
                 `\n`,
                 addQuotes(variables[variable].toString()),
-                true
+                true,
               )
             ) {
               // Add variables if they are in the core list of required ones
@@ -398,7 +408,7 @@ export async function migrateCapacitor(project: Project, currentVersion: string)
                 updateVariablesGradle(
                   join(project.projectFolder(), 'android', 'variables.gradle'),
                   variable,
-                  variables[variable].toString()
+                  variables[variable].toString(),
                 );
               }
             }
@@ -458,15 +468,15 @@ function writeBreakingChanges() {
   if (broken.length > 0) {
     writeIonic(
       `IMPORTANT: Review https://capacitorjs.com/docs/updating/4-0#plugins for breaking changes in these plugins that you use: ${broken.join(
-        ', '
-      )}.`
+        ', ',
+      )}.`,
     );
   } else {
     writeIonic('IMPORTANT: Review https://capacitorjs.com/docs/updating/4-0 for optional manual updates.');
   }
   if (exists('@capacitor/android')) {
     writeIonic(
-      'Warning: The Android Gradle plugin was updated and it requires Java 11 to run (included with Android Studio). You may need to select this in Android Studio (Preferences > Build, Execution, Deployment > Build Tools > Gradle).'
+      'Warning: The Android Gradle plugin was updated and it requires Java 11 to run (included with Android Studio). You may need to select this in Android Studio (Preferences > Build, Execution, Deployment > Build Tools > Gradle).',
     );
   }
 }
@@ -571,7 +581,7 @@ function updateMainActivity(path: string) {
           const eindex = data.lastIndexOf('.class);') + 8;
           data = data.replace(
             data.substring(bindex, eindex),
-            `${data.substring(bindex, eindex)}\n${' '.repeat(linePadding) + superLine.padStart(linePadding)}`
+            `${data.substring(bindex, eindex)}\n${' '.repeat(linePadding) + superLine.padStart(linePadding)}`,
           );
         }
       }
@@ -619,7 +629,7 @@ function patchPodFile(filename: string) {
     if (!replaced.includes('assertDeploymentTarget(installer)')) {
       replaced = replaced.replace(
         `post_install do |installer|`,
-        `post_install do |installer|\n  assertDeploymentTarget(installer)\n`
+        `post_install do |installer|\n  assertDeploymentTarget(installer)\n`,
       );
     }
   }
@@ -681,7 +691,7 @@ function updateGradleWrapper(filename: string) {
     'distributionUrl=',
     '\n',
     // eslint-disable-next-line no-useless-escape
-    `https\://services.gradle.org/distributions/gradle-7.4.2-bin.zip`
+    `https\://services.gradle.org/distributions/gradle-7.4.2-bin.zip`,
   );
   if (txt != replaced) {
     writeFileSync(filename, replaced, 'utf-8');
@@ -731,7 +741,7 @@ function updateStyles(filename: string) {
   //if (exists('@capacitor/splash-screen')) {
   replaced = replaced.replace(
     '<style name="AppTheme.NoActionBarLaunch" parent="AppTheme.NoActionBar">',
-    '<style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">'
+    '<style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">',
   );
   //}
   replaced = replaced.replace(`parent="Theme.AppCompat.NoActionBar"`, `parent="Theme.AppCompat.DayNight.NoActionBar"`);
@@ -808,7 +818,7 @@ function updateFile(
   textStart: string,
   textEnd: string,
   replacement?: string,
-  skipIfNotFound?: boolean
+  skipIfNotFound?: boolean,
 ): boolean {
   const path = join(project.projectFolder(), filename);
   const txt = readFile(path);
