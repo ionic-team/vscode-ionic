@@ -89,12 +89,12 @@ export function passesRemoteFilter(msg: string, logFilters: string[]): boolean {
 }
 
 export function passesFilter(msg: string, logFilters: string[], isRemote: boolean): boolean {
-  if (!logFilters) return true;
   for (const filteredLine of filteredLines) {
     if (msg.startsWith(filteredLine)) {
       return false;
     }
   }
+  if (!logFilters) return true;
 
   for (const logFilter of logFilters) {
     if (logFilter == '' && !isRemote) {
