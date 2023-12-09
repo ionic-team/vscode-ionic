@@ -27,11 +27,15 @@ export async function peerDependencyCleanup(project: Project): Promise<void> {
     return;
   }
   write('');
+  let question = 'Would you like to fix these?';
+  if (report.commands.length == 1) {
+    question = `Would you like to update ${report.dependencies[0].name}?`;
+  }
   if (
     (await window.showWarningMessage(
       `There ${isAre(report.commands.length)} ${report.commands.length} dependency conflict${plural(
         report.commands.length,
-      )} that can be resolved. Would you like to fix these?`,
+      )} that can be resolved. ${question}`,
       'Yes',
       'No',
     )) != 'Yes'
