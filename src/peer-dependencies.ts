@@ -7,12 +7,22 @@ import { getPackageVersion } from './analyzer';
 
 export interface PeerReport {
   // Dependencies that do not meet peer dependency requirements
-  dependencies: string[];
+  dependencies: DependencyConflict[];
   // Dependencies that do not have a version that can be updated to
   incompatible: string[];
 
   // Set of command to run to upgrade dependendencies that do not meet peer deps
   commands: string[];
+}
+
+export interface DependencyVersion {
+  name: string;
+  version: string;
+}
+
+export interface DependencyConflict {
+  name: string;
+  conflict: DependencyVersion;
 }
 
 /**
@@ -23,21 +33,21 @@ export interface PeerReport {
  */
 export async function checkPeerDependencies(
   folder: string,
-  peerDependency: string,
-  minVersion: string
+  peerDeps: DependencyVersion[],
+  ignoreDeps: string[],
 ): Promise<PeerReport> {
   if (ionicState.packageManager != PackageManager.npm) return { dependencies: [], incompatible: [], commands: [] };
-  const dependencies = await getDependencyConflicts(folder, peerDependency, minVersion);
+  const dependencies = await getDependencyConflicts(folder, peerDeps, ignoreDeps);
   const conflicts = [];
-  const updates = [];
+  const updates: string[] = [];
   const commands = [];
   for (const dependency of dependencies) {
-    const version = await findCompatibleVersion2(dependency, peerDependency, minVersion);
+    const version = await findCompatibleVersion2(dependency);
     if (version == 'latest') {
       conflicts.push(dependency);
     } else {
-      write(`${dependency} will be updated to ${version}`);
-      updates.push(`${dependency}@${version}`);
+      write(`${dependency.name} will be updated to ${version}`);
+      updates.push(`${dependency.name}@${version}`);
     }
   }
 
@@ -48,19 +58,31 @@ export async function checkPeerDependencies(
   return { dependencies, incompatible: conflicts, commands };
 }
 
-async function getDependencyConflicts(folder: string, peerDependency: string, minVersion: string): Promise<string[]> {
+async function getDependencyConflicts(
+  folder: string,
+  peerDeps: DependencyVersion[],
+  ignoreDeps: string[],
+): Promise<DependencyConflict[]> {
   try {
-    const list: string[] = [];
-    const data = await getRunOutput(`npm ls --depth=1 --long --json`, folder, undefined, true);
+    const list: DependencyConflict[] = [];
+    const data = await getRunOutput(`npm ls --depth=1 --long --json`, folder, undefined, true, true);
     const deps = JSON.parse(data);
-    for (const key of Object.keys(deps.dependencies)) {
-      for (const peer of Object.keys(deps.dependencies[key].peerDependencies)) {
-        const version = deps.dependencies[key].peerDependencies[peer];
-        if (peer == peerDependency) {
-          if (!satisfies(minVersion, version)) {
-            // Migration will update capacitor plugins so leave them out
-            if (!key.startsWith('@capacitor/')) {
-              list.push(key);
+    for (const peerDependency of peerDeps) {
+      for (const key of Object.keys(deps.dependencies)) {
+        for (const peer of Object.keys(deps.dependencies[key].peerDependencies)) {
+          const versionRange = deps.dependencies[key].peerDependencies[peer];
+          if (peer == peerDependency.name) {
+            if (!satisfies(peerDependency.version, versionRange)) {
+              // Migration will update capacitor plugins so leave them out
+              let ignore = false;
+              for (const ignoreDep of ignoreDeps) {
+                if (key.startsWith(ignoreDep)) {
+                  ignore = true;
+                }
+              }
+              if (!ignore) {
+                list.push({ name: key, conflict: peerDependency });
+              }
             }
           }
         }
@@ -95,15 +117,11 @@ async function getNPMInfoFor(dependency: string): Promise<any> {
  * If hasPeer is supplied then it will look for a version that passes with that peer and version
  *
  */
-export async function findCompatibleVersion2(
-  dependency: string,
-  hasPeer?: string,
-  hasPeerVersion?: string
-): Promise<string> {
+export async function findCompatibleVersion2(dependency: DependencyConflict): Promise<string> {
   let best: string;
   let incompatible = false;
   try {
-    const pck = await getNPMInfoFor(dependency);
+    const pck = await getNPMInfoFor(dependency.name);
     const latestVersion = pck.latestVersion;
     for (const version of Object.keys(pck.versions)) {
       if (pck.versions[version].peerDependencies) {
@@ -112,9 +130,9 @@ export async function findCompatibleVersion2(
           const current = getPackageVersion(peerDependency);
           let meetsNeeds = satisfies(current, peerVersion);
 
-          if (hasPeer) {
-            if (hasPeer == peerDependency) {
-              meetsNeeds = satisfies(hasPeerVersion, peerVersion);
+          if (dependency.conflict) {
+            if (dependency.conflict.name == peerDependency) {
+              meetsNeeds = satisfies(dependency.conflict.version, peerVersion);
             } else {
               meetsNeeds = false;
             }
@@ -125,15 +143,17 @@ export async function findCompatibleVersion2(
               best = version;
             }
           } else {
-            if (hasPeer) {
-              if (hasPeer == peerDependency && version == latestVersion) {
-                writeError(
-                  `The latest version of ${dependency} (${version}) does not work with ${peerDependency} ${hasPeerVersion}.`
-                );
+            if (dependency.conflict) {
+              if (dependency.conflict.name == peerDependency && version == latestVersion) {
                 incompatible = true;
+                if (!best) {
+                  writeError(
+                    `Your version of ${dependency.name} is not compatible with ${peerDependency} ${dependency.conflict.version}.`,
+                  );
 
-                if (pck.bugs?.url) {
-                  writeWarning(`Recommendation: File an issue with the plugin author at: ${pck.bugs.url}`);
+                  if (pck.bugs?.url) {
+                    writeWarning(`Recommendation: File an issue with the plugin author at: ${pck.bugs.url}`);
+                  }
                 }
               }
             } else {

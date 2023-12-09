@@ -4,7 +4,7 @@ import { join } from 'path';
 import { exists, isLess, isVersionGreaterOrEqual } from './analyzer';
 import { clearOutput, showOutput, write, writeError, writeIonic, writeWarning } from './logging';
 import { npmInstall, npmUninstall, npmUpdate } from './node-commands';
-import { Project } from './project';
+import { inspectProject, Project } from './project';
 import { getRunOutput, getStringFrom, plural, pluralize, run, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
 import { ActionResult } from './command-name';
@@ -68,7 +68,8 @@ export async function migrateCapacitor5(
   queueFunction();
   let report: PeerReport;
   await showProgress(`Checking plugins in your project...`, async () => {
-    report = await checkPeerDependencies(project.folder, '@capacitor/core', versionFull);
+    await inspectProject(ionicState.rootFolder, ionicState.context, undefined);
+    report = await checkPeerDependencies(project.folder, [{ name: '@capacitor/core', version: versionFull }], []);
   });
 
   // Set of minimum versions for dependencies
