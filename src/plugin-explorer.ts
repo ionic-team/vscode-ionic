@@ -41,7 +41,7 @@ export class PluginExplorerPanel {
     extensionUri: Uri,
     path: string,
     context: ExtensionContext,
-    provider: IonicTreeProvider
+    provider: IonicTreeProvider,
   ) {
     this.panel = panel;
     this.path = path;
@@ -70,7 +70,7 @@ export class PluginExplorerPanel {
             Uri.joinPath(extensionUri, 'out'),
             Uri.joinPath(extensionUri, 'plugin-explorer', 'build'),
           ],
-        }
+        },
       );
 
       PluginExplorerPanel.currentPanel = new PluginExplorerPanel(panel, extensionUri, path, context, provider);
@@ -158,7 +158,7 @@ export class PluginExplorerPanel {
         }
       },
       undefined,
-      this.disposables
+      this.disposables,
     );
   }
 
@@ -212,14 +212,14 @@ export class PluginExplorerPanel {
       await run(this.path, cmd, undefined, [], [], undefined, undefined, undefined, false);
       await run(
         this.path,
-        capacitorSync(ionicState.projectRef),
+        await capacitorSync(ionicState.projectRef),
         undefined,
         [],
         [],
         undefined,
         undefined,
         undefined,
-        false
+        false,
       );
       this.provider.refresh();
       window.showInformationMessage(`${plugin} was installed.`, 'OK');
@@ -362,7 +362,7 @@ function ageInHours(path: string): number {
 async function findBestVersion(plugin: string): Promise<string> {
   let v = 'latest';
   await showProgress(`Finding the best version of ${plugin} that works with your project`, async () => {
-    v = await findCompatibleVersion2(plugin);
+    v = await findCompatibleVersion2({ name: plugin, conflict: undefined });
   });
   if (v == 'latest') {
     const res = await window.showInformationMessage(`${plugin} is not compatible with your project.`, 'Install Anyway');

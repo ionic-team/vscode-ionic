@@ -6,10 +6,11 @@ import { ionicState } from './ionic-tree-provider';
 import { runCommands } from './advanced-actions';
 import { Project } from './project';
 import { window } from 'vscode';
-import { openUri } from './utilities';
+import { delay, openUri, showProgress } from './utilities';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { write } from './logging';
 import { join } from 'path';
+import { peerDependencyCleanup } from './peer-dependency-cleanup';
 
 // Maximum supported Angular version that we'll suggest migrating to
 export const maxAngularVersion = '17';
@@ -66,13 +67,19 @@ async function migrate(queueFunction: QueueFunction, project: Project, next: num
       commands.push(npmInstall(`@angular/pwa@${version}`, '--force'));
     }
     const dependencies = getAllPackageNames();
+    const list = [];
     for (const dependency of dependencies) {
       if (dependency.startsWith('@angular-eslint/')) {
-        commands.push(npmInstall(`${dependency}@${version}`, '--force'));
+        list.push(`${dependency}@${version}`);
       }
+    }
+    if (list.length > 0) {
+      commands.push(npmInstall(list.join(' '), '--force'));
     }
     await runCommands(commands, `Migrating to Angular ${version}`, project);
     postFixes(project, next);
+
+    await peerDependencyCleanup(project);
   }
 
   function postFixes(project: Project, version: number) {

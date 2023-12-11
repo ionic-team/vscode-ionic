@@ -89,12 +89,12 @@ export function passesRemoteFilter(msg: string, logFilters: string[]): boolean {
 }
 
 export function passesFilter(msg: string, logFilters: string[], isRemote: boolean): boolean {
-  if (!logFilters) return true;
   for (const filteredLine of filteredLines) {
     if (msg.startsWith(filteredLine)) {
       return false;
     }
   }
+  if (!logFilters) return true;
 
   for (const logFilter of logFilters) {
     if (logFilter == '' && !isRemote) {
@@ -464,6 +464,7 @@ export async function getRunOutput(
   folder: string,
   shell?: string,
   hideErrors?: boolean,
+  ignoreErrors?: boolean,
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';
@@ -490,7 +491,11 @@ export async function getRunOutput(
           } else {
             console.error(stdError);
           }
-          reject(stdError);
+          if (ignoreErrors) {
+            resolve(out);
+          } else {
+            reject(stdError);
+          }
         } else {
           // This is to fix a bug in npm outdated where it returns an exit code when it succeeds
           resolve(out);

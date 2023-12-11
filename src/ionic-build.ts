@@ -13,7 +13,11 @@ import { workspace } from 'vscode';
  * @param  {Project} project
  * @returns string
  */
-export function ionicBuild(project: Project, configurationArg?: string, platform?: CapacitorPlatform): string {
+export async function ionicBuild(
+  project: Project,
+  configurationArg?: string,
+  platform?: CapacitorPlatform,
+): Promise<string> {
   const preop = preflightNPMCheck(project);
 
   ionicState.projectDirty = false;
@@ -48,7 +52,7 @@ function ionicCLIBuild(
   prod: boolean,
   project: Project,
   configurationArg?: string,
-  platform?: CapacitorPlatform
+  platform?: CapacitorPlatform,
 ): string {
   let cmd = `${npx(project.packageManager)} ionic build`;
   if (configurationArg) {

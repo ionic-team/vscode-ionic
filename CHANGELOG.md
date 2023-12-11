@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.63
+
+- Fix peer dependencies when migrating Angular or Capacitor
+- Support for Android Flavors
+
 ### Version 1.62
 
 - Fix task queueing issue when a dialog is left to timeout

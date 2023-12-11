@@ -1,5 +1,4 @@
 import { existsSync } from 'fs';
-
 import { exists, isLess } from './analyzer';
 import { getConfigurationArgs } from './build-configuration';
 import { CapacitorPlatform } from './capacitor-platform';
@@ -11,8 +10,10 @@ import { certPath, liveReloadSSL } from './live-reload';
 import { MonoRepoType } from './monorepo';
 import { npx, PackageManager, preflightNPMCheck } from './node-commands';
 import { Project } from './project';
+import { gradleToJson } from './gradle-to-json';
 import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
-import { workspace } from 'vscode';
+import { window, workspace } from 'vscode';
+import { join } from 'path';
 
 /**
  * Creates the command line to run for Capacitor
@@ -20,7 +21,7 @@ import { workspace } from 'vscode';
  * @param  {Project} project
  * @returns string
  */
-export function capacitorRun(project: Project, platform: CapacitorPlatform): string {
+export async function capacitorRun(project: Project, platform: CapacitorPlatform): Promise<string> {
   let preop = '';
   let rebuilt = false;
   let noSync = false;
@@ -46,7 +47,7 @@ export function capacitorRun(project: Project, platform: CapacitorPlatform): str
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
     case MonoRepoType.npm:
-      return preop + capRun(platform, project.repoType, rebuilt, noSync, project);
+      return preop + (await capRun(platform, project.repoType, rebuilt, noSync, project));
     case MonoRepoType.nx:
       return preop + nxRun(platform, project.repoType, rebuilt, noSync, project);
     default:
@@ -66,13 +67,13 @@ export function useIonicCLI(): boolean {
   return exists('@ionic/cli');
 }
 
-function capRun(
+async function capRun(
   platform: CapacitorPlatform,
   repoType: MonoRepoType,
   noBuild: boolean,
   noSync: boolean,
-  project: Project
-): string {
+  project: Project,
+): Promise<string> {
   let liveReload = getSetting(WorkspaceSetting.liveReload);
   const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
   const httpsForWeb = getSetting(WorkspaceSetting.httpsForWeb);
@@ -120,6 +121,10 @@ function capRun(
 
   capRunFlags += getConfigurationArgs();
 
+  const flavors = await getFlavors(platform, project);
+  if (flavors == undefined) return;
+  capRunFlags += flavors;
+
   capRunFlags += InternalCommand.publicHost;
   if (httpsForWeb) {
     if (capRunFlags.length >= 0) capRunFlags += ' ';
@@ -147,18 +152,44 @@ function capRun(
   } ${capRunFlags}`;
 }
 
-function nxRun(
+async function nxRun(
   platform: CapacitorPlatform,
   repoType: MonoRepoType,
   noBuild: boolean,
   noSync: boolean,
-  project: Project
-): string {
+  project: Project,
+): Promise<string> {
   if (project.monoRepo?.isNXStandalone) {
-    return capRun(platform, repoType, noBuild, noSync, project);
+    return await capRun(platform, repoType, noBuild, noSync, project);
   }
   // Note: This may change, see: https://github.com/nxtend-team/nxtend/issues/490
   return `${npx(project.packageManager)} nx run ${project.monoRepo.name}:cap --cmd "run ${platform} --target=${
     InternalCommand.target
   }"`;
+}
+
+async function getFlavors(platform: CapacitorPlatform, prj: Project): Promise<string | undefined> {
+  if (platform == CapacitorPlatform.ios) {
+    return '';
+  }
+
+  if (ionicState.flavors == undefined) {
+    ionicState.flavors = [];
+    const buildGradle = join(prj.projectFolder(), 'android', 'app', 'build.gradle');
+    const data = gradleToJson(buildGradle);
+    if (data?.android?.productFlavors) {
+      const list = Object.keys(data.android.productFlavors);
+      if (list?.length == 0) {
+        return '';
+      }
+      ionicState.flavors = list;
+    }
+  }
+  if (ionicState.flavors.length == 0) {
+    return '';
+  }
+
+  const selection = await window.showQuickPick(ionicState.flavors, { placeHolder: 'Select the Android Flavor to run' });
+  if (!selection) return undefined;
+  return ` --flavor=${selection}`;
 }

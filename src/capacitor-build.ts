@@ -95,7 +95,11 @@ async function verifySettings(
       return undefined;
     }
     if (selection == 'Open Android Studio') {
-      await runWithProgress(capacitorOpen(project, platform), 'Opening Android Studio...', project.projectFolder());
+      await runWithProgress(
+        await capacitorOpen(project, platform),
+        'Opening Android Studio...',
+        project.projectFolder(),
+      );
       return undefined;
     }
     const path = await window.showOpenDialog({

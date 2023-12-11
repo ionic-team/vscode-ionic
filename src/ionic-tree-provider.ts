@@ -39,6 +39,7 @@ interface IonicState {
   project: string; // Angular project name
   nvm: string; // If .nvmrc is used will contain its contents
   rootFolder: string; // The folder to inspect
+  flavors: string[]; // Android Flavors
   runIOS: Tip;
   runAndroid: Tip;
   runWeb: Tip;
@@ -66,6 +67,7 @@ export const ionicState: IonicState = {
   runAndroid: undefined,
   runWeb: undefined,
   nvm: undefined,
+  flavors: undefined,
   rootFolder: undefined,
   lastRun: undefined,
   projectRef: undefined,

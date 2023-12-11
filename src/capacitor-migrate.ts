@@ -4,7 +4,7 @@ import { join } from 'path';
 import { exists, isLess, isVersionGreaterOrEqual } from './analyzer';
 import { clearOutput, showOutput, write, writeError, writeIonic, writeWarning } from './logging';
 import { npmInstall, npmUninstall, npmUpdate } from './node-commands';
-import { Project } from './project';
+import { inspectProject, Project } from './project';
 import { getRunOutput, getStringFrom, plural, pluralize, run, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
 import { ActionResult } from './command-name';
@@ -39,7 +39,7 @@ export async function migrateCapacitor5(
       if (res === openStudio) {
         await run(
           project.folder,
-          capacitorOpen(project, CapacitorPlatform.android),
+          await capacitorOpen(project, CapacitorPlatform.android),
           undefined,
           [],
           undefined,
@@ -68,7 +68,8 @@ export async function migrateCapacitor5(
   queueFunction();
   let report: PeerReport;
   await showProgress(`Checking plugins in your project...`, async () => {
-    report = await checkPeerDependencies(project.folder, '@capacitor/core', versionFull);
+    await inspectProject(ionicState.rootFolder, ionicState.context, undefined);
+    report = await checkPeerDependencies(project.folder, [{ name: '@capacitor/core', version: versionFull }], []);
   });
 
   // Set of minimum versions for dependencies
@@ -417,7 +418,7 @@ export async function migrateCapacitor(
       }
 
       // Ran Cap Sync
-      await project.run2(capacitorSync(project), true);
+      await project.run2(await capacitorSync(project), true);
 
       writeIonic('Capacitor 4 Migration Completed.');
 

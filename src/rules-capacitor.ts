@@ -31,6 +31,7 @@ import { showOutput, write, writeIonic } from './logging';
 import { window } from 'vscode';
 import { WorkspaceSetting, getSetting, setSetting } from './workspace-state';
 import { angularMigrate, maxAngularVersion } from './rules-angular-migrate';
+import { peerDependencyCleanup } from './peer-dependency-cleanup';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 

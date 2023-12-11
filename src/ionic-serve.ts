@@ -17,7 +17,7 @@ import { window, workspace } from 'vscode';
  * Create the ionic serve command
  * @returns string
  */
-export function ionicServe(project: Project, dontOpenBrowser: boolean): string {
+export async function ionicServe(project: Project, dontOpenBrowser: boolean): Promise<string> {
   ionicState.lastRun = undefined;
   switch (project.repoType) {
     case MonoRepoType.none:
