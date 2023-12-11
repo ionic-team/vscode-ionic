@@ -1,5 +1,4 @@
 import { existsSync } from 'fs';
-
 import { exists, isLess } from './analyzer';
 import { getConfigurationArgs } from './build-configuration';
 import { CapacitorPlatform } from './capacitor-platform';
@@ -11,8 +10,10 @@ import { certPath, liveReloadSSL } from './live-reload';
 import { MonoRepoType } from './monorepo';
 import { npx, PackageManager, preflightNPMCheck } from './node-commands';
 import { Project } from './project';
+import { gradleToJson } from './gradle-to-json';
 import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
 import { workspace } from 'vscode';
+import { join } from 'path';
 
 /**
  * Creates the command line to run for Capacitor
@@ -71,7 +72,7 @@ function capRun(
   repoType: MonoRepoType,
   noBuild: boolean,
   noSync: boolean,
-  project: Project
+  project: Project,
 ): string {
   let liveReload = getSetting(WorkspaceSetting.liveReload);
   const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
@@ -120,6 +121,10 @@ function capRun(
 
   capRunFlags += getConfigurationArgs();
 
+  const flavors = getFlavors(platform, project);
+  if (!flavors) return;
+  capRunFlags += flavors;
+
   capRunFlags += InternalCommand.publicHost;
   if (httpsForWeb) {
     if (capRunFlags.length >= 0) capRunFlags += ' ';
@@ -152,7 +157,7 @@ function nxRun(
   repoType: MonoRepoType,
   noBuild: boolean,
   noSync: boolean,
-  project: Project
+  project: Project,
 ): string {
   if (project.monoRepo?.isNXStandalone) {
     return capRun(platform, repoType, noBuild, noSync, project);
@@ -161,4 +166,21 @@ function nxRun(
   return `${npx(project.packageManager)} nx run ${project.monoRepo.name}:cap --cmd "run ${platform} --target=${
     InternalCommand.target
   }"`;
+}
+
+function getFlavors(platform: CapacitorPlatform, prj: Project): string | undefined {
+  if (platform == CapacitorPlatform.ios) {
+    return '';
+  }
+
+  const buildGradle = join(prj.projectFolder(), 'android', 'app', 'build.gradle');
+  const data = gradleToJson(buildGradle);
+  if (data?.android?.productFlavors) {
+    const list = Object.keys(data.android.productFlavors);
+    if (list?.length == 0) {
+      return '';
+    }
+    return list[0];
+  }
+  return '';
 }
