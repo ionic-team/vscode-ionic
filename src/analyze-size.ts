@@ -26,7 +26,7 @@ export async function analyzeSize(queueFunction: QueueFunction, project: Project
       if (project.repoType == MonoRepoType.nx) {
         args = '--configuration=production';
       }
-      const cmd = ionicBuild(project, args);
+      const cmd = await ionicBuild(project, args);
       const bumpSize = !isWindows() ? 'export NODE_OPTIONS="--max-old-space-size=8192" && ' : '';
       try {
         await run2(project, `${bumpSize}${cmd}`, undefined);
