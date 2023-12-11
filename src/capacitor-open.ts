@@ -14,7 +14,7 @@ import { join } from 'path';
  * @param  {CapacitorPlatform} platform ios or android
  * @returns string
  */
-export function capacitorOpen(project: Project, platform: CapacitorPlatform): string {
+export async function capacitorOpen(project: Project, platform: CapacitorPlatform): Promise<string> {
   const ionicCLI = useIonicCLI();
 
   if (platform == CapacitorPlatform.android) {
@@ -68,7 +68,7 @@ function checkAndroidStudioJDK(folder: string): void {
           <component name="CompilerConfiguration">
             <bytecodeTargetLevel target="17" />
           </component>
-        </project>`
+        </project>`,
         );
       }
     }

@@ -35,7 +35,7 @@ export class Tip {
 
   private onAction: (...args) => Promise<ActionResult> | Promise<void>;
   private onQueuedAction: (...args) => Promise<ActionResult> | Promise<void>;
-  private onCommand: (...args) => string;
+  private onCommand: (...args) => Promise<string>;
   private onTitle: (...args) => string;
   private actionArgs: any[];
   private titleArgs: any[];
@@ -205,7 +205,7 @@ export class Tip {
     return this;
   }
 
-  setDynamicCommand(func: (...argsIn) => string, ...args) {
+  setDynamicCommand(func: (...argsIn) => Promise<string>, ...args) {
     this.onCommand = func;
     this.actionArgs = args;
     return this;
@@ -259,7 +259,7 @@ export class Tip {
 
   async generateCommand() {
     if (this.onCommand) {
-      this.command = this.onCommand(...this.actionArgs);
+      this.command = await this.onCommand(...this.actionArgs);
     }
   }
 

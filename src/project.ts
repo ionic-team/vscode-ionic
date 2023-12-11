@@ -101,7 +101,7 @@ export class Project {
     type: TipType,
     message?: string,
     contextValue?: string,
-    expanded?: boolean
+    expanded?: boolean,
   ): Recommendation {
     const tip = new Tip(title, undefined, undefined, undefined, undefined, 'Upgrade');
     const r = new Recommendation(
@@ -110,7 +110,7 @@ export class Project {
       title,
       expanded ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed,
       undefined,
-      tip
+      tip,
     );
     r.children = [];
     this.group.children.push(r);
@@ -127,7 +127,7 @@ export class Project {
     message: string,
     type?: TipType,
     expanded?: boolean,
-    contextValue?: string
+    contextValue?: string,
   ): Recommendation {
     // If the last group has no items in it then remove it (eg if there are no recommendations for a project)
     if (this.groups.length > 1 && this.groups[this.groups.length - 1].children.length == 0) {
@@ -139,7 +139,7 @@ export class Project {
       message,
       '',
       title,
-      expanded ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed
+      expanded ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed,
     );
     if (contextValue) {
       r.setContext(contextValue);
@@ -164,7 +164,7 @@ export class Project {
         title: 'Information',
         arguments: [tip],
       },
-      undefined
+      undefined,
     );
 
     this.setIcon(tipType, r);
@@ -377,7 +377,7 @@ export class Project {
     return !!this.yarnVersion;
   }
 
-  private updatePackages(r: Recommendation): string {
+  private async updatePackages(r: Recommendation): Promise<string> {
     let command = '';
     const addCmd = addCommand();
     for (const child of r.children) {
@@ -425,10 +425,10 @@ export class Project {
           description,
           `${npmInstall(replacement)} && ${npmUninstall(name)}`,
           'Replace',
-          `Replaced ${name} with ${replacement}`
+          `Replaced ${name} with ${replacement}`,
         )
           .setRelatedDependency(name)
-          .canIgnore()
+          .canIgnore(),
       );
     }
   }
@@ -444,10 +444,10 @@ export class Project {
           npmUninstall(name),
           'Uninstall',
           `Uninstalled ${name}`,
-          url
+          url,
         )
           .canIgnore()
-          .setRelatedDependency(name)
+          .setRelatedDependency(name),
       );
     }
   }
@@ -462,8 +462,8 @@ export class Project {
         description,
         npmInstall(name, flags),
         'Install',
-        `Installed ${name}`
-      ).setRelatedDependency(name)
+        `Installed ${name}`,
+      ).setRelatedDependency(name),
     );
   }
 
@@ -474,7 +474,7 @@ export class Project {
         `This plugin is deprecated. ${message}`,
         url,
         TipType.Warning,
-        `The plugin ${name} is deprecated. ${message}`
+        `The plugin ${name} is deprecated. ${message}`,
       );
     }
   }
@@ -500,12 +500,12 @@ export class Project {
           `Upgrade`,
           `${name} upgraded to ${toVersion}`,
           `https://www.npmjs.com/package/${name}`,
-          `Upgrading ${name}`
+          `Upgrading ${name}`,
         )
           .setSecondCommand(`Uninstall`, npmUninstall(name))
           .setContextValue(Context.upgrade)
           .setData({ name: name, version: fromVersion })
-          .setTooltip(`${name} ${fromVersion}`)
+          .setTooltip(`${name} ${fromVersion}`),
       );
     }
   }
@@ -522,11 +522,11 @@ export class Project {
           `Uninstall`,
           `${name} Uninstalled`,
           `https://www.npmjs.com/package/${name}`,
-          `Uninstalling ${name}`
+          `Uninstalling ${name}`,
         )
           .setContextValue(Context.upgrade)
           .setData({ name: name, version: undefined })
-          .setTooltip(`${name} ${version}`)
+          .setTooltip(`${name} ${version}`),
       );
     }
   }
@@ -541,8 +541,8 @@ export class Project {
           undefined,
           npmUninstall(library),
           'Uninstall',
-          `Uninstalled ${library}`
-        ).setRelatedDependency(library)
+          `Uninstalled ${library}`,
+        ).setRelatedDependency(library),
       );
     }
   }
@@ -575,7 +575,7 @@ function checkNodeVersion() {
     if (major < 13) {
       window.showErrorMessage(
         `This extension requires a minimum version of Node 14. ${process.version} is not supported.`,
-        'OK'
+        'OK',
       );
     }
   } catch {
@@ -598,8 +598,8 @@ export async function installPackage(extensionPath: string, folder: string) {
       undefined,
       undefined,
       `Installing ${selected}`,
-      `Installed ${selected}`
-    ).showProgressDialog()
+      `Installed ${selected}`,
+    ).showProgressDialog(),
   );
 }
 
@@ -611,7 +611,7 @@ export interface ProjectSummary {
 export async function reviewProject(
   folder: string,
   context: ExtensionContext,
-  selectedProject: string
+  selectedProject: string,
 ): Promise<ProjectSummary | undefined> {
   if (!folder) return undefined;
   const summary = await inspectProject(folder, context, selectedProject);
@@ -622,7 +622,7 @@ export async function reviewProject(
 export async function inspectProject(
   folder: string,
   context: ExtensionContext,
-  selectedProject: string
+  selectedProject: string,
 ): Promise<ProjectSummary> {
   const startedOp = Date.now();
   commands.executeCommand(VSCommand.setContext, Context.inspectedProject, false);

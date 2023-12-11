@@ -3,6 +3,7 @@
 ### Version 1.63
 
 - Fix peer dependencies when migrating Angular or Capacitor
+- Support for Android Flavors
 
 ### Version 1.62
 

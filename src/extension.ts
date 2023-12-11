@@ -65,7 +65,7 @@ export async function fixIssue(
   ionicProvider?: IonicTreeProvider,
   tip?: Tip,
   successMessage?: string,
-  title?: string
+  title?: string,
 ) {
   const hasRunPoints = tip && tip.runPoints && tip.runPoints.length > 0;
 
@@ -156,7 +156,7 @@ export async function fixIssue(
                 ionicProvider,
                 undefined,
                 undefined,
-                tip.data
+                tip.data,
               );
             } catch (err) {
               retry = false;
@@ -169,7 +169,7 @@ export async function fixIssue(
         }
       }
       return true;
-    }
+    },
   );
   if (ionicProvider) {
     ionicProvider.refresh();
@@ -216,7 +216,7 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(
     window.registerWebviewViewProvider('ionic-devserver', ionicDevServerProvider, {
       webviewOptions: { retainContextWhenHidden: false },
-    })
+    }),
   );
 
   ionicState.view = view;
@@ -436,7 +436,7 @@ async function runAction(tip: Tip, ionicProvider: IonicTreeProvider, rootPath: s
     markActionAsRunning(tip);
     ionicProvider.refresh();
   }
-  tip.generateCommand();
+  await tip.generateCommand();
   tip.generateTitle();
   if (tip.command) {
     let command = tip.command;
@@ -477,12 +477,12 @@ async function fix(
   tip: Tip,
   rootPath: string,
   ionicProvider: IonicTreeProvider,
-  context: ExtensionContext
+  context: ExtensionContext,
 ): Promise<void> {
   if (await waitForOtherActions(tip)) {
     return; // Canceled
   }
-  tip.generateCommand();
+  await tip.generateCommand();
   tip.generateTitle();
   if (tip.command) {
     const urlBtn = tip.url ? 'Info' : undefined;

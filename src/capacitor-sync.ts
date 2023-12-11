@@ -11,7 +11,7 @@ import { useIonicCLI } from './capacitor-run';
  * @param  {Project} project
  * @returns string
  */
-export function capacitorSync(project: Project): string {
+export async function capacitorSync(project: Project): Promise<string> {
   const preop = preflightNPMCheck(project);
 
   const ionicCLI = useIonicCLI();

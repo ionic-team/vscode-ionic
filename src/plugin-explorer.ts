@@ -212,7 +212,7 @@ export class PluginExplorerPanel {
       await run(this.path, cmd, undefined, [], [], undefined, undefined, undefined, false);
       await run(
         this.path,
-        capacitorSync(ionicState.projectRef),
+        await capacitorSync(ionicState.projectRef),
         undefined,
         [],
         [],

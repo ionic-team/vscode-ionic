@@ -39,7 +39,7 @@ export async function migrateCapacitor5(
       if (res === openStudio) {
         await run(
           project.folder,
-          capacitorOpen(project, CapacitorPlatform.android),
+          await capacitorOpen(project, CapacitorPlatform.android),
           undefined,
           [],
           undefined,
@@ -418,7 +418,7 @@ export async function migrateCapacitor(
       }
 
       // Ran Cap Sync
-      await project.run2(capacitorSync(project), true);
+      await project.run2(await capacitorSync(project), true);
 
       writeIonic('Capacitor 4 Migration Completed.');
 
