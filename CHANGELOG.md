@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.64
+
+- Add support for PWA target for Angular Applications
+
 ### Version 1.63
 
 - Fix peer dependencies when migrating Angular or Capacitor

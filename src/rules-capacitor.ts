@@ -344,8 +344,7 @@ export async function capacitorRecommendations(project: Project, forMigration: b
     }
   }
 
-  const TODO = false;
-  if (exists('@ionic/angular') && !exists('@angular/service-worker') && TODO) {
+  if (exists('@ionic/angular') && !exists('@angular/service-worker')) {
     const pwaTip = new Tip(
       'Add PWA Integration',
       '',
