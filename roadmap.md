@@ -8,6 +8,19 @@
 - PWA settings page needs theme_color and background_color
 - When setting theme_color set in index.html `<meta name="theme-color" content="#F61067">`
 
+## PWA Helper
+
+Help user to install a PWA using a tooltip
+
+- Chrome browser: show link to install app icon and instructions
+- Safari: show share button and "Add to dock"
+- Windows, iOS, Android
+
+- Parameters:
+  - Time used: (seconds). How long does the user need to use the app before the install option appears. Default 5 mins
+  - Messaging: allow message displayed to be customized (eg language)
+- Script tag to include in index.html or npm package
+
 ## Capacitor 6
 
 - Detect and migrate
