@@ -1,11 +1,22 @@
 # Roadmap
 
+## PWA
+
 - PWA support for React/Vue
+- When display name is changed look for manifest.webmanifest and change name/shortname
+- When PWA support is added set teh name/shortname
+- PWA settings page needs theme_color and background_color
+- When setting theme_color set in index.html `<meta name="theme-color" content="#F61067">`
+
+## Capacitor 6
+
+- Detect and migrate
 - Fix: The bundledWebRuntime configuration option has been deprecated. Can be safely deleted.
+- Enable beta with "Experimental Features" option
+
 - Generate twitter and og metatags
 - Generate social and favicon
 - Avoid sharp and @capacitor/assets
-- Show the root package for projects - ie scripts etc
 - Angular projects that use IonicModule (eg `import { IonicModule } from '@ionic/angular';`) and `@ionic/angular/standalone` or `import { send } from 'ionicons/icons';` will break. Check code for it?
 - Customers dont really understand the upgrade process in packages/plugins - looking in the "plugins" windows:
 - Need to recommend upgrading minor versions of Capacitor on a regular basis (eg monthly)
@@ -40,7 +51,7 @@ Check `main.ts` for `provideIonicAngular` and apply this if missing
 
 ## Plugin Explorer
 
-- (feat) Add Electron to targets
+- (feat) Add Electron to targets ??
 - (feat) Add "Enterprise Ready" and "Capacitor Core" to filters of plugin explorer (per Max)
 - On hover over rating show: star count, forks, watchers, issues and link to explanation of rating.
 - When searching for a package show spinner
