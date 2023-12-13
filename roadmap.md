@@ -7,6 +7,8 @@
 - When PWA support is added set teh name/shortname
 - PWA settings page needs theme_color and background_color
 - When setting theme_color set in index.html `<meta name="theme-color" content="#F61067">`
+- Favicon generator - check @capacitor/assets will generate it
+- PWA splash screens?
 
 ## PWA Helper
 
