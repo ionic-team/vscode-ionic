@@ -3,25 +3,12 @@
 ## PWA
 
 - PWA support for React/Vue
-- When display name is changed look for manifest.webmanifest and change name/shortname
-- When PWA support is added set teh name/shortname
-- PWA settings page needs theme_color and background_color
-- When setting theme_color set in index.html `<meta name="theme-color" content="#F61067">`
-- Favicon generator - check @capacitor/assets will generate it
+- When display name is changed look for `manifest.webmanifest` and change name/shortname
+- When PWA support is added set the `name`/`shortname`
+- PWA settings page needs `theme_color` and `background_color`
+- When setting `theme_color` set in index.html `<meta name="theme-color" content="#F61067">`
+- Favicon generator - check `@capacitor/assets` will generate it
 - PWA splash screens?
-
-## PWA Helper
-
-Help user to install a PWA using a tooltip
-
-- Chrome browser: show link to install app icon and instructions
-- Safari: show share button and "Add to dock"
-- Windows, iOS, Android
-
-- Parameters:
-  - Time used: (seconds). How long does the user need to use the app before the install option appears. Default 5 mins
-  - Messaging: allow message displayed to be customized (eg language)
-- Script tag to include in index.html or npm package
 
 ## Capacitor 6
 
@@ -236,3 +223,16 @@ Alterantive visual web views:
 - Export
 
 - Remove "check for minor updates"
+
+## PWA Helper
+
+Help user to install a PWA using a tooltip
+
+- Chrome browser: show link to install app icon and instructions
+- Safari: show share button and "Add to dock"
+- Windows, iOS, Android
+
+- Parameters:
+  - Time used: (seconds). How long does the user need to use the app before the install option appears. Default 5 mins
+  - Messaging: allow message displayed to be customized (eg language)
+- Script tag to include in index.html or npm package
