@@ -5,7 +5,7 @@ import { exists, isLess, isVersionGreaterOrEqual } from './analyzer';
 import { clearOutput, showOutput, write, writeError, writeIonic, writeWarning } from './logging';
 import { npmInstall, npmUninstall, npmUpdate } from './node-commands';
 import { inspectProject, Project } from './project';
-import { getRunOutput, getStringFrom, plural, pluralize, run, setAllStringIn, showProgress } from './utilities';
+import { doDoes, getRunOutput, getStringFrom, plural, pluralize, run, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
 import { ActionResult } from './command-name';
 import { ionicState } from './ionic-tree-provider';
@@ -18,21 +18,41 @@ import { removeNodeModules } from './advanced-actions';
 import { window } from 'vscode';
 import { QueueFunction } from './tip';
 
-export async function migrateCapacitor5(
+export interface CapacitorMigrationOptions {
+  coreVersion: string;
+  versionTitle: string;
+  versionFull: string;
+  changesLink: string;
+  migrateInfo: string;
+  androidStudioMin: string;
+  androidStudioName: string;
+  androidStudioReason: string;
+  minJavaVersion: number;
+  minPlugins: MinPlugin[];
+}
+
+export interface MinPlugin {
+  dep: string;
+  version: string;
+}
+
+export async function migrateCapacitor(
   queueFunction: QueueFunction,
   project: Project,
   currentVersion: string,
+  options: CapacitorMigrationOptions,
 ): Promise<ActionResult> {
-  const coreVersion = '5';
-  const versionTitle = '5';
-  const versionFull = '5.0.0';
-  const changesLink = 'https://capacitorjs.com/docs/updating/5-0';
+  const coreVersion = options.coreVersion;
+  const versionTitle = options.versionTitle;
+  const versionFull = options.versionFull;
+  const changesLink = options.changesLink;
+
   // Android Studio Flamingo is Build #AI-222.4459.24.2221.9862592, built on March 31, 2023
   const openStudio = 'Open Android Studio';
   if (exists('@capacitor/android')) {
-    if (!checkAndroidStudio('222.4459.24')) {
+    if (!checkAndroidStudio(options.androidStudioMin)) {
       const res = await window.showInformationMessage(
-        `Android Studio Flamingo (2022.2.1) is the minimum version needed for Capacitor ${versionTitle} (It comes with Java 17 and Gradle 8). Choose Android Studio > Check for Updates.`,
+        `${options.androidStudioName} is the minimum version needed for Capacitor ${versionTitle} ${options.androidStudioReason}. Choose Android Studio > Check for Updates.`,
         openStudio,
         'Continue...',
       );
@@ -53,7 +73,7 @@ export async function migrateCapacitor5(
     const version = await checkJDK(project);
     if (version < 17) {
       const result = await window.showInformationMessage(
-        `Your version of Java is ${version} but version 17 is the minimum required. Please check your JAVA_HOME path and ensure it is using JDK Version 17. You may need to restart VS Code after making this change.`,
+        `Your version of Java is ${version} but version ${options.minJavaVersion} is the minimum required. Please check your JAVA_HOME path and ensure it is using JDK Version ${options.minJavaVersion}. You may need to restart VS Code after making this change.`,
         'OK',
         'Continue',
       );
@@ -69,16 +89,15 @@ export async function migrateCapacitor5(
   let report: PeerReport;
   await showProgress(`Checking plugins in your project...`, async () => {
     await inspectProject(ionicState.rootFolder, ionicState.context, undefined);
-    report = await checkPeerDependencies(project.folder, [{ name: '@capacitor/core', version: versionFull }], []);
+    report = await checkPeerDependencies(
+      project.folder,
+      [{ name: '@capacitor/core', version: versionFull }],
+      ['@capacitor/'],
+    );
   });
 
   // Set of minimum versions for dependencies
-  const minVersions = [
-    { dep: '@ionic-enterprise/identity-vault', version: '5.10.1' },
-    { dep: '@ionic-enterprise/google-pay', version: '2.0.0' },
-    { dep: '@ionic-enterprise/apple-pay', version: '2.0.0' },
-    { dep: '@ionic-enterprise/zebra-scanner', version: '2.0.0' },
-  ];
+  const minVersions = options.minPlugins;
 
   for (const minVersion of minVersions) {
     if (exists(minVersion.dep) && isLess(minVersion.dep, minVersion.version)) {
@@ -102,7 +121,9 @@ export async function migrateCapacitor5(
       `There ${plural('are', report.incompatible.length)} ${pluralize(
         'plugin',
         report.incompatible.length,
-      )} in your project that does not work with Capacitor ${versionTitle}. Filing an issue with the author is recommended.`,
+      )} in your project that ${doDoes(
+        report.incompatible.length,
+      )} not work with Capacitor ${versionTitle}. Filing an issue with the author is recommended.`,
       `Continue`,
       'Exit',
     );
@@ -111,11 +132,7 @@ export async function migrateCapacitor5(
     }
   }
 
-  const result = await window.showInformationMessage(
-    `Capacitor ${versionTitle} sets a deployment target of iOS 13 and Android 13 (SDK 33).`,
-    `Migrate to v${versionTitle}`,
-    'Ignore',
-  );
+  const result = await window.showInformationMessage(options.migrateInfo, `Migrate to v${versionTitle}`, 'Ignore');
   if (result == 'Ignore') {
     return ActionResult.Ignore;
   }
@@ -219,7 +236,7 @@ export interface AndroidStudioInfo {
   version: string;
 }
 
-export async function migrateCapacitor(
+export async function migrateCapacitor4(
   queueFunction: QueueFunction,
   project: Project,
   currentVersion: string,

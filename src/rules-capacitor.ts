@@ -22,7 +22,7 @@ import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall, npx } from './node-commands';
 import { InternalCommand } from './command-name';
 import { MonoRepoType } from './monorepo';
-import { migrateCapacitor, migrateCapacitor5 } from './capacitor-migrate';
+import { CapacitorMigrationOptions, migrateCapacitor4, migrateCapacitor } from './capacitor-migrate';
 import { checkAngularJson } from './rules-angular-json';
 import { checkBrowsersList } from './rules-browserslist';
 import { ionicState } from './ionic-tree-provider';
@@ -203,21 +203,47 @@ export function checkCapacitorRules(project: Project) {
       // Recommend migration from 3 to 4
       project.tip(
         new Tip('Migrate to Capacitor 4', '', TipType.Capacitor)
-          .setQueuedAction(migrateCapacitor, project, getPackageVersion('@capacitor/core'))
+          .setQueuedAction(migrateCapacitor4, project, getPackageVersion('@capacitor/core'))
           .canIgnore(),
       );
     }
   }
 
-  if (isLess('@capacitor/core', '5.0.0')) {
-    if (ionicState.hasNodeModules && isGreaterOrEqual('@capacitor/core', '4.0.0')) {
-      project.tip(
-        new Tip('Migrate to Capacitor 5', '', TipType.Capacitor)
-          .setQueuedAction(migrateCapacitor5, project, getPackageVersion('@capacitor/core'))
-          .canIgnore(),
-      );
-    }
-  }
+  suggestCapacitorMigration('4.0.0', '5.0.0', TipType.Capacitor, project, {
+    coreVersion: '5',
+    versionTitle: '5',
+    versionFull: '5.0.0',
+    changesLink: 'https://capacitorjs.com/docs/updating/5-0',
+    androidStudioMin: '222.4459.24',
+    androidStudioName: 'Android Studio Flamingo (2022.2.1)',
+    androidStudioReason: '(It comes with Java 17 and Gradle 8)',
+    minJavaVersion: 17,
+    migrateInfo: 'Capacitor 5 sets a deployment target of iOS 13 and Android 13 (SDK 33).',
+    minPlugins: [
+      { dep: '@ionic-enterprise/identity-vault', version: '5.10.1' },
+      { dep: '@ionic-enterprise/google-pay', version: '2.0.0' },
+      { dep: '@ionic-enterprise/apple-pay', version: '2.0.0' },
+      { dep: '@ionic-enterprise/zebra-scanner', version: '2.0.0' },
+    ],
+  });
+
+  suggestCapacitorMigration('5.0.0', '6.0.0', TipType.Experiment, project, {
+    coreVersion: '6.0.0-beta.2',
+    versionTitle: '6 Beta (2)',
+    versionFull: '6.0.0-beta.2',
+    changesLink: 'https://capacitorjs.com/docs/next/updating/6-0',
+    androidStudioMin: '231.9392.1',
+    androidStudioName: 'Android Studio Hedgehog (2023.1.1)',
+    androidStudioReason: '(It comes with Gradle 8.2)',
+    minJavaVersion: 17,
+    migrateInfo: 'Capacitor 6 sets a deployment target of iOS 13 and Android 14 (SDK 34).',
+    minPlugins: [
+      { dep: '@ionic-enterprise/identity-vault', version: '5.10.1' },
+      { dep: '@ionic-enterprise/google-pay', version: '2.0.0' },
+      { dep: '@ionic-enterprise/apple-pay', version: '2.0.0' },
+      { dep: '@ionic-enterprise/zebra-scanner', version: '2.0.0' },
+    ],
+  });
 
   if (!isGreaterOrEqual('@ionic-enterprise/identity-vault', '5.1.0')) {
     project.tip(
@@ -234,6 +260,24 @@ export function checkCapacitorRules(project: Project) {
     project.tip(
       checkMinVersion('@ionic/angular-toolkit', '8.1.0', 'as the current version is missing Angular 15 support.'),
     );
+  }
+}
+
+function suggestCapacitorMigration(
+  minCapacitorCore: string,
+  maxCapacitorCore: string,
+  type: TipType,
+  project: Project,
+  migrateOptions: CapacitorMigrationOptions,
+) {
+  if (isLess('@capacitor/core', maxCapacitorCore)) {
+    if (ionicState.hasNodeModules && isGreaterOrEqual('@capacitor/core', minCapacitorCore)) {
+      project.tip(
+        new Tip(`Migrate to Capacitor ${migrateOptions.versionTitle}`, '', type)
+          .setQueuedAction(migrateCapacitor, project, getPackageVersion('@capacitor/core'), migrateOptions)
+          .canIgnore(),
+      );
+    }
   }
 }
 
@@ -344,7 +388,8 @@ export async function capacitorRecommendations(project: Project, forMigration: b
     }
   }
 
-  if (exists('@ionic/angular') && !exists('@angular/service-worker')) {
+  // Treat for Angular 17+ users
+  if (exists('@ionic/angular') && !exists('@angular/service-worker') && isGreaterOrEqual('@angular/core', '17.0.0')) {
     const pwaTip = new Tip(
       'Add PWA Integration',
       '',

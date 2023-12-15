@@ -285,6 +285,7 @@ export enum TipType {
   Check,
   CheckMark,
   Box,
+  Experiment,
   Ionic,
   Run,
   Link,
