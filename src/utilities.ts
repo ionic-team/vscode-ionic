@@ -664,6 +664,10 @@ export function plural(name: string, count?: number): string {
   return name + 's';
 }
 
+export function doDoes(count: number): string {
+  return count > 1 ? 'does' : 'do';
+}
+
 export function pluralize(name: string, count: number): string {
   if (count) {
     return count <= 1 ? `${count} ${name}` : `${count} ${name}s`;

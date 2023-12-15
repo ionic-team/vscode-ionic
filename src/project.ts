@@ -207,6 +207,9 @@ export class Project {
       case TipType.Cordova:
         r.setIcon('cordova');
         break;
+      case TipType.Experiment:
+        r.setIcon('beaker');
+        break;
       case TipType.Capacitor:
         r.setIcon('capacitor');
         break;

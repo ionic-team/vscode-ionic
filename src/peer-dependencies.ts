@@ -2,7 +2,7 @@ import { ionicState } from './ionic-tree-provider';
 import { satisfies, gt } from 'semver';
 import { write, writeError, writeWarning } from './logging';
 import { PackageManager, npmInstall } from './node-commands';
-import { getRunOutput, httpRequest } from './utilities';
+import { getRunOutput, httpRequest, replaceAll } from './utilities';
 import { getPackageVersion } from './analyzer';
 
 export interface PeerReport {
@@ -72,7 +72,7 @@ async function getDependencyConflicts(
         for (const peer of Object.keys(deps.dependencies[key].peerDependencies)) {
           const versionRange = deps.dependencies[key].peerDependencies[peer];
           if (peer == peerDependency.name) {
-            if (!satisfies(peerDependency.version, versionRange)) {
+            if (!satisfies(peerDependency.version, cleanRange(versionRange))) {
               // Migration will update capacitor plugins so leave them out
               let ignore = false;
               for (const ignoreDep of ignoreDeps) {
@@ -112,6 +112,15 @@ async function getNPMInfoFor(dependency: string): Promise<any> {
     return pck;
   }
 }
+
+// The semver satisfies function chokes on "> 1.0.0 && < 2.0.0" and this will return "> 1.0.0 < 2.0.0"
+function cleanRange(range: string): string {
+  if (range.includes('&&')) {
+    return replaceAll(range, '&&', '');
+  }
+  return range;
+}
+
 /**
  * Finds the latest release version of the plugin that is compatible with peer dependencies.
  * If hasPeer is supplied then it will look for a version that passes with that peer and version
@@ -128,11 +137,11 @@ export async function findCompatibleVersion2(dependency: DependencyConflict): Pr
         for (const peerDependency of Object.keys(pck.versions[version].peerDependencies)) {
           const peerVersion = pck.versions[version].peerDependencies[peerDependency];
           const current = getPackageVersion(peerDependency);
-          let meetsNeeds = satisfies(current, peerVersion);
+          let meetsNeeds = satisfies(current.version, cleanRange(peerVersion));
 
           if (dependency.conflict) {
             if (dependency.conflict.name == peerDependency) {
-              meetsNeeds = satisfies(dependency.conflict.version, peerVersion);
+              meetsNeeds = satisfies(dependency.conflict.version, cleanRange(peerVersion));
             } else {
               meetsNeeds = false;
             }
@@ -158,7 +167,7 @@ export async function findCompatibleVersion2(dependency: DependencyConflict): Pr
               }
             } else {
               if (version == latestVersion && !best && current) {
-                writeWarning(`${dependency} requires ${peerDependency} ${peerVersion} but you have ${current}`);
+                writeWarning(`${dependency.name} requires ${peerDependency} ${peerVersion} but you have ${current}`);
                 incompatible = true;
               }
             }
