@@ -3,6 +3,7 @@
 ### Version 1.64
 
 - Add support for PWA target for Angular Applications
+- Fix peer dependency checks when the dependency uses `&&` in its version range
 
 ### Version 1.63
 

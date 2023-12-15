@@ -178,6 +178,9 @@ export class PluginExplorerPanel {
       title: 'Ionic Enterprise Product Key',
       placeHolder: 'Enter product key',
     });
+    if (productKey == '') {
+      return true;
+    }
     if (!productKey) return false;
     const cmd = `npx ionic enterprise register --key=${productKey}`;
     return await run(this.path, cmd, undefined, [], [], undefined, undefined, undefined, false);
