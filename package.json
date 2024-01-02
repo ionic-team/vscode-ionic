@@ -505,7 +505,7 @@
   },
   "dependencies": {
     "-": "^0.0.1",
-    "@ionic/cli": "7.1.5",
+    "@ionic/cli": "7.1.6",
     "@trapezedev/configure": "7.0.10",
     "fast-xml-parser": "^3.21.1",
     "g": "^2.0.1",
