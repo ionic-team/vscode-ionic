@@ -3,6 +3,7 @@
 ### Version 1.65
 
 - Update from @ionic/cli 7.1.5 to 7.2.0
+- Fix "Switch to ESBuild" for Windows machines
 
 ### Version 1.64
 

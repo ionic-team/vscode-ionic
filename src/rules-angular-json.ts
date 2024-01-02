@@ -7,7 +7,7 @@ import { getCapacitorConfigWebDir, getCapacitorConfigureFilename, writeCapacitor
 import { join, sep } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { window } from 'vscode';
-import { openUri, replaceAll } from './utilities';
+import { openUri, replaceAll, replaceAllStringIn, replaceStringIn } from './utilities';
 import { MonoRepoType } from './monorepo';
 
 /**
@@ -284,6 +284,7 @@ async function switchESBuild(queueFunction: QueueFunction, project: Project, fil
             let value = webDir;
             if (!value.endsWith(sep)) {
               value = join(value, 'browser'); // Angular now writes to a browser folder
+              value = value.replace(/\\/g, '/'); // On windows backslash is escape
             }
             writeCapacitorConfig(project, [{ key: 'webDir', value }]);
             writeIonic(`Your Capacitor config webDir was changed from "${webDir}" to "${value}"`);
