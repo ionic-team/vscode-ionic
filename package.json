@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.64.0",
+  "version": "1.65.0",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -505,7 +505,7 @@
   },
   "dependencies": {
     "-": "^0.0.1",
-    "@ionic/cli": "7.1.5",
+    "@ionic/cli": "7.2.0",
     "@trapezedev/configure": "7.0.10",
     "fast-xml-parser": "^3.21.1",
     "g": "^2.0.1",

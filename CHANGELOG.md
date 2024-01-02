@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.65
+
+- Update from @ionic/cli 7.1.5 to 7.2.0
+
 ### Version 1.64
 
 - Add support for PWA target for Angular Applications

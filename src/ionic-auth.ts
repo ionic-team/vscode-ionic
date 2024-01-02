@@ -2,7 +2,7 @@ import { Context, VSCommand } from './context-variables';
 import { ionicState } from './ionic-tree-provider';
 import { sendTelemetryEvent, TelemetryEventType } from './telemetry';
 import { writeAppend } from './logging';
-import { ExtensionContext, commands, window } from 'vscode';
+import { ExtensionContext, ExtensionKind, UIKind, commands, env, window } from 'vscode';
 import { join } from 'path';
 import { ExecException, exec } from 'child_process';
 
@@ -14,6 +14,13 @@ import { ExecException, exec } from 'child_process';
 export async function ionicLogin(folder: string, context: ExtensionContext) {
   const ifolder = join(folder, 'node_modules', '@ionic', 'cli', 'bin');
   try {
+    if (env.uiKind == UIKind.Web) {
+      window.showErrorMessage(
+        'The Codespaces browser editor is not compatible with the Ionic Extension. Most functionality will not work.',
+      );
+      ionicState.skipAuth = true;
+      return;
+    }
     await run(`node ionic login --confirm`, ifolder);
     sendTelemetryEvent(folder, TelemetryEventType.Login, context);
   } catch (err) {
