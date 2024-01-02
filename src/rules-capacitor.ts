@@ -166,6 +166,9 @@ export function checkCapacitorRules(project: Project) {
     if (exists('@capacitor/android') || exists('@capacitor/ios')) {
       checkBrowsersList(project);
     }
+    if (isLess('@ionic/cli', '7.2.0')) {
+      project.tip(checkMinVersion('@ionic/cli', '7.2.0', 'to fix live reload support'));
+    }
     if (isLess('@angular/core', `${maxAngularVersion}.0.0`)) {
       const t = angularMigrate(project, maxAngularVersion);
 
