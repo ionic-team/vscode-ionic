@@ -16,9 +16,11 @@ export async function ionicLogin(folder: string, context: ExtensionContext) {
   try {
     if (env.uiKind == UIKind.Web) {
       window.showErrorMessage(
-        'The Codespaces browser editor is not compatible with the Ionic Extension. Most functionality will not work.',
+        'The Codespaces browser editor has limited functionality. Click "Next" to continue.',
+        'Next',
       );
       ionicState.skipAuth = true;
+      await commands.executeCommand(VSCommand.setContext, Context.isAnonymous, false);
       return;
     }
     await run(`node ionic login --confirm`, ifolder);
