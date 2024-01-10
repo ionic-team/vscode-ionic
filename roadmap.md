@@ -16,6 +16,10 @@
 - Fix: The bundledWebRuntime configuration option has been deprecated. Can be safely deleted.
 - Enable beta with "Experimental Features" option
 
+## Features
+
+- Add Type Coverage: https://github.com/plantain-00/type-coverage
+
 - Generate twitter and og metatags
 - Generate social and favicon
 - Avoid sharp and @capacitor/assets

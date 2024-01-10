@@ -13,6 +13,8 @@ import { npmInstall, npmUninstall } from './node-commands';
 import { Project } from './project';
 import { Tip, TipType } from './tip';
 import { getRunOutput } from './utilities';
+import { ionicExport } from './ionic-export';
+import { ionicState } from './ionic-tree-provider';
 
 /**
  * Check rules for Cordova projects
@@ -23,22 +25,22 @@ export function checkCordovaRules(project: Project) {
     warnMinVersion(
       'cordova-android',
       '10.0.1',
-      'to be able to target Android SDK v30 which is required for all submissions to the Play Store'
-    )
+      'to be able to target Android SDK v30 which is required for all submissions to the Play Store',
+    ),
   );
   project.tip(warnMinVersion('cordova-ios', '6.1.0'));
 
   if (isGreaterOrEqual('cordova-android', '10.0.0')) {
     project.checkNotExists(
       'cordova-plugin-whitelist',
-      'should be removed as its functionality is now built into Cordova'
+      'should be removed as its functionality is now built into Cordova',
     );
     project.checkNotExists('phonegap-plugin-multidex', 'is not compatible with cordova-android 10+');
     project.checkNotExists('cordova-plugin-androidx', 'is not required when using cordova-android 10+');
     project.checkNotExists('cordova-plugin-androidx-adapter', 'is not required when using cordova-android 10+');
     project.checkNotExists(
       'phonegap-plugin-push',
-      'is deprecated and does not support Android X. Migrate to using cordova-plugin-push'
+      'is deprecated and does not support Android X. Migrate to using cordova-plugin-push',
     );
 
     project.tip(checkMinVersion('cordova-plugin-inappbrowser', '5.0.0', 'to support Android 10+'));
@@ -54,7 +56,7 @@ export function checkCordovaRules(project: Project) {
   } else {
     project.checkNotExists(
       'cordova-plugin-whitelist',
-      'is deprecated and no longer required with cordova-android v10+'
+      'is deprecated and no longer required with cordova-android v10+',
     );
   }
 
@@ -67,8 +69,16 @@ export function checkCordovaRules(project: Project) {
         TipType.Error,
         `Your project is based on Capacitor but has remnants of cordova in the package.json file.`,
         undefined,
-        'Fix package.json'
-      ).setAfterClickAction('Fix package.json', fixPackageJson, project)
+        'Fix package.json',
+      ).setAfterClickAction('Fix package.json', fixPackageJson, project),
+    );
+  }
+
+  if (!project.isCapacitor) {
+    project.add(
+      new Tip('Export', '', TipType.Media)
+        .setQueuedAction(ionicExport, project, ionicState.context)
+        .setTooltip('Export a markdown file with all project dependencies and plugins'),
     );
   }
   if (isGreaterOrEqual('@ionic/angular-toolkit', '6.0.0')) {
@@ -79,7 +89,7 @@ export function checkCordovaRules(project: Project) {
         '@ionic/cordova-builders',
         'Install @ionic/cordova-builders for compatibility',
         'The package @ionic/cordova-builders is required when @ionic/angular-toolkit is version 6 and higher.',
-        true
+        true,
       );
     }
   }
@@ -89,14 +99,14 @@ export function checkCordovaRules(project: Project) {
     'phonegap-plugin-push',
     `Replace with cordova-plugin-push due to deprecation`,
     `The plugin phonegap-plugin-push should be replaced with cordova-plugin-push as phonegap-plugin-push was deprecated in 2017`,
-    '@havesource/cordova-plugin-push'
+    '@havesource/cordova-plugin-push',
   );
 
   if (exists('cordova-plugin-customurlscheme') && exists('ionic-plugin-deeplinks')) {
     project.recommendRemove(
       'cordova-plugin-customurlscheme',
       'cordova-plugin-customurlscheme',
-      'Remove as the functionality is part of ionic-plugin-deeplinks which is already installed.'
+      'Remove as the functionality is part of ionic-plugin-deeplinks which is already installed.',
     );
   }
 
@@ -109,8 +119,8 @@ export function checkCordovaRules(project: Project) {
           '@ionic-enterprise/identity-vault',
           '5.0.0',
           'Update to v5 as it contains significant security fixes and broader support for Android security features',
-          'https://ionic.io/docs/identity-vault'
-        )
+          'https://ionic.io/docs/identity-vault',
+        ),
       );
     } else {
       if (!isGreaterOrEqual('@ionic-enterprise/identity-vault', '5.1.0')) {
@@ -119,8 +129,8 @@ export function checkCordovaRules(project: Project) {
             '@ionic-enterprise/identity-vault',
             '5.1.0',
             'as the current version is missing important security fixes.',
-            'https://ionic.io/docs/identity-vault'
-          )
+            'https://ionic.io/docs/identity-vault',
+          ),
         );
       }
     }
@@ -130,7 +140,7 @@ export function checkCordovaRules(project: Project) {
     project.recommendRemove(
       'cordova-support-google-services',
       'cordova-support-google-services',
-      'Remove as the functionality is built into cordova-android 9+. See: https://github.com/chemerisuk/cordova-support-google-services'
+      'Remove as the functionality is built into cordova-android 9+. See: https://github.com/chemerisuk/cordova-support-google-services',
     );
   }
 }
@@ -177,8 +187,8 @@ export function checkCordovaPlugins(packages, project: Project) {
               TipType.Warning,
               `The plugin ${library} has a dependency on ${dependentPlugin} but it is missing from your project. It should be installed.`,
               npmInstall(dependentPlugin),
-              `Install`
-            )
+              `Install`,
+            ),
           );
         }
       }
