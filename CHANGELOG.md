@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.66
+
+- Export now reports dependencies that have not been updated
+
 ### Version 1.65
 
 - Update from @ionic/cli 7.1.5 to 7.2.0
