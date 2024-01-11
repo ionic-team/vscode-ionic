@@ -25,7 +25,7 @@ function addScriptsFrom(packages: PackageFile, project: Project) {
         new Tip(script, '', TipType.Run, '', npmRun(script), `Running ${script}`, `Ran ${script}`)
           .canStop()
           .canAnimate()
-          .setTooltip(`Runs 'npm run ${script}' found in package.json`)
+          .setTooltip(`Runs 'npm run ${script}' found in package.json`),
       );
     }
   }
@@ -44,8 +44,8 @@ function addNXScripts(names: Array<string>, project: Project) {
         '',
         `npx nx run ${project.monoRepo.name}:${name}`,
         `Running ${name}`,
-        `Ran ${name}`
-      )
+        `Ran ${name}`,
+      ),
     );
   }
 }

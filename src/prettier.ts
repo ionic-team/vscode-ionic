@@ -12,7 +12,7 @@ export async function integratePrettier(project: Project) {
     const question = await window.showInformationMessage(
       'You can enforce coding standards during development using a standard set of ESLint and Prettier rules. Would you like to add this integration to your project?',
       'Yes',
-      'No'
+      'No',
     );
 
     if (question != 'Yes') return;
@@ -60,10 +60,10 @@ export async function integratePrettier(project: Project) {
     const hasLint = !!packageFile.scripts['lint'];
     const response = await window.showInformationMessage(
       `ESLint and Prettier have been integrated and will enforce coding standards during development. Do you want to apply these standards to the code base now? (this will run '${npmRun(
-        'lint -- --fix'
+        'lint -- --fix',
       )}' which may alter source code and report errors in your code)`,
       'Yes',
-      'No'
+      'No',
     );
     if (response == 'No') {
       return;
@@ -110,6 +110,6 @@ function defaultPrettier() {
       ],
     },
     undefined,
-    2
+    2,
   );
 }

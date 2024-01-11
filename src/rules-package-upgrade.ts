@@ -50,7 +50,7 @@ export async function packageUpgrade(info: PackageInfo, folder: string): Promise
     undefined,
     new Tip(message, undefined).showProgressDialog(),
     undefined,
-    message
+    message,
   );
   return true;
 }

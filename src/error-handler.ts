@@ -25,11 +25,11 @@ export async function handleError(error: string, logs: Array<string>, folder: st
   if (error && error.includes('ionic: command not found')) {
     await window.showErrorMessage(
       'The Ionic CLI is not installed. Get started by running npm install -g @ionic/cli at the terminal.',
-      'More Information'
+      'More Information',
     );
     commands.executeCommand(
       'vscode.open',
-      Uri.parse('https://ionicframework.com/docs/intro/cli#install-the-ionic-cli')
+      Uri.parse('https://ionicframework.com/docs/intro/cli#install-the-ionic-cli'),
     );
     return;
   }

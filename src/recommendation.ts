@@ -15,7 +15,7 @@ export class Recommendation extends TreeItem {
     public readonly collapsibleState: TreeItemCollapsibleState,
     public readonly command?: Command,
     public tip?: Tip,
-    public readonly url?: string
+    public readonly url?: string,
   ) {
     super(label, collapsibleState);
 

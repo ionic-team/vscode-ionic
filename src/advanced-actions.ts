@@ -89,7 +89,7 @@ async function migrateAngularControlFlow(selection: string, project: Project) {
   if (
     !(await confirm(
       'This will change your Angular templates to use the new built-in control flow syntax. Are you sure?',
-      'Continue'
+      'Continue',
     ))
   )
     return;
@@ -102,7 +102,7 @@ async function migrateToAngularStandalone(selection: string, project: Project) {
   if (
     !(await confirm(
       'This will replace IonicModule with individual Ionic components and icons in your project. Are you sure?',
-      'Continue'
+      'Continue',
     ))
   )
     return;

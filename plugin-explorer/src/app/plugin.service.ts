@@ -100,7 +100,7 @@ export class PluginService {
   public getTitle(name: any): string {
     const words = name.replace('/', '-').replaceAll('.', ' ').split('-');
     return this.titleCase(
-      words.filter((word: string) => word !== 'capacitor' && word !== 'cordova' && word !== 'plugin').join(' ')
+      words.filter((word: string) => word !== 'capacitor' && word !== 'cordova' && word !== 'plugin').join(' '),
     );
   }
 
@@ -156,7 +156,7 @@ export class PluginService {
     android: boolean,
     ios: boolean,
     both: boolean,
-    any: boolean
+    any: boolean,
   ): Plugin[] {
     let count = 0;
     const termsWithDash = this.replaceAll(terms, ' ', '-');

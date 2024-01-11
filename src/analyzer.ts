@@ -214,7 +214,7 @@ export function checkCordovaAndroidPreference(project: Project, preference: stri
   if (!equals(cordovaConfig.androidPreferences[preference], value)) {
     const tip = error(
       'config.xml',
-      `The android preference ${preference} should be ${value}. Add <preference name="${preference}" value="${value}" /> to <platform name="android"> in config.xml`
+      `The android preference ${preference} should be ${value}. Add <preference name="${preference}" value="${value}" /> to <platform name="android"> in config.xml`,
     ).setAfterClickAction('Fix config.xml', AddCordovaAndroidPreference, project.folder, preference, value);
     return tip;
   }
@@ -231,7 +231,7 @@ function AddCordovaAndroidPreference(folder: string, preference: string, value: 
   } else {
     newtxt = txt.replace(
       `<platform name="android">`,
-      `<platform name="android">\n        <preference name="${preference}" value="${value}" />`
+      `<platform name="android">\n        <preference name="${preference}" value="${value}" />`,
     );
   }
   writeFileSync(configXMLFilename, newtxt);
@@ -261,7 +261,7 @@ export function checkCordovaAndroidPreferenceMinimum(preference, minVersion): Ti
   if (!v || lt(v, minVersion)) {
     return error(
       'config.xml',
-      `The android preference ${preference} should be at a minimum ${minVersion}. Add <preference name="${preference}" value="${minVersion}" /> to <platform name="android"> in config.xml`
+      `The android preference ${preference} should be at a minimum ${minVersion}. Add <preference name="${preference}" value="${minVersion}" /> to <platform name="android"> in config.xml`,
     );
   }
 }
@@ -284,12 +284,12 @@ export function checkCordovaIosPreference(preference: string, value: any, prefer
     if (preferredValue) {
       return error(
         'config.xml',
-        `The ios preference ${preference} cannot be ${cordovaConfig.iosPreferences[preference]}. Add <preference name="${preference}" value="${preferredValue}" /> to <platform name="ios"> in config.xml`
+        `The ios preference ${preference} cannot be ${cordovaConfig.iosPreferences[preference]}. Add <preference name="${preference}" value="${preferredValue}" /> to <platform name="ios"> in config.xml`,
       );
     } else {
       return error(
         'config.xml',
-        `The ios preference ${preference} should be ${value}. Add <preference name="${preference}" value="${value}" /> to <platform name="ios"> in config.xml`
+        `The ios preference ${preference} should be ${value}. Add <preference name="${preference}" value="${value}" /> to <platform name="ios"> in config.xml`,
       );
     }
   }
@@ -347,7 +347,7 @@ export function notRequiredPlugin(name: string, message?: string): Tip {
       `The plugin ${name} is not required with Capacitor${msg}`,
       npmUninstall(name),
       'Uninstall',
-      `${name} was uninstalled`
+      `${name} was uninstalled`,
     ).canIgnore();
   }
 }
@@ -365,7 +365,7 @@ export function replacementPlugin(name: string, replacement: string, url?: strin
       npmInstall(replacement) + ' && ' + npmUninstall(name),
       'Replace Plugin',
       `${name} replaced with ${replacement}`,
-      url
+      url,
     ).canIgnore();
   }
 }
@@ -382,7 +382,7 @@ export function incompatibleReplacementPlugin(name: string, replacement: string,
       npmInstall(replacement) + ' && ' + npmUninstall(name),
       'Replace Plugin',
       `${name} replaced with ${replacement}`,
-      url
+      url,
     ).canIgnore();
   }
 }
@@ -397,7 +397,7 @@ export function incompatiblePlugin(name: string, url?: string): Tip {
       TipType.Error,
       `The plugin ${name} is incompatible with Capacitor. ${msg}`,
       Command.NoOp,
-      'OK'
+      'OK',
     )
       .canIgnore()
       .setRelatedDependency(name);
@@ -417,7 +417,7 @@ export function reviewPlugin(name: string): Tip {
       name,
       `Test for Capacitor compatibility.`,
       TipType.Warning,
-      `The plugin ${name} requires testing for Capacitor compatibility.`
+      `The plugin ${name} requires testing for Capacitor compatibility.`,
     );
   }
 }

@@ -18,7 +18,7 @@ export async function selectDevice(
   command: string,
   rootPath: string,
   tip: Tip,
-  srcCommand?: CommandName
+  srcCommand?: CommandName,
 ): Promise<string> {
   const isAndroid = command.includes('android');
   const preselected = isAndroid ? ionicState.selectedAndroidDevice : ionicState.selectedIOSDevice;
@@ -31,7 +31,7 @@ export async function selectDevice(
   });
 
   const realDevices = devices.filter(
-    (device) => !device.name.includes('(simulator)') && !device.name.includes('(emulator)')
+    (device) => !device.name.includes('(simulator)') && !device.name.includes('(emulator)'),
   );
   const names = devices.map((device) => {
     device.title = formatDeviceName(device.name);
@@ -189,6 +189,6 @@ async function showProgress(message: string, func: () => Promise<any>) {
     },
     async (progress, token) => {
       await func();
-    }
+    },
   );
 }

@@ -49,7 +49,7 @@ export function npmInstall(name: string, ...args): string {
     case MonoRepoType.npm:
       return `${pm(PMOperation.install, name)} ${argList} --workspace=${getMonoRepoFolder(
         ionicState.workspace,
-        undefined
+        undefined,
       )}`;
     case MonoRepoType.folder:
     case MonoRepoType.yarn:
@@ -98,7 +98,7 @@ export async function suggestInstallAll(project: Project) {
   const res = await window.showInformationMessage(
     `Would you like to install node modules for this project?`,
     'Yes',
-    'No'
+    'No',
   );
   if (res != 'Yes') return;
   showProgress(`Installing....`, async () => {

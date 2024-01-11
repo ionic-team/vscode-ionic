@@ -78,7 +78,7 @@ export async function kill(proc: ChildProcess, rootPath: string): Promise<void> 
  */
 async function getWindowsProcessList(folder: string): Promise<Array<string>> {
   return (await getRunOutput('gwmi Win32_Process | select ProcessId, ParentProcessId', folder, 'powershell.exe')).split(
-    '\r\n'
+    '\r\n',
   );
 }
 

@@ -43,7 +43,7 @@ export async function processPackages(
   allDependencies: object,
   devDependencies: object,
   context: ExtensionContext,
-  project: Project
+  project: Project,
 ): Promise<any> {
   if (!lstatSync(folder).isDirectory()) {
     return {};
@@ -92,12 +92,12 @@ export async function processPackages(
     if (err && err.includes('401')) {
       window.showInformationMessage(
         `Unable to run '${outdatedCommand(project.packageManager)}' due to authentication error. Check .npmrc`,
-        'OK'
+        'OK',
       );
     }
     if (project.isModernYarn()) {
       writeWarning(
-        `Modern Yarn does not have a command to review outdated package versions. Most functionality of this extension will be disabled.`
+        `Modern Yarn does not have a command to review outdated package versions. Most functionality of this extension will be disabled.`,
       );
     } else {
       writeError(`Unable to run '${outdatedCommand(project.packageManager)}'. Try reinstalling node modules.`);
@@ -112,7 +112,7 @@ export async function processPackages(
     allDependencies,
     getOutdatedData(outdated),
     devDependencies,
-    getListData(versions)
+    getListData(versions),
   );
   inspectPackages(project.projectFolder() ? project.projectFolder() : folder, packages);
   return packages;
@@ -142,7 +142,7 @@ export function reviewPackages(packages: object, project: Project) {
     'Packages',
     `Your ${project.type} project relies on these packages. Consider packages which have not had updates in more than a year to be a candidate for replacement in favor of a project that is actively maintained.`,
     packages,
-    [PackageType.Dependency]
+    [PackageType.Dependency],
   );
 
   listPackages(
@@ -151,7 +151,7 @@ export function reviewPackages(packages: object, project: Project) {
     `Your project relies on these Capacitor and Cordova plugins. Consider plugins which have not had updates in more than a year to be a candidate for replacement in favor of a plugin that is actively maintained.`,
     packages,
     [PackageType.CordovaPlugin, PackageType.CapacitorPlugin],
-    TipType.Capacitor
+    TipType.Capacitor,
   );
 
   // listPackages(
@@ -199,8 +199,8 @@ export function reviewPluginsWithHooks(packages: object): Tip[] {
             TipType.Warning,
             `${library} cannot be inspected to check for Capacitor compatibility as it is a custom plugin or is a remote dependency. You will need to manually test this plugin after migration to Capacitor - the good news is that most plugins will work.`,
             Command.NoOp,
-            'OK'
-          )
+            'OK',
+          ),
         );
         //
       }
@@ -423,7 +423,7 @@ function listPackages(
   description: string,
   packages: object,
   depTypes: Array<string>,
-  tipType?: TipType
+  tipType?: TipType,
 ) {
   const count = Object.keys(packages).filter((library) => {
     return depTypes.includes(packages[library].depType);

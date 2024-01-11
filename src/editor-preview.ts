@@ -81,7 +81,7 @@ export async function debugBrowser(url: string, stopWebServerAfter: boolean) {
 async function selectMockDevice(): Promise<device> {
   const selected = await window.showQuickPick(
     devices.map((device) => `${device.name} (${device.width} x ${device.height})`),
-    { placeHolder: 'Select Emulated Device' }
+    { placeHolder: 'Select Emulated Device' },
   );
   if (!selected) return;
   return devices.find((device) => selected.startsWith(device.name));
