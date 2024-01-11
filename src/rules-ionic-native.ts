@@ -16,7 +16,7 @@ export function checkIonicNativePackages(packages, project: Project) {
           project.recommendRemove(
             name,
             name,
-            `You already have a newer version of this package installed (${replacement}) so ${name} can be uninstalled as it is not needed`
+            `You already have a newer version of this package installed (${replacement}) so ${name} can be uninstalled as it is not needed`,
           );
         } else {
           replacePackage(project, name, replacement);
@@ -28,7 +28,7 @@ export function checkIonicNativePackages(packages, project: Project) {
         project.recommendRemove(
           name,
           name,
-          `You have the typescript wrapper '${name}' installed but do not have the matching plugin '${plugin}' installed.`
+          `You have the typescript wrapper '${name}' installed but do not have the matching plugin '${plugin}' installed.`,
         );
       }
     }
@@ -43,8 +43,8 @@ function replacePackage(project: Project, name: string, replacement: string) {
       TipType.Idea,
       `@ionic-native migrated to @awesome-cordova-plugins in 2021. You can safely migrate from ${name} to ${replacement}`,
       npmInstall(replacement) + ' && ' + npmUninstall(name),
-      `Replace ${name}`
-    )
+      `Replace ${name}`,
+    ),
   );
 }
 

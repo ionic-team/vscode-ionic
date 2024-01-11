@@ -13,7 +13,7 @@ export class AndroidDebugProvider implements DebugConfigurationProvider {
   public async resolveDebugConfiguration?(
     folder: WorkspaceFolder | undefined,
     debugConfiguration: DebugConfiguration,
-    token?: CancellationToken
+    token?: CancellationToken,
   ): Promise<DebugConfiguration | null | undefined> {
     if (!debugConfiguration.type || !debugConfiguration.request || debugConfiguration.request !== 'attach') {
       return null;
@@ -107,7 +107,7 @@ export class AndroidDebugProvider implements DebugConfigurationProvider {
         debugConfiguration.port = await forwardDebugger(webView, debugConfiguration.port);
         debugConfiguration.browserAttachLocation = 'workspace';
         return debugConfiguration;
-      }
+      },
     );
   }
 }

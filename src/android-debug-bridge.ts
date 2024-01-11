@@ -35,7 +35,7 @@ export async function androidDebugUnforward(): Promise<void> {
     promises.push(
       promise.catch(() => {
         /* Ignore */
-      })
+      }),
     );
   }
 

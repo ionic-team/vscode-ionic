@@ -28,7 +28,7 @@ provideVSCodeDesignSystem().register(
   vsCodeCheckbox(),
   vsCodeRadio(),
   vsCodeRadioGroup(),
-  vsCodeProgressRing()
+  vsCodeProgressRing(),
 );
 
 @Component({

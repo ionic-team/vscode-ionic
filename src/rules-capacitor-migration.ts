@@ -14,7 +14,7 @@ export async function capacitorMigrationChecks(packages, project: Project): Prom
       project.name +
       ' can be migrated to Capacitor (see [guide](https://capacitorjs.com/docs/cordova/migrating-from-cordova-to-capacitor)). The following recommendations will help with the migration:',
     TipType.Capacitor,
-    true
+    true,
   );
 
   const list = await capacitorRecommendations(project, true);
@@ -39,8 +39,8 @@ export async function capacitorMigrationChecks(packages, project: Project): Prom
         ['npm uninstall cordova-ios', 'npm uninstall cordova-android', movecmd, InternalCommand.removeCordova],
         'Remove Cordova',
         'Removing Cordova',
-        'Successfully removed Cordova'
-      )
+        'Successfully removed Cordova',
+      ),
     );
   }
   project.tips(tips);

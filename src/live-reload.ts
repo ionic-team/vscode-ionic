@@ -30,7 +30,7 @@ export async function setupServerCertificate(project: Project): Promise<void> {
     if (
       (await window.showInformationMessage(
         'A trusted root certificate is required to use HTTPS with Live Reload. Would you like to create one?',
-        'Yes'
+        'Yes',
       )) == 'Yes'
     ) {
       liveReloadSSL(project);
@@ -41,16 +41,16 @@ export async function setupServerCertificate(project: Project): Promise<void> {
   // Create a server certificate request
   const crFile = createCertificateRequest();
   const cmd = `openssl req -new -nodes -sha256 -keyout '${certPath('key')}' -config '${crFile}' -out '${certPath(
-    'csr'
+    'csr',
   )}' -newkey rsa:4096 -subj "/C=US/ST=/L=/O=/CN=myserver"`;
   writeIonic(`> ${cmd}`);
   const txt = await getRunOutput(cmd, project.folder);
 
   // Create the server certificate
   const cmd2 = `openssl x509 -sha256 -extfile '${crFile}' -extensions x509_ext -req -in '${certPath(
-    'csr'
+    'csr',
   )}' -CA '${getRootCACertFilename()}' -CAkey '${getRootCAKeyFilename()}' -CAcreateserial -out '${certPath(
-    'crt'
+    'crt',
   )}' -days 180`;
   writeIonic(`> ${cmd2}`);
   const txt2 = await getRunOutput(cmd2, project.folder);

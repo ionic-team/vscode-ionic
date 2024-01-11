@@ -78,11 +78,11 @@ export async function troubleshootPlugins() {
               const browserv = coerce(versions[library]);
               if (projectv.major != browserv.major) {
                 writeWarning(
-                  `Your project has v${pkg.version} of ${library} but Nexus Browser has v${versions[library]}`
+                  `Your project has v${pkg.version} of ${library} but Nexus Browser has v${versions[library]}`,
                 );
               } else {
                 write(
-                  `[info] Your project has v${pkg.version} of ${library} but Nexus Browser has v${versions[library]}`
+                  `[info] Your project has v${pkg.version} of ${library} but Nexus Browser has v${versions[library]}`,
                 );
               }
             }
@@ -97,17 +97,17 @@ export async function troubleshootPlugins() {
     if (problems == 1) {
       window.showWarningMessage(
         `Your project uses the plugin ${problem} which is not in the Nexus Browser app, so you may have issues related to its functionality.`,
-        'Dismiss'
+        'Dismiss',
       );
     } else if (problems > 0) {
       writeWarning(
         `Your project has these plugins: ${pluginList.join(
-          ', '
-        )} but Nexus Browser does not. You can suggest adding these here: https://github.com/ionic-team/vscode-extension/issues/91`
+          ', ',
+        )} but Nexus Browser does not. You can suggest adding these here: https://github.com/ionic-team/vscode-extension/issues/91`,
       );
       window.showWarningMessage(
         `Your project has ${problems} plugins that are not in the Nexus Browser app, so you may have issues related to functionality that relies on those plugins.`,
-        'Dismiss'
+        'Dismiss',
       );
     }
   } catch (err) {

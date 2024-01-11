@@ -68,7 +68,7 @@ export class IonicStartPanel {
         {
           enableScripts: true,
           localResourceRoots: [Uri.joinPath(extensionUri, 'out'), Uri.joinPath(extensionUri, 'ionic-start', 'build')],
-        }
+        },
       );
 
       IonicStartPanel.currentPanel = new IonicStartPanel(panel, extensionUri, path, context);
@@ -204,7 +204,7 @@ export class IonicStartPanel {
         }
       },
       undefined,
-      this.disposables
+      this.disposables,
     );
   }
 }
@@ -296,7 +296,7 @@ async function createProject(project: Project, webview: Webview, panel: IonicSta
   cmds.push(
     `npx ionic start "${name}" ${project.template} --type=${project.type} --capacitor --package-id=${packageId} ${
       noGit ? '--no-git' : ''
-    }`
+    }`,
   );
 
   const folder = join(getProjectsFolder(), name);

@@ -124,7 +124,7 @@ export async function waitForOtherActions(tip: Tip): Promise<boolean> {
           cancelled = true;
         }
       }
-    }
+    },
   );
   return cancelled;
 }

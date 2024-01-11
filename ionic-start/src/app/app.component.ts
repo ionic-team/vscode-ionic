@@ -42,7 +42,7 @@ provideVSCodeDesignSystem().register(
   vsCodeDivider(),
   vsCodeRadio(),
   vsCodeRadioGroup(),
-  vsCodeProgressRing()
+  vsCodeProgressRing(),
 );
 
 @Component({

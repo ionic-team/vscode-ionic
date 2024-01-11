@@ -18,7 +18,7 @@ export const writeMinVersionError = (library: string, version: string, minVersio
     undefined,
     npmInstall(library + '@latest'),
     `Upgrade`,
-    `${library} successfully updated.`
+    `${library} successfully updated.`,
   ).canIgnore();
 };
 export const writeMinVersionWarning = (
@@ -26,7 +26,7 @@ export const writeMinVersionWarning = (
   version: string,
   minVersion: string,
   reason: string,
-  url?: string
+  url?: string,
 ): Tip => {
   let r = reason ? ' ' + reason : '';
   if (url) r = `[${reason}](${url})`;
@@ -37,7 +37,7 @@ export const writeMinVersionWarning = (
     `${library} ${version} should be updated to at least ${minVersion}${reason ? ' ' + reason : ''}`,
     npmInstall(`${library}@latest`),
     `Upgrade`,
-    `${library} successfully updated.`
+    `${library} successfully updated.`,
   ).canIgnore();
 };
 
@@ -49,7 +49,7 @@ export const writeConsistentVersionWarning = (lib1: string, ver1: string, lib2: 
     undefined,
     npmInstall(`${lib2}@${ver1}`),
     `Upgrade`,
-    `${lib2} successfully updated.`
+    `${lib2} successfully updated.`,
   ).canIgnore();
 };
 
@@ -61,6 +61,6 @@ export const writeConsistentVersionError = (lib1: string, ver1: string, lib2: st
     undefined,
     npmInstall(`${lib2}@${ver1}`),
     `Upgrade`,
-    `${lib2} successfully updated.`
+    `${lib2} successfully updated.`,
   ).canIgnore();
 };

@@ -44,14 +44,14 @@ export function webProject(project: Project) {
           npmInstall(`@capacitor/cli`),
           npmInstall(`@capacitor/app @capacitor/haptics @capacitor/keyboard @capacitor/status-bar`),
           `${pre}${npx(project.packageManager)} capacitor init "${project.name}" "${asAppId(
-            project.name
+            project.name,
           )}" --web-dir ${outFolder}`,
           InternalCommand.ionicInit,
         ],
         'Add Capacitor',
         'Capacitor added to this project',
-        'https://capacitorjs.com'
-      )
+        'https://capacitorjs.com',
+      ),
     );
   }
 }
