@@ -23,7 +23,7 @@ export async function ionicLogin(folder: string, context: ExtensionContext) {
       await commands.executeCommand(VSCommand.setContext, Context.isAnonymous, false);
       return;
     }
-    await run(`node ionic login --confirm`, ifolder);
+    await run(`npx ionic login --confirm`, ifolder);
     sendTelemetryEvent(folder, TelemetryEventType.Login, context);
   } catch (err) {
     window.showErrorMessage(err);
