@@ -3,6 +3,7 @@
 ### Version 1.66
 
 - Export now reports dependencies that have not been updated
+- Fix for ionic login
 
 ### Version 1.65
 
