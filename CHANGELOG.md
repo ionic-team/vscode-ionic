@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.67
+
+- Auto import Ionic Standalone Components
+
 ### Version 1.66
 
 - Export now reports dependencies that have not been updated

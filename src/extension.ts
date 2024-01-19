@@ -26,9 +26,11 @@ import { selectExternalIPAddress } from './ionic-serve';
 import { advancedActions } from './advanced-actions';
 import { PluginExplorerPanel } from './plugin-explorer';
 import { features, showTips } from './features';
+import { autoFixAngularImports } from './angular-imports';
 
 import { webDebugSetting } from './web-debug';
 import { showOutput, write, writeError, writeIonic } from './logging';
+import { ImportQuickFixProvider } from './quick-fix';
 import {
   cancelIfRunning,
   finishCommand,
@@ -49,6 +51,7 @@ import {
   workspace,
   debug,
   TextDocument,
+  languages,
 } from 'vscode';
 import { existsSync } from 'fs';
 
@@ -204,11 +207,21 @@ export async function activate(context: ExtensionContext) {
   const ionicProvider = new IonicTreeProvider(rootPath, context);
   const view = window.createTreeView('ionic-tree', { treeDataProvider: ionicProvider });
 
-  //IonicStartPanel.init(context.extensionUri, this.workspaceRoot, context);
+  // Quick Fixes
+  context.subscriptions.push(
+    languages.registerCodeActionsProvider({ scheme: 'file', language: 'html' }, new ImportQuickFixProvider(), {
+      providedCodeActionKinds: ImportQuickFixProvider.providedCodeActionKinds,
+    }),
+  );
+
+  const diagnostics = languages.createDiagnosticCollection('ionic');
+  context.subscriptions.push(diagnostics);
 
   // Project List Panel
   const ionicProjectsProvider = new IonicProjectsreeProvider(rootPath, context);
   const projectsView = window.createTreeView('ionic-zprojects', { treeDataProvider: ionicProjectsProvider });
+
+  // Quick Fixes
 
   // Dev Server Running Panel
   const ionicDevServerProvider = new IonicDevServerProvider(rootPath, context);
