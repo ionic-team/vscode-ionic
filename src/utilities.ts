@@ -781,3 +781,11 @@ function removeCordovaFromPackageJSON(folder: string): Promise<boolean> {
     }
   });
 }
+
+export function toPascalCase(text: string) {
+  return text.replace(/(^\w|-\w)/g, clearAndUpper);
+}
+
+function clearAndUpper(text: string) {
+  return text.replace(/-/, '').toUpperCase();
+}
