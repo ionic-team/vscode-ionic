@@ -1,5 +1,8 @@
 # Roadmap
 
+- Flag packages pull from git with a warning. If they are not pinned to a commit then flag as an error
+- Target Mac, Linux & Windows with https://neutralino.js.org/
+
 ## PWA
 
 - PWA support for React/Vue
