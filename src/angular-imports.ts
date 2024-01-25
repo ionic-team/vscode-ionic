@@ -1,8 +1,6 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync } from 'fs';
 import { Range, TextDocument, Uri, WorkspaceEdit, commands, workspace } from 'vscode';
 import { toPascalCase } from './utilities';
-import { write, writeIonic } from './logging';
-import { basename } from 'path';
 
 export async function autoFixAngularImports(document: TextDocument, component: string): Promise<boolean> {
   // Validate that the file changed was a .html file that also has a .ts file which uses @ionic standalone
@@ -13,8 +11,10 @@ export async function autoFixAngularImports(document: TextDocument, component: s
   const tsUri = Uri.file(tsFile);
   const tsDoc = await workspace.openTextDocument(tsUri);
 
-  const tsText = readFileSync(tsFile, 'utf-8');
+  // const tsText = readFileSync(tsFile, 'utf-8');
+  const tsText = tsDoc.getText();
   const htmlText = document.getText();
+
   if (!tsText.includes(`'@ionic/angular/standalone'`)) return false;
   if (!component.startsWith('ion-')) return false;
 
