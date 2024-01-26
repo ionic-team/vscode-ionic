@@ -78,7 +78,7 @@
       },
       {
         "view": "ionic-tree",
-        "contents": "",
+        "contents": "Want to create a new Mobile or Web App?\n[Start New Project](command:ionic-official.newProject)\n",
         "when": "noProjectFound == true"
       },
       {

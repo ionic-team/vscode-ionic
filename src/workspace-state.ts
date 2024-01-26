@@ -23,6 +23,7 @@ export enum ExtensionSetting {
 export enum GlobalSetting {
   lastTipsShown = 'lastTipsShown',
   projectsFolder = 'projectsFolder',
+  suggestNPMInstall = 'suggestNPMInstall',
 }
 
 export function getSetting(key: WorkspaceSetting): any {
