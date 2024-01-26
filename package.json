@@ -45,7 +45,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onView:ionic"
+    "onView:ionic",
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {

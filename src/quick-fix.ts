@@ -6,13 +6,11 @@ import {
   CodeActionProvider,
   Command,
   Diagnostic,
-  Position,
   ProviderResult,
   Range,
   TextDocument,
-  WorkspaceEdit,
 } from 'vscode';
-import { autoFixAngularImports } from './angular-imports';
+import { autoFixImports } from './imports-auto-fix';
 
 export class ImportQuickFixProvider implements CodeActionProvider {
   public static readonly providedCodeActionKinds = [CodeActionKind.QuickFix];
@@ -36,7 +34,7 @@ export class ImportQuickFixProvider implements CodeActionProvider {
     // Get the name of the missing identifier from the diagnostic message
     const missingComponent = diagnostic.message.split(' ')[0].replace(/["']/g, '');
 
-    autoFixAngularImports(document, missingComponent);
+    autoFixImports(document, missingComponent);
     return;
   }
 }

@@ -26,7 +26,6 @@ import { selectExternalIPAddress } from './ionic-serve';
 import { advancedActions } from './advanced-actions';
 import { PluginExplorerPanel } from './plugin-explorer';
 import { features, showTips } from './features';
-import { autoFixAngularImports } from './angular-imports';
 
 import { webDebugSetting } from './web-debug';
 import { showOutput, write, writeError, writeIonic } from './logging';
