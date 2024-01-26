@@ -11,7 +11,6 @@ export async function autoFixAngularImports(document: TextDocument, component: s
   const edit = new WorkspaceEdit();
   const tsDoc = await workspace.openTextDocument(Uri.file(tsFile));
 
-  // const tsText = readFileSync(tsFile, 'utf-8');
   const tsText = tsDoc.getText();
   const htmlText = document.getText();
 
@@ -19,7 +18,7 @@ export async function autoFixAngularImports(document: TextDocument, component: s
   if (!component.startsWith('ion-')) return false;
 
   if (!IonicComponents.includes(component)) {
-    // Not a knowm Ionic Component
+    // Not a known Ionic Component
     return false;
   }
 

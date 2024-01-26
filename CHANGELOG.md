@@ -3,6 +3,8 @@
 ### Version 1.67
 
 - Auto import Ionic Standalone Components
+- Extension starts on VS Code startup
+- No longer requires a logged in Ionic Account (but will use it if one is logged in) - Due to breaking Ionic CLI changes
 
 ### Version 1.66
 

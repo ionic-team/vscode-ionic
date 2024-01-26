@@ -19,6 +19,7 @@ import { Command, ExtensionContext, TreeItemCollapsibleState, commands, window }
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { write } from './logging';
+import { Features } from './features';
 
 export class Project {
   name: string;
@@ -643,6 +644,10 @@ export async function inspectProject(
   project.type = project.isCapacitor ? 'Capacitor' : project.isCordova ? 'Cordova' : 'Other';
 
   const gConfig = getGlobalIonicConfig();
+
+  if (!Features.requireLogin) {
+    ionicState.skipAuth = true;
+  }
 
   if (!gConfig['user.id'] && !ionicState.skipAuth) {
     commands.executeCommand(VSCommand.setContext, Context.isAnonymous, true);

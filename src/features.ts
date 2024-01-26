@@ -3,9 +3,10 @@ import { GlobalSetting, getGlobalSetting, setGlobalSetting } from './workspace-s
 import { alt } from './utilities';
 
 // Feature Flags for experimental options
-export const features = {
+export const Features = {
   debugAndroid: true, // Whether debugging for Android is turned on
   pluginExplorer: true, // Whether the plugin explorer is shown
+  requireLogin: false, // Whether we require the user to be logged in via "ionic login"
 };
 
 export function showTips() {
