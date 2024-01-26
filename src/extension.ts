@@ -25,7 +25,7 @@ import { kill } from './process-list';
 import { selectExternalIPAddress } from './ionic-serve';
 import { advancedActions } from './advanced-actions';
 import { PluginExplorerPanel } from './plugin-explorer';
-import { features, showTips } from './features';
+import { Features, showTips } from './features';
 
 import { webDebugSetting } from './web-debug';
 import { showOutput, write, writeError, writeIonic } from './logging';
@@ -253,7 +253,7 @@ export async function activate(context: ExtensionContext) {
   });
 
   commands.registerCommand(CommandName.Add, async () => {
-    if (features.pluginExplorer) {
+    if (Features.pluginExplorer) {
       PluginExplorerPanel.init(context.extensionUri, rootPath, context, ionicProvider);
     } else {
       await installPackage(context.extensionPath, rootPath);
