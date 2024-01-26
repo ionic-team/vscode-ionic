@@ -231,9 +231,9 @@ export function checkCapacitorRules(project: Project) {
   });
 
   suggestCapacitorMigration('5.0.0', '6.0.0', TipType.Experiment, project, {
-    coreVersion: '6.0.0-beta.2',
-    versionTitle: '6 Beta (2)',
-    versionFull: '6.0.0-beta.2',
+    coreVersion: '6.0.0-rc.0',
+    versionTitle: '6 Release Candidate 1',
+    versionFull: '6.0.0-rc.0',
     changesLink: 'https://capacitorjs.com/docs/next/updating/6-0',
     androidStudioMin: '231.9392.1',
     androidStudioName: 'Android Studio Hedgehog (2023.1.1)',
