@@ -3,6 +3,48 @@
 - Flag packages pull from git with a warning. If they are not pinned to a commit then flag as an error
 - Target Mac, Linux & Windows with https://neutralino.js.org/
 
+## Studio
+
+- `Welcome page` - show "New Ionic Project", list of recent projects (icons with framework type, name), search bar to find a project
+- `Project page`
+  - `Develop` - Runs "serve" which will running:
+    - Open Browser - Opens a new default web browser
+    - Open Mockup Opens a VS Code window with a phone mockup
+    - Shows QR Code for Nexus Browser
+  - `iOS, Android` - To do `cap run`
+  - `Debug Web` - To debug the app in VS Code
+  - `Code`
+    - Shows list of all components, pages, services etc
+    - Has a quick search to find one and opens it on pressing enter
+    - Has a keyboard shortcut to flip between `html > css > ts > html`
+    - Buttons for new component, page etc
+    - `Preview mode` - Render the look and feel of the page / component
+  - `Deploy Page`
+    - Prepare Android - APK. Great for upload to play store.
+    - Prepare iOS - Generates the IPA:
+      - Uploads to a deployment server with generate plist and extracted icon, name and branch and version (plus developer)
+      - Provides URL which shows a page that can install the IPA / APK
+  - `Capabilities Page`
+    - List installed dependencies: filter for plugins, framework, other, capabilities, all
+    - View as grid (columns for name, version, rating, official badge, recommended badge, upgrade button)
+    - View as cards (like current plugins)
+    - Capabilities are plugins like "Screen Reader", "Push Notifications"
+    - Plugins may be recommended: tagged in a category and type (eg Play Integrity + Security)
+    - Idea is that you can drill into say "Security" and see all related Categories with one plugin per category
+    - The best rated plugin show as recommended
+    - Alternatives are shown as well
+    - Option to purchase a plugin: links to purchase url/home page
+- `Targets Page`
+  - Allows you to turn on/off/rebuild a target
+  - Includes `iOS`, `Android`, `PWA`, `Windows`, `Mac`, `Linux`
+- `Cool Features`
+  - Eliminate `Sync` by syncing when package.json changes or an install happens
+  - Eliminate `Build` by tracking latest changed file
+  - `Build Watch`
+    - Rebuild `www` and continously re-deploy on a change (a slower but more accurate live-deploy)
+    - Rebuild to deploy url (equivalent to netlify deploy)
+    - Rebuild to live update (live update to a "dev" version of your app that will reload on volume button press)
+
 ## PWA
 
 - PWA support for React/Vue

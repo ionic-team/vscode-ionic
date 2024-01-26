@@ -7,7 +7,7 @@ import { clearRefreshCache } from './process-packages';
 import { Recommendation } from './recommendation';
 import { installPackage, reviewProject } from './project';
 import { Command, Tip, TipFeature } from './tip';
-import { CancelObject, run, estimateRunTime, channelShow, openUri, replaceAll } from './utilities';
+import { CancelObject, run, estimateRunTime, openUri } from './utilities';
 import { ignore } from './ignore';
 import { ActionResult, CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
@@ -235,9 +235,10 @@ export async function activate(context: ExtensionContext) {
   ionicState.projectsView = projectsView;
   ionicState.context = context;
 
-  if (rootPath == undefined) {
-    IonicStartPanel.init(context.extensionUri, this.workspaceRoot, context);
-  }
+  // if (rootPath == undefined) {
+  //     // Show the start new project panel
+  //     IonicStartPanel.init(context.extensionUri, this.workspaceRoot, context);
+  // }
 
   ionicState.shell = context.workspaceState.get(Context.shell);
   const shellOverride: string = workspace.getConfiguration('ionic').get('shellPath');

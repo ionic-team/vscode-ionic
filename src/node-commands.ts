@@ -5,6 +5,7 @@ import { getMonoRepoFolder, MonoRepoType } from './monorepo';
 import { Project } from './project';
 import { showProgress } from './utilities';
 import { existsSync } from 'fs';
+import { GlobalSetting, getGlobalSetting, setGlobalSetting } from './workspace-state';
 
 export enum PackageManager {
   npm,
@@ -95,11 +96,18 @@ export async function suggestInstallAll(project: Project) {
   if (project.isModernYarn()) {
     return;
   }
+  if (getGlobalSetting(GlobalSetting.suggestNPMInstall) == 'no') return;
+
   const res = await window.showInformationMessage(
     `Would you like to install node modules for this project?`,
     'Yes',
     'No',
+    'Never',
   );
+  if (res == 'Never') {
+    setGlobalSetting(GlobalSetting.suggestNPMInstall, 'no');
+    return;
+  }
   if (res != 'Yes') return;
   showProgress(`Installing....`, async () => {
     await project.runAtRoot(npmInstallAll());
