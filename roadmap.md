@@ -3,6 +3,17 @@
 - Flag packages pull from git with a warning. If they are not pinned to a commit then flag as an error
 - Target Mac, Linux & Windows with https://neutralino.js.org/
 
+- When package.json is changed then refresh scripts
+- Errors not finding code and line number in Angular or some scripts
+- Add a shortcut option+R that will re-run the last script run
+- When switching between projects - if its a project like a cloudflare worker then open the scripts by default
+- With Scripts - have an option to pretty format them in a tree: eg local-db-list-migration, local-db-apply-migration > local-db . list-migration, apply-migration
+- If you run "rebuild node modules" on a folder based mono-repo (eg dust-web) then it will fail
+- When running do it in the DEBUG CONSOLE!!!!
+  - This way interactive things work (like wrangler dev)
+  - You get color coding
+  - Hopefully error handling is easier
+
 ## Studio
 
 - `Welcome page` - show "New Ionic Project", list of recent projects (icons with framework type, name), search bar to find a project

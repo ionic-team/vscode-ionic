@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.68
+
+- Remove annoying "Waiting for connectivity with npm" from logs
+
 ### Version 1.67
 
 - Auto import Ionic Standalone Components
