@@ -32,6 +32,7 @@ const filteredLines = [
   '  :host-context([dir=rtl])',
   '  .ion-float-start:dir(rtl)',
   '▲ [WARNING] 20 rules skipped',
+  '[INFO] Waiting for connectivity with npm...', // Occurs during debugging
 ];
 
 export function estimateRunTime(command: string) {
