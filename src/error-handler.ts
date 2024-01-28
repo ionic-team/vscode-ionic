@@ -184,6 +184,8 @@ function extractErrors(errorText: string, logs: Array<string>, folder: string): 
   if (errors.length == 0 && errorText) {
     const lines = errorText.split('\n');
     let fail: string;
+    let errorIn = -1;
+    let failIn: string;
     for (const line of lines) {
       if (line.startsWith('Error: ')) {
         errors.push(extractErrorFrom(line));
@@ -191,10 +193,20 @@ function extractErrors(errorText: string, logs: Array<string>, folder: string): 
         errors.push(extractTSErrorFrom(line));
       } else if (line.startsWith('FAIL')) {
         fail = line;
+      } else if (line.startsWith('✘ [ERROR] ')) {
+        errorIn = 2; // Vite reports the actual error line in 2 lines time
+        failIn = line.replace('✘ [ERROR] ', '').trim();
       } else {
         if (fail) {
           errors.push(extractJestErrorFrom(fail, line));
           fail = undefined;
+        }
+        if (errorIn > 0) {
+          errorIn--;
+          if (errorIn == 0) {
+            errors.push(extractViteErrorFrom(failIn, line));
+            errorIn = -1;
+          }
         }
       }
     }
@@ -232,6 +244,21 @@ function extractErrorFrom(line: string): ErrorLine {
     const position = parseInt(args[3].substring(0, args[3].indexOf(' ')) + 2) - 1;
     const errormsg = line.substring(line.indexOf('- ', codeline.length + 7) + 2);
     return { line: linenumber, position: position, uri: codeline, error: errormsg };
+  } catch {
+    // Couldnt parse the line. Continue
+  }
+}
+
+// Parse an error like this one for the line, position and error message
+// fail: TS1192: Module '"/Users/name/models"' has no default export. [plugin angular-compiler]
+// line:     src/app/thing/thing.page.ts:5:7:
+function extractViteErrorFrom(fail: string, line: string): ErrorLine {
+  try {
+    const codeline = line.trim().split(':')[0];
+    const args = line.split(':');
+    const linenumber = parseInt(args[1]) - 1;
+    const position = parseInt(args[2]);
+    return { line: linenumber, position: position, uri: codeline, error: fail };
   } catch {
     // Couldnt parse the line. Continue
   }
