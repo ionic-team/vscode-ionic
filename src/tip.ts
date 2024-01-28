@@ -93,10 +93,6 @@ export class Tip {
     return this;
   }
 
-  public sameAs(tip: Tip): boolean {
-    return this.title == tip.title; // && this.message == tip.message;
-  }
-
   canStop() {
     if (isRunning(this)) {
       this.setContextValue(Context.stop);
@@ -248,9 +244,12 @@ export class Tip {
         return;
       }
       try {
-        return await this.onQueuedAction(() => {
-          markActionAsRunning(this);
-        }, ...this.actionArgs);
+        return await this.onQueuedAction(
+          () => {
+            markActionAsRunning(this);
+          },
+          ...this.actionArgs,
+        );
       } finally {
         finishCommand(this);
       }
