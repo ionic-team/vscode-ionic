@@ -3,6 +3,7 @@
 ### Version 1.68
 
 - Remove annoying "Waiting for connectivity with npm" from logs
+- Fixed issues where 2 tasks started in different workspaces but same name would interfere with each other
 
 ### Version 1.67
 
