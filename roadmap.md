@@ -3,6 +3,7 @@
 - Flag packages pull from git with a warning. If they are not pinned to a commit then flag as an error
 - Target Mac, Linux & Windows with https://neutralino.js.org/
 
+- Icon for stop task, Icon for restart task
 - When package.json is changed then refresh scripts
 - Errors not finding code and line number in Angular or some scripts
 - Add a shortcut option+R that will re-run the last script run
