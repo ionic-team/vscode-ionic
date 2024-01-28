@@ -8,7 +8,7 @@ import { getPackageJSON, PackageFile } from './utilities';
 // Look in package.json for scripts and add options to execute
 export function addScripts(project: Project) {
   const expand = !(exists('@capacitor/core') || exists('cordova-ios') || exists('cordova-android'));
-  project.setGroup(`Scripts`, `Any scripts from your package.json will appear here`, TipType.Files, expand);
+  project.setGroup(`Scripts`, `The scripts from package.json`, TipType.Files, expand);
 
   addScriptsFrom(getPackageJSON(project.projectFolder()), project);
 
