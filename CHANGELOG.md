@@ -4,6 +4,7 @@
 
 - Remove annoying "Waiting for connectivity with npm" from logs
 - Fixed issues where 2 tasks started in different workspaces but same name would interfere with each other
+- Handle errors in Angulars ESBuild
 
 ### Version 1.67
 
