@@ -71,14 +71,14 @@
             <dict>
                 <!-- Command line Check -->
                 <key>match</key>
-                <string>(\✔).*</string>
+                <string>(\✔|\⚡).*</string>
                 <key>name</key>
                 <string>comment log.date</string> <!-- green -->
             </dict>            
             <dict>
                 <!-- Command line -->
                 <key>match</key>
-                <string>^(npm WARN|WARNING:|Warning:|\[Warning\]).*</string>
+                <string>^(npm WARN|WARNING:|Warning:|\▲|\[Warning\]).*</string>
                 <key>name</key>
                 <string>markup.deleted log.warning</string>
             </dict>	 	
