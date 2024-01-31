@@ -14,7 +14,7 @@ export async function autoFixAngularImports(document: TextDocument, component: s
   const tsText = tsDoc.getText();
   const htmlText = document.getText();
 
-  if (!tsText.includes(`'@ionic/angular/standalone'`)) return false;
+  if (!tsText.includes(`'@ionic/angular/standalone'`) && !tsText.includes(`"@ionic/angular/standalone"`)) return false;
   if (!component.startsWith('ion-')) return false;
 
   if (!IonicComponents.includes(component)) {
