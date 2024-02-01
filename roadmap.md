@@ -1,5 +1,8 @@
 # Roadmap
 
+- Run ios - "no devices" error is xcode missing. Show "To run you'll need XCode installed. Do you want to install it?"
+- Run Android - Error on no android studio. Show "To run you'll need Android Studio installed...."
+- Run Web - Show [Open In Google Chrome, Open In Editor, Open with Nexus]
 - Flag packages pull from git with a warning. If they are not pinned to a commit then flag as an error
 - Target Mac, Linux & Windows with https://neutralino.js.org/
 
