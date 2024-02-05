@@ -24,9 +24,16 @@ export async function angularGenerate(
   // CREATE src/app/test2/test2.component.ts
   try {
     let args = '';
-    if (isGreaterOrEqual('@ionic/angular-toolkit', '8.1.0') && isGreaterOrEqual('@angular/core', '15.0.0')) {
-      if (angularType == 'page') {
-        args += ' --standalone';
+    if (isGreaterOrEqual('@angular/core', '15.0.0')) {
+      if (isGreaterOrEqual('@ionic/angular-toolkit', '8.1.0')) {
+        if (angularType == 'page') {
+          args += ' --standalone';
+        }
+      }
+      if (isGreaterOrEqual('@ionic/angular-toolkit', '11.0.1')) {
+        if (angularType == 'component') {
+          args += ' --standalone';
+        }
       }
     }
     name = replaceAll(name, ' ', '-').trim();
