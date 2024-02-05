@@ -1,5 +1,11 @@
 ## Changelog
 
+### Version 1.69
+
+- Fix for automated imports of Ionic Components in Angular standalone projects
+- Fix for creating new components in Angular standalone projects
+- Fix for opening web browser in some Ionic projects
+
 ### Version 1.68
 
 - Remove annoying "Waiting for connectivity with npm" from logs

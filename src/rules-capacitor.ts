@@ -264,6 +264,15 @@ export function checkCapacitorRules(project: Project) {
       checkMinVersion('@ionic/angular-toolkit', '8.1.0', 'as the current version is missing Angular 15 support.'),
     );
   }
+  if (isLessOrEqual('@ionic/angular-toolkit', '11.0.1') && isGreaterOrEqual('@angular/core', '17.0.0')) {
+    project.tip(
+      checkMinVersion(
+        '@ionic/angular-toolkit',
+        '11.0.1',
+        'as the current version is missing Angular 17 standalone component support.',
+      ),
+    );
+  }
 }
 
 function suggestCapacitorMigration(
