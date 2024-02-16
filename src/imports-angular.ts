@@ -38,7 +38,7 @@ export async function autoFixAngularImports(document: TextDocument, component: s
   const moduleSpecifier = '@ionic/angular/standalone';
 
   let existsAlready = false;
-  let added = false;
+  // Check if the import name already exists in the typescript file
   for (const importDeclaration of importDeclarations) {
     if (importDeclaration.getModuleSpecifier().getText().includes(moduleSpecifier)) {
       for (const named of importDeclaration.getNamedImports()) {
@@ -46,11 +46,20 @@ export async function autoFixAngularImports(document: TextDocument, component: s
           existsAlready = true;
         }
       }
+    }
+  }
+  if (existsAlready) return;
+  let added = false;
+
+  // Add the import
+  for (const importDeclaration of importDeclarations) {
+    if (!added && importDeclaration.getModuleSpecifier().getText().includes(moduleSpecifier)) {
       importDeclaration.addNamedImport(importName);
       added = true;
     }
   }
-  if (existsAlready) return;
+
+  // It wasnt added so we need to add the import declaration
   if (!added) {
     sourceFile.addImportDeclaration({
       namedImports: [importName],
@@ -82,4 +91,7 @@ export async function autoFixAngularImports(document: TextDocument, component: s
     sourceFile.getText(),
   );
   await workspace.applyEdit(edit);
+
+  // Save the changes so that refresh happens
+  await workspace.saveAll();
 }

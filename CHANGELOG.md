@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.70
+
+- One more fix for auto importing Angular standalone components.
+
 ### Version 1.69
 
 - Fix for automated imports of Ionic Components in Angular standalone projects
