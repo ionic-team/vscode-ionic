@@ -5,13 +5,14 @@ import { getConfigurationArgs } from './build-configuration';
 import { InternalCommand } from './command-name';
 import { ionicState } from './ionic-tree-provider';
 import { certPath } from './live-reload';
-import { MonoRepoType } from './monorepo';
+import { FrameworkType, MonoRepoType } from './monorepo';
 import { npx, preflightNPMCheck } from './node-commands';
 import { Project } from './project';
 import { liveReloadSSL } from './live-reload';
 import { ExtensionSetting, getExtSetting, getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 import { getWebConfiguration, WebConfigSetting } from './web-configuration';
 import { window, workspace } from 'vscode';
+import { error } from 'console';
 
 /**
  * Create the ionic serve command
@@ -44,13 +45,20 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
   let serveFlags = '';
   if (webConfig == WebConfigSetting.editor || webConfig == WebConfigSetting.welcomeNoBrowser || dontOpenBrowser) {
     serveFlags += ' --no-open';
+  } else {
+    serveFlags += ' --open';
   }
 
   if (externalIP) {
-    serveFlags += ' --external';
+    serveFlags += ` ${externalArg(project.frameworkType)}`;
+  } else {
+    serveFlags += ` ${internalArg(project.frameworkType)}`;
   }
+
   if (defaultPort && defaultPort !== 8100) {
     serveFlags += ` --port=${defaultPort}`;
+  } else {
+    serveFlags += ` --port=8100`;
   }
 
   if (ionicState.project) {
@@ -65,11 +73,46 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
       liveReloadSSL(project);
       return '';
     }
-    serveFlags += ` -- --ssl-cert='${certPath('crt')}'`;
+    serveFlags += ` --ssl-cert='${certPath('crt')}'`;
     serveFlags += ` --ssl-key='${certPath('key')}'`;
   }
 
-  return `${preop}${npx(project.packageManager)} ionic serve${serveFlags}`;
+  return `${preop}${npx(project.packageManager)} ${serveCmd(project.frameworkType)}${serveFlags}`;
+}
+
+function serveCmd(framework: FrameworkType): string {
+  switch (framework) {
+    case 'angular':
+    case 'angular-standalone':
+      return 'ng serve';
+    case 'vue-vite':
+    case 'react-vite':
+      return 'vite';
+    case 'react':
+      return 'react-scripts start';
+    case 'vue':
+      return 'vue-cli-service serve';
+    default:
+      error(`serve command is not know for this project type`);
+  }
+}
+
+function internalArg(framework: FrameworkType): string {
+  switch (framework) {
+    case 'angular-standalone':
+      return '';
+    default:
+      return '--host=localhost';
+  }
+}
+
+function externalArg(framework: FrameworkType): string {
+  switch (framework) {
+    case 'angular-standalone':
+      return '--host=0.0.0.0';
+    default:
+      return '--host=0.0.0.0';
+  }
 }
 
 function nxServe(project: Project): string {

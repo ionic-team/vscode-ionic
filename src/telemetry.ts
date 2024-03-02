@@ -37,6 +37,7 @@ export interface IonicConfig {
   'user.email'?: string;
   'user.id'?: string;
   version?: string;
+  type: string; // ionic.config.json type
   sessionId: string; // Generated
 }
 
@@ -165,6 +166,11 @@ export function getIonicConfig(folder: string): IonicConfig {
     if (data.telemetry) {
       config.telemetry = data.telemetry; // Override global with local setting
     }
+    if (data.type) {
+      config.type = data.type;
+    } else {
+      config.type = 'unknown';
+    }
   }
   config.sessionId = config['tokens.telemetry'];
   if (!config.sessionId) {
@@ -189,7 +195,7 @@ export function getGlobalIonicConfig(): IonicConfig {
     }
     return data;
   } else {
-    return { telemetry: false, sessionId: undefined };
+    return { telemetry: false, sessionId: undefined, type: 'unknown' };
   }
 }
 
