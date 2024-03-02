@@ -2,14 +2,14 @@ import { Recommendation } from './recommendation';
 import { Tip, TipType } from './tip';
 import { load, exists } from './analyzer';
 import { isRunning } from './tasks';
-import { getGlobalIonicConfig, sendTelemetryEvents } from './telemetry';
+import { getGlobalIonicConfig, getIonicConfig, sendTelemetryEvents } from './telemetry';
 import { ionicState } from './ionic-tree-provider';
 import { Context, VSCommand } from './context-variables';
 import { getRecommendations } from './recommend';
 import { getIgnored } from './ignore';
 import { CommandName, InternalCommand } from './command-name';
 import { angularMigrate } from './rules-angular-migrate';
-import { checkForMonoRepo, MonoRepoProject, MonoRepoType } from './monorepo';
+import { checkForMonoRepo, FrameworkType, MonoRepoProject, MonoRepoType } from './monorepo';
 import { CapacitorPlatform } from './capacitor-platform';
 import { addCommand, npmInstall, npmUninstall, PackageManager } from './node-commands';
 import { run } from './utilities';
@@ -39,6 +39,9 @@ export class Project {
 
   // Package Manager Type (eg npm, pnpm)
   public packageManager: PackageManager;
+
+  // Ionic Config Json Type
+  public frameworkType: FrameworkType;
 
   // Mono Repo Project selected
   public monoRepo: MonoRepoProject;
@@ -667,6 +670,8 @@ export async function inspectProject(
     packages = await load(project.monoRepo.folder, project, context);
   }
 
+  guessFramework(project);
+
   sendTelemetryEvents(folder, project, packages, context);
 
   checkNodeVersion();
@@ -678,6 +683,26 @@ export async function inspectProject(
 
   //console.log(`Analyzed Project in ${Date.now() - startedOp}ms`);
   return { project, packages };
+}
+
+function guessFramework(project: Project) {
+  const config = getIonicConfig(project.projectFolder());
+  project.frameworkType = config.type as FrameworkType;
+  if (project.frameworkType) return;
+  if (exists('@vue/cli-service')) {
+    project.frameworkType = 'vue';
+  } else if (exists('@angular/core')) {
+    project.frameworkType = 'angular';
+  } else if (exists('react-scripts')) {
+    project.frameworkType = 'react';
+  } else if (exists('vite')) {
+    if (exists('react')) {
+      project.frameworkType = 'react-vite';
+    }
+    if (exists('vue')) {
+      project.frameworkType = 'vue-vite';
+    }
+  }
 }
 
 function getPackageManager(folder: string): PackageManager {

@@ -40,6 +40,8 @@ export enum MonoRepoType {
   folder,
 }
 
+export type FrameworkType = 'angular' | 'react' | 'vue' | 'react-vite' | 'vue-vite' | 'angular-standalone' | 'unknown';
+
 /**
  * Check to see if this is a monorepo and what type.
  * @param  {Project} project

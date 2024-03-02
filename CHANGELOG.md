@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 2.00
+
+- Ionic CLI serve and build have been replaced with framework specific commands
+
 ### Version 1.70
 
 - One more fix for auto importing Angular standalone components.

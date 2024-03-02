@@ -1,5 +1,5 @@
 import { Project } from './project';
-import { MonoRepoType } from './monorepo';
+import { FrameworkType, MonoRepoType } from './monorepo';
 import { ionicState } from './ionic-tree-provider';
 import { InternalCommand } from './command-name';
 import { npx, preflightNPMCheck } from './node-commands';
@@ -7,6 +7,7 @@ import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
 import { getConfigurationArgs } from './build-configuration';
 import { workspace } from 'vscode';
+import { error } from 'console';
 
 /**
  * Creates the ionic build command
@@ -54,7 +55,7 @@ function ionicCLIBuild(
   configurationArg?: string,
   platform?: CapacitorPlatform,
 ): string {
-  let cmd = `${npx(project.packageManager)} ionic build`;
+  let cmd = `${npx(project.packageManager)} ${buildCmd(project.frameworkType)}`;
   if (configurationArg) {
     cmd += ` ${configurationArg}`;
   } else if (prod) {
@@ -65,6 +66,24 @@ function ionicCLIBuild(
     if (platform) cmd += ` ${platform}`;
   }
   return cmd;
+}
+
+function buildCmd(framework: FrameworkType): string {
+  switch (framework) {
+    case 'angular':
+    case 'angular-standalone':
+      return 'ng build';
+    case 'vue-vite':
+    case 'react-vite':
+      return 'vite build';
+    case 'react':
+      return 'react-scripts build';
+    case 'vue':
+      return 'vue-cli-service build';
+    default:
+      error('build command is unknown');
+  }
+  return 'build command unknown';
 }
 
 function nxBuild(prod: boolean, project: Project, configurationArg?: string): string {
