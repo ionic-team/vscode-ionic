@@ -454,6 +454,8 @@ function getPackageManager(manager: PackageManager): string {
   switch (manager) {
     case PackageManager.npm:
       return 'npm';
+    case PackageManager.bun:
+      return 'bun';
     case PackageManager.pnpm:
       return 'pnpm';
     case PackageManager.yarn:
