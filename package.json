@@ -2,14 +2,20 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "2.00.0",
+  "version": "2.0.0",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
     "Ionic",
     "Capacitor",
     "Ionic Framework",
-    "Cordova"
+    "Cordova",
+    "Cross Platform",
+    "Web Native",
+    "Android",
+    "iOS",
+    "React Native",
+    "Flutter"
   ],
   "private": true,
   "license": "MIT",

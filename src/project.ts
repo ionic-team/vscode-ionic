@@ -708,10 +708,13 @@ function guessFramework(project: Project) {
 function getPackageManager(folder: string): PackageManager {
   const yarnLock = join(folder, 'yarn.lock');
   const pnpmLock = join(folder, 'pnpm-lock.yaml');
+  const bunLock = join(folder, 'bun.lockb');
   if (existsSync(yarnLock)) {
     return PackageManager.yarn;
   } else if (existsSync(pnpmLock) || ionicState.repoType == MonoRepoType.pnpm) {
     return PackageManager.pnpm;
+  } else if (existsSync(bunLock)) {
+    return PackageManager.bun;
   }
   return PackageManager.npm;
 }

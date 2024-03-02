@@ -3,6 +3,7 @@
 ### Version 2.00
 
 - Ionic CLI serve and build have been replaced with framework specific commands
+- Support for bun
 
 ### Version 1.70
 

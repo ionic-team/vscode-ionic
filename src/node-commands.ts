@@ -11,6 +11,7 @@ export enum PackageManager {
   npm,
   yarn,
   pnpm,
+  bun,
 }
 
 export enum PMOperation {
@@ -25,6 +26,8 @@ export function outdatedCommand(packageManager: PackageManager): string {
   switch (packageManager) {
     case PackageManager.yarn:
       return 'yarn outdated --json';
+    case PackageManager.bun:
+      return 'npm outdated --json';
     case PackageManager.pnpm:
       return 'pnpm outdated --json';
     default:
@@ -38,6 +41,8 @@ export function listCommand(packageManager: PackageManager): string {
       return 'yarn list --json';
     case PackageManager.pnpm:
       return 'pnpm list --json';
+    case PackageManager.bun:
+      return 'npm list --json';
     default:
       return 'npm list --json';
   }
@@ -145,6 +150,8 @@ function pm(operation: PMOperation, name?: string): string {
       return yarn(operation, name);
     case PackageManager.pnpm:
       return pnpm(operation, name);
+    case PackageManager.bun:
+      return bun(operation, name);
     default:
       window.showErrorMessage('Unknown package manager');
   }
@@ -195,8 +202,25 @@ function pnpm(operation: PMOperation, name?: string): string {
   }
 }
 
+function bun(operation: PMOperation, name?: string): string {
+  switch (operation) {
+    case PMOperation.installAll:
+      return 'bun install';
+    case PMOperation.install:
+      return `bun install ${name}  --save-exact`;
+    case PMOperation.uninstall:
+      return `bun uninstall ${name}`;
+    case PMOperation.run:
+      return `bun run ${name}`;
+    case PMOperation.update:
+      return `bun update`;
+  }
+}
+
 export function npx(packageManager: PackageManager): string {
   switch (packageManager) {
+    case PackageManager.bun:
+      return `${InternalCommand.cwd}bunx`;
     case PackageManager.pnpm:
       return `${InternalCommand.cwd}pnpm exec`;
     default:
