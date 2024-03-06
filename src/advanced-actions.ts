@@ -1,5 +1,5 @@
 import { Project } from './project';
-import { PackageManager, npmInstall } from './node-commands';
+import { PackageManager, npmInstall, npmInstallAll } from './node-commands';
 import { confirm, getRunOutput, isWindows, replaceAll } from './utilities';
 import { write, writeError, writeIonic } from './logging';
 import { exists, isGreaterOrEqual, isLess } from './analyzer';
@@ -13,6 +13,7 @@ import { integratePrettier } from './prettier';
 
 enum Features {
   migrateToPNPM = '$(find-replace) Migrate to PNPM',
+  migrateToBun = '$(find-replace) Migrate to Bun',
   migrateToNX = '$(outline-view-icon) Migrate to NX',
   reinstallNodeModules = '$(extensions-sync-enabled) Reinstall Node Modules',
   angularESBuild = '$(test-view-icon) Switch from WebPack to ESBuild (experimental)',
@@ -26,12 +27,17 @@ export async function advancedActions(project: Project) {
   const picks: Array<Features> = [];
   if (project.packageManager == PackageManager.npm) {
     picks.push(Features.migrateToPNPM);
+    picks.push(Features.migrateToBun);
 
     if (isGreaterOrEqual('@angular/core', '14.0.0')) {
       picks.push(Features.migrateToNX);
     }
 
     picks.push(Features.reinstallNodeModules);
+  } else {
+    if (project.packageManager == PackageManager.bun) {
+      picks.push(Features.reinstallNodeModules);
+    }
   }
   if (isGreaterOrEqual('@angular/core', '14.0.0')) {
     picks.push(Features.migrateAngularStandalone);
@@ -56,6 +62,9 @@ export async function advancedActions(project: Project) {
   switch (selection) {
     case Features.migrateToPNPM:
       await runCommands(migrateToPNPM(), selection, project);
+      break;
+    case Features.migrateToBun:
+      await runCommands(migrateToBun(), selection, project);
       break;
     case Features.migrateToNX:
       await window.showInformationMessage('Run the following command: npx nx init', 'OK');
@@ -83,6 +92,14 @@ export async function advancedActions(project: Project) {
 
 function migrateToPNPM(): Array<string> {
   return ['pnpm -v', 'rm -rf node_modules', 'pnpm import', 'pnpm install', 'rm package-lock.json'];
+}
+
+function migrateToBun(): Array<string> {
+  return cwd(['bun -v', 'rm -rf node_modules', 'bun install', 'rm package-lock.json']);
+}
+
+function cwd(commands: string[]): string[] {
+  return commands.map((command) => `${InternalCommand.cwd}${command}`);
 }
 
 async function migrateAngularControlFlow(selection: string, project: Project) {
@@ -126,7 +143,7 @@ export function removeNodeModules(): string {
   return isWindows() ? 'del node_modules /S /Q' : 'rm -rf node_modules';
 }
 function reinstallNodeModules(): Array<string> {
-  return [removeNodeModules(), 'npm install'];
+  return cwd([removeNodeModules(), npmInstallAll()]);
 }
 
 function showIgnoredRecommendations(): void {

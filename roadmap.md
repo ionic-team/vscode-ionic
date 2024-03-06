@@ -1,9 +1,8 @@
 # Roadmap
 
 - work without ionic-config.json by looking at project files
-- ionic build without ionic cli
-- avoid installing ionic cli local
-- support for bun
+- check for projects that are unknown but have a build or ionic:build script
+- switch to bun option
 
 - Run ios - "no devices" error is xcode missing. Show "To run you'll need XCode installed. Do you want to install it?"
 - Run Android - Error on no android studio. Show "To run you'll need Android Studio installed...."

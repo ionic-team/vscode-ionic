@@ -55,10 +55,8 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
     serveFlags += ` ${internalArg(project.frameworkType)}`;
   }
 
-  if (defaultPort && defaultPort !== 8100) {
+  if (defaultPort && defaultPort !== 8100 && defaultPort !== 4200) {
     serveFlags += ` --port=${defaultPort}`;
-  } else {
-    serveFlags += ` --port=8100`;
   }
 
   if (ionicState.project) {
