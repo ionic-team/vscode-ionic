@@ -1,6 +1,7 @@
 import { debug, workspace } from 'vscode';
 import { startSourceMapServer } from './source-map-server';
 import { debugSkipFiles } from './utilities';
+import { ionicState } from './ionic-tree-provider';
 
 // The debug provider type for VS Code
 export const AndroidDebugType = 'android-web';
@@ -20,6 +21,7 @@ export function debugAndroid(packageName: string, wwwFolder: string) {
 
   // Note: options here include sourceMapPathOverrides and resolveSourceMapLocations both dont fix the
   // problem with source maps not being accessible to the debugger
+  ionicState.debugged = true;
   debug.startDebugging(workspace.workspaceFolders[0], {
     type: AndroidDebugType,
     name: 'Debug Android',

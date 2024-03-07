@@ -40,6 +40,7 @@ interface IonicState {
   nvm: string; // If .nvmrc is used will contain its contents
   rootFolder: string; // The folder to inspect
   flavors: string[]; // Android Flavors
+  debugged: boolean; // Have we ever started debugging
   runIOS: Tip;
   runAndroid: Tip;
   runWeb: Tip;
@@ -73,6 +74,7 @@ export const ionicState: IonicState = {
   projectRef: undefined,
   configuration: undefined,
   project: undefined,
+  debugged: false,
 };
 
 interface FolderInfo {
@@ -91,7 +93,10 @@ export class IonicTreeProvider implements TreeDataProvider<Recommendation> {
 
   selectedProject: string;
 
-  constructor(private workspaceRoot: string | undefined, private context: ExtensionContext) {}
+  constructor(
+    private workspaceRoot: string | undefined,
+    private context: ExtensionContext,
+  ) {}
 
   refresh(): void {
     this._onDidChangeTreeData.fire();
