@@ -21,6 +21,9 @@ import { spawn } from 'child_process';
 const forwardedSockets: ForwardedSocket[] = [];
 
 export async function androidDebugUnforward(): Promise<void> {
+  if (!ionicState.debugged) {
+    return; // May be debugging some other non Ionic app
+  }
   // Swtich back to Ionic View
   ionicState.view.reveal(undefined, { focus: true });
 

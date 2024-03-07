@@ -4,6 +4,7 @@
 
 - Ionic CLI serve and build have been replaced with framework specific commands
 - Support for command palette commands: sync, run for Web, run for Android, run for iOS, open XCode, open Android Studio
+- The extension no longer opens if debugging other apps
 - Support for bun
 
 ### Version 1.70
