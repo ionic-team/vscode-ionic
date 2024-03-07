@@ -223,8 +223,28 @@
         "title": "Rebuild"
       },
       {
-        "command": "ionic-official.runios",
-        "title": "Run on iOS"
+        "command": "ionic-official.openXcode",
+        "title": "Ionic: Open in XCode"
+      },
+      {
+        "command": "ionic-official.openAndroidStudio",
+        "title": "Ionic: Open in Android Studio"
+      },
+      {
+        "command": "ionic-official.runIOS",
+        "title": "Ionic: Run for iOS"
+      },
+      {
+        "command": "ionic-official.runAndroid",
+        "title": "Ionic: Run for Android"
+      },
+      {
+        "command": "ionic-official.runWeb",
+        "title": "Ionic: Run for Web"
+      },
+      {
+        "command": "ionic-official.capSync",
+        "title": "Ionic: Sync"
       },
       {
         "command": "ionic-official.refreshDebug",
@@ -319,10 +339,6 @@
         },
         {
           "command": "ionic-official.rebuild",
-          "when": "false"
-        },
-        {
-          "command": "ionic-official.runios",
           "when": "false"
         },
         {

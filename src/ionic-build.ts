@@ -30,7 +30,11 @@ export async function ionicBuild(
   }
   const additionalArgs = getConfigurationArgs(false);
   if (additionalArgs) {
-    args += additionalArgs;
+    if (additionalArgs.includes('--configuration=') && args.includes('--configuration')) {
+      // We've already got the configuration argument so ignore it
+    } else {
+      args += additionalArgs;
+    }
   }
   switch (project.repoType) {
     case MonoRepoType.none:

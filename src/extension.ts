@@ -53,6 +53,7 @@ import {
   languages,
 } from 'vscode';
 import { existsSync } from 'fs';
+import { CommandTitle } from './command-title';
 
 /**
  * Runs the command while showing a vscode window that can be cancelled
@@ -270,6 +271,25 @@ export async function activate(context: ExtensionContext) {
     recommendation.setContext(undefined);
   });
 
+  commands.registerCommand(CommandName.OpenInXCode, async () => {
+    await findAndRun(ionicProvider, rootPath, CommandTitle.OpenInXCode);
+  });
+  commands.registerCommand(CommandName.OpenInAndroidStudio, async () => {
+    await findAndRun(ionicProvider, rootPath, CommandTitle.OpenInAndroidStudio);
+  });
+  commands.registerCommand(CommandName.RunForIOS, async () => {
+    await findAndRun(ionicProvider, rootPath, CommandTitle.RunForIOS);
+  });
+  commands.registerCommand(CommandName.RunForAndroid, async () => {
+    await findAndRun(ionicProvider, rootPath, CommandTitle.RunForAndroid);
+  });
+  commands.registerCommand(CommandName.RunForWeb, async () => {
+    await findAndRun(ionicProvider, rootPath, CommandTitle.RunForWeb);
+  });
+  commands.registerCommand(CommandName.Sync, async () => {
+    await findAndRun(ionicProvider, rootPath, CommandTitle.Sync);
+  });
+
   commands.registerCommand(CommandName.SignUp, async () => {
     await ionicSignup(context.extensionPath, context);
     ionicProvider.refresh();
@@ -423,6 +443,31 @@ async function runAgain(ionicProvider: IonicTreeProvider, rootPath: string) {
   if (runInfo) {
     runAction(runInfo, ionicProvider, rootPath);
   }
+}
+
+async function findAndRun(ionicProvider: IonicTreeProvider, rootPath: string, commandTitle: CommandTitle) {
+  const list = await ionicProvider.getChildren();
+  const r = findRecursive(commandTitle, list);
+  if (r) {
+    runAction(r.tip, ionicProvider, rootPath);
+  } else {
+    window.showInformationMessage(`The action "${commandTitle}" is not available.`);
+  }
+}
+
+function findRecursive(label: string, items: Recommendation[]): Recommendation | undefined {
+  for (const item of items) {
+    if (item.children && item.children.length > 0) {
+      const found = findRecursive(label, item.children);
+      if (found) {
+        return found;
+      }
+    }
+    if (item.label == label) {
+      return item;
+    }
+  }
+  return undefined;
 }
 
 function trackProjectChange() {

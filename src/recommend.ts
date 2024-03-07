@@ -38,6 +38,7 @@ import { LoggingSettings } from './log-settings';
 import { writeIonic } from './logging';
 import { cancelLastOperation } from './tasks';
 import { CommandName } from './command-name';
+import { CommandTitle } from './command-title';
 import { ExtensionContext, Uri, commands, env } from 'vscode';
 
 export async function getRecommendations(project: Project, context: ExtensionContext, packages: any): Promise<void> {
@@ -47,7 +48,15 @@ export async function getRecommendations(project: Project, context: ExtensionCon
     const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
     const hasCapAndroid = project.hasCapacitorProject(CapacitorPlatform.android);
 
-    const runWeb = new Tip('Web', '', TipType.Run, 'Serve', undefined, 'Running on Web', `Project Served`)
+    const runWeb = new Tip(
+      CommandTitle.RunForWeb,
+      '',
+      TipType.Run,
+      'Serve',
+      undefined,
+      'Running on Web',
+      `Project Served`,
+    )
       .setDynamicCommand(ionicServe, project, false)
       .requestIPSelection()
       .setData(project.name)
@@ -59,6 +68,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
       ])
       .canStop()
       .willNotBlock()
+      .setVSCommand(CommandName.RunForWeb)
       .canAnimate()
       .setTooltip(`Run a development server and open using the default web browser (${alt('R')})`);
     project.add(runWeb);
@@ -77,7 +87,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
 
     if (hasCapAndroid) {
       const runAndroid = new Tip(
-        'Android',
+        CommandTitle.RunForAndroid,
         ionicState.selectedAndroidDeviceName ?? '',
         TipType.Run,
         'Run',
@@ -95,6 +105,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
         .willNotBlock()
         .canAnimate()
         .canRefreshAfter()
+        .setVSCommand(CommandName.RunForAndroid)
         .setSyncOnSuccess(CapacitorPlatform.android)
         .setContextValue(Context.selectDevice);
 
@@ -103,7 +114,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
     }
     if (hasCapIos) {
       const runIos = new Tip(
-        'iOS',
+        CommandTitle.RunForIOS,
         ionicState.selectedIOSDeviceName ?? '',
         TipType.Run,
         'Run',
@@ -121,6 +132,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
         .willNotBlock()
         .canAnimate()
         .canRefreshAfter()
+        .setVSCommand(CommandName.RunForIOS)
         .setSyncOnSuccess(CapacitorPlatform.ios)
         .setContextValue(Context.selectDevice);
       project.add(runIos);
@@ -166,10 +178,11 @@ export async function getRecommendations(project: Project, context: ExtensionCon
 
     if (hasCapIos || hasCapAndroid) {
       project.add(
-        new Tip('Sync', '', TipType.Sync, 'Capacitor Sync', undefined, 'Syncing', undefined)
+        new Tip(CommandTitle.Sync, '', TipType.Sync, 'Capacitor Sync', undefined, 'Syncing', undefined)
           .setDynamicCommand(capacitorSync, project)
           .canStop()
           .canAnimate()
+          .setVSCommand(CommandName.Sync)
           .setTooltip(
             'Capacitor Sync copies the web app build assets to the native projects and updates native plugins and dependencies.',
           ),
@@ -177,8 +190,16 @@ export async function getRecommendations(project: Project, context: ExtensionCon
     }
     if (hasCapIos) {
       project.add(
-        new Tip('Open in Xcode', '', TipType.Edit, 'Opening Project in Xcode', undefined, 'Open Project in Xcode')
+        new Tip(
+          CommandTitle.OpenInXCode,
+          '',
+          TipType.Edit,
+          'Opening Project in Xcode',
+          undefined,
+          'Open Project in Xcode',
+        )
           .showProgressDialog()
+          .setVSCommand(CommandName.OpenInXCode)
           .setDynamicCommand(capacitorOpen, project, CapacitorPlatform.ios)
           .setTooltip('Opens the native iOS project in XCode'),
       );
@@ -186,7 +207,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
     if (hasCapAndroid) {
       project.add(
         new Tip(
-          'Open in Android Studio',
+          CommandTitle.OpenInAndroidStudio,
           '',
           TipType.Edit,
           'Opening Project in Android Studio',
@@ -194,6 +215,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
           'Open Android Studio',
         )
           .showProgressDialog()
+          .setVSCommand(CommandName.OpenInAndroidStudio)
           .setDynamicCommand(capacitorOpen, project, CapacitorPlatform.android)
           .setTooltip('Opens the native Android project in Android Studio'),
       );
