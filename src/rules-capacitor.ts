@@ -476,15 +476,25 @@ export async function capacitorRecommendations(project: Project, forMigration: b
   if (!isWindows() && exists('@capacitor/ios')) {
     const cocoaPods = await getCocoaPodsVersion(project);
     const minVersion = '1.13.0';
-    if (cocoaPods && !isVersionGreaterOrEqual(cocoaPods, minVersion)) {
-      project.add(
-        new Tip('Update Cocoapods', `Cocoapods requires updating.`, TipType.Error).setQueuedAction(
-          updateCocoaPods,
-          cocoaPods,
-          project,
-          minVersion,
-        ),
-      );
+    const badVersions = ['1.15.0', '1.15.1']; // This version has regressions with @capacitor/live-updates
+    let needsUpdating = false;
+    if (cocoaPods) {
+      if (!isVersionGreaterOrEqual(cocoaPods, minVersion)) {
+        needsUpdating = true;
+      }
+      if (badVersions.includes(cocoaPods)) {
+        needsUpdating = true;
+      }
+      if (needsUpdating) {
+        project.add(
+          new Tip('Update Cocoapods', `Cocoapods requires updating.`, TipType.Error).setQueuedAction(
+            updateCocoaPods,
+            cocoaPods,
+            project,
+            minVersion,
+          ),
+        );
+      }
     }
   }
 

@@ -6,6 +6,7 @@
 - Support for command palette commands: sync, run for Web, run for Android, run for iOS, open XCode, open Android Studio
 - The extension no longer opens if debugging other apps
 - Support for bun
+- Detect Cocoapods 1.15.0 and 1.15.1 regressions and suggest update
 
 ### Version 1.70
 
