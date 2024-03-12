@@ -12,7 +12,8 @@ import { liveReloadSSL } from './live-reload';
 import { ExtensionSetting, getExtSetting, getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 import { getWebConfiguration, WebConfigSetting } from './web-configuration';
 import { window, workspace } from 'vscode';
-import { error } from 'console';
+import { write, writeError } from './logging';
+import { createServer } from 'http';
 
 /**
  * Create the ionic serve command
@@ -30,18 +31,18 @@ export async function ionicServe(project: Project, dontOpenBrowser: boolean): Pr
     case MonoRepoType.lerna:
     case MonoRepoType.pnpm:
     case MonoRepoType.folder:
-      return InternalCommand.cwd + ionicCLIServe(project, dontOpenBrowser);
+      return InternalCommand.cwd + (await ionicCLIServe(project, dontOpenBrowser));
     default:
       throw new Error('Unsupported Monorepo type');
   }
 }
 
-function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
+async function ionicCLIServe(project: Project, dontOpenBrowser: boolean): Promise<string> {
   const preop = preflightNPMCheck(project);
   const httpsForWeb = getSetting(WorkspaceSetting.httpsForWeb);
   const webConfig: WebConfigSetting = getWebConfiguration();
   const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
-  const defaultPort = workspace.getConfiguration('ionic').get('defaultPort');
+  const defaultPort: number | undefined = workspace.getConfiguration('ionic').get('defaultPort');
   let serveFlags = '';
   if (webConfig == WebConfigSetting.editor || webConfig == WebConfigSetting.welcomeNoBrowser || dontOpenBrowser) {
     serveFlags += ' --no-open';
@@ -55,8 +56,9 @@ function ionicCLIServe(project: Project, dontOpenBrowser: boolean): string {
     serveFlags += ` ${internalArg(project.frameworkType)}`;
   }
 
-  if (defaultPort && defaultPort !== 8100 && defaultPort !== 4200) {
-    serveFlags += ` --port=${defaultPort}`;
+  if (defaultPort) {
+    const port = await findNextPort(defaultPort);
+    serveFlags += ` --port=${port}`;
   }
 
   if (ionicState.project) {
@@ -91,8 +93,41 @@ function serveCmd(framework: FrameworkType): string {
     case 'vue':
       return 'vue-cli-service serve';
     default:
-      error(`serve command is not know for this project type`);
+      writeError(`serve command is not know for this project type`);
   }
+}
+
+async function findNextPort(port: number): Promise<number> {
+  let availablePort = port;
+  while (await isPortInUse(availablePort)) {
+    write(`Port ${availablePort} is in use.`);
+    availablePort++;
+  }
+  return availablePort;
+}
+
+async function isPortInUse(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const server = createServer();
+
+    server.once('error', (err: any) => {
+      if (err.code === 'EADDRINUSE') {
+        // Port is currently in use
+        resolve(true);
+      } else {
+        // Other error occurred
+        resolve(false);
+      }
+    });
+
+    server.once('listening', () => {
+      // Close the server if listening doesn't fail
+      server.close();
+      resolve(false);
+    });
+
+    server.listen(port);
+  });
 }
 
 function internalArg(framework: FrameworkType): string {
