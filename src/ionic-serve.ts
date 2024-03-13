@@ -1,4 +1,4 @@
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { networkInterfaces } from 'os';
 
 import { getConfigurationArgs } from './build-configuration';
@@ -6,7 +6,7 @@ import { InternalCommand } from './command-name';
 import { ionicState } from './ionic-tree-provider';
 import { certPath } from './live-reload';
 import { FrameworkType, MonoRepoType } from './monorepo';
-import { npx, preflightNPMCheck } from './node-commands';
+import { npmRun, npx, preflightNPMCheck } from './node-commands';
 import { Project } from './project';
 import { liveReloadSSL } from './live-reload';
 import { ExtensionSetting, getExtSetting, getSetting, setSetting, WorkspaceSetting } from './workspace-state';
@@ -14,6 +14,7 @@ import { getWebConfiguration, WebConfigSetting } from './web-configuration';
 import { window, workspace } from 'vscode';
 import { write, writeError } from './logging';
 import { createServer } from 'http';
+import { join } from 'path';
 
 /**
  * Create the ionic serve command
@@ -77,11 +78,11 @@ async function ionicCLIServe(project: Project, dontOpenBrowser: boolean): Promis
     serveFlags += ` --ssl-key='${certPath('key')}'`;
   }
 
-  return `${preop}${npx(project.packageManager)} ${serveCmd(project.frameworkType)}${serveFlags}`;
+  return `${preop}${npx(project.packageManager)} ${serveCmd(project)}${serveFlags}`;
 }
 
-function serveCmd(framework: FrameworkType): string {
-  switch (framework) {
+function serveCmd(project: Project): string {
+  switch (project.frameworkType) {
     case 'angular':
     case 'angular-standalone':
       return 'ng serve';
@@ -92,11 +93,29 @@ function serveCmd(framework: FrameworkType): string {
       return 'react-scripts start';
     case 'vue':
       return 'vue-cli-service serve';
-    default:
+    default: {
+      const cmd = guessServeCommand(project);
+      if (cmd) {
+        return cmd;
+      }
       writeError(`serve command is not know for this project type`);
+    }
   }
 }
 
+function guessServeCommand(project: Project): string | undefined {
+  const filename = join(project.projectFolder(), 'package.json');
+  if (existsSync(filename)) {
+    const packageFile = JSON.parse(readFileSync(filename, 'utf8'));
+    if (packageFile.scripts['ionic:serve']) {
+      return npmRun('ionic:serve');
+    }
+    if (packageFile.scripts?.serve) {
+      return npmRun('serve');
+    }
+  }
+  return undefined;
+}
 async function findNextPort(port: number): Promise<number> {
   let availablePort = port;
   while (await isPortInUse(availablePort)) {
