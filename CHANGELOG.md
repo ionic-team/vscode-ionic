@@ -1,6 +1,6 @@
 ## Changelog
 
-### Version 2.00
+### Version 1.80
 
 - Ionic CLI serve and build have been replaced with framework specific commands
 - Support for command palette commands: sync, run for Web, run for Android, run for iOS, open XCode, open Android Studio
