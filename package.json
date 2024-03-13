@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "2.0.0",
+  "version": "1.80.0",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -474,6 +474,11 @@
           "type": "boolean",
           "default": false,
           "description": "Use the production configuration when building the application."
+        },
+        "ionic.ignoreIonicCLIConfig": {
+          "type": "boolean",
+          "default": false,
+          "description": "Ignore the settings in Ionic CLI config."
         },
         "ionic.javaHome": {
           "type": "string",

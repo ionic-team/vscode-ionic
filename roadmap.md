@@ -1,8 +1,6 @@
 # Roadmap
 
-- work without ionic-config.json by looking at project files
-- check for projects that are unknown but have a build or ionic:build script
-- switch to bun option
+- If "The bundledWebRuntime configuration option has been deprecated. Can be safely deleted." then remove option
 
 - Run ios - "no devices" error is xcode missing. Show "To run you'll need XCode installed. Do you want to install it?"
 - Run Android - Error on no android studio. Show "To run you'll need Android Studio installed...."

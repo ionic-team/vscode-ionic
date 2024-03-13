@@ -8,6 +8,7 @@ import { existsSync, readFileSync } from 'fs';
 import { join, resolve } from 'path';
 import { request } from 'http';
 import { homedir, platform, release } from 'os';
+import { workspace } from 'vscode';
 
 interface TelemetryMetric {
   name: string;
@@ -195,7 +196,8 @@ export function getGlobalIonicConfig(): IonicConfig {
     }
     return data;
   } else {
-    return { telemetry: false, sessionId: undefined, type: 'unknown' };
+    const ignoreIonicCLI: boolean = workspace.getConfiguration('ionic').get('ignoreIonicCLIConfig');
+    return { telemetry: !ignoreIonicCLI, sessionId: generateUUID(), type: 'unknown' };
   }
 }
 
