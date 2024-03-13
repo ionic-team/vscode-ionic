@@ -281,6 +281,7 @@ export async function run(
               'open your browser on ',
               '> Local:', // Nuxt
               '➜  Local:', // AnalogJs
+              '- Local:', // Vue
             ]);
             if (url) {
               findLocalUrl = false;
@@ -296,6 +297,7 @@ export async function run(
               'On Your Network:',
               '> Network:', // Nuxt
               '➜  Network:', // AnalogJs
+              '- Network:', // Vue
               'open your browser on ', // NX
             ]);
             if (url) {

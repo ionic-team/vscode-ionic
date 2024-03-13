@@ -2,12 +2,14 @@ import { Project } from './project';
 import { FrameworkType, MonoRepoType } from './monorepo';
 import { ionicState } from './ionic-tree-provider';
 import { InternalCommand } from './command-name';
-import { npx, preflightNPMCheck } from './node-commands';
+import { npmRun, npx, preflightNPMCheck } from './node-commands';
 import { exists } from './analyzer';
 import { CapacitorPlatform } from './capacitor-platform';
 import { getConfigurationArgs } from './build-configuration';
 import { workspace } from 'vscode';
 import { error } from 'console';
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
 
 /**
  * Creates the ionic build command
@@ -59,7 +61,7 @@ function ionicCLIBuild(
   configurationArg?: string,
   platform?: CapacitorPlatform,
 ): string {
-  let cmd = `${npx(project.packageManager)} ${buildCmd(project.frameworkType)}`;
+  let cmd = `${npx(project.packageManager)} ${buildCmd(project)}`;
   if (configurationArg) {
     cmd += ` ${configurationArg}`;
   } else if (prod) {
@@ -72,8 +74,8 @@ function ionicCLIBuild(
   return cmd;
 }
 
-function buildCmd(framework: FrameworkType): string {
-  switch (framework) {
+function buildCmd(project: Project): string {
+  switch (project.frameworkType) {
     case 'angular':
     case 'angular-standalone':
       return 'ng build';
@@ -84,10 +86,28 @@ function buildCmd(framework: FrameworkType): string {
       return 'react-scripts build';
     case 'vue':
       return 'vue-cli-service build';
-    default:
-      error('build command is unknown');
+    default: {
+      const cmd = guessBuildCommand(project);
+      if (!cmd) {
+        error('build command is unknown');
+      }
+      return cmd;
+    }
   }
-  return 'build command unknown';
+}
+
+function guessBuildCommand(project: Project): string | undefined {
+  const filename = join(project.projectFolder(), 'package.json');
+  if (existsSync(filename)) {
+    const packageFile = JSON.parse(readFileSync(filename, 'utf8'));
+    if (packageFile.scripts['ionic:build']) {
+      return npmRun('ionic:build');
+    }
+    if (packageFile.scripts?.build) {
+      return npmRun('build');
+    }
+  }
+  return undefined;
 }
 
 function nxBuild(prod: boolean, project: Project, configurationArg?: string): string {
