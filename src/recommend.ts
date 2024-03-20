@@ -316,7 +316,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
     }
   }
   if (project.isCapacitor) {
-    checkCapacitorRules(project);
+    await checkCapacitorRules(project);
     checkIonicNativePackages(packages, project);
     checkCordovaPlugins(packages, project);
     project.tips(await capacitorRecommendations(project, false));
