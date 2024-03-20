@@ -480,7 +480,7 @@ export async function getRunOutput(
       folder = getMonoRepoFolder(ionicState.workspace, folder);
     }
     command = qualifyCommand(command, folder);
-    console.log(`> ${replaceAll(command, InternalCommand.cwd, '')}`);
+    tStart(command);
     exec(command, runOptions(command, folder, shell), (error: ExecException, stdout: string, stdError: string) => {
       if (stdout) {
         out += stdout;
@@ -489,6 +489,7 @@ export async function getRunOutput(
         if (out == '' && stdError) {
           out += stdError;
         }
+        tEnd(command);
         resolve(out);
       } else {
         if (stdError) {
@@ -498,12 +499,15 @@ export async function getRunOutput(
             console.error(stdError);
           }
           if (ignoreErrors) {
+            tEnd(command);
             resolve(out);
           } else {
+            tEnd(command);
             reject(stdError);
           }
         } else {
           // This is to fix a bug in npm outdated where it returns an exit code when it succeeds
+          tEnd(command);
           resolve(out);
         }
       }
@@ -794,4 +798,16 @@ export function toPascalCase(text: string) {
 
 function clearAndUpper(text: string) {
   return text.replace(/-/, '').toUpperCase();
+}
+
+const times = {};
+
+export function tStart(name: string) {
+  times[name] = process.hrtime();
+}
+
+export function tEnd(name: string) {
+  const endTime = process.hrtime(times[name]);
+  const executionTime = (endTime[0] * 1e9 + endTime[1]) / 1e6; // Convert to milliseconds
+  console.log(`${name} took ${Math.trunc(executionTime)} milliseconds to run.`);
 }

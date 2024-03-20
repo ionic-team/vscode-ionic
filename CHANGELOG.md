@@ -3,6 +3,7 @@
 ### Version 1.81
 
 - Detect missing privacy manifest file and APIs used
+- Improve performance and caching
 
 ### Version 1.80
 

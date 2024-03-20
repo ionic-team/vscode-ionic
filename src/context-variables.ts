@@ -88,3 +88,5 @@ export function PackageCacheModified(project: Project) {
   }
   return 'packagesModified';
 }
+
+export const LastManifestCheck = 'LastManifestCheck';
