@@ -32,6 +32,7 @@ import { window } from 'vscode';
 import { WorkspaceSetting, getSetting, setSetting } from './workspace-state';
 import { angularMigrate, maxAngularVersion } from './rules-angular-migrate';
 import { peerDependencyCleanup } from './peer-dependency-cleanup';
+import { checkPrivacyManifest } from './xcode';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -39,7 +40,7 @@ import { join } from 'path';
  * Check rules for Capacitor projects
  * @param  {Project} project
  */
-export function checkCapacitorRules(project: Project) {
+export async function checkCapacitorRules(project: Project) {
   project.tip(checkMinVersion('@capacitor/core', '2.2.0'));
   project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/cli'));
   project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/ios'));
@@ -161,6 +162,9 @@ export function checkCapacitorRules(project: Project) {
     checkMigrationAngularToolkit(project);
   }
 
+  if (exists('@capacitor/ios')) {
+    await checkPrivacyManifest(project);
+  }
   if (isGreaterOrEqual('@angular/core', '12.0.0')) {
     checkAngularJson(project);
     if (exists('@capacitor/android') || exists('@capacitor/ios')) {

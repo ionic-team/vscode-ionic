@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.81
+
+- Detect missing privacy manifest file and APIs used
+
 ### Version 1.80
 
 - Ionic CLI serve and build have been replaced with framework specific commands
