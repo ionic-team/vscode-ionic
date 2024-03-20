@@ -22,7 +22,7 @@ import { ionicState } from './ionic-tree-provider';
 import { getAndroidWebViewList } from './android-debug-list';
 import { getDebugBrowserName } from './editor-preview';
 import { checkIonicNativePackages } from './rules-ionic-native';
-import { alt, getRunOutput, showProgress } from './utilities';
+import { alt, getRunOutput, showProgress, tEnd, tStart } from './utilities';
 import { startStopLogServer } from './log-server';
 import { getConfigurationName } from './build-configuration';
 import { liveReloadSSL } from './live-reload';
@@ -42,6 +42,7 @@ import { CommandTitle } from './command-title';
 import { ExtensionContext, Uri, commands, env } from 'vscode';
 
 export async function getRecommendations(project: Project, context: ExtensionContext, packages: any): Promise<void> {
+  tStart('getRecommendations');
   if (project.isCapacitor) {
     project.setGroup(`Run`, `Press ${alt('R')} to run the last chosen platform or Web.`, TipType.Ionic, true);
 
@@ -315,12 +316,20 @@ export async function getRecommendations(project: Project, context: ExtensionCon
       await checkCapacitorMigrationRules(packages, project);
     }
   }
+
+  tEnd('getRecommendations');
+
   if (project.isCapacitor) {
-    await checkCapacitorRules(project);
+    tStart('checkCapacitorRules');
+    await checkCapacitorRules(project, context);
+    tEnd('checkCapacitorRules');
+    tStart('capacitorRecommendations');
     checkIonicNativePackages(packages, project);
     checkCordovaPlugins(packages, project);
     project.tips(await capacitorRecommendations(project, false));
+    tEnd('capacitorRecommendations');
   }
+  tStart('reviewPackages');
   if (!project.isCapacitor && !project.isCordova) {
     // The project is not using Cordova or Capacitor
     webProject(project);
@@ -373,6 +382,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
       `https://ionicframework.com`,
     ),
   );
+  tEnd('reviewPackages');
 }
 
 async function settings(queueFunction: QueueFunction) {

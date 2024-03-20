@@ -4,11 +4,13 @@ import { project } from 'xcode';
 import * as plist from 'simple-plist';
 import { existsSync, writeFileSync } from 'fs';
 import { QueueFunction, Tip, TipType } from './tip';
-import { window } from 'vscode';
+import { ExtensionContext, window } from 'vscode';
 import { writeError, writeIonic } from './logging';
 import { exists } from './analyzer';
 import { openUri, replaceAll } from './utilities';
 import { privacyManifestRules } from './privacy-manifest';
+import { LastManifestCheck } from './context-variables';
+import { clearRefreshCache } from './process-packages';
 
 interface XCProject {
   p: any;
@@ -16,27 +18,44 @@ interface XCProject {
   projectFilePath: string;
 }
 
-export async function checkPrivacyManifest(project: Project): Promise<void> {
+const oneHour = 60 * 1000 * 60;
+
+export async function checkPrivacyManifest(project: Project, context: ExtensionContext): Promise<void> {
+  const lastManifestCheck = getLastManifestCheck(context);
+  if (lastManifestCheck < oneHour) {
+    return;
+  }
   const xc = await getXCProject(project);
   const pFiles = xc.p.pbxFileReferenceSection();
   const files = Object.keys(pFiles);
   const found = files.find((f) => pFiles[f].path?.includes('.xcprivacy'));
   if (found) {
     // Has a .xcprivacy file
-    investigatePrivacyManifest(project, replaceAll(pFiles[found].path, '"', ''));
+    investigatePrivacyManifest(project, replaceAll(pFiles[found].path, '"', ''), context);
+    setLastManifestCheck(context);
     return;
   }
   const title = 'Add Privacy Manifest';
   project.add(
     new Tip(title, '', TipType.Warning)
-      .setQueuedAction(createPrivacyManifest, project)
+      .setQueuedAction(createPrivacyManifest, project, context)
       .setTooltip('A Privacy Manifest file is required by Apple when submitting your app to the App Store.')
+      .canRefreshAfter()
       .canIgnore(),
   );
+  setLastManifestCheck(context);
   return undefined;
 }
 
-async function investigatePrivacyManifest(project: Project, filename: string) {
+function setLastManifestCheck(context: ExtensionContext) {
+  context.workspaceState.update(LastManifestCheck, new Date().getTime());
+}
+
+function getLastManifestCheck(context: ExtensionContext): number {
+  const v = parseInt(context.workspaceState.get(LastManifestCheck));
+  return new Date().getTime() - (isNaN(v) ? 0 : v);
+}
+async function investigatePrivacyManifest(project: Project, filename: string, context: ExtensionContext) {
   const path = join(iosFolder(project), filename);
   if (!existsSync(path)) {
     writeError(`Unable to find privacy manifest file from XCode project: ${path}`);
@@ -51,7 +70,7 @@ async function investigatePrivacyManifest(project: Project, filename: string) {
             new Tip(`Missing Privacy Manifest Category`, '', TipType.Error)
               .setQueuedAction(
                 setPrivacyCategory,
-                project,
+                context,
                 path,
                 requirement.plugin,
                 requirement.category,
@@ -59,6 +78,7 @@ async function investigatePrivacyManifest(project: Project, filename: string) {
                 requirement.reasonUrl,
               )
               .setTooltip(`${requirement.plugin} requires that the privacy manifest specifies ${requirement.category}.`)
+              .canRefreshAfter()
               .canIgnore(),
           );
         } else {
@@ -68,7 +88,7 @@ async function investigatePrivacyManifest(project: Project, filename: string) {
               new Tip(`Missing Privacy Manifest Reason`, '', TipType.Error)
                 .setQueuedAction(
                   setPrivacyCategory,
-                  project,
+                  context,
                   path,
                   requirement.plugin,
                   requirement.category,
@@ -78,6 +98,7 @@ async function investigatePrivacyManifest(project: Project, filename: string) {
                 .setTooltip(
                   `${requirement.plugin} requires that the privacy manifest has a reason for the category ${requirement.category}.`,
                 )
+                .canRefreshAfter()
                 .canIgnore(),
             );
           }
@@ -91,7 +112,7 @@ async function investigatePrivacyManifest(project: Project, filename: string) {
 
 async function setPrivacyCategory(
   queueFunction: QueueFunction,
-  project: Project,
+  context: ExtensionContext,
   privacyFilename: string,
   plugin: string,
   category: string,
@@ -131,6 +152,7 @@ async function setPrivacyCategory(
   }
   plist.writeFileSync(privacyFilename, data);
   // Add it
+  clearRefreshCache(context);
 }
 
 // name: eg NSPrivacyAccessedAPICategoryUserDefaults
@@ -176,7 +198,7 @@ async function getXCProject(project: Project): Promise<XCProject> {
   return { projectFilePath: path, projectFolder, p };
 }
 
-async function createPrivacyManifest(queueFunction: QueueFunction, project: Project) {
+async function createPrivacyManifest(queueFunction: QueueFunction, project: Project, context: ExtensionContext) {
   const result = await window.showInformationMessage(
     `A Privacy Manifest file is required by Apple when submitting your app to the App Store. Would you like to create one?`,
     'Yes',
@@ -216,6 +238,7 @@ async function createPrivacyManifest(queueFunction: QueueFunction, project: Proj
   } catch (e) {
     writeError(`Unable to create privacy manifest file: ${e}`);
   }
+  clearRefreshCache(context);
 }
 
 function writeManifestFile(iosFolder: string, filename: string): string {

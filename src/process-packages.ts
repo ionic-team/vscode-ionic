@@ -1,10 +1,16 @@
 import { coerce } from 'semver';
 import { Command, Tip, TipType } from './tip';
 import { Project } from './project';
-import { getRunOutput, getStringFrom, setAllStringIn, stripJSON } from './utilities';
+import { getRunOutput, getStringFrom, setAllStringIn, stripJSON, tEnd, tStart } from './utilities';
 import { NpmDependency, NpmOutdatedDependency, NpmPackage, PackageType, PackageVersion } from './npm-model';
 import { listCommand, outdatedCommand } from './node-commands';
-import { CapProjectCache, PackageCacheList, PackageCacheModified, PackageCacheOutdated } from './context-variables';
+import {
+  CapProjectCache,
+  LastManifestCheck,
+  PackageCacheList,
+  PackageCacheModified,
+  PackageCacheOutdated,
+} from './context-variables';
 import { join } from 'path';
 import { ionicState } from './ionic-tree-provider';
 import { writeError, writeWarning } from './logging';
@@ -30,6 +36,9 @@ export function clearRefreshCache(context: ExtensionContext) {
         context.workspaceState.update(key, undefined);
       }
       if (key.startsWith(CapProjectCache(undefined))) {
+        context.workspaceState.update(key, undefined);
+      }
+      if (key == LastManifestCheck) {
         context.workspaceState.update(key, undefined);
       }
     }
@@ -77,14 +86,17 @@ export async function processPackages(
     } else {
       // Use the cached value
       // But also get a copy of the latest packages for updating later
-      getRunOutput(outdatedCommand(project.packageManager), folder, undefined, true).then((outdatedFresh) => {
-        context.workspaceState.update(PackageCacheOutdated(project), outdatedFresh);
-        context.workspaceState.update(PackageCacheModified(project), packagesModified.toUTCString());
-      });
+      const itsAGoodTime = false;
+      if (itsAGoodTime) {
+        getRunOutput(outdatedCommand(project.packageManager), folder, undefined, true).then((outdatedFresh) => {
+          context.workspaceState.update(PackageCacheOutdated(project), outdatedFresh);
+          context.workspaceState.update(PackageCacheModified(project), packagesModified.toUTCString());
+        });
 
-      getRunOutput(listCommand(project.packageManager), folder, undefined, true).then((versionsFresh) => {
-        context.workspaceState.update(PackageCacheList(project), versionsFresh);
-      });
+        getRunOutput(listCommand(project.packageManager), folder, undefined, true).then((versionsFresh) => {
+          context.workspaceState.update(PackageCacheList(project), versionsFresh);
+        });
+      }
     }
   } catch (err) {
     outdated = '[]';
@@ -108,13 +120,17 @@ export async function processPackages(
   // outdated is an array with:
   //  "@ionic-native/location-accuracy": { "wanted": "5.36.0", "latest": "5.36.0", "dependent": "cordova-old" }
 
+  tStart('processDependencies');
   const packages = processDependencies(
     allDependencies,
     getOutdatedData(outdated),
     devDependencies,
     getListData(versions),
   );
+  tEnd('processDependencies');
+  tStart('inspectPackages');
   inspectPackages(project.projectFolder() ? project.projectFolder() : folder, packages);
+  tEnd('inspectPackages');
   return packages;
 }
 

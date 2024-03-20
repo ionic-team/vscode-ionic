@@ -16,7 +16,7 @@ import {
 import { checkMigrationAngularToolkit } from './rules-angular-toolkit';
 import { Project } from './project';
 import { QueueFunction, Tip, TipType } from './tip';
-import { asAppId, getRunOutput, isWindows, showProgress } from './utilities';
+import { asAppId, getRunOutput, isWindows, showProgress, tStart, tEnd } from './utilities';
 import { capacitorAdd } from './capacitor-add';
 import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall, npx } from './node-commands';
@@ -28,7 +28,7 @@ import { checkBrowsersList } from './rules-browserslist';
 import { ionicState } from './ionic-tree-provider';
 import { integratePWA } from './capacitor-pwa';
 import { showOutput, write, writeIonic } from './logging';
-import { window } from 'vscode';
+import { ExtensionContext, window } from 'vscode';
 import { WorkspaceSetting, getSetting, setSetting } from './workspace-state';
 import { angularMigrate, maxAngularVersion } from './rules-angular-migrate';
 import { peerDependencyCleanup } from './peer-dependency-cleanup';
@@ -40,7 +40,7 @@ import { join } from 'path';
  * Check rules for Capacitor projects
  * @param  {Project} project
  */
-export async function checkCapacitorRules(project: Project) {
+export async function checkCapacitorRules(project: Project, context: ExtensionContext) {
   project.tip(checkMinVersion('@capacitor/core', '2.2.0'));
   project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/cli'));
   project.tip(checkConsistentVersions('@capacitor/core', '@capacitor/ios'));
@@ -163,7 +163,9 @@ export async function checkCapacitorRules(project: Project) {
   }
 
   if (exists('@capacitor/ios')) {
-    await checkPrivacyManifest(project);
+    tStart('checkPrivacyManifest');
+    await checkPrivacyManifest(project, context);
+    tEnd('checkPrivacyManifest');
   }
   if (isGreaterOrEqual('@angular/core', '12.0.0')) {
     checkAngularJson(project);
