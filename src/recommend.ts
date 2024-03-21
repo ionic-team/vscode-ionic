@@ -408,7 +408,7 @@ export function debugOnWeb(project: Project): Tip {
 
 export function build(project: Project) {
   return new Tip('Build', getConfigurationName(), TipType.Build, 'Build', undefined, 'Building', undefined)
-    .setDynamicCommand(ionicBuild, project)
+    .setDynamicCommand(ionicBuild, project, {})
     .setContextValue(Context.buildConfig)
     .canStop()
     .canAnimate()
