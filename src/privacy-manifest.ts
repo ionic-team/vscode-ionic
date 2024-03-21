@@ -7,6 +7,13 @@ export const privacyManifestRules = [
     reasons: ['CA92.1', '1C8F.1'],
   },
   {
+    plugin: '@capacitor-community/apple-sign-in', // Uses UserDefaults
+    category: 'NSPrivacyAccessedAPICategoryUserDefaults',
+    reasonUrl:
+      'https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api#4278401',
+    reasons: ['CA92.1', '1C8F.1'],
+  },
+  {
     plugin: '@capacitor/preferences', // Uses UserDefaults
     category: 'NSPrivacyAccessedAPICategoryUserDefaults',
     reasonUrl:
