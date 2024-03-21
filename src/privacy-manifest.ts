@@ -32,7 +32,7 @@ export const privacyManifestRules = [
     category: 'NSPrivacyAccessedAPICategoryFileTimestamp',
     reasonUrl:
       'https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api#4278393',
-    reasons: ['C617.1', 'DDA9.1', '3B52.1'], // FYI: 0A2A.1 is not applicable
+    reasons: ['C617.1', 'DDA9.1'], // FYI: 0A2A.1, 3B52.1 is not applicable
   },
   {
     plugin: '@capacitor-community/mdm-appconfig',
