@@ -151,7 +151,6 @@ async function setPrivacyCategory(
     });
   }
   plist.writeFileSync(privacyFilename, data);
-  // Add it
   clearRefreshCache(context);
 }
 
@@ -202,8 +201,13 @@ async function createPrivacyManifest(queueFunction: QueueFunction, project: Proj
   const result = await window.showInformationMessage(
     `A Privacy Manifest file is required by Apple when submitting your app to the App Store. Would you like to create one?`,
     'Yes',
+    'More Information',
     'Exit',
   );
+  if (result == 'More Information') {
+    openUri('https://developer.apple.com/support/third-party-SDK-requirements/');
+    return;
+  }
   if (result !== 'Yes') {
     return;
   }
@@ -215,24 +219,10 @@ async function createPrivacyManifest(queueFunction: QueueFunction, project: Proj
     const path = writeManifestFile(iosFolder(project), filename);
 
     const res = xc.p.addPbxGroup([], 'Resources', undefined, undefined);
-    // res { uuid: pbxGroupUuid, pbxGroup: pbxGroup }
-    //const g = xc.p.getPBXGroupByKey('504EC2FB1FED79650016851F');
 
-    //const r = xc.p.addResourceFile(path, {}, res);
-
-    // const pFiles = xc.p.pbxFileReferenceSection();
-    // const files = Object.keys(pFiles);
-    // const found = files.find(f => pFiles[f].path?.includes('.xcprivacy'));
-
-    // const file = { target: found, path: path, fileref: path , basename: filename, group: res.uuid };
-    // const r = xc.p.addToPbxGroup(file, res.uuid);
-
-    //xc.p.addToPbxFileReferenceSection(file);
     const r3 = xc.p.getPBXGroupByKey('504EC2FB1FED79650016851F', 'PBXGroup');
     const r2 = xc.p.addResourceFile(filename, {}, res.uuid);
     r3.children.push({ value: r2.fileRef, comment: 'Resources' });
-    // r2
-    //xc.p.addToPbxResourcesBuildPhase(file);
     writeFileSync(xc.projectFilePath, xc.p.writeSync());
     writeIonic('A privacy manifest file was added to your project.');
   } catch (e) {

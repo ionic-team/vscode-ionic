@@ -11,22 +11,23 @@ import { error } from 'console';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 
+interface BuildOptions {
+  platform?: CapacitorPlatform;
+  arguments?: string;
+  sourceMaps?: boolean;
+}
 /**
  * Creates the ionic build command
  * @param  {Project} project
  * @returns string
  */
-export async function ionicBuild(
-  project: Project,
-  configurationArg?: string,
-  platform?: CapacitorPlatform,
-): Promise<string> {
+export async function ionicBuild(project: Project, options: BuildOptions): Promise<string> {
   const preop = preflightNPMCheck(project);
 
   ionicState.projectDirty = false;
 
   const prod: boolean = workspace.getConfiguration('ionic').get('buildForProduction');
-  let args = configurationArg ? configurationArg : '';
+  let args = options.arguments ? options.arguments : '';
   if (ionicState.project) {
     args += ` --project=${ionicState.project}`;
   }
@@ -40,26 +41,27 @@ export async function ionicBuild(
   }
   switch (project.repoType) {
     case MonoRepoType.none:
-      return `${preop}${ionicCLIBuild(prod, project, args, platform)}`;
+      return `${preop}${build(prod, project, args, options.platform, options.sourceMaps)}`;
     case MonoRepoType.npm:
-      return `${InternalCommand.cwd}${preop}${ionicCLIBuild(prod, project, args, platform)}`;
+      return `${InternalCommand.cwd}${preop}${build(prod, project, args, options.platform)}`;
     case MonoRepoType.nx:
       return `${preop}${nxBuild(prod, project, args)}`;
     case MonoRepoType.folder:
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
     case MonoRepoType.pnpm:
-      return `${InternalCommand.cwd}${preop}${ionicCLIBuild(prod, project, args, platform)}`;
+      return `${InternalCommand.cwd}${preop}${build(prod, project, args, options.platform, options.sourceMaps)}`;
     default:
       throw new Error('Unsupported Monorepo type');
   }
 }
 
-function ionicCLIBuild(
+function build(
   prod: boolean,
   project: Project,
   configurationArg?: string,
   platform?: CapacitorPlatform,
+  sourceMaps?: boolean,
 ): string {
   let cmd = `${npx(project.packageManager)} ${buildCmd(project)}`;
   if (configurationArg) {
@@ -67,10 +69,15 @@ function ionicCLIBuild(
   } else if (prod) {
     cmd += ' --prod';
   }
+  if (sourceMaps && cmd.includes('vite')) {
+    cmd += ` --sourcemap true`;
+  }
+
   if (platform || exists('@capacitor/ios') || exists('@capacitor/android')) {
     cmd += ` && ${npx(project.packageManager)} cap copy`;
     if (platform) cmd += ` ${platform}`;
   }
+
   return cmd;
 }
 
@@ -81,7 +88,7 @@ function buildCmd(project: Project): string {
       return 'ng build';
     case 'vue-vite':
     case 'react-vite':
-      return 'vite build';
+      return `vite build`;
     case 'react':
       return 'react-scripts build';
     case 'vue':

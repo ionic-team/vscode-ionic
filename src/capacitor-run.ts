@@ -29,7 +29,7 @@ export async function capacitorRun(project: Project, platform: CapacitorPlatform
   // If the user modified something in the editor then its likely they need to rebuild the app before running
   if (ionicState.projectDirty) {
     writeIonic('Rebuilding as you changed your project...');
-    preop = (await ionicBuild(project, undefined, platform)) + ' && ';
+    preop = (await ionicBuild(project, { platform })) + ' && ';
     rebuilt = true;
   } else {
     preop = preflightNPMCheck(project);
