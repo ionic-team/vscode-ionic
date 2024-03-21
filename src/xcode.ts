@@ -25,6 +25,12 @@ export async function checkPrivacyManifest(project: Project, context: ExtensionC
   if (lastManifestCheck < oneHour) {
     return;
   }
+
+  const manifestRequired = !!privacyManifestRules.find((rule) => exists(rule.plugin));
+  if (!manifestRequired) {
+    return; // Manifest file is not required
+  }
+
   const xc = await getXCProject(project);
   const pFiles = xc.p.pbxFileReferenceSection();
   const files = Object.keys(pFiles);
@@ -199,7 +205,7 @@ async function getXCProject(project: Project): Promise<XCProject> {
 
 async function createPrivacyManifest(queueFunction: QueueFunction, project: Project, context: ExtensionContext) {
   const result = await window.showInformationMessage(
-    `A Privacy Manifest file is required by Apple when submitting your app to the App Store. Would you like to create one?`,
+    `A Privacy Manifest file is required by Apple when submitting your app as you use plugins that access specific APIs. Would you like to create one?`,
     'Yes',
     'More Information',
     'Exit',
