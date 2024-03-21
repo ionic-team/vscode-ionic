@@ -3,6 +3,7 @@
 ### Version 1.81
 
 - Detect missing privacy manifest file and APIs used
+- Support statistics feature for vite based projects (React/Vue)
 - Improve performance and caching
 
 ### Version 1.80

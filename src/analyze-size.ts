@@ -22,11 +22,12 @@ export async function analyzeSize(queueFunction: QueueFunction, project: Project
     try {
       previousValue = enableSourceMaps(project);
       writeIonic('Building for production with Sourcemaps...');
-      let args = '--prod';
-      if (project.repoType == MonoRepoType.nx) {
+      let args = '';
+      if (project.repoType == MonoRepoType.nx || project.frameworkType.startsWith('angular')) {
         args = '--configuration=production';
       }
-      const cmd = await ionicBuild(project, args);
+
+      const cmd = await ionicBuild(project, { arguments: args, sourceMaps: true });
       const bumpSize = !isWindows() ? 'export NODE_OPTIONS="--max-old-space-size=8192" && ' : '';
       try {
         await run2(project, `${bumpSize}${cmd}`, undefined);
