@@ -205,7 +205,7 @@ async function getXCProject(project: Project): Promise<XCProject> {
 
 async function createPrivacyManifest(queueFunction: QueueFunction, project: Project, context: ExtensionContext) {
   const result = await window.showInformationMessage(
-    `A Privacy Manifest file is required by Apple when submitting your app as you use plugins that access specific APIs. Would you like to create one?`,
+    `Your app requires a Privacy Manifest file as it uses particular plugins. Would you like to create one?`,
     'Yes',
     'More Information',
     'Exit',
