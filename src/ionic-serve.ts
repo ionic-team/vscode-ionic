@@ -58,7 +58,7 @@ async function ionicCLIServe(project: Project, dontOpenBrowser: boolean): Promis
   }
 
   if (defaultPort) {
-    const port = await findNextPort(defaultPort);
+    const port = await findNextPort(defaultPort, externalIP ? '0.0.0.0' : undefined);
     serveFlags += ` --port=${port}`;
   }
 
@@ -116,16 +116,16 @@ function guessServeCommand(project: Project): string | undefined {
   }
   return undefined;
 }
-async function findNextPort(port: number): Promise<number> {
+async function findNextPort(port: number, host: string | undefined): Promise<number> {
   let availablePort = port;
-  while (await isPortInUse(availablePort)) {
+  while (await isPortInUse(availablePort, host)) {
     write(`Port ${availablePort} is in use.`);
     availablePort++;
   }
   return availablePort;
 }
 
-async function isPortInUse(port: number): Promise<boolean> {
+async function isPortInUse(port: number, host: string | undefined): Promise<boolean> {
   return new Promise((resolve) => {
     const server = createServer();
 
@@ -145,7 +145,7 @@ async function isPortInUse(port: number): Promise<boolean> {
       resolve(false);
     });
 
-    server.listen(port);
+    server.listen(port, host);
   });
 }
 
