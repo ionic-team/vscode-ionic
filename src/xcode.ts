@@ -18,6 +18,13 @@ interface XCProject {
   projectFilePath: string;
 }
 
+interface APIUsage {
+  api: string;
+  plugin: string;
+  reasons: string[];
+  reasonUrl: string;
+}
+
 const oneHour = 60 * 1000 * 60;
 
 export async function checkPrivacyManifest(project: Project, context: ExtensionContext): Promise<void> {
@@ -26,31 +33,42 @@ export async function checkPrivacyManifest(project: Project, context: ExtensionC
     return;
   }
 
-  const manifestRequired = !!privacyManifestRules.find((rule) => exists(rule.plugin));
-  if (!manifestRequired) {
+  const apisUsed: APIUsage[] = [];
+  for (const api of Object.keys(privacyManifestRules)) {
+    for (const plugin of privacyManifestRules[api]) {
+      if (exists(plugin)) {
+        apisUsed.push({ api, plugin, reasons: getReasons(api), reasonUrl: getReasonUrl(api) });
+      }
+    }
+  }
+  if (apisUsed.length == 0) {
     return; // Manifest file is not required
   }
 
-  const xc = await getXCProject(project);
-  const pFiles = xc.p.pbxFileReferenceSection();
-  const files = Object.keys(pFiles);
-  const found = files.find((f) => pFiles[f].path?.includes('.xcprivacy'));
-  if (found) {
-    // Has a .xcprivacy file
-    investigatePrivacyManifest(project, replaceAll(pFiles[found].path, '"', ''), context);
+  try {
+    const xc = await getXCProject(project);
+    const pFiles = xc.p.pbxFileReferenceSection();
+    const files = Object.keys(pFiles);
+    const found = files.find((f) => pFiles[f].path?.includes('.xcprivacy'));
+    if (found) {
+      // Has a .xcprivacy file
+      investigatePrivacyManifest(project, replaceAll(pFiles[found].path, '"', ''), context, apisUsed);
+      setLastManifestCheck(context);
+      return;
+    }
+    const title = 'Add Privacy Manifest';
+    project.add(
+      new Tip(title, '', TipType.Warning)
+        .setQueuedAction(createPrivacyManifest, project, context)
+        .setTooltip('A Privacy Manifest file is required by Apple when submitting your app to the App Store.')
+        .canRefreshAfter()
+        .canIgnore(),
+    );
     setLastManifestCheck(context);
-    return;
+    return undefined;
+  } catch (err) {
+    writeError(`Unable to read privacy manifest of XCode project: ${err}`);
   }
-  const title = 'Add Privacy Manifest';
-  project.add(
-    new Tip(title, '', TipType.Warning)
-      .setQueuedAction(createPrivacyManifest, project, context)
-      .setTooltip('A Privacy Manifest file is required by Apple when submitting your app to the App Store.')
-      .canRefreshAfter()
-      .canIgnore(),
-  );
-  setLastManifestCheck(context);
-  return undefined;
 }
 
 function setLastManifestCheck(context: ExtensionContext) {
@@ -61,54 +79,39 @@ function getLastManifestCheck(context: ExtensionContext): number {
   const v = parseInt(context.workspaceState.get(LastManifestCheck));
   return new Date().getTime() - (isNaN(v) ? 0 : v);
 }
-async function investigatePrivacyManifest(project: Project, filename: string, context: ExtensionContext) {
+async function investigatePrivacyManifest(
+  project: Project,
+  filename: string,
+  context: ExtensionContext,
+  apisUsages: APIUsage[],
+) {
   const path = join(iosFolder(project), filename);
   if (!existsSync(path)) {
     writeError(`Unable to find privacy manifest file from XCode project: ${path}`);
     return;
   }
   try {
-    const data = plist.readFileSync(path);
-    for (const requirement of privacyManifestRules) {
-      if (exists(requirement.plugin)) {
-        if (!hasAPIType(data, requirement.category)) {
-          project.add(
-            new Tip(`Missing Privacy Manifest Category`, '', TipType.Error)
-              .setQueuedAction(
-                setPrivacyCategory,
-                context,
-                path,
-                requirement.plugin,
-                requirement.category,
-                requirement.reasons,
-                requirement.reasonUrl,
-              )
-              .setTooltip(`${requirement.plugin} requires that the privacy manifest specifies ${requirement.category}.`)
-              .canRefreshAfter()
-              .canIgnore(),
-          );
-        } else {
-          const reasons = APITypeReason(data, requirement.category);
-          if (!reasons || reasons.length == 0) {
-            project.add(
-              new Tip(`Missing Privacy Manifest Reason`, '', TipType.Error)
-                .setQueuedAction(
-                  setPrivacyCategory,
-                  context,
-                  path,
-                  requirement.plugin,
-                  requirement.category,
-                  requirement.reasons,
-                  requirement.reasonUrl,
-                )
-                .setTooltip(
-                  `${requirement.plugin} requires that the privacy manifest has a reason for the category ${requirement.category}.`,
-                )
-                .canRefreshAfter()
-                .canIgnore(),
-            );
-          }
-        }
+    const data: any = plist.readFileSync(path);
+    for (const apiUsage of apisUsages) {
+      const found = data.NSPrivacyAccessedAPITypes
+        ? data.NSPrivacyAccessedAPITypes.find((a: any) => a.NSPrivacyAccessedAPIType == apiUsage.api)
+        : undefined;
+      if (!found) {
+        project.add(
+          new Tip(`Missing Privacy Manifest Category`, '', TipType.Error)
+            .setQueuedAction(
+              setPrivacyCategory,
+              context,
+              path,
+              apiUsage.plugin,
+              apiUsage.api,
+              apiUsage.reasons,
+              apiUsage.reasonUrl,
+            )
+            .setTooltip(`${apiUsage.plugin} requires that the privacy manifest specifies ${apiUsage.api}.`)
+            .canRefreshAfter()
+            .canIgnore(),
+        );
       }
     }
   } catch (e) {
@@ -144,7 +147,7 @@ async function setPrivacyCategory(
   if (!data.NSPrivacyAccessedAPITypes) {
     data.NSPrivacyAccessedAPITypes = [];
   }
-  const found = data.NSPrivacyAccessedAPITypes.find((t) => t.NSPrivacyAccessedAPIType == category);
+  const found = data.NSPrivacyAccessedAPITypes.find((t: any) => t.NSPrivacyAccessedAPIType == category);
   if (found) {
     if (!found.NSPrivacyAccessedAPITypeReasons) {
       found.NSPrivacyAccessedAPITypeReasons = [];
@@ -158,30 +161,6 @@ async function setPrivacyCategory(
   }
   plist.writeFileSync(privacyFilename, data);
   clearRefreshCache(context);
-}
-
-// name: eg NSPrivacyAccessedAPICategoryUserDefaults
-// data
-function hasAPIType(data: any, name: string): boolean {
-  if (!data.NSPrivacyAccessedAPITypes || data.NSPrivacyAccessedAPITypes.length == 0) {
-    return false;
-  }
-  const found = data.NSPrivacyAccessedAPITypes.find((t: any) => t.NSPrivacyAccessedAPIType == name);
-  if (found) {
-    return true;
-  }
-  return false;
-}
-
-function APITypeReason(data: any, name: string): string[] | undefined {
-  if (!data.NSPrivacyAccessedAPITypes || data.NSPrivacyAccessedAPITypes.length == 0) {
-    return;
-  }
-  const found = data.NSPrivacyAccessedAPITypes.find((t) => t.NSPrivacyAccessedAPIType == name);
-  if (found) {
-    return found.NSPrivacyAccessedAPITypeReasons ?? [];
-  }
-  return;
 }
 
 function XCodeProjFolder(project: Project): string {
@@ -262,4 +241,37 @@ async function parse(path: string): Promise<any> {
       resolve(p);
     });
   });
+}
+
+function getReasons(api: string): string[] {
+  switch (api) {
+    case 'NSPrivacyAccessedAPICategoryUserDefaults':
+      return ['CA92.1', '1C8F.1'];
+    case 'NSPrivacyAccessedAPICategoryFileTimestamp':
+      return ['C617.1', 'DDA9.1', '3B52.1']; // FYI: 0A2A.1 is not applicable
+    case 'NSPrivacyAccessedAPICategoryDiskSpace':
+      return ['85F4.1', 'E174.1', '7D9E.1', 'B728.1'];
+    case 'NSPrivacyAccessedAPICategorySystemBootTime':
+      return ['35F9.1', '8FFB.1', '3D61.1'];
+    case 'NSPrivacyAccessedAPICategoryActiveKeyboards':
+      return ['3EC4.1', '54BD.1'];
+
+    default:
+      writeError(`Unknown api ${api} in getReasons`);
+  }
+}
+
+function getReasonUrl(api: string): string {
+  switch (api) {
+    case 'NSPrivacyAccessedAPICategoryUserDefaults':
+      return 'https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api#4278401';
+    case 'NSPrivacyAccessedAPICategoryFileTimestamp':
+      return 'https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api#4278393';
+    case 'NSPrivacyAccessedAPICategoryDiskSpace':
+      return 'https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api#4278397';
+    case 'NSPrivacyAccessedAPICategoryActiveKeyboards':
+      return 'https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api#4278400';
+    case 'NSPrivacyAccessedAPICategorySystemBootTime':
+      return 'https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api#4278394';
+  }
 }
