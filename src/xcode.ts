@@ -47,6 +47,13 @@ export async function checkPrivacyManifest(project: Project, context: ExtensionC
 
   try {
     const xc = await getXCProject(project);
+    if (!xc) {
+      if (!existsSync(iosFolder(project))) {
+        return; // They have @capacitor/ios but haven't added an iOS project yet
+      }
+      writeError(`XCode project file is missing: ${xCodeProjectFile(project)}.`);
+      return;
+    }
     const pFiles = xc.p.pbxFileReferenceSection();
     const files = Object.keys(pFiles);
     const found = files.find((f) => pFiles[f].path?.includes('.xcprivacy'));
@@ -167,8 +174,13 @@ function XCodeProjFolder(project: Project): string {
   return join(iosFolder(project), 'App.xcodeproj');
 }
 
-function iosFolder(project: Project): string {
+export function iosFolder(project: Project): string {
   return join(project.projectFolder(), 'ios', 'App');
+}
+
+function xCodeProjectFile(project: Project): string {
+  const projectFolder = XCodeProjFolder(project);
+  return join(projectFolder, 'project.pbxproj');
 }
 
 async function getXCProject(project: Project): Promise<XCProject> {
