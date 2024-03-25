@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.82
+
+- Support Nuxt with Vite (allow running on web)
+
 ### Version 1.81
 
 - Detect missing privacy manifest file and APIs used

@@ -194,9 +194,9 @@ export async function run(
         viewInEditor(localUrl);
         break;
       case WebConfigSetting.browser:
-        // if (!externalUrl) {
-        //   openUri(localUrl);
-        // }
+        if (!externalUrl) {
+          openUri(localUrl);
+        }
         break;
       default: {
         //qrView(externalUrl);
@@ -281,6 +281,7 @@ export async function run(
               'open your browser on ',
               '> Local:', // Nuxt
               '➜  Local:', // AnalogJs
+              '➜ Local:', // Nuxt with Vite
               '- Local:', // Vue
             ]);
             if (url) {
