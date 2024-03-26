@@ -3,6 +3,7 @@
 ### Version 1.82
 
 - Support Nuxt with Vite (allow running on web)
+- Remove need to install @capacitor/assets during rebuild of Splash and Icon
 
 ### Version 1.81
 
