@@ -172,10 +172,6 @@ async function runCapacitorAssets(queueFunction: QueueFunction | undefined, proj
   writeIonic('Generating Splash Screen and Icon Assets...');
   channelShow();
   await showProgress('Generating Splash Screen and Icon Assets', async () => {
-    if (!hasCordovaRes) {
-      writeIonic(`Installing @capacitor/assets temporarily...`);
-      await run(folder, npmInstall('@capacitor/assets', '--save-dev'), undefined, [], undefined, undefined);
-    }
     if (exists('cordova-res')) {
       await run(folder, npmUninstall('cordova-res'), undefined, [], undefined, undefined);
     }
@@ -200,9 +196,6 @@ async function runCapacitorAssets(queueFunction: QueueFunction | undefined, proj
       await run(folder, cmd, undefined, [], undefined, undefined);
     }
   });
-
-  writeIonic(`Removing @capacitor/assets...`);
-  await run(folder, npmUninstall('@capacitor/assets'), undefined, [], undefined, undefined, undefined, undefined, true);
 
   writeIonic('Completed created Splash Screen and Icon Assets');
   channelShow();
