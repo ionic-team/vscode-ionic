@@ -77,6 +77,10 @@ export class Project {
     return this.hasCapacitorProject(CapacitorPlatform.ios) || this.hasCapacitorProject(CapacitorPlatform.android);
   }
 
+  public isYarnV1(): boolean {
+    return this.yarnVersion.startsWith('1.');
+  }
+
   /**
    * This is the path the selected project (for monorepos) or the root folder
    */

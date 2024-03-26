@@ -4,6 +4,7 @@
 
 - Support Nuxt with Vite (allow running on web)
 - Remove need to install @capacitor/assets during rebuild of Splash and Icon
+- Support for Yarn 3 and 4
 
 ### Version 1.81
 

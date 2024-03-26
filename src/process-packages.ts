@@ -72,12 +72,14 @@ export async function processPackages(
     }
     if (changed || !outdated || !versions) {
       await Promise.all([
-        getRunOutput(outdatedCommand(project.packageManager), folder, undefined, true).then((data) => {
-          data = fixYarnGarbage(data, project.packageManager);
+        getRunOutput(outdatedCommand(project), folder, undefined, true).then((data) => {
+          if (project.isYarnV1()) {
+            data = fixYarnGarbage(data, project.packageManager);
+          }
           outdated = data;
           context.workspaceState.update(PackageCacheOutdated(project), outdated);
         }),
-        getRunOutput(listCommand(project.packageManager), folder, undefined, true).then((data) => {
+        getRunOutput(listCommand(project), folder, undefined, true).then((data) => {
           versions = data;
           context.workspaceState.update(PackageCacheList(project), versions);
         }),
@@ -88,12 +90,12 @@ export async function processPackages(
       // But also get a copy of the latest packages for updating later
       const itsAGoodTime = false;
       if (itsAGoodTime) {
-        getRunOutput(outdatedCommand(project.packageManager), folder, undefined, true).then((outdatedFresh) => {
+        getRunOutput(outdatedCommand(project), folder, undefined, true).then((outdatedFresh) => {
           context.workspaceState.update(PackageCacheOutdated(project), outdatedFresh);
           context.workspaceState.update(PackageCacheModified(project), packagesModified.toUTCString());
         });
 
-        getRunOutput(listCommand(project.packageManager), folder, undefined, true).then((versionsFresh) => {
+        getRunOutput(listCommand(project), folder, undefined, true).then((versionsFresh) => {
           context.workspaceState.update(PackageCacheList(project), versionsFresh);
         });
       }
@@ -103,7 +105,7 @@ export async function processPackages(
     versions = '{}';
     if (err && err.includes('401')) {
       window.showInformationMessage(
-        `Unable to run '${outdatedCommand(project.packageManager)}' due to authentication error. Check .npmrc`,
+        `Unable to run '${outdatedCommand(project)}' due to authentication error. Check .npmrc`,
         'OK',
       );
     }
@@ -112,7 +114,7 @@ export async function processPackages(
         `Modern Yarn does not have a command to review outdated package versions. Most functionality of this extension will be disabled.`,
       );
     } else {
-      writeError(`Unable to run '${outdatedCommand(project.packageManager)}'. Try reinstalling node modules.`);
+      writeError(`Unable to run '${outdatedCommand(project)}'. Try reinstalling node modules.`);
       console.error(err);
     }
   }

@@ -22,10 +22,14 @@ export enum PMOperation {
   run,
 }
 
-export function outdatedCommand(packageManager: PackageManager): string {
-  switch (packageManager) {
-    case PackageManager.yarn:
-      return 'yarn outdated --json';
+export function outdatedCommand(project: Project): string {
+  switch (project.packageManager) {
+    case PackageManager.yarn: {
+      if (project.isYarnV1()) {
+        return 'yarn outdated --json';
+      }
+      return 'npm outdated --json'; // Assume npm is installed
+    }
     case PackageManager.bun:
       return 'npm outdated --json';
     case PackageManager.pnpm:
@@ -35,10 +39,10 @@ export function outdatedCommand(packageManager: PackageManager): string {
   }
 }
 
-export function listCommand(packageManager: PackageManager): string {
-  switch (packageManager) {
+export function listCommand(project: Project): string {
+  switch (project.packageManager) {
     case PackageManager.yarn:
-      return 'yarn list --json';
+      return project.isYarnV1() ? 'yarn list --json' : 'npm list --json';
     case PackageManager.pnpm:
       return 'pnpm list --json';
     case PackageManager.bun:

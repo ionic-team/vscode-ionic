@@ -29,7 +29,7 @@ export async function updateMinorDependencies(
     let count = 0;
     let updates = [];
     await showProgress('Checking dependencies....', async () => {
-      if (project.packageManager == PackageManager.yarn) {
+      if (project.packageManager == PackageManager.yarn && project.isYarnV1()) {
         updates = await addForYarn(packages, tmpDir, channel);
       } else {
         updates = await addForPackageManager(project, packages, tmpDir, channel);
@@ -74,8 +74,11 @@ async function addForPackageManager(
   tmpDir: string,
   channel: OutputChannel,
 ): Promise<string[]> {
-  let data = await getRunOutput(outdatedCommand(project.packageManager), tmpDir, undefined, true);
-  data = fixYarnGarbage(data, project.packageManager);
+  let data = await getRunOutput(outdatedCommand(project), tmpDir, undefined, true);
+
+  if (project.isYarnV1()) {
+    data = fixYarnGarbage(data, project.packageManager);
+  }
   const updates = [];
   try {
     const out = JSON.parse(data);
@@ -87,7 +90,7 @@ async function addForPackageManager(
       }
     }
   } catch {
-    writeError(`${outdatedCommand(project.packageManager)} returned invalid json.`);
+    writeError(`${outdatedCommand(project)} returned invalid json.`);
     writeError(data);
   }
   return updates;
