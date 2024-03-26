@@ -6,6 +6,7 @@ import { getRunOutput } from './utilities';
 import { write, writeError, writeIonic } from './logging';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { exists } from './analyzer';
 
 // Create ionic:serve if there is a serve script
 export async function ionicInit(folder: string): Promise<boolean> {
@@ -22,6 +23,9 @@ export async function ionicInit(folder: string): Promise<boolean> {
     }
     if (packageFile.scripts?.build) {
       packageFile.scripts['ionic:build'] = 'npm run build';
+      if (exists('@nuxtjs/ionic') && packageFile.scripts?.generate) {
+        packageFile.scripts['ionic:build'] = 'npm run generate';
+      }
     }
 
     // Typical for Vite
