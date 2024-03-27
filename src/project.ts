@@ -78,7 +78,7 @@ export class Project {
   }
 
   public isYarnV1(): boolean {
-    return this.yarnVersion.startsWith('1.');
+    return this.yarnVersion?.startsWith('1.');
   }
 
   /**
