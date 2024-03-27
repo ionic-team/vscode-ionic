@@ -6,6 +6,7 @@ import { Project } from './project';
 import { showProgress } from './utilities';
 import { existsSync } from 'fs';
 import { GlobalSetting, getGlobalSetting, setGlobalSetting } from './workspace-state';
+import { exists } from './analyzer';
 
 export enum PackageManager {
   npm,
@@ -62,14 +63,19 @@ export function npmInstall(name: string, ...args): string {
         ionicState.workspace,
         undefined,
       )}`;
-    case MonoRepoType.folder:
     case MonoRepoType.yarn:
+    case MonoRepoType.folder:
     case MonoRepoType.lerna:
     case MonoRepoType.pnpm:
-      return InternalCommand.cwd + `${pm(PMOperation.install, name)} ${argList}`;
+      return InternalCommand.cwd + `${pm(PMOperation.install, name)} ${notForce(argList)}`;
     default:
-      return `${pm(PMOperation.install, name)} ${argList}`;
+      return `${pm(PMOperation.install, name)} ${notForce(argList)}`;
   }
+}
+
+function notForce(args: string): string {
+  if (ionicState.packageManager !== PackageManager.yarn) return args;
+  return args.replace('--force', '');
 }
 
 // The package manager add command (without arguments)
@@ -222,13 +228,23 @@ function bun(operation: PMOperation, name?: string): string {
   }
 }
 
-export function npx(packageManager: PackageManager): string {
+interface NpxOptions {
+  forceNpx?: boolean; // Will force to use npx instead of the package manager default
+}
+
+export function npx(packageManager: PackageManager, options?: NpxOptions): string {
   switch (packageManager) {
     case PackageManager.bun:
       return `${InternalCommand.cwd}bunx`;
     case PackageManager.pnpm:
       return `${InternalCommand.cwd}pnpm exec`;
     case PackageManager.yarn:
+      if (options?.forceNpx) {
+        return `${InternalCommand.cwd}npx`;
+      }
+      if (exists('@yarnpkg/pnpify')) {
+        return `${InternalCommand.cwd}yarn pnpify`;
+      }
       return `${InternalCommand.cwd}yarn exec`;
     default:
       return `${InternalCommand.cwd}npx`;

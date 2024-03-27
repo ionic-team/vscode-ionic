@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { clearOutput, writeError, writeIonic } from './logging';
+import { clearOutput, writeError, writeIonic, writeWarning } from './logging';
 import { PackageManager, npmInstall, npmInstallAll, outdatedCommand } from './node-commands';
 import { NpmOutdatedDependency } from './npm-model';
 import { Project } from './project';
@@ -78,6 +78,10 @@ async function addForPackageManager(
 
   if (project.isYarnV1()) {
     data = fixYarnV1Outdated(data, project.packageManager);
+  }
+  if (project.isModernYarn()) {
+    writeWarning(`This feature is not available with yarn ${project.yarnVersion}`);
+    return [];
   }
   const updates = [];
   try {
