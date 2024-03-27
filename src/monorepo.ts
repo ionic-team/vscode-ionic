@@ -9,10 +9,12 @@ import { getPnpmWorkspaces } from './monorepos-pnpm';
 import { PackageManager } from './node-commands';
 import { getLernaWorkspaces } from './monorepos-lerna';
 import { join } from 'path';
-import { writeError } from './logging';
-import { NpmOutdatedDependency } from './npm-model';
+import { writeError, write } from './logging';
+import { NpmDependency, NpmOutdatedDependency } from './npm-model';
 import { ExtensionContext, commands, window, workspace } from 'vscode';
 import { existsSync, readFileSync, readdirSync } from 'fs';
+import { QueueFunction, Tip, TipType } from './tip';
+import { getRunOutput, openUri } from './utilities';
 
 export interface MonoRepoProject {
   name: string;
@@ -232,13 +234,89 @@ function getFolderBasedProjects(prj: Project): Array<MonoRepoProject> {
 }
 
 // Yarn outdated returns invalid json in a visual format. This fixes it and returns it in something like npm outdated
-export function fixYarnGarbage(data: string, packageManager: PackageManager): string {
+export function fixYarnV1Outdated(data: string, packageManager: PackageManager): string {
   if (packageManager !== PackageManager.yarn) {
     return data;
   }
   const tmp = data.split('\n');
   if (tmp.length > 1) {
     return parseYarnFormat(tmp[1]);
+  }
+  return data;
+}
+
+export function fixYarnOutdated(data: string, project: Project): string {
+  /* npm outdated --json returns an object like this
+  {
+  "@angular/animations": {
+    "wanted": "17.3.1",
+    "latest": "17.3.1",
+    "dependent": "cs-yarn4-test"
+  },
+  // yarn outdated --json returns an object like:
+  [{"current":"17.3.1","latest":"17.3.2","name":"@angular/cli","severity":"patch","type":"devDependencies"},{"current":"7.8.1","latest":"7.8.2","name":"@ionic/angular","severity":"patch","type":"dependencies"},{"current":"7.3.0","latest":"7.3.1","name":"ionicons","severity":"patch","type":"dependencies"}]
+  */
+  if (data.startsWith(`Usage Error: Couldn't find a script named "outdated"`)) {
+    project.setGroup('Extension', '', TipType.Ionic, true);
+    project.tip(new Tip('Install yarn outdated plugin', '', TipType.Idea).setQueuedAction(installYarnPlugin, project));
+    return;
+  }
+  const items = JSON.parse(data);
+  const result = {};
+  for (const item of items) {
+    const dep: NpmOutdatedDependency = {
+      current: item.current,
+      wanted: item.latest,
+      latest: item.latest,
+      dependent: '',
+      location: '',
+    };
+    result[item.name] = dep;
+  }
+  return JSON.stringify(result);
+}
+
+async function installYarnPlugin(queueFunction: QueueFunction, project: Project) {
+  const response = await window.showInformationMessage(
+    `The Yarn plugin called "Outdated" is required to find the latest versions of dependencies. Install it?`,
+    'Yes',
+    'More Information',
+  );
+  if (!response) {
+    return;
+  }
+  if (response == 'More Information') {
+    openUri('https://github.com/mskelton/yarn-plugin-outdated');
+    return;
+  }
+  queueFunction();
+  const url = project.yarnVersion.startsWith('3')
+    ? `yarn plugin import https://mskelton.dev/yarn-outdated/v3`
+    : `yarn plugin import https://mskelton.dev/yarn-outdated/v4`;
+  const result = await getRunOutput(url, project.projectFolder());
+  write(result);
+}
+
+// Yarn list --json returns a NDJSON stream that needs to fixed
+export function fixModernYarnList(data: string): string {
+  const items = data.split('\n');
+  if (items.length > 1) {
+    //tmp[x].value = @angular-eslint/builder@npm:17.3.0
+    //tmp[x].children.Version = 0.14.4
+    const result = { dependencies: {} };
+    for (const item of items) {
+      if (item === '') break;
+
+      const info = JSON.parse(item);
+      const ldx = info.value.lastIndexOf('@');
+      const name = info.value.substring(0, ldx);
+      const dep: NpmDependency = {
+        version: info.children.Version,
+        resolved: '',
+      };
+      result.dependencies[name] = dep;
+    }
+    return JSON.stringify(result);
   }
   return data;
 }

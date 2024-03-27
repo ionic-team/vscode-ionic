@@ -28,7 +28,8 @@ export function outdatedCommand(project: Project): string {
       if (project.isYarnV1()) {
         return 'yarn outdated --json';
       }
-      return 'npm outdated --json'; // Assume npm is installed
+      // Uses https://github.com/mskelton/yarn-plugin-outdated
+      return 'yarn outdated --format=json';
     }
     case PackageManager.bun:
       return 'npm outdated --json';
@@ -42,7 +43,7 @@ export function outdatedCommand(project: Project): string {
 export function listCommand(project: Project): string {
   switch (project.packageManager) {
     case PackageManager.yarn:
-      return project.isYarnV1() ? 'yarn list --json' : 'npm list --json';
+      return project.isYarnV1() ? 'yarn list --json' : 'yarn info --json';
     case PackageManager.pnpm:
       return 'pnpm list --json';
     case PackageManager.bun:
@@ -84,7 +85,7 @@ export function addCommand(): string {
  */
 export function preflightNPMCheck(project: Project): string {
   const nmf = project.getNodeModulesFolder();
-  const preop = !existsSync(nmf) ? npmInstallAll() + ' && ' : '';
+  const preop = !existsSync(nmf) && !project.isModernYarn() ? npmInstallAll() + ' && ' : '';
 
   // If not set then set to a default value to prevent failrue
   if (!process.env.ANDROID_SDK_ROOT && !process.env.ANDROID_HOME && process.platform !== 'win32') {
@@ -227,6 +228,8 @@ export function npx(packageManager: PackageManager): string {
       return `${InternalCommand.cwd}bunx`;
     case PackageManager.pnpm:
       return `${InternalCommand.cwd}pnpm exec`;
+    case PackageManager.yarn:
+      return `${InternalCommand.cwd}yarn exec`;
     default:
       return `${InternalCommand.cwd}npx`;
   }

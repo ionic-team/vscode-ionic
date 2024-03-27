@@ -7,7 +7,7 @@ import { NpmOutdatedDependency } from './npm-model';
 import { Project } from './project';
 import { getRunOutput, run, RunResults, showProgress } from './utilities';
 
-import { fixYarnGarbage } from './monorepo';
+import { fixYarnV1Outdated } from './monorepo';
 import { OutputChannel, window } from 'vscode';
 import { QueueFunction } from './tip';
 
@@ -77,7 +77,7 @@ async function addForPackageManager(
   let data = await getRunOutput(outdatedCommand(project), tmpDir, undefined, true);
 
   if (project.isYarnV1()) {
-    data = fixYarnGarbage(data, project.packageManager);
+    data = fixYarnV1Outdated(data, project.packageManager);
   }
   const updates = [];
   try {

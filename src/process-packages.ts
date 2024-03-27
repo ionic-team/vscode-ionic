@@ -13,8 +13,8 @@ import {
 } from './context-variables';
 import { join } from 'path';
 import { ionicState } from './ionic-tree-provider';
-import { writeError, writeWarning } from './logging';
-import { fixYarnGarbage } from './monorepo';
+import { write, writeError, writeWarning } from './logging';
+import { fixYarnV1Outdated, fixModernYarnList, fixYarnOutdated } from './monorepo';
 import { ExtensionContext, window } from 'vscode';
 import { existsSync, lstatSync, readFileSync, readdirSync } from 'fs';
 import { execSync } from 'child_process';
@@ -58,7 +58,7 @@ export async function processPackages(
     return {};
   }
 
-  // npm outdated only shows dependencies and not dev dependencies if the node module isnt installed
+  // npm outdated only shows dependencies and not dev dependencies if the node module isn't installed
   let outdated = '[]';
   let versions = '{}';
   try {
@@ -71,18 +71,35 @@ export async function processPackages(
       ionicState.syncDone = [];
     }
     if (changed || !outdated || !versions) {
+      const outdatedCmd = outdatedCommand(project);
+      const listCmd = listCommand(project);
       await Promise.all([
-        getRunOutput(outdatedCommand(project), folder, undefined, true).then((data) => {
-          if (project.isYarnV1()) {
-            data = fixYarnGarbage(data, project.packageManager);
-          }
-          outdated = data;
-          context.workspaceState.update(PackageCacheOutdated(project), outdated);
-        }),
-        getRunOutput(listCommand(project), folder, undefined, true).then((data) => {
-          versions = data;
-          context.workspaceState.update(PackageCacheList(project), versions);
-        }),
+        getRunOutput(outdatedCmd, folder, undefined, true)
+          .then((data) => {
+            if (project.isYarnV1()) {
+              data = fixYarnV1Outdated(data, project.packageManager);
+            } else if (project.isModernYarn()) {
+              data = fixYarnOutdated(data, project);
+            }
+            outdated = data;
+            context.workspaceState.update(PackageCacheOutdated(project), outdated);
+          })
+          .catch((reason) => {
+            write(`> ${outdatedCmd}`);
+            writeError(reason);
+          }),
+        getRunOutput(listCmd, folder, undefined, true)
+          .then((data) => {
+            if (project.isModernYarn()) {
+              data = fixModernYarnList(data);
+            }
+            versions = data;
+            context.workspaceState.update(PackageCacheList(project), versions);
+          })
+          .catch((reason) => {
+            write(`> ${listCmd}`);
+            writeError(reason);
+          }),
       ]);
       context.workspaceState.update(PackageCacheModified(project), packagesModified.toUTCString());
     } else {

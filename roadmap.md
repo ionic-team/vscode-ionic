@@ -1,5 +1,7 @@
 # Roadmap
 
+- // yarn plugin import https://mskelton.dev/yarn-outdated/v4
+
 - When adding Capacitor check if www exists and if it doesnt but dist does then set `webDir` to dist
 - When adding ios platform or android platform be sure to run sync as second step
 - If there is no build step then rather than running `npx undefined` just skip it
