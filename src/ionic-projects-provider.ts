@@ -8,7 +8,10 @@ export class IonicProjectsreeProvider implements TreeDataProvider<Recommendation
     Recommendation | undefined | void
   >();
   readonly onDidChangeTreeData: Event<Recommendation | undefined | void> = this._onDidChangeTreeData.event;
-  constructor(private workspaceRoot: string | undefined, private context: ExtensionContext) {}
+  constructor(
+    private workspaceRoot: string | undefined,
+    private context: ExtensionContext,
+  ) {}
 
   selectedProject: string;
 

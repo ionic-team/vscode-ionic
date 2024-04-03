@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.83
+
+- Fix for Windows finding Android Debug Bridge (adb) executable
+- Fix for Windows when replacing node_modules folder
+
 ### Version 1.82
 
 - Support Nuxt with Vite (allow running on web)
