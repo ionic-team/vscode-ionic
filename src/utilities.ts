@@ -557,6 +557,7 @@ export function alt(key: string): string {
 }
 
 export function getStringFrom(data: string, start: string, end: string): string {
+  if (data == undefined) return undefined;
   const foundIdx = data.lastIndexOf(start);
   if (foundIdx == -1) {
     return undefined;

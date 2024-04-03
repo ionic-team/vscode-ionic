@@ -27,7 +27,12 @@ export class Publisher extends events.EventEmitter implements IPublisher {
   client?: dgram.Socket;
   interfaces?: Interface[];
 
-  constructor(public namespace: string, public name: string, public port: number, public secure: boolean) {
+  constructor(
+    public namespace: string,
+    public name: string,
+    public port: number,
+    public secure: boolean,
+  ) {
     super();
 
     if (name.indexOf(':') >= 0) {

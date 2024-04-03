@@ -14,7 +14,7 @@ import {
 import { ionicState } from './ionic-tree-provider';
 import { workspace } from 'vscode';
 import { existsSync } from 'fs';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import { homedir } from 'os';
 import { spawn } from 'child_process';
 
@@ -252,6 +252,13 @@ function getAdbExecutable(): string {
       const adbDefault = '~/Library/Android/sdk/platform-tools/adb';
       if (existsSync(resolvePath(adbDefault))) {
         return resolvePath(adbDefault);
+      }
+    } else {
+      // For Windows
+      // c:\users\USER\AppData\Android\SDK\platform-tools
+      const winAdb = join(process.env['LOCALAPPDATA'], 'Android', 'SDK', 'platform-tools', 'adb.exe');
+      if (existsSync(resolvePath(winAdb))) {
+        return resolvePath(winAdb);
       }
     }
 

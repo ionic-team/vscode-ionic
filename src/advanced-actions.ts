@@ -91,11 +91,11 @@ export async function advancedActions(project: Project) {
 }
 
 function migrateToPNPM(): Array<string> {
-  return ['pnpm -v', 'rm -rf node_modules', 'pnpm import', 'pnpm install', 'rm package-lock.json'];
+  return ['pnpm -v', removeNodeModules(), 'pnpm import', 'pnpm install', 'rm package-lock.json'];
 }
 
 function migrateToBun(): Array<string> {
-  return cwd(['bun -v', 'rm -rf node_modules', 'bun install', 'rm package-lock.json']);
+  return cwd(['bun -v', removeNodeModules(), 'bun install', 'rm package-lock.json']);
 }
 
 function cwd(commands: string[]): string[] {

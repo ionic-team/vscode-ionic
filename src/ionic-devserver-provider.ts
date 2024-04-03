@@ -12,7 +12,10 @@ import { qrWebView } from './nexus-browser';
 
 export class IonicDevServerProvider implements WebviewViewProvider {
   registered = false;
-  constructor(private workspaceRoot: string | undefined, private context: ExtensionContext) {}
+  constructor(
+    private workspaceRoot: string | undefined,
+    private context: ExtensionContext,
+  ) {}
 
   resolveWebviewView(webviewView: WebviewView, context: WebviewViewResolveContext, token: CancellationToken) {
     if (this.registered) return;
