@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.84
+
+- Fix for NX workspaces with pnpm / nvm to correctly identify outdated packages
+
 ### Version 1.83
 
 - Fix for Windows finding Android Debug Bridge (adb) executable

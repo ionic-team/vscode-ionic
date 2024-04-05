@@ -422,7 +422,7 @@ function qualifyCommand(command: string, folder: string): string {
       const nvmrc = join(folder, '.nvmrc');
       if (existsSync(nvmrc)) {
         const txt = readFileSync(nvmrc, 'utf-8').replace('\n', '');
-        ionicState.nvm = `source ${process.env.NVM_DIR}/nvm.sh && nvm use`;
+        ionicState.nvm = `source ${process.env.NVM_DIR}/nvm.sh && nvm use > /dev/null`;
         writeIonic(`Detected nvm (${txt}) for this project.`);
       }
     }
