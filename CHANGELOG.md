@@ -3,6 +3,7 @@
 ### Version 1.84
 
 - Fix for NX workspaces with pnpm / nvm to correctly identify outdated packages
+- Fix for modern yarn install without packageManager version specified
 
 ### Version 1.83
 
