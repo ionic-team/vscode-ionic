@@ -385,7 +385,14 @@ export class Project {
   }
 
   public isModernYarn() {
-    return !!this.yarnVersion;
+    const result = !!this.yarnVersion;
+    if (result && this.yarnVersion.startsWith('pnpm@')) {
+      return false;
+    }
+    if (!result && this.packageManager == PackageManager.yarn && !this.isYarnV1()) {
+      return true;
+    }
+    return result;
   }
 
   private async updatePackages(r: Recommendation): Promise<string> {

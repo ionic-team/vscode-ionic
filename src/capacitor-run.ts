@@ -49,7 +49,7 @@ export async function capacitorRun(project: Project, platform: CapacitorPlatform
     case MonoRepoType.npm:
       return preop + (await capRun(platform, project.repoType, rebuilt, noSync, project));
     case MonoRepoType.nx:
-      return preop + nxRun(platform, project.repoType, rebuilt, noSync, project);
+      return preop + (await nxRun(platform, project.repoType, rebuilt, noSync, project));
     default:
       throw new Error('Unsupported Monorepo type');
   }
