@@ -389,6 +389,9 @@ export class Project {
     if (result && this.yarnVersion.startsWith('pnpm@')) {
       return false;
     }
+    if (!result && this.packageManager == PackageManager.yarn && !this.isYarnV1()) {
+      return true;
+    }
     return result;
   }
 
