@@ -46,8 +46,12 @@ export async function checkPeerDependencies(
     if (version == 'latest') {
       conflicts.push(dependency);
     } else {
-      write(`${dependency.name} will be updated to ${version}`);
-      updates.push(`${dependency.name}@${version}`);
+      const v = version ?? 'unsure';
+      write(`${dependency.name} will be updated to ${v}`);
+      const cmd = `${dependency.name}@${v}`;
+      if (updates.indexOf(cmd) == -1) {
+        updates.push(cmd);
+      }
     }
   }
 
@@ -179,7 +183,7 @@ export async function findCompatibleVersion2(dependency: DependencyConflict): Pr
       best = incompatible ? 'latest' : latestVersion;
     }
   } catch (error) {
-    writeError(`Unable to search for a version of ${dependency} that works in your project`);
+    writeError(`Unable to search for a version of ${dependency.name} that works in your project`);
     console.error(error);
     best = undefined;
   }

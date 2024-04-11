@@ -17,17 +17,13 @@ export async function capacitorSync(project: Project): Promise<string> {
   const ionicCLI = useIonicCLI();
   switch (project.repoType) {
     case MonoRepoType.none:
-      return preop + (ionicCLI ? ionicCLISync(project.packageManager) : capCLISync(project.packageManager));
+      return preop + (ionicCLI ? ionicCLISync(project) : capCLISync(project));
     case MonoRepoType.folder:
     case MonoRepoType.pnpm:
     case MonoRepoType.lerna:
     case MonoRepoType.yarn:
     case MonoRepoType.npm:
-      return (
-        InternalCommand.cwd +
-        preop +
-        (ionicCLI ? ionicCLISync(project.packageManager) : capCLISync(project.packageManager))
-      );
+      return InternalCommand.cwd + preop + (ionicCLI ? ionicCLISync(project) : capCLISync(project));
     case MonoRepoType.nx:
       return preop + nxSync(project);
     default:
@@ -35,20 +31,20 @@ export async function capacitorSync(project: Project): Promise<string> {
   }
 }
 
-function capCLISync(packageManager: PackageManager): string {
+function capCLISync(project: Project): string {
   if (isGreaterOrEqual('@capacitor/cli', '4.1.0')) {
-    return `${npx(packageManager)} cap sync --inline`;
+    return `${npx(project)} cap sync --inline`;
   }
-  return `${npx(packageManager)} cap sync${getConfigurationArgs()}`;
+  return `${npx(project)} cap sync${getConfigurationArgs()}`;
 }
 
-function ionicCLISync(packageManager: PackageManager): string {
-  return `${npx(packageManager)} ionic cap sync --inline${getConfigurationArgs()}`;
+function ionicCLISync(project: Project): string {
+  return `${npx(project)} ionic cap sync --inline${getConfigurationArgs()}`;
 }
 
 function nxSync(project: Project): string {
   if (project.monoRepo.isNXStandalone) {
-    return capCLISync(project.packageManager);
+    return capCLISync(project);
   }
-  return `${npx(project.packageManager)} nx sync ${project.monoRepo.name}${getConfigurationArgs()}`;
+  return `${npx(project)} nx sync ${project.monoRepo.name}${getConfigurationArgs()}`;
 }

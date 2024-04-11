@@ -63,7 +63,7 @@ function build(
   platform?: CapacitorPlatform,
   sourceMaps?: boolean,
 ): string {
-  let cmd = `${npx(project.packageManager)} ${buildCmd(project)}`;
+  let cmd = `${npx(project)} ${buildCmd(project)}`;
   if (configurationArg) {
     cmd += ` ${configurationArg}`;
   } else if (prod) {
@@ -74,7 +74,7 @@ function build(
   }
 
   if (platform || exists('@capacitor/ios') || exists('@capacitor/android')) {
-    cmd += ` && ${npx(project.packageManager)} cap copy`;
+    cmd += ` && ${npx(project)} cap copy`;
     if (platform) cmd += ` ${platform}`;
   }
 
@@ -118,7 +118,7 @@ function guessBuildCommand(project: Project): string | undefined {
 }
 
 function nxBuild(prod: boolean, project: Project, configurationArg?: string): string {
-  let cmd = `${npx(project.packageManager)} nx build ${project.monoRepo.name}`;
+  let cmd = `${npx(project)} nx build ${project.monoRepo.name}`;
   if (configurationArg) {
     cmd += ` ${configurationArg}`;
   } else if (prod) {
