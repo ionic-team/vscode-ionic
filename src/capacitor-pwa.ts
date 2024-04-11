@@ -22,7 +22,7 @@ export async function integratePWA(queueFunction: QueueFunction, project: Projec
   }
   queueFunction();
   await runCommands(
-    [`${npx(project.packageManager)} ng add @angular/pwa --defaults --skip-confirmation true`],
+    [`${npx(project)} ng add @angular/pwa --defaults --skip-confirmation true`],
     'Adding @angular/pwa',
     project,
   );

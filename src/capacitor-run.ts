@@ -55,9 +55,9 @@ export async function capacitorRun(project: Project, platform: CapacitorPlatform
   }
 }
 
-export function capacitorDevicesCommand(platform: CapacitorPlatform, packageManager: PackageManager): string {
+export function capacitorDevicesCommand(platform: CapacitorPlatform, project: Project): string {
   const ionic = useIonicCLI() ? 'ionic ' : '';
-  return `${npx(packageManager)} ${ionic}cap run ${platform} --list`;
+  return `${npx(project)} ${ionic}cap run ${platform} --list`;
 }
 
 export function useIonicCLI(): boolean {
@@ -147,9 +147,7 @@ async function capRun(
       ? InternalCommand.cwd
       : '';
 
-  return `${pre}${npx(project.packageManager)} ${ionic}cap run ${platform} --target=${
-    InternalCommand.target
-  } ${capRunFlags}`;
+  return `${pre}${npx(project)} ${ionic}cap run ${platform} --target=${InternalCommand.target} ${capRunFlags}`;
 }
 
 async function nxRun(
@@ -163,7 +161,7 @@ async function nxRun(
     return await capRun(platform, repoType, noBuild, noSync, project);
   }
   // Note: This may change, see: https://github.com/nxtend-team/nxtend/issues/490
-  return `${npx(project.packageManager)} nx run ${project.monoRepo.name}:cap --cmd "run ${platform} --target=${
+  return `${npx(project)} nx run ${project.monoRepo.name}:cap --cmd "run ${platform} --target=${
     InternalCommand.target
   }"`;
 }

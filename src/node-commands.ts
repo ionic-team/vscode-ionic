@@ -232,14 +232,14 @@ interface NpxOptions {
   forceNpx?: boolean; // Will force to use npx instead of the package manager default
 }
 
-export function npx(packageManager: PackageManager, options?: NpxOptions): string {
-  switch (packageManager) {
+export function npx(project: Project, options?: NpxOptions): string {
+  switch (project.packageManager) {
     case PackageManager.bun:
       return `${InternalCommand.cwd}bunx`;
     case PackageManager.pnpm:
       return `${InternalCommand.cwd}pnpm exec`;
     case PackageManager.yarn:
-      if (options?.forceNpx) {
+      if (options?.forceNpx && !project.isModernYarn()) {
         return `${InternalCommand.cwd}npx`;
       }
       if (exists('@yarnpkg/pnpify')) {

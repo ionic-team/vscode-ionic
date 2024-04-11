@@ -177,19 +177,19 @@ async function runCapacitorAssets(queueFunction: QueueFunction | undefined, proj
     }
     let cmd = '';
     if (ios) {
-      cmd = `${npx(project.packageManager, { forceNpx: true })} @capacitor/assets generate --ios`;
+      cmd = `${npx(project, { forceNpx: true })} @capacitor/assets generate --ios`;
       write(`> ${cmd}`);
       await run(folder, cmd, undefined, [], undefined, undefined);
       addToGitIgnore(folder, 'resources/ios/**/*');
     }
     if (android) {
-      cmd = `${npx(project.packageManager, { forceNpx: true })} @capacitor/assets generate --android`;
+      cmd = `${npx(project, { forceNpx: true })} @capacitor/assets generate --android`;
       write(`> ${cmd}`);
       await run(folder, cmd, undefined, [], undefined, undefined);
       addToGitIgnore(folder, 'resources/android/**/*');
     }
     if (pwa) {
-      cmd = `${npx(project.packageManager, {
+      cmd = `${npx(project, {
         forceNpx: true,
       })} @capacitor/assets generate --pwa --pwaManifestPath './src/manifest.webmanifest'`;
       write(`> ${cmd}`);

@@ -1,7 +1,8 @@
 ## Changelog
 
-### Version 1.84
+### Version 1.84.1
 
+- Workaround to use npx instead of yarn exec due to yarn v1 issue
 - Fix for NX workspaces with pnpm / nvm to correctly identify outdated packages
 - Fix for modern yarn install without packageManager version specified
 

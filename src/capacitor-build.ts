@@ -156,13 +156,13 @@ function capBuildCommand(
 ): string {
   switch (project.repoType) {
     case MonoRepoType.none:
-      return capCLIBuild(platform, project.packageManager, args, settings);
+      return capCLIBuild(platform, project, args, settings);
     case MonoRepoType.folder:
     case MonoRepoType.pnpm:
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
     case MonoRepoType.npm:
-      return InternalCommand.cwd + capCLIBuild(platform, project.packageManager, args, settings);
+      return InternalCommand.cwd + capCLIBuild(platform, project, args, settings);
     case MonoRepoType.nx:
       return nxBuild(project, platform, args);
     default:
@@ -170,23 +170,18 @@ function capBuildCommand(
   }
 }
 
-function capCLIBuild(
-  platform: CapacitorPlatform,
-  packageManager: PackageManager,
-  args: string,
-  settings: KeyStoreSettings,
-): string {
+function capCLIBuild(platform: CapacitorPlatform, project: Project, args: string, settings: KeyStoreSettings): string {
   if (platform == CapacitorPlatform.android) {
     if (settings.keyAlias) args += ` --keystorealias="${settings.keyAlias}"`;
     if (settings.keyPassword) args += ` --keystorealiaspass="${settings.keyPassword}"`;
     if (settings.keyStorePassword) args += ` --keystorepass="${settings.keyStorePassword}"`;
     if (settings.keyStorePath) args += ` --keystorepath="${settings.keyStorePath}"`;
   }
-  return `${npx(packageManager)} cap build ${platform}${args}`;
+  return `${npx(project)} cap build ${platform}${args}`;
 }
 
 function nxBuild(project: Project, platform: CapacitorPlatform, args: string): string {
-  return `${npx(project.packageManager)} nx run ${project.monoRepo.name}:build:${platform}${args}`;
+  return `${npx(project)} nx run ${project.monoRepo.name}:build:${platform}${args}`;
 }
 
 function readKeyStoreSettings(project: Project): KeyStoreSettings {

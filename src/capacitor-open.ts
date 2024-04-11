@@ -22,16 +22,13 @@ export async function capacitorOpen(project: Project, platform: CapacitorPlatfor
   }
   switch (project.repoType) {
     case MonoRepoType.none:
-      return ionicCLI ? ionicCLIOpen(platform, project.packageManager) : capCLIOpen(platform, project.packageManager);
+      return ionicCLI ? ionicCLIOpen(platform, project) : capCLIOpen(platform, project);
     case MonoRepoType.folder:
     case MonoRepoType.pnpm:
     case MonoRepoType.yarn:
     case MonoRepoType.lerna:
     case MonoRepoType.npm:
-      return (
-        InternalCommand.cwd +
-        (ionicCLI ? ionicCLIOpen(platform, project.packageManager) : capCLIOpen(platform, project.packageManager))
-      );
+      return InternalCommand.cwd + (ionicCLI ? ionicCLIOpen(platform, project) : capCLIOpen(platform, project));
     case MonoRepoType.nx:
       return nxOpen(project, platform);
     default:
@@ -39,19 +36,19 @@ export async function capacitorOpen(project: Project, platform: CapacitorPlatfor
   }
 }
 
-function capCLIOpen(platform: CapacitorPlatform, packageManager: PackageManager): string {
-  return `${npx(packageManager)} cap open ${platform}`;
+function capCLIOpen(platform: CapacitorPlatform, project: Project): string {
+  return `${npx(project)} cap open ${platform}`;
 }
 
-function ionicCLIOpen(platform: CapacitorPlatform, packageManager: PackageManager): string {
-  return `${npx(packageManager)} ionic cap open ${platform}`;
+function ionicCLIOpen(platform: CapacitorPlatform, project: Project): string {
+  return `${npx(project)} ionic cap open ${platform}`;
 }
 
 function nxOpen(project: Project, platform: CapacitorPlatform): string {
   if (project.monoRepo.isNXStandalone) {
-    return capCLIOpen(platform, project.packageManager);
+    return capCLIOpen(platform, project);
   }
-  return `${npx(project.packageManager)} nx run ${project.monoRepo.name}:open:${platform}`;
+  return `${npx(project)} nx run ${project.monoRepo.name}:open:${platform}`;
 }
 
 // This will create the default files that specify the JDK version to use for a project that has never been opened in Android Studio

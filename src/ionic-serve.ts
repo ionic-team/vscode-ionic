@@ -78,7 +78,7 @@ async function ionicCLIServe(project: Project, dontOpenBrowser: boolean): Promis
     serveFlags += ` --ssl-key='${certPath('key')}'`;
   }
 
-  return `${preop}${npx(project.packageManager)} ${serveCmd(project)}${serveFlags}`;
+  return `${preop}${npx(project)} ${serveCmd(project)}${serveFlags}`;
 }
 
 function serveCmd(project: Project): string {
@@ -178,7 +178,7 @@ function nxServe(project: Project): string {
       serveFlags += ' --host=0.0.0.0';
     }
   }
-  return `${npx(project.packageManager)} nx serve ${project.monoRepo.name}${serveFlags}`;
+  return `${npx(project)} nx serve ${project.monoRepo.name}${serveFlags}`;
 }
 
 export async function selectExternalIPAddress(): Promise<string> {

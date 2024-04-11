@@ -43,9 +43,7 @@ export function webProject(project: Project) {
           npmInstall(`@capacitor/core`),
           npmInstall(`@capacitor/cli`),
           npmInstall(`@capacitor/app @capacitor/haptics @capacitor/keyboard @capacitor/status-bar`),
-          `${pre}${npx(project.packageManager)} capacitor init "${project.name}" "${asAppId(
-            project.name,
-          )}" --web-dir ${outFolder}`,
+          `${pre}${npx(project)} capacitor init "${project.name}" "${asAppId(project.name)}" --web-dir ${outFolder}`,
           InternalCommand.ionicInit,
         ],
         'Add Capacitor',

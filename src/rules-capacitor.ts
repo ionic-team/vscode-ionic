@@ -358,9 +358,7 @@ export async function capacitorRecommendations(project: Project, forMigration: b
           npmInstall('@capacitor/core@latest', '--save', '-E'),
           npmInstall('@capacitor/cli@latest', '-D', '-E'),
           npmInstall(`@capacitor/app @capacitor/core @capacitor/haptics @capacitor/keyboard @capacitor/status-bar`),
-          `${local}${npx(project.packageManager)} capacitor init "${project.name}" "${asAppId(
-            project.name,
-          )}" --web-dir www`,
+          `${local}${npx(project)} capacitor init "${project.name}" "${asAppId(project.name)}" --web-dir www`,
         ],
         'Add Capacitor',
         'Capacitor added to this project',

@@ -56,9 +56,7 @@ async function migrate(queueFunction: QueueFunction, project: Project, next: num
   async function migrateTo(queueFunction: QueueFunction, version: number, project: Project) {
     queueFunction();
     const commands = [
-      `${npx(
-        ionicState.packageManager,
-      )} ng update @angular/cli@${version} @angular/core@${version} --allow-dirty --force`,
+      `${npx(project)} ng update @angular/cli@${version} @angular/core@${version} --allow-dirty --force`,
     ];
     if (exists('@angular/cdk')) {
       commands.push(npmInstall(`@angular/cdk@${version}`, '--force'));
