@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.85
+
+- Capacitor 6 release.
+
 ### Version 1.84.1
 
 - Workaround to use npx instead of yarn exec due to yarn v1 issue
