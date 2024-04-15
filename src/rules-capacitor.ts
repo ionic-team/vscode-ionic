@@ -237,10 +237,10 @@ export async function checkCapacitorRules(project: Project, context: ExtensionCo
   });
 
   suggestCapacitorMigration('5.0.0', '6.0.0', TipType.Experiment, project, {
-    coreVersion: '6.0.0-rc.0',
-    versionTitle: '6 Release Candidate 1',
-    versionFull: '6.0.0-rc.0',
-    changesLink: 'https://capacitorjs.com/docs/next/updating/6-0',
+    coreVersion: '6.0.0',
+    versionTitle: '6',
+    versionFull: '6.0.0',
+    changesLink: 'https://capacitorjs.com/docs/updating/6-0',
     androidStudioMin: '231.9392.1',
     androidStudioName: 'Android Studio Hedgehog (2023.1.1)',
     androidStudioReason: '(It comes with Gradle 8.2)',
