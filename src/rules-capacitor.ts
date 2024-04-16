@@ -236,7 +236,7 @@ export async function checkCapacitorRules(project: Project, context: ExtensionCo
     ],
   });
 
-  suggestCapacitorMigration('5.0.0', '6.0.0', TipType.Experiment, project, {
+  suggestCapacitorMigration('5.0.0', '6.0.0', TipType.Capacitor, project, {
     coreVersion: '6.0.0',
     versionTitle: '6',
     versionFull: '6.0.0',

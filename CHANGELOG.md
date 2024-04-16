@@ -1,8 +1,9 @@
 ## Changelog
 
-### Version 1.85
+### Version 1.85.1
 
 - Capacitor 6 release.
+- Migration feature for Capacitor Plugin v5 to v6.
 
 ### Version 1.84.1
 

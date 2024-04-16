@@ -1,15 +1,24 @@
-import { isGreaterOrEqual, isLess } from './analyzer';
-import { showOutput, writeIonic } from './logging';
+import { getPackageVersion, isGreaterOrEqual, isLess } from './analyzer';
+import { showOutput, write, writeIonic } from './logging';
 import { Project } from './project';
 import { QueueFunction, Tip, TipType } from './tip';
 import { window } from 'vscode';
-import { PackageFile, getPackageJSON, replaceStringIn, showProgress } from './utilities';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { getPackageJSONFilename } from './monorepo';
-import { npmInstallAll } from './node-commands';
-import { join } from 'path';
+import { openUri, showProgress } from './utilities';
+import { npx } from './node-commands';
+import { ActionResult } from './command-name';
+import { ionicState } from './ionic-tree-provider';
+
+export interface CapacitorPluginMigrationOptions {
+  changesLink: string;
+  migrateCommand: string;
+}
 
 export function checkCapacitorPluginMigration(project: Project) {
+  suggestCapacitorPluginMigration('5.0.0', '6.0.0', TipType.Capacitor, project, {
+    changesLink: 'https://capacitorjs.com/docs/updating/plugins/6-0',
+    migrateCommand: '@capacitor/plugin-migration-v5-to-v6@latest',
+  });
+
   if (isGreaterOrEqual('@capacitor/core', '4.0.0') && isLess('@capacitor/core', '5.0.0')) {
     // Capacitor 4 to 5 plugin migration
     project.add(
@@ -18,6 +27,69 @@ export function checkCapacitorPluginMigration(project: Project) {
         project,
       ),
     );
+  }
+}
+
+export async function migrateCapacitorPlugin(
+  queueFunction: QueueFunction,
+  project: Project,
+  currentVersion: string,
+  migrateVersion: string,
+  migrateOptions: CapacitorPluginMigrationOptions,
+): Promise<ActionResult> {
+  const result = await window.showInformationMessage(
+    `Migrate this Capacitor Plugin from ${currentVersion} to version ${migrateVersion}?`,
+    `Migrate to v${migrateVersion}`,
+    'Ignore',
+  );
+  if (result == 'Ignore') {
+    return ActionResult.Ignore;
+  }
+  if (!result) {
+    return;
+  }
+  queueFunction();
+  const cmd = `${npx(project)} ${migrateOptions.migrateCommand}`;
+  write(`> ${cmd}`);
+  try {
+    await showProgress('Migrating Plugin...', async () => {
+      await project.run2(cmd, false);
+    });
+  } finally {
+    const message = `Capacitor Plugin migration to v${migrateVersion} completed.`;
+    writeIonic(message);
+    showOutput();
+    const changesTitle = 'View Changes';
+    window.showInformationMessage(message, changesTitle, 'OK').then((res) => {
+      if (res == changesTitle) {
+        openUri(migrateOptions.changesLink);
+      }
+    });
+  }
+  //)
+}
+
+function suggestCapacitorPluginMigration(
+  minCapacitorCore: string,
+  maxCapacitorCore: string,
+  type: TipType,
+  project: Project,
+  migrateOptions: CapacitorPluginMigrationOptions,
+) {
+  if (isLess('@capacitor/core', maxCapacitorCore)) {
+    if (ionicState.hasNodeModules && isGreaterOrEqual('@capacitor/core', minCapacitorCore)) {
+      project.tip(
+        new Tip(`Migrate Capacitor Plugin to ${maxCapacitorCore}`, '', type)
+          .setQueuedAction(
+            migrateCapacitorPlugin,
+            project,
+            getPackageVersion('@capacitor/core'),
+            maxCapacitorCore,
+            migrateOptions,
+          )
+          .canIgnore(),
+      );
+    }
   }
 }
 
