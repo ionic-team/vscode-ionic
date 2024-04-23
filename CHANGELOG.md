@@ -1,9 +1,13 @@
 ## Changelog
 
-### Version 1.85.1
+### Version 1.85.3
 
 - Capacitor 6 release.
 - Migration feature for Capacitor Plugin v5 to v6.
+- Fix Capacitor 6 migration finding potential peer dependency conflicts.
+- Handle projects that are missing @capacitor/core but have @capacitor/ios or @capacitor/android.
+- Handle project that have a config.xml that is not Cordova based.
+- Fix issue where privacy manifest file has API but no reason.
 
 ### Version 1.84.1
 

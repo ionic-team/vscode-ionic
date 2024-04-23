@@ -29,6 +29,7 @@ export interface CapacitorMigrationOptions {
   androidStudioReason: string;
   minJavaVersion: number;
   minPlugins: MinPlugin[];
+  ignorePeerDependencies: string[]; // Ignore peer dependency conflicts with these plugins
 }
 
 export interface MinPlugin {
@@ -92,7 +93,7 @@ export async function migrateCapacitor(
     report = await checkPeerDependencies(
       project.folder,
       [{ name: '@capacitor/core', version: versionFull }],
-      ['@capacitor/'],
+      options.ignorePeerDependencies,
     );
   });
 
