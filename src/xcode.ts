@@ -103,7 +103,7 @@ async function investigatePrivacyManifest(
       const found = data.NSPrivacyAccessedAPITypes
         ? data.NSPrivacyAccessedAPITypes.find((a: any) => a.NSPrivacyAccessedAPIType == apiUsage.api)
         : undefined;
-      if (!found) {
+      if (!found || found.NSPrivacyAccessedAPITypeReasons?.length == 0) {
         project.add(
           new Tip(`Missing Privacy Manifest Category`, '', TipType.Error)
             .setQueuedAction(
