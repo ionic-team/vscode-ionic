@@ -360,6 +360,8 @@ function checkFolder(filename: string): FolderType {
       pck?.dependencies?.['@ionic/angular'] ||
       pck?.dependencies?.['@ionic/react'] ||
       pck?.dependencies?.['@capacitor/core'] ||
+      pck?.dependencies?.['@capacitor/ios'] ||
+      pck?.dependencies?.['@capacitor/android'] ||
       pck?.dependencies?.['@angular/core']
     );
     return isIonic ? FolderType.hasIonic : pck.dependencies ? FolderType.hasDependencies : FolderType.unknown;

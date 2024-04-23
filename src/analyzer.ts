@@ -30,38 +30,43 @@ function processConfigXML(folder: string) {
   const config = { preferences: {}, androidPreferences: {}, iosPreferences: {}, plugins: {} };
   if (existsSync(configXMLFilename)) {
     const xml = readFileSync(configXMLFilename, 'utf8');
-    const json = parse(xml, {
-      ignoreNameSpace: true,
-      arrayMode: true,
-      parseNodeValue: true,
-      parseAttributeValue: true,
-      ignoreAttributes: false,
-    });
+    try {
+      const json = parse(xml, {
+        ignoreNameSpace: true,
+        arrayMode: true,
+        parseNodeValue: true,
+        parseAttributeValue: true,
+        ignoreAttributes: false,
+      });
 
-    const widget = json.widget[0];
-    if (widget.preference) {
-      for (const pref of widget.preference) {
-        config.preferences[pref['@_name']] = pref['@_value'];
-      }
-    }
-    if (!widget.platform) return config;
-    for (const platform of widget.platform) {
-      if (platform['@_name'] == 'android' && platform.preference) {
-        for (const pref of platform.preference) {
-          config.androidPreferences[pref['@_name']] = pref['@_value'];
+      const widget = json.widget[0];
+      if (widget.preference) {
+        for (const pref of widget.preference) {
+          config.preferences[pref['@_name']] = pref['@_value'];
         }
       }
+      if (!widget.platform) return config;
+      for (const platform of widget.platform) {
+        if (platform['@_name'] == 'android' && platform.preference) {
+          for (const pref of platform.preference) {
+            config.androidPreferences[pref['@_name']] = pref['@_value'];
+          }
+        }
 
-      if (platform['@_name'] == 'ios' && platform.preference) {
-        for (const pref of platform.preference) {
-          config.iosPreferences[pref['@_name']] = pref['@_value'];
+        if (platform['@_name'] == 'ios' && platform.preference) {
+          for (const pref of platform.preference) {
+            config.iosPreferences[pref['@_name']] = pref['@_value'];
+          }
         }
       }
-    }
-    if (widget.plugin) {
-      for (const plugin of widget.plugin) {
-        config.plugins[plugin['@_name']] = plugin['@_spec'];
+      if (widget.plugin) {
+        for (const plugin of widget.plugin) {
+          config.plugins[plugin['@_name']] = plugin['@_spec'];
+        }
       }
+    } catch (err) {
+      // Likely a config.xml that is not cordova
+      console.error(`Unable to parse config.xml`, err);
     }
   }
   return config;
