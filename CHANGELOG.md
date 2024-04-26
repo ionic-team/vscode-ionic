@@ -1,6 +1,6 @@
 ## Changelog
 
-### Version 1.85.4
+### Version 1.85.5
 
 - Capacitor 6 release.
 - Migration feature for Capacitor Plugin v5 to v6.
@@ -9,6 +9,7 @@
 - Handle project that have a config.xml that is not Cordova based.
 - Fix issue where privacy manifest file has API but no reason.
 - Fix colors on the new project page when using high contrast theme.
+- Fix support for yarn v1 projects.
 
 ### Version 1.84.1
 
