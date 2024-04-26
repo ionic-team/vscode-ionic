@@ -1,6 +1,7 @@
 .ionicon {
   width: 56px;
   height: 56px;
+  filter: invert(0.5);
 }
 
 .rows {
@@ -52,8 +53,8 @@ main {
 }
 
 .selected {
-  border: 2px solid var(--vscode-button-background);
-  background-color: var(--vscode-button-background);
+  border: 2px solid var(--vscode-sash-hoverBorder);
+  background-color: var(--vscode-editorWidget-background);
 }
 
 .unselected {

@@ -1,6 +1,6 @@
 ## Changelog
 
-### Version 1.85.3
+### Version 1.85.4
 
 - Capacitor 6 release.
 - Migration feature for Capacitor Plugin v5 to v6.
@@ -8,6 +8,7 @@
 - Handle projects that are missing @capacitor/core but have @capacitor/ios or @capacitor/android.
 - Handle project that have a config.xml that is not Cordova based.
 - Fix issue where privacy manifest file has API but no reason.
+- Fix colors on the new project page when using high contrast theme.
 
 ### Version 1.84.1
 
