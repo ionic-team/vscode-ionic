@@ -14,7 +14,7 @@ import {
 import { processPackages } from './process-packages';
 import { Command, Tip, TipType } from './tip';
 import { Project } from './project';
-import { setStringIn } from './utilities';
+import { getRunOutput, setStringIn } from './utilities';
 import { npmInstall, npmUninstall } from './node-commands';
 import { ionicState } from './ionic-tree-provider';
 import { ExtensionContext, window } from 'vscode';
@@ -131,7 +131,7 @@ export async function load(fn: string, project: Project, context: ExtensionConte
   }
   project.workspaces = packageFile.workspaces;
   if (!project.yarnVersion) {
-    project.yarnVersion = getYarnVersion(packageFile.packageManager);
+    project.yarnVersion = await getYarnVersion(packageFile.packageManager, project.folder);
   }
   allDependencies = {
     ...packageFile.dependencies,
@@ -243,10 +243,12 @@ function AddCordovaAndroidPreference(folder: string, preference: string, value: 
   window.showInformationMessage(`config.xml has been updated to include the ${preference} preference`, 'OK');
 }
 
-function getYarnVersion(packageManager: string): string {
+async function getYarnVersion(packageManager: string, folder: string): Promise<string> {
   if (packageManager) {
     return packageManager.replace('yarn@', '');
   }
+  const v = await getRunOutput('yarn --version', folder, undefined, true, true);
+  return v ? v.replace('\n', '') : '';
   return packageManager;
 }
 

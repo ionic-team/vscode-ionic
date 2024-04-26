@@ -389,7 +389,10 @@ export class Project {
     if (result && this.yarnVersion.startsWith('pnpm@')) {
       return false;
     }
-    if (!result && this.packageManager == PackageManager.yarn && !this.isYarnV1()) {
+    if (this.isYarnV1()) {
+      return false;
+    }
+    if (!result && this.packageManager == PackageManager.yarn) {
       return true;
     }
     return result;
