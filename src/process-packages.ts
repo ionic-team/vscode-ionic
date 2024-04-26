@@ -90,9 +90,9 @@ export async function processPackages(
           }),
         getRunOutput(listCmd, folder, undefined, true)
           .then((data) => {
-            if (project.isModernYarn()) {
-              data = fixModernYarnList(data);
-            }
+            //if (project.isModernYarn()) {
+            data = fixModernYarnList(data);
+            //}
             versions = data;
             context.workspaceState.update(PackageCacheList(project), versions);
           })
