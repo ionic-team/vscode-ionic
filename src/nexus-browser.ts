@@ -103,7 +103,7 @@ export async function troubleshootPlugins() {
       writeWarning(
         `Your project has these plugins: ${pluginList.join(
           ', ',
-        )} but Nexus Browser does not. You can suggest adding these here: https://github.com/ionic-team/vscode-extension/issues/91`,
+        )} but Nexus Browser does not. You can suggest adding these here: https://github.com/ionic-team/vscode-ionic/issues/91`,
       );
       window.showWarningMessage(
         `Your project has ${problems} plugins that are not in the Nexus Browser app, so you may have issues related to functionality that relies on those plugins.`,

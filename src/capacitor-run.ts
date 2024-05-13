@@ -119,8 +119,6 @@ async function capRun(
     capRunFlags += `--project=${ionicState.project}`;
   }
 
-  capRunFlags += getConfigurationArgs();
-
   const flavors = await getFlavors(platform, project);
   if (flavors == undefined) return;
   capRunFlags += flavors;

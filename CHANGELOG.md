@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.86.0
+
+- Fix for cap run command when used with Capacitor 6 CLI
+
 ### Version 1.85.5
 
 - Capacitor 6 release.
