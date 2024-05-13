@@ -366,7 +366,7 @@ export async function getRecommendations(project: Project, context: ExtensionCon
       undefined,
       undefined,
       undefined,
-      `https://github.com/ionic-team/vscode-extension/issues`,
+      `https://github.com/ionic-team/vscode-ionic/issues`,
     ),
   );
 

@@ -166,4 +166,4 @@ Debugging for iOS is not supported yet. Use Safari's debugging options documente
 
 ## Submit Feedback
 
-[File an issue](https://github.com/ionic-team/vscode-extension/issues) to provide feedback on bugs and feature requests.
+[File an issue](https://github.com/ionic-team/vscode-ionic/issues) to provide feedback on bugs and feature requests.
