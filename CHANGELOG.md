@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.87.0
+
+- Add migration to Angular 18
+
 ### Version 1.86.0
 
 - Fix for cap run command when used with Capacitor 6 CLI

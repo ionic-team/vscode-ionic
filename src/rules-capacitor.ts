@@ -177,7 +177,6 @@ export async function checkCapacitorRules(project: Project, context: ExtensionCo
     }
     if (isLess('@angular/core', `${maxAngularVersion}.0.0`)) {
       const t = angularMigrate(project, maxAngularVersion);
-
       project.add(t);
     }
   }
