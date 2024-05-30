@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.88.0
+
+- Fix for checking statistics for projects using NX with capacitor.config.json
+- Fix to apply configuration argument when using livereload
+
 ### Version 1.87.0
 
 - Add migration to Angular 18

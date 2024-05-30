@@ -57,6 +57,9 @@ export function getCapacitorConfigWebDir(folder: string): string | undefined {
     result = getStringFrom(config, `webDir: '`, `'`);
     if (!result) {
       result = getStringFrom(config, `webDir: "`, `"`);
+      if (!result) {
+        result = getStringFrom(config, `"webDir": "`, `"`);
+      }
     }
   }
   return result;
