@@ -57,6 +57,10 @@ export function isWindows(): boolean {
   return process.platform === 'win32';
 }
 
+export function isMac(): boolean {
+  return process.platform === 'darwin';
+}
+
 function runOptions(command: string, folder: string, shell?: string): ExecOptionsWithStringEncoding {
   const env = { ...process.env };
   const javaHome: string = getExtSetting(ExtensionSetting.javaHome);
