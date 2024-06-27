@@ -32,6 +32,10 @@ const filteredLines = [
   '  :host-context([dir=rtl])',
   '  .ion-float-start:dir(rtl)',
   '▲ [WARNING] 20 rules skipped',
+  '◑  Install Dependencies',
+  '◒  Install Dependencies',
+  '◐  Install Dependencies',
+  '◓  Install Dependencies',
   '[INFO] Waiting for connectivity with npm...', // Occurs during debugging
 ];
 
@@ -51,6 +55,10 @@ export async function confirm(message: string, confirmButton: string): Promise<b
 
 export function isWindows(): boolean {
   return process.platform === 'win32';
+}
+
+export function isMac(): boolean {
+  return process.platform === 'darwin';
 }
 
 function runOptions(command: string, folder: string, shell?: string): ExecOptionsWithStringEncoding {

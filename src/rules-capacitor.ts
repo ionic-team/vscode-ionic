@@ -16,7 +16,7 @@ import {
 import { checkMigrationAngularToolkit } from './rules-angular-toolkit';
 import { Project } from './project';
 import { QueueFunction, Tip, TipType } from './tip';
-import { asAppId, getRunOutput, isWindows, showProgress, tStart, tEnd } from './utilities';
+import { asAppId, getRunOutput, isWindows, showProgress, tStart, tEnd, isMac } from './utilities';
 import { capacitorAdd } from './capacitor-add';
 import { CapacitorPlatform } from './capacitor-platform';
 import { npmInstall, npx } from './node-commands';
@@ -503,7 +503,7 @@ export async function capacitorRecommendations(project: Project, forMigration: b
     ),
   );
 
-  if (!isWindows() && exists('@capacitor/ios')) {
+  if (isMac() && exists('@capacitor/ios')) {
     const cocoaPods = await getCocoaPodsVersion(project);
     const minVersion = '1.13.0';
     const badVersions = ['1.15.0', '1.15.1']; // This version has regressions with @capacitor/live-updates
