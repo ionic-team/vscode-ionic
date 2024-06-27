@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.89.0
+
+- Replace Ionic start with npm create ionic
+
 ### Version 1.88.0
 
 - Fix for checking statistics for projects using NX with capacitor.config.json

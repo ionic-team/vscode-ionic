@@ -9,14 +9,15 @@ import {
   commands,
   workspace,
 } from 'vscode';
-import { getRunOutput, isWindows, replaceAll, run, toTitleCase } from './utilities';
+import { asAppId, getRunOutput, isWindows, replaceAll, run, toTitleCase } from './utilities';
 import { writeIonic } from './logging';
 import { homedir } from 'os';
 import { ExtensionSetting, GlobalSetting, getExtSetting, getGlobalSetting, setGlobalSetting } from './workspace-state';
 import { join } from 'path';
 import { existsSync, readdirSync } from 'fs';
 import { CapacitorPlatform } from './capacitor-platform';
-import { npmInstall } from './node-commands';
+import { npmInstall, npx } from './node-commands';
+import { ionicTemplates } from './ionic-start-templates';
 
 interface Template {
   type: string;
@@ -87,8 +88,8 @@ export class IonicStartPanel {
   }
 
   public async getTemplates(): Promise<Template[]> {
-    const out = await getRunOutput('npx ionic start -l', this.path);
-    return this.parseIonicStart(out);
+    //const out = await getRunOutput('npx ionic start -l', this.path);
+    return this.parseIonicStart(ionicTemplates);
   }
 
   private parseIonicStart(text: string): Array<Template> {
@@ -293,11 +294,16 @@ async function createProject(project: Project, webview: Webview, panel: IonicSta
   const packageId = getPackageId(name);
   const cmds: string[] = [];
   const noGit = !isWindows();
+  // Example: npx ionic start "my-app" list --type=angular-standalone --capacitor --package-id=my.app --no-git
+  // to: npm create ionic@beta my-app -- tabs --type angular-standalone --no-git --package-id=my.app
   cmds.push(
-    `npx ionic start "${name}" ${project.template} --type=${project.type} --capacitor --package-id=${packageId} ${
-      noGit ? '--no-git' : ''
-    }`,
+    `npm create ionic@beta "${name}" -- ${project.template} --type ${project.type} --no-git --capacitor --package-id ${packageId}`,
   );
+  // cmds.push(
+  //   `npx ionic start "${name}" ${project.template} --type=${project.type} --capacitor --package-id=${packageId} ${
+  //     noGit ? '--no-git' : ''
+  //   }`,
+  // );
 
   const folder = join(getProjectsFolder(), name);
   if (existsSync(folder)) {
@@ -307,6 +313,15 @@ async function createProject(project: Project, webview: Webview, panel: IonicSta
   }
   webview.postMessage({ command: MessageType.creatingProject });
   cmds.push('#' + folder);
+
+  // Cap Init
+  if (project.targets.includes(CapacitorPlatform.android) || project.targets.includes(CapacitorPlatform.ios)) {
+    cmds.push(npmInstall(`@capacitor/core`));
+    cmds.push(npmInstall(`@capacitor/cli`));
+    cmds.push(npmInstall(`@capacitor/app @capacitor/haptics @capacitor/keyboard @capacitor/status-bar`));
+    //cmds.push(`npx capacitor init "${project.name}" "${asAppId(project.name)}"`);
+    // May need  --web-dir ${outFolder}
+  }
 
   // Create Platforms
   if (project.targets.includes(CapacitorPlatform.android)) {
