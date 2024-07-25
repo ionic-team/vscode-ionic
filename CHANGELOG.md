@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.90.0
+
+- The ionic:build or build command in package.json will now override the default build command
+
 ### Version 1.89.0
 
 - Replace Ionic start with npm create ionic
