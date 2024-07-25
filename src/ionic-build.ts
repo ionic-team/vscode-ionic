@@ -85,10 +85,10 @@ function buildCmd(project: Project): string {
   switch (project.frameworkType) {
     case 'angular':
     case 'angular-standalone':
-      return 'ng build';
+      return guessBuildCommand(project) ?? 'ng build';
     case 'vue-vite':
     case 'react-vite':
-      return `vite build`;
+      return guessBuildCommand(project) ?? 'vite build';
     case 'react':
       return 'react-scripts build';
     case 'vue':
