@@ -87,8 +87,9 @@ function buildCmd(project: Project): string {
     case 'angular-standalone':
       return guessBuildCommand(project) ?? 'ng build';
     case 'vue-vite':
-    case 'react-vite':
       return guessBuildCommand(project) ?? 'vite build';
+    case 'react-vite':
+      return 'vite build';
     case 'react':
       return 'react-scripts build';
     case 'vue':
@@ -109,9 +110,6 @@ function guessBuildCommand(project: Project): string | undefined {
     const packageFile = JSON.parse(readFileSync(filename, 'utf8'));
     if (packageFile.scripts['ionic:build']) {
       return npmRun('ionic:build');
-    }
-    if (packageFile.scripts?.build) {
-      return npmRun('build');
     }
   }
   return undefined;

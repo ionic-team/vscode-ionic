@@ -25,7 +25,11 @@ export function getConfigurationArgs(isDebugging?: boolean): string {
   if (!config || config == 'default') {
     return '';
   } else {
-    return ` --configuration=${config}`;
+    if (exists('vue') || exists('react')) {
+      return `--mode=${config}`;
+    } else {
+      return `--configuration=${config}`;
+    }
   }
 }
 
@@ -34,6 +38,9 @@ export async function buildConfiguration(folder: string, context: ExtensionConte
   const filename = join(project.projectFolder(), 'angular.json');
   if (existsSync(filename)) {
     configs = getAngularBuildConfigs(filename);
+  }
+  if (exists('vue') || exists('react')) {
+    configs = ['development', 'production'];
   }
   if (configs.length == 0) {
     window.showInformationMessage('No build configurations found in this project');
