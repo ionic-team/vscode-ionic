@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.91.0
+
+- Configurations of development and production added for React and Vue builds.
+
 ### Version 1.90.0
 
 - The ionic:build or build command in package.json will now override the default build command
