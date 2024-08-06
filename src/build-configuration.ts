@@ -26,9 +26,9 @@ export function getConfigurationArgs(isDebugging?: boolean): string {
     return '';
   } else {
     if (exists('vue') || exists('react')) {
-      return `--mode=${config}`;
+      return ` --mode=${config}`;
     } else {
-      return `--configuration=${config}`;
+      return ` --configuration=${config}`;
     }
   }
 }
