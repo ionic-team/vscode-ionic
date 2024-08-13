@@ -18,7 +18,7 @@ import { getCapacitorConfigDistFolder } from './capacitor-config-file';
 import { Command, ExtensionContext, TreeItemCollapsibleState, commands, window } from 'vscode';
 import { join } from 'path';
 import { existsSync } from 'fs';
-import { write } from './logging';
+import { write, writeError } from './logging';
 import { Features } from './features';
 
 export class Project {
@@ -707,6 +707,10 @@ function guessFramework(project: Project) {
     project.frameworkType = 'vue';
   } else if (exists('@angular/core')) {
     project.frameworkType = 'angular';
+  } else if (exists('@angular/cli')) {
+    project.frameworkType = 'angular-standalone';
+  } else if (exists('@ionic/angular')) {
+    project.frameworkType = 'angular-standalone';
   } else if (exists('react-scripts')) {
     project.frameworkType = 'react';
   } else if (exists('vite')) {
@@ -716,6 +720,9 @@ function guessFramework(project: Project) {
     if (exists('vue')) {
       project.frameworkType = 'vue-vite';
     }
+  }
+  if (!project.frameworkType) {
+    writeError(`Unable to determine the framework type for ${project.name}`);
   }
 }
 

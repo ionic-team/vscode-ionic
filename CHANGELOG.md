@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.92.0
+
+- Better detection of projects without an ionic.config.json
+
 ### Version 1.91.0
 
 - Configurations of development and production added for React and Vue builds.
