@@ -162,6 +162,30 @@ export function isFolderBasedMonoRepo(rootFolder: string): Array<MonoFolder> {
       result.push({ name: folder, packageJson: packageJson, path: join(rootFolder, folder) });
     }
   }
+  if (result.length == 0) {
+    // It could be an ionic multi-app config file
+    const configFile = join(rootFolder, 'ionic.config.json');
+    if (existsSync(configFile)) {
+      const json: any = readFileSync(configFile);
+      const data: any = JSON.parse(json);
+      if (data.projects) {
+        for (const key of Object.keys(data.projects)) {
+          const project = data.projects[key];
+          if (project.root) {
+            const packageJson = join(rootFolder, project.root, 'package.json');
+            if (existsSync(packageJson)) {
+              result.push({ name: project.name, packageJson: packageJson, path: join(rootFolder, project.root) });
+            }
+          } else {
+            const packageJson = join(rootFolder, 'package.json');
+            if (existsSync(packageJson)) {
+              result.push({ name: project.name, packageJson: packageJson, path: join(rootFolder) });
+            }
+          }
+        }
+      }
+    }
+  }
   return result;
 }
 
@@ -220,11 +244,16 @@ function getFolderBasedProjects(prj: Project): Array<MonoRepoProject> {
   }
   const rootFolderType = checkFolder(join(prj.folder, 'package.json'));
   if (rootFolderType == FolderType.hasIonic) {
-    // Its definitely an Ionic or Capacitor project in the root but we have sub folders that look like Ionic projects so throw error
-    writeError(
-      `This folder has Capacitor/Ionic dependencies but there are subfolders that do too which will be ignored (eg ${exampleFolder})`,
-    );
-    return [];
+    if (prj.folder == projects[0].path) {
+      // Sub folder is the root folder (eg ionic multi-app without a root)
+    } else {
+      // Its definitely an Ionic or Capacitor project in the root but we have sub folders that look like Ionic projects so throw error
+      writeError(
+        `This folder has Capacitor/Ionic dependencies but there are subfolders that do too which will be ignored (eg ${exampleFolder})`,
+      );
+
+      return [];
+    }
   }
   result = result.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
   if (rootFolderType == FolderType.hasDependencies) {
