@@ -40,6 +40,8 @@ export interface IonicConfig {
   version?: string;
   type: string; // ionic.config.json type
   sessionId: string; // Generated
+  projects?: any;
+  defaultProject?: string;
 }
 
 export function sendTelemetryEvent(folder: string, name: string, context: ExtensionContext) {
@@ -171,6 +173,17 @@ export function getIonicConfig(folder: string): IonicConfig {
       config.type = data.type;
     } else {
       config.type = 'unknown';
+      if (data.projects) {
+        const keys = Object.keys(data.projects);
+        if (keys.length > 0) {
+          if (data.defaultProject) {
+            config.type = data.projects[data.defaultProject].type;
+          } else {
+            // Assume the first project type
+            config.type = data.projects[keys[0]].type;
+          }
+        }
+      }
     }
   }
   config.sessionId = config['tokens.telemetry'];
