@@ -1,6 +1,6 @@
 # Roadmap
 
-- If using capacitor-rate-app switch to @capacitor-community/in-app-review
+- Check target sdk: make sure matches https://capacitorjs.com/docs/android/setting-target-sdk
 - cordova-plugin-file-opener2 uses AndroidX - not compatible
 - Check .gitignore and look for /android, /ios
 - Check if android/ios folder under git control and warn if not

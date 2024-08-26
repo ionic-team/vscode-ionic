@@ -722,7 +722,7 @@ function guessFramework(project: Project) {
     }
   }
   if (!project.frameworkType) {
-    writeError(`Unable to determine the framework type for ${project.name}`);
+    // Project may not being using a known framework or its a regular node project  }
   }
 }
 

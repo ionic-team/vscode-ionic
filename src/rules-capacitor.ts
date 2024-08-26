@@ -480,6 +480,14 @@ export async function capacitorRecommendations(project: Project, forMigration: b
       TipType.Error,
     ),
   );
+  tips.push(
+    replacementPlugin(
+      'capacitor-rate-app',
+      '@capacitor-community/in-app-review',
+      'The capacitor-rate-app plugin has been deprecated in favor of @capacitor-community/in-app-review.',
+      TipType.Error,
+    ),
+  );
 
   tips.push(
     incompatiblePlugin(
