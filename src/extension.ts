@@ -502,7 +502,8 @@ async function runAction(tip: Tip, ionicProvider: IonicTreeProvider, rootPath: s
     if (tip.doIpSelection) {
       host = await selectExternalIPAddress();
       if (host) {
-        host = ` --public-host=${host}`;
+        // Ionic cli uses --public-host but capacitor cli uses --host
+        host = ` --host=${host}`;
       } else {
         host = '';
       }

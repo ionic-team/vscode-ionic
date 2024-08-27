@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.93.0
+
+- Live Reload now uses the Capacitor CLI only
+
 ### Version 1.92.0
 
 - Better detection of projects without an ionic.config.json

@@ -41,6 +41,7 @@ interface IonicState {
   rootFolder: string; // The folder to inspect
   flavors: string[]; // Android Flavors
   debugged: boolean; // Have we ever started debugging
+  servePort: number; // The port used when the dev server is running
   runIOS: Tip;
   runAndroid: Tip;
   runWeb: Tip;
@@ -73,6 +74,7 @@ export const ionicState: IonicState = {
   lastRun: undefined,
   projectRef: undefined,
   configuration: undefined,
+  servePort: 8100,
   project: undefined,
   debugged: false,
 };
