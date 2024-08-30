@@ -3,6 +3,7 @@
 ### Version 1.93.0
 
 - Live Reload now uses the Capacitor CLI only
+- Fix to prevent checking for yarn version
 
 ### Version 1.92.0
 
