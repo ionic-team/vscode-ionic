@@ -4,6 +4,7 @@
 
 - Live Reload now uses the Capacitor CLI only
 - Fix to prevent checking for yarn version
+- Use ng generate instead of ionic generate
 
 ### Version 1.92.0
 

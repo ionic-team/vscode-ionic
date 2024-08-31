@@ -7,6 +7,9 @@ import { existsSync } from 'fs';
 import { isGreaterOrEqual } from './analyzer';
 import { window } from 'vscode';
 import { QueueFunction } from './tip';
+import { ionicState } from './ionic-tree-provider';
+import { npx } from './node-commands';
+import { checkAngularJson } from './rules-angular-json';
 
 export async function angularGenerate(
   queueFunction: QueueFunction,
@@ -38,7 +41,15 @@ export async function angularGenerate(
     }
     name = replaceAll(name, ' ', '-').trim();
     writeIonic(`Creating Angular ${angularType} named ${name}..`);
-    const out = await getRunOutput(`npx ionic generate ${angularType} ${name}${args}`, project.projectFolder());
+    checkAngularJson(project);
+    const angularProjectName = ionicState.project ?? 'app';
+    // eg ng generate page page-a --standalone --project=app
+    let cmd = `${npx(project)} ng generate ${angularType} ${name}${args} --project=${angularProjectName}`;
+    if (angularType == 'directive') {
+      cmd += ` --skip-import`;
+    }
+    write(`> ${cmd}`);
+    const out = await getRunOutput(cmd, project.projectFolder());
     write(out);
     const src = getStringFrom(out, 'CREATE ', '.ts');
     const path = join(project.projectFolder(), src + '.ts');
