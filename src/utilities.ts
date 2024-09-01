@@ -522,7 +522,21 @@ export async function getRunOutput(
   hideErrors?: boolean,
   ignoreErrors?: boolean,
 ): Promise<string> {
-  return getSpawnOutput(command, folder, shell, hideErrors, ignoreErrors);
+  if (isWindows()) {
+    // Spawn does not work on windows
+    return getExecOutput(command, folder, shell, hideErrors, ignoreErrors);
+  } else {
+    return getSpawnOutput(command, folder, shell, hideErrors, ignoreErrors);
+  }
+}
+
+export async function getExecOutput(
+  command: string,
+  folder: string,
+  shell?: string,
+  hideErrors?: boolean,
+  ignoreErrors?: boolean,
+): Promise<string> {
   return new Promise((resolve, reject) => {
     let out = '';
     if (command.includes(InternalCommand.cwd)) {
