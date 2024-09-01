@@ -18,6 +18,7 @@ import { fixYarnV1Outdated, fixModernYarnList, fixYarnOutdated } from './monorep
 import { ExtensionContext, window } from 'vscode';
 import { existsSync, lstatSync, readFileSync, readdirSync } from 'fs';
 import { execSync } from 'child_process';
+import { getVersionsFromPackageLock } from './package-lock';
 
 export interface PluginInformation {
   androidPermissions: Array<string>;
@@ -47,6 +48,24 @@ export function clearRefreshCache(context: ExtensionContext) {
   console.log('Cached data cleared');
 }
 
+async function runListPackages(project: Project, folder: string, context: ExtensionContext): Promise<string> {
+  const outdated = getVersionsFromPackageLock(project);
+  if (outdated) {
+    return outdated;
+  }
+  const listCmd = listCommand(project);
+  try {
+    let data = await getRunOutput(listCmd, folder, undefined, true);
+    if (project.isModernYarn()) {
+      data = fixModernYarnList(data);
+    }
+    return data;
+  } catch (reason) {
+    write(`> ${listCmd}`);
+    writeError(reason);
+  }
+}
+
 export async function processPackages(
   folder: string,
   allDependencies: object,
@@ -72,8 +91,8 @@ export async function processPackages(
     }
     if (changed || !outdated || !versions) {
       const outdatedCmd = outdatedCommand(project);
-      const listCmd = listCommand(project);
-      await Promise.all([
+
+      const values = await Promise.all([
         getRunOutput(outdatedCmd, folder, undefined, true, true)
           .then((data) => {
             if (project.isYarnV1()) {
@@ -88,19 +107,23 @@ export async function processPackages(
             write(`> ${outdatedCmd}`);
             writeError(reason);
           }),
-        getRunOutput(listCmd, folder, undefined, true)
-          .then((data) => {
-            if (project.isModernYarn()) {
-              data = fixModernYarnList(data);
-            }
-            versions = data;
-            context.workspaceState.update(PackageCacheList(project), versions);
-          })
-          .catch((reason) => {
-            write(`> ${listCmd}`);
-            writeError(reason);
-          }),
+        runListPackages(project, folder, context),
+        // getRunOutput(listCmd, folder, undefined, true)
+        //   .then((data) => {
+        //     if (project.isModernYarn()) {
+        //       data = fixModernYarnList(data);
+        //     }
+        //     versions = data;
+        //     context.workspaceState.update(PackageCacheList(project), versions);
+        //   })
+        //   .catch((reason) => {
+        //     write(`> ${listCmd}`);
+        //     writeError(reason);
+        //   }),
       ]);
+      versions = values[1];
+      context.workspaceState.update(PackageCacheList(project), versions);
+
       context.workspaceState.update(PackageCacheModified(project), packagesModified.toUTCString());
     } else {
       // Use the cached value
