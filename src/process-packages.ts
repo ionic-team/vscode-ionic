@@ -74,7 +74,7 @@ export async function processPackages(
       const outdatedCmd = outdatedCommand(project);
       const listCmd = listCommand(project);
       await Promise.all([
-        getRunOutput(outdatedCmd, folder, undefined, true)
+        getRunOutput(outdatedCmd, folder, undefined, true, true)
           .then((data) => {
             if (project.isYarnV1()) {
               data = fixYarnV1Outdated(data, project.packageManager);
