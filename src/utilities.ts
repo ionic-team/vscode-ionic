@@ -13,7 +13,7 @@ import { getWebConfiguration, WebConfigSetting } from './web-configuration';
 import { Publisher } from './discovery';
 import { join } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { ChildProcess, exec, ExecException, ExecOptionsWithStringEncoding } from 'child_process';
+import { ChildProcess, exec, ExecException, ExecOptionsWithStringEncoding, spawn } from 'child_process';
 import { startStopLogServer } from './log-server';
 import { qrView } from './nexus-browser';
 import { CancellationToken, ProgressLocation, Uri, commands, window, workspace } from 'vscode';
@@ -474,6 +474,47 @@ export function stripJSON(txt: string, startText: string): string {
   return txt;
 }
 
+export function getSpawnOutput(
+  command: string,
+  folder: string,
+  shell?: string,
+  hideErrors?: boolean,
+  ignoreErrors?: boolean,
+): Promise<string> {
+  const a = command.split(' ');
+  const args = a.slice(1);
+  return new Promise((resolve, reject) => {
+    const childProcess = spawn(a[0], args, { cwd: folder });
+
+    let output = '';
+    let error = '';
+    tStart(command);
+    childProcess.stdout.on('data', (data) => {
+      output += data.toString();
+    });
+
+    childProcess.stderr.on('data', (data) => {
+      error += data.toString();
+    });
+
+    childProcess.on('close', (code) => {
+      tEnd(command);
+      if (code !== 0) {
+        if (!hideErrors) {
+          writeError(error);
+        }
+        if (ignoreErrors) {
+          resolve(output);
+        } else {
+          reject(`${error}`);
+        }
+      } else {
+        resolve(output);
+      }
+    });
+  });
+}
+
 export async function getRunOutput(
   command: string,
   folder: string,
@@ -481,6 +522,7 @@ export async function getRunOutput(
   hideErrors?: boolean,
   ignoreErrors?: boolean,
 ): Promise<string> {
+  return getSpawnOutput(command, folder, shell, hideErrors, ignoreErrors);
   return new Promise((resolve, reject) => {
     let out = '';
     if (command.includes(InternalCommand.cwd)) {

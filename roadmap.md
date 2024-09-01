@@ -1,5 +1,7 @@
 # Roadmap
 
+- Replace `npx ionic init` with another option
+-
 - Check target sdk: make sure matches https://capacitorjs.com/docs/android/setting-target-sdk
 - cordova-plugin-file-opener2 uses AndroidX - not compatible
 - Check .gitignore and look for /android, /ios
