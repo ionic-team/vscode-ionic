@@ -53,6 +53,7 @@ async function addIconsToCode(icons: string[], tsFile: string) {
     // Its got the IonicModule kitchen sink
     return false;
   }
+  let changed = false;
   const project = new Project();
   const sourceFile = project.addSourceFileAtPath(Uri.file(tsFile).fsPath);
   sourceFile.replaceWithText(tsText);
@@ -64,6 +65,7 @@ async function addIconsToCode(icons: string[], tsFile: string) {
       namedImports: ['addIcons'],
       moduleSpecifier: 'ionicons',
     });
+    changed = true;
   }
 
   const importIcons = importDeclarations.find((d) => d.getModuleSpecifier().getText().includes('ionicons/icons'));
@@ -73,12 +75,14 @@ async function addIconsToCode(icons: string[], tsFile: string) {
         namedImports: [camelize(icon)],
         moduleSpecifier: 'ionicons/icons',
       });
+      changed = true;
     }
   } else {
     for (const icon of icons) {
       const text = importIcons.getText();
       if (!text.includes(camelize(icon))) {
         importIcons.addNamedImport(camelize(icon));
+        changed = true;
       }
     }
   }
@@ -93,11 +97,25 @@ async function addIconsToCode(icons: string[], tsFile: string) {
     for (const st of ctr.getStatements()) {
       if (st.getText().startsWith('addIcons(')) {
         const text = camelize(icons.join(','));
-        st.replaceWithText(`addIcons({${text}});`);
+        const code = `addIcons({${text}});`;
+        const before = st.getText().replace(/\s/g, '');
+
+        st.replaceWithText(code);
+        if (st.getText() != before) {
+          changed = true;
+        }
       }
     }
   }
+  if (componentClass.getConstructors().length == 1) {
+    const ctr = componentClass.getConstructors()[0];
+    if (ctr.getStatements().length == 0 && icons.length > 0) {
+      ctr.addStatements(`addIcons({${camelize(icons.join(','))}});`);
+      changed = true;
+    }
+  }
 
+  if (!changed) return;
   const edit = new WorkspaceEdit();
   edit.replace(
     Uri.file(tsFile),

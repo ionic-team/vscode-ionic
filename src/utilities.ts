@@ -522,12 +522,10 @@ export async function getRunOutput(
   hideErrors?: boolean,
   ignoreErrors?: boolean,
 ): Promise<string> {
-  if (isWindows()) {
-    // Spawn does not work on windows
-    return getExecOutput(command, folder, shell, hideErrors, ignoreErrors);
-  } else {
-    return getSpawnOutput(command, folder, shell, hideErrors, ignoreErrors);
-  }
+  return getExecOutput(command, folder, shell, hideErrors, ignoreErrors);
+
+  // Problems with spawn with some commands (eg windows, npx ng generate)
+  //return getSpawnOutput(command, folder, shell, hideErrors, ignoreErrors);
 }
 
 export async function getExecOutput(
