@@ -2,6 +2,7 @@
 
 ### Version 1.93.0
 
+- Auto import IonIcons for Standalone Angular projects
 - Live Reload now uses the Capacitor CLI only
 - Fix to prevent checking for yarn version
 - Improve speed of detecting package versions

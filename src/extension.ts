@@ -54,6 +54,7 @@ import {
 } from 'vscode';
 import { existsSync } from 'fs';
 import { CommandTitle } from './command-title';
+import { autoFixOtherImports } from './imports-icons';
 
 /**
  * Runs the command while showing a vscode window that can be cancelled
@@ -473,6 +474,9 @@ function findRecursive(label: string, items: Recommendation[]): Recommendation |
 function trackProjectChange() {
   workspace.onDidSaveTextDocument((document: TextDocument) => {
     ionicState.projectDirty = true;
+    if (document.fileName.endsWith('.html')) {
+      autoFixOtherImports(document);
+    }
   });
 
   window.onDidChangeVisibleTextEditors((e: Array<any>) => {

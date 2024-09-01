@@ -19,6 +19,7 @@ import { existsSync } from 'fs';
 export function checkPackages(project: Project) {
   const nmf = project.getNodeModulesFolder();
   ionicState.hasNodeModules = true;
+  ionicState.nodeModulesFolder = nmf;
   if (!existsSync(nmf) && !project.isModernYarn()) {
     ionicState.hasNodeModules = false;
     project.add(

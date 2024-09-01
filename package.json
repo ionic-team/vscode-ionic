@@ -536,6 +536,7 @@
     "@trapezedev/configure": "7.0.10",
     "fast-xml-parser": "^3.21.1",
     "globule": "1.3.4",
+    "htmlparser2": "^9.1.0",
     "netmask": "2.0.2",
     "rimraf": "4.4.1",
     "semver": "7.6.0",

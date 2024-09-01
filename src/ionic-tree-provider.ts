@@ -33,6 +33,7 @@ interface IonicState {
   refreshDebugDevices: boolean; // Should we refresh the list of debuggable devices
   remoteLogging: boolean; // Whether remote logging is enabled
   hasNodeModules: boolean; // Whether node modules are installed
+  nodeModulesFolder: string; // The folder where node_modules is located
   hasPackageJson: boolean; // Whether folder has package.json
   hasNodeModulesNotified: boolean; // Whether we've notified the user of no node_modules
   configuration: string; // Build configuration
@@ -60,6 +61,7 @@ export const ionicState: IonicState = {
   outputIsFocused: false,
   channelFocus: true,
   hasNodeModules: undefined,
+  nodeModulesFolder: undefined,
   hasPackageJson: undefined,
   hasNodeModulesNotified: undefined,
   syncDone: [],
