@@ -541,6 +541,9 @@ function processDependencies(allDependencies: object, outdated: object, devDepen
     if (allDependencies[library]?.startsWith('git') || allDependencies[library]?.startsWith('file')) {
       version = PackageVersion.Custom;
     }
+    if (allDependencies[library]?.startsWith('catalog:') || allDependencies[library]?.startsWith('workspace:')) {
+      version = PackageVersion.Unknown;
+    }
 
     const recent: NpmOutdatedDependency = outdated[library];
     const wanted = recent?.wanted;
