@@ -20,11 +20,11 @@ import { join } from 'path';
  * Create the ionic serve command
  * @returns string
  */
-export async function ionicServe(project: Project, dontOpenBrowser: boolean): Promise<string> {
+export async function ionicServe(project: Project, dontOpenBrowser: boolean, isDebugging?: boolean): Promise<string> {
   ionicState.lastRun = undefined;
   switch (project.repoType) {
     case MonoRepoType.none:
-      return ionicCLIServe(project, dontOpenBrowser);
+      return ionicCLIServe(project, dontOpenBrowser, isDebugging);
     case MonoRepoType.nx:
       return nxServe(project);
     case MonoRepoType.npm:
@@ -32,13 +32,13 @@ export async function ionicServe(project: Project, dontOpenBrowser: boolean): Pr
     case MonoRepoType.lerna:
     case MonoRepoType.pnpm:
     case MonoRepoType.folder:
-      return InternalCommand.cwd + (await ionicCLIServe(project, dontOpenBrowser));
+      return InternalCommand.cwd + (await ionicCLIServe(project, dontOpenBrowser, isDebugging));
     default:
       throw new Error('Unsupported Monorepo type');
   }
 }
 
-async function ionicCLIServe(project: Project, dontOpenBrowser: boolean): Promise<string> {
+async function ionicCLIServe(project: Project, dontOpenBrowser: boolean, isDebugging?: boolean): Promise<string> {
   const preop = preflightNPMCheck(project);
   const httpsForWeb = getSetting(WorkspaceSetting.httpsForWeb);
   const webConfig: WebConfigSetting = getWebConfiguration();
@@ -52,7 +52,7 @@ async function ionicCLIServe(project: Project, dontOpenBrowser: boolean): Promis
   }
 
   if (externalIP) {
-    serveFlags += ` ${externalArg(project.frameworkType)}`;
+    serveFlags += ` ${await externalArg(project.frameworkType)}`;
   } else {
     serveFlags += ` ${internalArg(project.frameworkType)}`;
   }
@@ -60,13 +60,14 @@ async function ionicCLIServe(project: Project, dontOpenBrowser: boolean): Promis
   if (defaultPort) {
     const port = await findNextPort(defaultPort, externalIP ? '0.0.0.0' : undefined);
     serveFlags += ` --port=${port}`;
+    ionicState.servePort = port;
   }
 
   if (ionicState.project) {
     serveFlags += ` --project=${ionicState.project}`;
   }
 
-  serveFlags += getConfigurationArgs(dontOpenBrowser);
+  serveFlags += getConfigurationArgs(isDebugging);
 
   if (httpsForWeb) {
     serveFlags += ' --ssl';
@@ -77,6 +78,9 @@ async function ionicCLIServe(project: Project, dontOpenBrowser: boolean): Promis
     serveFlags += ` --ssl-cert='${certPath('crt')}'`;
     serveFlags += ` --ssl-key='${certPath('key')}'`;
   }
+  // if (liveReload) {
+  //   serveFlags += ` --live-reload`;
+  // }
 
   return `${preop}${npx(project)} ${serveCmd(project)}${serveFlags}`;
 }
@@ -158,25 +162,28 @@ function internalArg(framework: FrameworkType): string {
   }
 }
 
-function externalArg(framework: FrameworkType): string {
-  switch (framework) {
-    case 'angular-standalone':
-      return '--host=0.0.0.0';
-    default:
-      return '--host=0.0.0.0';
-  }
+async function externalArg(framework: FrameworkType): Promise<string> {
+  const host = await selectExternalIPAddress();
+  return `--host=${host}`;
+  return `--host=${bestAddress()}`;
+  // switch (framework) {
+  //   case 'angular-standalone':
+  //     return '--host=0.0.0.0';
+  //   default:
+  //     return '--host=0.0.0.0';
+  // }
+}
+
+function bestAddress(): string {
+  const list = getAddresses();
+  return list.length == 1 ? list[0] : '0.0.0.0';
 }
 
 function nxServe(project: Project): string {
   let serveFlags = '';
   const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
   if (externalIP) {
-    const list = getAddresses();
-    if (list.length == 1) {
-      serveFlags += ` --host=${list[0]}`;
-    } else {
-      serveFlags += ' --host=0.0.0.0';
-    }
+    serveFlags += ` --host=${bestAddress()}`;
   }
   return `${npx(project)} nx serve ${project.monoRepo.name}${serveFlags}`;
 }
@@ -189,7 +196,7 @@ export async function selectExternalIPAddress(): Promise<string> {
   }
   const list = getAddresses();
   if (list.length <= 1) {
-    return;
+    return list[0];
   }
   const lastIPAddress = getSetting(WorkspaceSetting.lastIPAddress);
   for (const address of list) {

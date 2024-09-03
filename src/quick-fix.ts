@@ -33,7 +33,7 @@ export class ImportQuickFixProvider implements CodeActionProvider {
   private createImportQuickFix(document: TextDocument, diagnostic: Diagnostic): CodeAction {
     // Get the name of the missing identifier from the diagnostic message
     const missingComponent = diagnostic.message.split(' ')[0].replace(/["']/g, '');
-
+    console.log(diagnostic.message);
     autoFixImports(document, missingComponent);
     return;
   }

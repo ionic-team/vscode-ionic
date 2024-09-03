@@ -1,6 +1,5 @@
 import { existsSync } from 'fs';
 import { exists, isLess } from './analyzer';
-import { getConfigurationArgs } from './build-configuration';
 import { CapacitorPlatform } from './capacitor-platform';
 import { InternalCommand } from './command-name';
 import { writeError, writeIonic } from './logging';
@@ -14,6 +13,7 @@ import { gradleToJson } from './gradle-to-json';
 import { ExtensionSetting, getExtSetting, getSetting, WorkspaceSetting } from './workspace-state';
 import { window, workspace } from 'vscode';
 import { join } from 'path';
+import { ionicServe } from './ionic-serve';
 
 /**
  * Creates the command line to run for Capacitor
@@ -75,7 +75,7 @@ async function capRun(
   project: Project,
 ): Promise<string> {
   let liveReload = getSetting(WorkspaceSetting.liveReload);
-  const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
+  const externalIP = !getExtSetting(ExtensionSetting.internalAddress) && liveReload;
   const httpsForWeb = getSetting(WorkspaceSetting.httpsForWeb);
   const prod: boolean = workspace.getConfiguration('ionic').get('buildForProduction');
 
@@ -83,7 +83,9 @@ async function capRun(
     writeError('Live Reload is not supported with npm workspaces. Ignoring the live reload option');
     liveReload = false;
   }
-  let capRunFlags = liveReload ? ' --livereload' : '';
+
+  // ionic cli uses --livereload but capacitor cli uses --live-reload
+  let capRunFlags = liveReload ? '--live-reload' : '';
 
   if (liveReload && exists('@ionic-enterprise/auth') && isLess('@ionic-enterprise/auth', '3.9.4')) {
     capRunFlags = '';
@@ -91,7 +93,7 @@ async function capRun(
     writeIonic('Live Update was ignored as you have less than v3.9.4 of @ionic-enterprise/auth in your project');
   }
 
-  const ionic = useIonicCLI() || liveReload ? 'ionic ' : '';
+  const ionic = '';
 
   if (externalIP) {
     if (capRunFlags.length >= 0) capRunFlags += ' ';
@@ -120,14 +122,17 @@ async function capRun(
   }
 
   if (liveReload) {
-    capRunFlags += getConfigurationArgs();
+    //capRunFlags += getConfigurationArgs();
+    capRunFlags += ` --port=${ionicState.servePort}`;
   }
 
   const flavors = await getFlavors(platform, project);
   if (flavors == undefined) return;
   capRunFlags += flavors;
 
-  capRunFlags += InternalCommand.publicHost;
+  if (externalIP) {
+    capRunFlags += InternalCommand.publicHost;
+  }
   if (httpsForWeb) {
     if (capRunFlags.length >= 0) capRunFlags += ' ';
     capRunFlags += '--ssl';
@@ -149,7 +154,12 @@ async function capRun(
       ? InternalCommand.cwd
       : '';
 
-  return `${pre}${npx(project)} ${ionic}cap run ${platform} --target=${InternalCommand.target} ${capRunFlags}`;
+  let post = '';
+  if (liveReload) {
+    const serveCmd = await ionicServe(project, true, false);
+    post = ` & ${serveCmd}`;
+  }
+  return `${pre}${npx(project)} ${ionic}cap run ${platform} --target=${InternalCommand.target} ${capRunFlags}${post}`;
 }
 
 async function nxRun(

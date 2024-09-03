@@ -15,7 +15,7 @@ import { processPackages } from './process-packages';
 import { Command, Tip, TipType } from './tip';
 import { Project } from './project';
 import { getRunOutput, setStringIn } from './utilities';
-import { npmInstall, npmUninstall } from './node-commands';
+import { npmInstall, npmUninstall, PackageManager } from './node-commands';
 import { ionicState } from './ionic-tree-provider';
 import { ExtensionContext, window } from 'vscode';
 import { existsSync, lstatSync, readFileSync, statSync, writeFileSync } from 'fs';
@@ -131,7 +131,9 @@ export async function load(fn: string, project: Project, context: ExtensionConte
   }
   project.workspaces = packageFile.workspaces;
   if (!project.yarnVersion) {
-    project.yarnVersion = await getYarnVersion(packageFile.packageManager, project.folder);
+    if (project.packageManager == PackageManager.yarn) {
+      project.yarnVersion = await getYarnVersion(packageFile.packageManager, project.folder);
+    }
   }
   allDependencies = {
     ...packageFile.dependencies,

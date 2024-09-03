@@ -1,5 +1,13 @@
 ## Changelog
 
+### Version 1.93.0
+
+- Auto import IonIcons for Standalone Angular projects
+- Live Reload now uses the Capacitor CLI only
+- Fix to prevent checking for yarn version
+- Improve speed of detecting package versions
+- Use ng generate instead of ionic generate
+
 ### Version 1.92.0
 
 - Better detection of projects without an ionic.config.json
