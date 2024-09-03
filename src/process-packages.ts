@@ -49,9 +49,9 @@ export function clearRefreshCache(context: ExtensionContext) {
 }
 
 async function runListPackages(project: Project, folder: string, context: ExtensionContext): Promise<string> {
-  const outdated = getVersionsFromPackageLock(project);
-  if (outdated) {
-    return outdated;
+  const listOutput = getVersionsFromPackageLock(project);
+  if (listOutput) {
+    return JSON.stringify(listOutput);
   }
   const listCmd = listCommand(project);
   try {

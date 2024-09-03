@@ -3,8 +3,9 @@ import { Project } from './project';
 import { PackageManager } from './node-commands';
 import { existsSync, readFileSync } from 'fs';
 import { tEnd, tStart } from './utilities';
+import { NpmPackage } from './npm-model';
 
-export function getVersionsFromPackageLock(project: Project): any {
+export function getVersionsFromPackageLock(project: Project): NpmPackage {
   if (project.packageManager != PackageManager.npm) return undefined;
   const lockFile = join(project.projectFolder(), 'package-lock.json');
   if (!existsSync(lockFile)) return undefined;
@@ -20,7 +21,7 @@ export function getVersionsFromPackageLock(project: Project): any {
       result[dep] = { version: data.packages[name].version };
     }
     tEnd(command);
-    return result;
+    return { name: project.name, version: '0.0.0', dependencies: result };
   } catch {
     return undefined;
   }
