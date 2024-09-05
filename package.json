@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.93.1",
+  "version": "1.93.2",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
