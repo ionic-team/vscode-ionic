@@ -23,7 +23,9 @@ export async function autoFixOtherImports(document: TextDocument): Promise<boole
         if (name == 'ion-icon') {
           if (attributes.name) {
             if (availableIcons.includes(camelize(attributes.name))) {
-              icons.push(attributes.name);
+              if (!icons.includes(attributes.name)) {
+                icons.push(attributes.name);
+              }
             } else {
               if (availableIcons.length == 0) {
                 icons.push(attributes.name); // Assume available
