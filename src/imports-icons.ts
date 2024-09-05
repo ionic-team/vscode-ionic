@@ -5,12 +5,16 @@ import { Project } from 'ts-morph';
 import { ionicState } from './ionic-tree-provider';
 import { join } from 'path';
 import { writeError } from './logging';
+import { exists } from './analyzer';
 
 export async function autoFixOtherImports(document: TextDocument): Promise<boolean> {
   // Look for <ion-icon name="icon-name"></ion-icon> in file.html
   // Then inspect file.ts to see if it has an import for icon-name
   // If it does not then add an import
   try {
+    if (!exists('@ionic/angular')) {
+      return false; // Only needed for Angular
+    }
     // Load node_modules/ionicons/icons/index.d.ts and verify that the icon exists
     const availableIcons = getAvailableIcons();
     const icons: string[] = [];
@@ -32,6 +36,9 @@ export async function autoFixOtherImports(document: TextDocument): Promise<boole
       },
     });
     doc.write(document.getText());
+    if (icons.length == 0) {
+      return false; // This may not be a template with icons
+    }
     const tsFile = document.fileName.replace(new RegExp('.html$'), '.ts');
     if (existsSync(tsFile)) {
       await addIconsToCode(icons, tsFile);
