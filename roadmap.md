@@ -233,7 +233,7 @@ Check `main.ts` for `provideIonicAngular` and apply this if missing
 
 ## View Style
 
-Alterantive visual web views:
+Alternative visual web views:
 
 - Run iOS, Android - Show lists of devices and option to run as live reload
 - Splash, Icon, Settings - Named Configuration allow visuals

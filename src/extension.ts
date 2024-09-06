@@ -13,7 +13,7 @@ import { ActionResult, CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
 import { IonicProjectsreeProvider } from './ionic-projects-provider';
 import { buildConfiguration } from './build-configuration';
-import { webConfiguration } from './web-configuration';
+import { setWebConfig, WebConfigSetting } from './web-configuration';
 import { selectDevice } from './capacitor-device';
 import { getLocalFolder } from './monorepo';
 import { androidDebugUnforward } from './android-debug-bridge';
@@ -317,8 +317,28 @@ export async function activate(context: ExtensionContext) {
     ionicProvider.refresh();
   });
 
-  commands.registerCommand(CommandName.WebConfig, async (r: Recommendation) => {
-    webConfiguration(r.tip.actionArg(0));
+  commands.registerCommand(CommandName.WebOpenBrowser, async () => {
+    setWebConfig(WebConfigSetting.browser);
+  });
+
+  commands.registerCommand(CommandName.WebOpenBrowserSelected, async () => {
+    setWebConfig(WebConfigSetting.none);
+  });
+
+  commands.registerCommand(CommandName.WebEditor, async () => {
+    setWebConfig(WebConfigSetting.editor);
+  });
+
+  commands.registerCommand(CommandName.WebEditorSelected, async () => {
+    setWebConfig(WebConfigSetting.editor);
+  });
+
+  commands.registerCommand(CommandName.WebNexusBrowser, async () => {
+    setWebConfig(WebConfigSetting.nexus);
+  });
+
+  commands.registerCommand(CommandName.WebNexusBrowserSelected, async () => {
+    setWebConfig(WebConfigSetting.nexus);
   });
 
   commands.registerCommand(CommandName.BuildConfig, async (r: Recommendation) => {

@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.94
+
+- Options for running in the web browser, VS Code editor, Nexus browser added as icons
+- Fix to ensure running for web will run on localhost
+
 ### Version 1.93.4
 
 - Auto import IonIcons for Standalone Angular projects
