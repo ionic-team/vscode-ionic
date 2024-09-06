@@ -663,7 +663,7 @@ export async function capacitorRecommendations(project: Project, forMigration: b
     ),
   );
   addOptional(
-    replacementPlugin('cordova-plugin-app-version', '@capacitor/device', 'https://capacitorjs.com/docs/apis/device'),
+    replacementPlugin('cordova-plugin-app-version', '@capacitor/app', 'https://capacitorjs.com/docs/apis/app'),
   );
   addOptional(
     replacementPlugin('cordova-plugin-dialogs', '@capacitor/dialog', 'https://capacitorjs.com/docs/apis/dialog'),

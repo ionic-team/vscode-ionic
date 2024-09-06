@@ -1,4 +1,4 @@
-import { Range, TextDocument, Uri, workspace, WorkspaceEdit } from 'vscode';
+import { Range, TextDocument, Uri, window, workspace, WorkspaceEdit } from 'vscode';
 import { Parser } from 'htmlparser2';
 import { existsSync, readFileSync } from 'fs';
 import { Project } from 'ts-morph';
@@ -6,8 +6,12 @@ import { ionicState } from './ionic-tree-provider';
 import { join } from 'path';
 import { writeError } from './logging';
 import { exists } from './analyzer';
+import { getSetting, setSetting, WorkspaceSetting } from './workspace-state';
 
 export async function autoFixOtherImports(document: TextDocument): Promise<boolean> {
+  const value = getSetting(WorkspaceSetting.autoImportIcons);
+  if (value == 'no') return false;
+
   // Look for <ion-icon name="icon-name"></ion-icon> in file.html
   // Then inspect file.ts to see if it has an import for icon-name
   // If it does not then add an import
@@ -23,7 +27,9 @@ export async function autoFixOtherImports(document: TextDocument): Promise<boole
         if (name == 'ion-icon') {
           if (attributes.name) {
             if (availableIcons.includes(camelize(attributes.name))) {
-              icons.push(attributes.name);
+              if (!icons.includes(attributes.name)) {
+                icons.push(attributes.name);
+              }
             } else {
               if (availableIcons.length == 0) {
                 icons.push(attributes.name); // Assume available
@@ -75,7 +81,7 @@ async function addIconsToCode(icons: string[], tsFile: string) {
     changed = true;
   }
 
-  const importIcons = importDeclarations.find((d) => d.getModuleSpecifier().getText().includes('ionicons/icons'));
+  const importIcons = importDeclarations.filter((d) => d.getModuleSpecifier().getText().includes('ionicons/icons'));
   if (!importIcons) {
     for (const icon of icons) {
       sourceFile.addImportDeclaration({
@@ -86,9 +92,10 @@ async function addIconsToCode(icons: string[], tsFile: string) {
     }
   } else {
     for (const icon of icons) {
-      const text = importIcons.getText();
-      if (!text.includes(camelize(icon))) {
-        importIcons.addNamedImport(camelize(icon));
+      const exists = importIcons.find((d) => d.getText().includes(camelize(icon)));
+
+      if (!exists) {
+        importIcons[0].addNamedImport(camelize(icon));
         changed = true;
       }
     }
@@ -123,6 +130,24 @@ async function addIconsToCode(icons: string[], tsFile: string) {
   }
 
   if (!changed) return;
+
+  const value = getSetting(WorkspaceSetting.autoImportIcons);
+  if (value !== 'yes') {
+    // Some developers may not want this to be auto-fixed so ask
+    const choice = await window.showInformationMessage(
+      'Do you want to automatically import ion-icons for this project?',
+      'Yes',
+      'No',
+    );
+
+    if (!choice) return;
+    setSetting(WorkspaceSetting.autoImportIcons, choice === 'Yes' ? 'yes' : 'no');
+
+    if (choice === 'No') {
+      return;
+    }
+  }
+
   const edit = new WorkspaceEdit();
   edit.replace(
     Uri.file(tsFile),
