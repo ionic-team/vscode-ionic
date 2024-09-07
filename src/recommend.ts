@@ -340,9 +340,9 @@ export async function getRecommendations(project: Project, context: ExtensionCon
 
   project.setGroup(`Settings`, 'Settings', TipType.Settings, false);
   if (project.isCapacitor) {
-    if (exists('@capacitor/ios') || exists('@capacitor/android')) {
-      project.add(liveReload());
-    }
+    // if (exists('@capacitor/ios') || exists('@capacitor/android')) {
+    //   project.add(liveReload());
+    // }
     project.add(useHttps(project));
 
     //project.add(remoteLogging(project));

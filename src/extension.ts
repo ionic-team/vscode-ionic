@@ -55,6 +55,7 @@ import {
 import { existsSync } from 'fs';
 import { CommandTitle } from './command-title';
 import { autoFixOtherImports } from './imports-icons';
+import { setSetting, WorkspaceSetting } from './workspace-state';
 
 /**
  * Runs the command while showing a vscode window that can be cancelled
@@ -315,6 +316,16 @@ export async function activate(context: ExtensionContext) {
   commands.registerCommand(CommandName.SelectAction, async (r: Recommendation) => {
     await advancedActions(r.getData());
     ionicProvider.refresh();
+  });
+
+  commands.registerCommand(CommandName.LiveReload, async () => {
+    setSetting(WorkspaceSetting.liveReload, true);
+    commands.executeCommand(VSCommand.setContext, Context.liveReload, true);
+  });
+
+  commands.registerCommand(CommandName.LiveReloadSelected, async () => {
+    setSetting(WorkspaceSetting.liveReload, false);
+    commands.executeCommand(VSCommand.setContext, Context.liveReload, false);
   });
 
   commands.registerCommand(CommandName.WebOpenBrowser, async () => {

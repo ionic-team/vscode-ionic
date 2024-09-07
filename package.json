@@ -287,6 +287,22 @@
         }
       },
       {
+        "command": "ionic-official.liveReload",
+        "title": "Live Reload - Refresh your app after a code change",
+        "icon": {
+          "light": "resources/light/live.svg",
+          "dark": "resources/dark/live.svg"
+        }
+      },
+      {
+        "command": "ionic-official.liveReloadSelected",
+        "title": "Live Reload - Click to turn off",
+        "icon": {
+          "light": "resources/light/live-select.svg",
+          "dark": "resources/dark/live-select.svg"
+        }
+      },
+      {
         "command": "ionic-official.webNexus",
         "title": "Open in Nexus Browser",
         "icon": {
@@ -337,10 +353,7 @@
       {
         "command": "ionic-official.selectDevice",
         "title": "Select device to run",
-        "icon": {
-          "light": "resources/light/more.svg",
-          "dark": "resources/dark/more.svg"
-        }
+        "icon": "$(device-mobile)"
       },
       {
         "command": "ionic-official.runMode",
@@ -395,6 +408,10 @@
         },
         {
           "command": "ionic-official.webOpenBrowser",
+          "when": "false"
+        },
+        {
+          "command": "ionic-official.liveReload",
           "when": "false"
         },
         {
@@ -480,6 +497,16 @@
         {
           "command": "ionic-official.buildConfig",
           "when": "view == ionic-tree && viewItem == buildConfig",
+          "group": "inline"
+        },
+        {
+          "command": "ionic-official.liveReload",
+          "when": "view == ionic-tree && viewItem == selectDevice && !liveReload",
+          "group": "inline"
+        },
+        {
+          "command": "ionic-official.liveReloadSelected",
+          "when": "view == ionic-tree && viewItem == selectDevice && liveReload",
           "group": "inline"
         },
         {

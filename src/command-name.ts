@@ -19,6 +19,8 @@ export enum CommandName {
   ProjectSelect = 'ionic-official.projectSelect',
   BuildConfig = 'ionic-official.buildConfig',
 
+  LiveReload = 'ionic-official.liveReload',
+  LiveReloadSelected = 'ionic-official.liveReloadSelected',
   WebOpenBrowser = 'ionic-official.webOpenBrowser',
   WebOpenBrowserSelected = 'ionic-official.webOpenBrowserSelected',
   WebEditor = 'ionic-official.webEditor',
