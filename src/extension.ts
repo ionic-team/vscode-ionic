@@ -13,7 +13,7 @@ import { ActionResult, CommandName, InternalCommand } from './command-name';
 import { packageUpgrade } from './rules-package-upgrade';
 import { IonicProjectsreeProvider } from './ionic-projects-provider';
 import { buildConfiguration } from './build-configuration';
-import { webConfiguration } from './web-configuration';
+import { setWebConfig, WebConfigSetting } from './web-configuration';
 import { selectDevice } from './capacitor-device';
 import { getLocalFolder } from './monorepo';
 import { androidDebugUnforward } from './android-debug-bridge';
@@ -55,6 +55,7 @@ import {
 import { existsSync } from 'fs';
 import { CommandTitle } from './command-title';
 import { autoFixOtherImports } from './imports-icons';
+import { setSetting, WorkspaceSetting } from './workspace-state';
 
 /**
  * Runs the command while showing a vscode window that can be cancelled
@@ -317,8 +318,38 @@ export async function activate(context: ExtensionContext) {
     ionicProvider.refresh();
   });
 
-  commands.registerCommand(CommandName.WebConfig, async (r: Recommendation) => {
-    webConfiguration(r.tip.actionArg(0));
+  commands.registerCommand(CommandName.LiveReload, async () => {
+    setSetting(WorkspaceSetting.liveReload, true);
+    commands.executeCommand(VSCommand.setContext, Context.liveReload, true);
+  });
+
+  commands.registerCommand(CommandName.LiveReloadSelected, async () => {
+    setSetting(WorkspaceSetting.liveReload, false);
+    commands.executeCommand(VSCommand.setContext, Context.liveReload, false);
+  });
+
+  commands.registerCommand(CommandName.WebOpenBrowser, async () => {
+    setWebConfig(WebConfigSetting.browser);
+  });
+
+  commands.registerCommand(CommandName.WebOpenBrowserSelected, async () => {
+    setWebConfig(WebConfigSetting.none);
+  });
+
+  commands.registerCommand(CommandName.WebEditor, async () => {
+    setWebConfig(WebConfigSetting.editor);
+  });
+
+  commands.registerCommand(CommandName.WebEditorSelected, async () => {
+    setWebConfig(WebConfigSetting.editor);
+  });
+
+  commands.registerCommand(CommandName.WebNexusBrowser, async () => {
+    setWebConfig(WebConfigSetting.nexus);
+  });
+
+  commands.registerCommand(CommandName.WebNexusBrowserSelected, async () => {
+    setWebConfig(WebConfigSetting.nexus);
   });
 
   commands.registerCommand(CommandName.BuildConfig, async (r: Recommendation) => {

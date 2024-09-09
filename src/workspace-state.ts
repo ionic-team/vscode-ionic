@@ -11,7 +11,6 @@ export enum WorkspaceSetting {
   lastIPAddress = 'lastIPAddress',
   debugBrowser = 'debugBrowser',
   autoImportIcons = 'autoImportIcons',
-
   cocoaPods = 'cocoaPods2',
 }
 

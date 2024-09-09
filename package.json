@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.93.4",
+  "version": "1.94.0",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -271,11 +271,67 @@
         }
       },
       {
-        "command": "ionic-official.webConfig",
-        "title": "Web Run Configuration",
+        "command": "ionic-official.webOpenBrowser",
+        "title": "Open in a web browser",
         "icon": {
-          "light": "resources/light/more.svg",
-          "dark": "resources/dark/more.svg"
+          "light": "resources/light/globe.svg",
+          "dark": "resources/dark/globe.svg"
+        }
+      },
+      {
+        "command": "ionic-official.webOpenBrowserSelected",
+        "title": "Open in a web browser",
+        "icon": {
+          "light": "resources/light/globe-select.svg",
+          "dark": "resources/dark/globe-select.svg"
+        }
+      },
+      {
+        "command": "ionic-official.liveReload",
+        "title": "Live Reload - Refresh your app after a code change",
+        "icon": {
+          "light": "resources/light/live.svg",
+          "dark": "resources/dark/live.svg"
+        }
+      },
+      {
+        "command": "ionic-official.liveReloadSelected",
+        "title": "Live Reload - Click to turn off",
+        "icon": {
+          "light": "resources/light/live-select.svg",
+          "dark": "resources/dark/live-select.svg"
+        }
+      },
+      {
+        "command": "ionic-official.webNexus",
+        "title": "Open in Nexus Browser",
+        "icon": {
+          "light": "resources/light/nexus.svg",
+          "dark": "resources/dark/nexus.svg"
+        }
+      },
+      {
+        "command": "ionic-official.webNexusSelected",
+        "title": "Open in Nexus Browser",
+        "icon": {
+          "light": "resources/light/nexus-select.svg",
+          "dark": "resources/dark/nexus-select.svg"
+        }
+      },
+      {
+        "command": "ionic-official.webEditor",
+        "title": "Open in a VS Code window",
+        "icon": {
+          "light": "resources/light/vscode.svg",
+          "dark": "resources/dark/vscode.svg"
+        }
+      },
+      {
+        "command": "ionic-official.webEditorSelected",
+        "title": "Open in a VS Code window",
+        "icon": {
+          "light": "resources/light/vscode-select.svg",
+          "dark": "resources/dark/vscode-select.svg"
         }
       },
       {
@@ -297,10 +353,7 @@
       {
         "command": "ionic-official.selectDevice",
         "title": "Select device to run",
-        "icon": {
-          "light": "resources/light/more.svg",
-          "dark": "resources/dark/more.svg"
-        }
+        "icon": "$(device-mobile)"
       },
       {
         "command": "ionic-official.runMode",
@@ -354,7 +407,19 @@
           "when": "false"
         },
         {
-          "command": "ionic-official.webConfig",
+          "command": "ionic-official.webOpenBrowser",
+          "when": "false"
+        },
+        {
+          "command": "ionic-official.liveReload",
+          "when": "false"
+        },
+        {
+          "command": "ionic-official.webNexus",
+          "when": "false"
+        },
+        {
+          "command": "ionic-official.webEditor",
           "when": "false"
         },
         {
@@ -435,8 +500,43 @@
           "group": "inline"
         },
         {
-          "command": "ionic-official.webConfig",
-          "when": "view == ionic-tree && viewItem == webConfig",
+          "command": "ionic-official.liveReload",
+          "when": "view == ionic-tree && viewItem == selectDevice && !liveReload",
+          "group": "inline"
+        },
+        {
+          "command": "ionic-official.liveReloadSelected",
+          "when": "view == ionic-tree && viewItem == selectDevice && liveReload",
+          "group": "inline"
+        },
+        {
+          "command": "ionic-official.webOpenBrowser",
+          "when": "view == ionic-tree && viewItem == webConfig && webConfig !== WebConfigWebBrowser && webConfig",
+          "group": "inline"
+        },
+        {
+          "command": "ionic-official.webOpenBrowserSelected",
+          "when": "view == ionic-tree && viewItem == webConfig && (webConfig == WebConfigWebBrowser || !webConfig)",
+          "group": "inline"
+        },
+        {
+          "command": "ionic-official.webNexus",
+          "when": "view == ionic-tree && viewItem == webConfig && webConfig !== WebConfigNexusBrowser",
+          "group": "inline"
+        },
+        {
+          "command": "ionic-official.webNexusSelected",
+          "when": "view == ionic-tree && viewItem == webConfig && webConfig == WebConfigNexusBrowser",
+          "group": "inline"
+        },
+        {
+          "command": "ionic-official.webEditor",
+          "when": "view == ionic-tree && viewItem == webConfig && webConfig !== WebConfigEditor",
+          "group": "inline"
+        },
+        {
+          "command": "ionic-official.webEditorSelected",
+          "when": "view == ionic-tree && viewItem == webConfig && webConfig == WebConfigEditor",
           "group": "inline"
         },
         {

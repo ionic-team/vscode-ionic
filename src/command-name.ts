@@ -18,7 +18,16 @@ export enum CommandName {
   ProjectsRefresh = 'ionic-official.projectRefresh',
   ProjectSelect = 'ionic-official.projectSelect',
   BuildConfig = 'ionic-official.buildConfig',
-  WebConfig = 'ionic-official.webConfig',
+
+  LiveReload = 'ionic-official.liveReload',
+  LiveReloadSelected = 'ionic-official.liveReloadSelected',
+  WebOpenBrowser = 'ionic-official.webOpenBrowser',
+  WebOpenBrowserSelected = 'ionic-official.webOpenBrowserSelected',
+  WebEditor = 'ionic-official.webEditor',
+  WebEditorSelected = 'ionic-official.webEditorSelected',
+  WebNexusBrowser = 'ionic-official.webNexus',
+  WebNexusBrowserSelected = 'ionic-official.webNexusSelected',
+
   WebDebugConfig = 'ionic-official.webDebugConfig',
   SelectAction = 'ionic-official.selectAction',
   DebugMode = 'ionic-official.debugMode',

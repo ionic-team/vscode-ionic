@@ -28,6 +28,9 @@ export enum Context {
   // Upgrade options
   lightbulb = 'lightbulb',
 
+  // Live Reload
+  liveReload = 'liveReload',
+
   // Stop option
   stop = 'stop',
 

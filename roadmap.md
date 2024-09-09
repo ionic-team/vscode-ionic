@@ -1,13 +1,8 @@
 # Roadmap
 
-- Replace `npx ionic init` with another option
--
 - Check target sdk: make sure matches https://capacitorjs.com/docs/android/setting-target-sdk
-- cordova-plugin-file-opener2 uses AndroidX - not compatible
 - Check .gitignore and look for /android, /ios
 - Check if android/ios folder under git control and warn if not
-
-- // yarn plugin import https://mskelton.dev/yarn-outdated/v4
 
 - When adding Capacitor check if www exists and if it doesnt but dist does then set `webDir` to dist
 - When adding ios platform or android platform be sure to run sync as second step
@@ -233,7 +228,7 @@ Check `main.ts` for `provideIonicAngular` and apply this if missing
 
 ## View Style
 
-Alterantive visual web views:
+Alternative visual web views:
 
 - Run iOS, Android - Show lists of devices and option to run as live reload
 - Splash, Icon, Settings - Named Configuration allow visuals

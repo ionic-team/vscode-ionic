@@ -184,7 +184,7 @@ export async function run(
         pub = new Publisher('devapp', auxData, portFrom(externalUrl), externalUrl.startsWith('https'));
       }
       pub.start().then(() => {
-        if (config == WebConfigSetting.welcome || config == WebConfigSetting.welcomeNoBrowser) {
+        if (config == WebConfigSetting.nexus) {
           qrView(externalUrl);
         }
       });

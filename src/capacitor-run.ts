@@ -156,7 +156,7 @@ async function capRun(
 
   let post = '';
   if (liveReload) {
-    const serveCmd = await ionicServe(project, true, false);
+    const serveCmd = await ionicServe(project, true, false, true);
     post = ` & ${serveCmd}`;
   }
   return `${pre}${npx(project)} ${ionic}cap run ${platform} --target=${InternalCommand.target} ${capRunFlags}${post}`;

@@ -18,13 +18,19 @@ import { join } from 'path';
 
 /**
  * Create the ionic serve command
+ * @param  {boolean} isNative Whether we are serving iOS or Android (for live reload)
  * @returns string
  */
-export async function ionicServe(project: Project, dontOpenBrowser: boolean, isDebugging?: boolean): Promise<string> {
+export async function ionicServe(
+  project: Project,
+  dontOpenBrowser: boolean,
+  isDebugging?: boolean,
+  isNative?: boolean,
+): Promise<string> {
   ionicState.lastRun = undefined;
   switch (project.repoType) {
     case MonoRepoType.none:
-      return ionicCLIServe(project, dontOpenBrowser, isDebugging);
+      return ionicCLIServe(project, dontOpenBrowser, isDebugging, isNative);
     case MonoRepoType.nx:
       return nxServe(project);
     case MonoRepoType.npm:
@@ -38,21 +44,26 @@ export async function ionicServe(project: Project, dontOpenBrowser: boolean, isD
   }
 }
 
-async function ionicCLIServe(project: Project, dontOpenBrowser: boolean, isDebugging?: boolean): Promise<string> {
+async function ionicCLIServe(
+  project: Project,
+  dontOpenBrowser: boolean,
+  isDebugging?: boolean,
+  isNative?: boolean,
+): Promise<string> {
   const preop = preflightNPMCheck(project);
   const httpsForWeb = getSetting(WorkspaceSetting.httpsForWeb);
   const webConfig: WebConfigSetting = getWebConfiguration();
   const externalIP = !getExtSetting(ExtensionSetting.internalAddress);
   const defaultPort: number | undefined = workspace.getConfiguration('ionic').get('defaultPort');
   let serveFlags = '';
-  if (webConfig == WebConfigSetting.editor || webConfig == WebConfigSetting.welcomeNoBrowser || dontOpenBrowser) {
+  if ([WebConfigSetting.editor, WebConfigSetting.nexus, WebConfigSetting.none].includes(webConfig) || dontOpenBrowser) {
     serveFlags += ' --no-open';
   } else {
     serveFlags += ' --open';
   }
 
   if (externalIP) {
-    serveFlags += ` ${await externalArg(project.frameworkType)}`;
+    serveFlags += ` ${await externalArg(isNative)}`;
   } else {
     serveFlags += ` ${internalArg(project.frameworkType)}`;
   }
@@ -162,16 +173,15 @@ function internalArg(framework: FrameworkType): string {
   }
 }
 
-async function externalArg(framework: FrameworkType): Promise<string> {
-  const host = await selectExternalIPAddress();
-  return `--host=${host}`;
+async function externalArg(isNative?: boolean): Promise<string> {
+  const liveReload = getSetting(WorkspaceSetting.liveReload);
+  if (liveReload && isNative) {
+    const host = await selectExternalIPAddress();
+    return `--host=${host}`;
+  } else {
+    return '--host=0.0.0.0';
+  }
   return `--host=${bestAddress()}`;
-  // switch (framework) {
-  //   case 'angular-standalone':
-  //     return '--host=0.0.0.0';
-  //   default:
-  //     return '--host=0.0.0.0';
-  // }
 }
 
 function bestAddress(): string {
