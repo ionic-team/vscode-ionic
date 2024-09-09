@@ -28,6 +28,7 @@ jobs:
           npm install
           cd ../ionic-start
           npm install
+          npm install -g @vscode/vsce
 
       - name: Lint
         run: |
