@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.94.0",
+  "version": "1.94.1",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -591,6 +591,17 @@
           "scope": "application",
           "default": false,
           "description": "Whether to avoid using an external IP Address when using Live Reload"
+        },
+        "ionic.autoImportIcons": {
+          "type": "string",
+          "scope": "workspace",
+          "enum": [
+            "yes",
+            "no",
+            ""
+          ],
+          "default": "",
+          "description": "Whether to automatically import ion-icons for this project."
         },
         "ionic.manualNewProjects": {
           "type": "boolean",
