@@ -392,7 +392,7 @@ async function settings(queueFunction: QueueFunction) {
 
 export function debugOnWeb(project: Project): Tip {
   return new Tip('Web', `(${getDebugBrowserName()})`, TipType.Debug, 'Serve', undefined, 'Debugging', `Project Served`)
-    .setDynamicCommand(ionicServe, project, true)
+    .setDynamicCommand(ionicServe, project, true, true)
     .setFeatures([TipFeature.debugOnWeb])
     .setRunPoints([
       { title: 'Building...', text: 'Generating browser application bundles' },

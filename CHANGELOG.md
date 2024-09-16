@@ -4,6 +4,7 @@
 
 - Options for running in the web browser, VS Code editor, Nexus browser added as icons
 - Fix to ensure running for web will run on localhost
+- Ensure using a development build when debugging
 
 ### Version 1.93.4
 
