@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.95
+
+- Support for NextJS projects using static exports with an `out` folder
+
 ### Version 1.94
 
 - Options for running in the web browser, VS Code editor, Nexus browser added as icons
