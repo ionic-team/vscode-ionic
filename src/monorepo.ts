@@ -393,7 +393,11 @@ function checkFolder(filename: string): FolderType {
       pck?.dependencies?.['@capacitor/android'] ||
       pck?.dependencies?.['@angular/core']
     );
-    return isIonic ? FolderType.hasIonic : pck.dependencies ? FolderType.hasDependencies : FolderType.unknown;
+    return isIonic
+      ? FolderType.hasIonic
+      : pck.dependencies || pck.devDependencies
+        ? FolderType.hasDependencies
+        : FolderType.unknown;
   } catch {
     return FolderType.unknown;
   }

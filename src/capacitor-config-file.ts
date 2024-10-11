@@ -42,6 +42,8 @@ export function getCapacitorConfigDistFolder(folder: string): string {
       result = 'dist';
     } else if (existsSync(join(folder, 'build'))) {
       result = 'build';
+    } else if (existsSync(join(folder, 'out'))) {
+      result = 'out';
     }
   }
   if (!result) {

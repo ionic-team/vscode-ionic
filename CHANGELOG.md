@@ -1,5 +1,11 @@
 ## Changelog
 
+### Version 1.95
+
+- Support for NextJS projects using static exports with an `out` folder
+- Support for Non-Ionic projects using `serve`, `build` and `start` scripts
+- Support for Capacitor Plugin monorepos
+
 ### Version 1.94
 
 - Options for running in the web browser, VS Code editor, Nexus browser added as icons

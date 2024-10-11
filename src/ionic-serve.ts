@@ -124,13 +124,15 @@ function guessServeCommand(project: Project): string | undefined {
     const packageFile = JSON.parse(readFileSync(filename, 'utf8'));
     if (packageFile.scripts['ionic:serve']) {
       return npmRun('ionic:serve');
-    }
-    if (packageFile.scripts?.serve) {
+    } else if (packageFile.scripts?.serve) {
       return npmRun('serve');
+    } else if (packageFile.scripts?.start) {
+      return npmRun('start');
     }
   }
   return undefined;
 }
+
 async function findNextPort(port: number, host: string | undefined): Promise<number> {
   let availablePort = port;
   while (await isPortInUse(availablePort, host)) {

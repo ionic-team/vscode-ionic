@@ -110,6 +110,8 @@ function guessBuildCommand(project: Project): string | undefined {
     const packageFile = JSON.parse(readFileSync(filename, 'utf8'));
     if (packageFile.scripts['ionic:build']) {
       return npmRun('ionic:build');
+    } else if (packageFile.scripts['build']) {
+      return npmRun('build');
     }
   }
   return undefined;
