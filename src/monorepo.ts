@@ -239,12 +239,10 @@ function getFolderBasedProjects(prj: Project): Array<MonoRepoProject> {
       likelyFolderBasedMonoRepo = true;
     }
   }
-  if (!likelyFolderBasedMonoRepo) {
-    return [];
-  }
+
   const rootFolderType = checkFolder(join(prj.folder, 'package.json'));
   if (rootFolderType == FolderType.hasIonic) {
-    if (prj.folder == projects[0].path) {
+    if (projects.length == 0 || prj.folder == projects[0].path) {
       // Sub folder is the root folder (eg ionic multi-app without a root)
     } else {
       // Its definitely an Ionic or Capacitor project in the root but we have sub folders that look like Ionic projects so throw error

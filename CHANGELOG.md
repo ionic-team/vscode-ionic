@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.96
+
+- For build command use `--` to ensure parameters are passed
+- Support for folder based monorepos with Non-Ionic projects
+
 ### Version 1.95
 
 - Support for NextJS projects using static exports with an `out` folder
