@@ -65,6 +65,12 @@ function build(
 ): string {
   let cmd = `${npx(project)} ${buildCmd(project)}`;
   if (configurationArg) {
+    if (cmd.includes('npm run ')) {
+      // This adds -- if the command is npm run build but does not if it is something like ng build
+      cmd += ' -- --';
+    } else if (cmd.includes('run ')) {
+      cmd += ' --';
+    }
     cmd += ` ${configurationArg}`;
   } else if (prod) {
     cmd += ' --prod';
