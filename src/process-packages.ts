@@ -3,7 +3,7 @@ import { Command, Tip, TipType } from './tip';
 import { Project } from './project';
 import { getRunOutput, getStringFrom, setAllStringIn, stripJSON, tEnd, tStart } from './utilities';
 import { NpmDependency, NpmOutdatedDependency, NpmPackage, PackageType, PackageVersion } from './npm-model';
-import { listCommand, outdatedCommand } from './node-commands';
+import { listCommand, outdatedCommand, PackageManager } from './node-commands';
 import {
   CapProjectCache,
   LastManifestCheck,
@@ -14,7 +14,7 @@ import {
 import { join } from 'path';
 import { ionicState } from './ionic-tree-provider';
 import { write, writeError, writeWarning } from './logging';
-import { fixYarnV1Outdated, fixModernYarnList, fixYarnOutdated } from './monorepo';
+import { fixYarnV1Outdated, fixModernYarnList, fixYarnOutdated, MonoRepoType } from './monorepo';
 import { ExtensionContext, window } from 'vscode';
 import { existsSync, lstatSync, readFileSync, readdirSync } from 'fs';
 import { execSync } from 'child_process';

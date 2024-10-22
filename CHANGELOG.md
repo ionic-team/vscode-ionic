@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.97
+
+- Fix for Modern yarn monorepos
+
 ### Version 1.96
 
 - For build command use `--` to ensure parameters are passed
