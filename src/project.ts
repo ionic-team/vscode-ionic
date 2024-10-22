@@ -651,7 +651,7 @@ export async function inspectProject(
 
   const project: Project = new Project('My Project');
   project.folder = folder;
-  project.packageManager = getPackageManager(folder);
+  project.packageManager = getPackageManager(folder, project.repoType);
   ionicState.packageManager = project.packageManager;
   ionicState.rootFolder = folder;
   ionicState.projectRef = project;
@@ -677,7 +677,8 @@ export async function inspectProject(
 
   if (project.monoRepo?.folder) {
     // Use the package manager from the monorepo project
-    project.packageManager = getPackageManager(project.monoRepo.folder);
+    project.packageManager = getPackageManager(project.monoRepo.folder, project.repoType);
+
     ionicState.packageManager = project.packageManager;
   }
   if (project.monoRepo?.localPackageJson) {
@@ -726,7 +727,7 @@ function guessFramework(project: Project) {
   }
 }
 
-function getPackageManager(folder: string): PackageManager {
+function getPackageManager(folder: string, monoRepoType: MonoRepoType): PackageManager {
   const yarnLock = join(folder, 'yarn.lock');
   const pnpmLock = join(folder, 'pnpm-lock.yaml');
   const bunLock = join(folder, 'bun.lockb');
@@ -736,6 +737,14 @@ function getPackageManager(folder: string): PackageManager {
     return PackageManager.pnpm;
   } else if (existsSync(bunLock)) {
     return PackageManager.bun;
+  }
+
+  if (monoRepoType == MonoRepoType.yarn) {
+    const packageLock = join(folder, 'package-lock.json');
+    if (!packageLock) {
+      // Its a yarn monorepo so use yarn as package manager
+      return PackageManager.yarn;
+    }
   }
   return PackageManager.npm;
 }
