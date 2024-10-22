@@ -741,7 +741,8 @@ function getPackageManager(folder: string, monoRepoType: MonoRepoType): PackageM
 
   if (monoRepoType == MonoRepoType.yarn) {
     const packageLock = join(folder, 'package-lock.json');
-    if (!packageLock) {
+
+    if (!existsSync(packageLock)) {
       // Its a yarn monorepo so use yarn as package manager
       return PackageManager.yarn;
     }
