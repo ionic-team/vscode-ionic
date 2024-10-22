@@ -65,7 +65,7 @@ function build(
 ): string {
   let cmd = `${npx(project)} ${buildCmd(project)}`;
   if (configurationArg) {
-    if (cmd.includes('npm run ')) {
+    if (cmd.includes('npm run ionic:build')) {
       // This adds -- if the command is npm run build but does not if it is something like ng build
       cmd += ' -- --';
     } else if (cmd.includes('run ')) {
