@@ -9,7 +9,7 @@ import { getPnpmWorkspaces } from './monorepos-pnpm';
 import { PackageManager } from './node-commands';
 import { getLernaWorkspaces } from './monorepos-lerna';
 import { join } from 'path';
-import { writeError, write } from './logging';
+import { write, writeWarning } from './logging';
 import { NpmDependency, NpmOutdatedDependency } from './npm-model';
 import { ExtensionContext, commands, window, workspace } from 'vscode';
 import { existsSync, readFileSync, readdirSync } from 'fs';
@@ -240,15 +240,20 @@ function getFolderBasedProjects(prj: Project): Array<MonoRepoProject> {
     }
   }
 
+  let subFolderWarning = false;
+
   const rootFolderType = checkFolder(join(prj.folder, 'package.json'));
   if (rootFolderType == FolderType.hasIonic) {
     if (projects.length == 0 || prj.folder == projects[0].path) {
       // Sub folder is the root folder (eg ionic multi-app without a root)
     } else {
       // Its definitely an Ionic or Capacitor project in the root but we have sub folders that look like Ionic projects so throw error
-      writeError(
-        `This folder has Capacitor/Ionic dependencies but there are subfolders that do too which will be ignored (eg ${exampleFolder})`,
-      );
+      if (!subFolderWarning && exampleFolder != '') {
+        writeWarning(
+          `This folder has Capacitor/Ionic dependencies but there are subfolders that do too which will be ignored (eg ${exampleFolder})`,
+        );
+        subFolderWarning = true;
+      }
 
       return [];
     }
