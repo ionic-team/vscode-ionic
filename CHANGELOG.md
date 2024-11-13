@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.98
+
+- Update dependencies
+
 ### Version 1.97
 
 - Fix for Modern yarn monorepos
