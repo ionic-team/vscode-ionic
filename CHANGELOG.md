@@ -2,6 +2,7 @@
 
 ### Version 1.99
 
+- Support for Angular 19 migration
 - Fix for yarn outdated plugin
 - Fix for Capacitor migrate with modern yarn
 

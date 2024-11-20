@@ -13,7 +13,7 @@ import { join } from 'path';
 import { peerDependencyCleanup } from './peer-dependency-cleanup';
 
 // Maximum supported Angular version that we'll suggest migrating to
-export const maxAngularVersion = '18';
+export const maxAngularVersion = '19';
 
 export function angularMigrate(project: Project, latestVersion: string): Tip | undefined {
   const current = getPackageVersion('@angular/core');
