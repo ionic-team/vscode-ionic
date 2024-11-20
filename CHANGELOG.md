@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.99
+
+- Fix for yarn outdated plugin
+
 ### Version 1.98
 
 - Update dependencies
