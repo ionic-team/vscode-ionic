@@ -54,6 +54,24 @@ export function listCommand(project: Project): string {
   }
 }
 
+export function saveDevArgument(project: Project): string {
+  switch (project.packageManager) {
+    case PackageManager.yarn:
+      return '--dev';
+    default:
+      return '--save-dev';
+  }
+}
+
+export function installForceArgument(project: Project): string {
+  switch (project.packageManager) {
+    case PackageManager.yarn:
+      return '';
+    default:
+      return '--force';
+  }
+}
+
 export function npmInstall(name: string, ...args): string {
   const argList = args.join(' ').trim();
 

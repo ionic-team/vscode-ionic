@@ -3,6 +3,7 @@
 ### Version 1.99
 
 - Fix for yarn outdated plugin
+- Fix for Capacitor migrate with modern yarn
 
 ### Version 1.98
 

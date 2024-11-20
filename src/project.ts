@@ -11,7 +11,7 @@ import { CommandName, InternalCommand } from './command-name';
 import { angularMigrate } from './rules-angular-migrate';
 import { checkForMonoRepo, FrameworkType, MonoRepoProject, MonoRepoType } from './monorepo';
 import { CapacitorPlatform } from './capacitor-platform';
-import { addCommand, npmInstall, npmUninstall, PackageManager } from './node-commands';
+import { addCommand, npmInstall, npmUninstall, PackageManager, saveDevArgument } from './node-commands';
 import { run } from './utilities';
 import { fixIssue } from './extension';
 import { getCapacitorConfigDistFolder } from './capacitor-config-file';
@@ -474,7 +474,7 @@ export class Project {
   }
 
   public recommendAdd(name: string, title: string, message: string, description: string, devDependency: boolean) {
-    const flags = devDependency ? ' --save-dev' : undefined;
+    const flags = devDependency ? saveDevArgument(this) : undefined;
     this.add(
       new Tip(
         title,

@@ -3,7 +3,7 @@ import { join } from 'path';
 
 import { exists, isLess, isVersionGreaterOrEqual } from './analyzer';
 import { clearOutput, showOutput, write, writeError, writeIonic, writeWarning } from './logging';
-import { npmInstall, npmUninstall, npmUpdate } from './node-commands';
+import { installForceArgument, npmInstall, npmUninstall, npmUpdate, saveDevArgument } from './node-commands';
 import { inspectProject, Project } from './project';
 import { doDoes, getRunOutput, getStringFrom, plural, pluralize, run, setAllStringIn, showProgress } from './utilities';
 import { capacitorSync } from './capacitor-sync';
@@ -103,7 +103,7 @@ export async function migrateCapacitor(
   for (const minVersion of minVersions) {
     if (exists(minVersion.dep) && isLess(minVersion.dep, minVersion.version)) {
       write(`${minVersion.dep} will be updated to ${minVersion.version}`);
-      report.commands.push(npmInstall(`${minVersion.dep}@${minVersion.version}`, '--force'));
+      report.commands.push(npmInstall(`${minVersion.dep}@${minVersion.version}`, installForceArgument(project)));
     }
   }
 
@@ -151,7 +151,9 @@ export async function migrateCapacitor(
         await project.run2(command, true);
       }
     }
-    const cmd = npmInstall(`@capacitor/cli@${coreVersion} --save-dev --force`);
+    const cmd = npmInstall(
+      `@capacitor/cli@${coreVersion} ${saveDevArgument(project)} ${installForceArgument(project)}`,
+    );
     write(`> ${cmd}`);
     await project.run2(cmd, true);
     const manager = getPackageManager(ionicState.packageManager);
@@ -270,7 +272,7 @@ export async function migrateCapacitor4(
         replaceStorage = true;
       }
       if (exists('@capacitor/cli')) {
-        await project.run2(npmInstall(`@capacitor/cli@4 --save-dev --force`));
+        await project.run2(npmInstall(`@capacitor/cli@4 ${saveDevArgument(project)} ${installForceArgument(project)}`));
       }
       await project.run2(
         install(
