@@ -1,20 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import {
-  provideVSCodeDesignSystem,
-  vsCodeButton,
-  vsCodeCheckbox,
-  vsCodeLink,
-  vsCodePanelView,
-  vsCodeProgressRing,
-  vsCodeTag,
-  vsCodeRadio,
-  vsCodeRadioGroup,
-  vsCodeTextField,
-  vsCodeDivider,
-} from '@vscode/webview-ui-toolkit';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
+
 import { MessageType, sendMessage } from './utilities/messages';
 import { Template } from './utilities/template';
 import { getValue } from './utilities/dom';
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
 
 interface Framework {
   name: string;
@@ -29,26 +19,13 @@ interface Target {
   appearance: string;
 }
 
-// In order to use the Webview UI Toolkit web components they
-// must be registered with the browser (i.e. webview) using the
-// syntax below.
-provideVSCodeDesignSystem().register(
-  vsCodeButton(),
-  vsCodeTextField(),
-  vsCodePanelView(),
-  vsCodeLink(),
-  vsCodeTag(),
-  vsCodeCheckbox(),
-  vsCodeDivider(),
-  vsCodeRadio(),
-  vsCodeRadioGroup(),
-  vsCodeProgressRing(),
-);
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  standalone: true,
+  imports: [BrowserModule, FormsModule],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class AppComponent implements OnInit {
   private templates: Template[] = [];
