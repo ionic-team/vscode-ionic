@@ -1,40 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import {
-  provideVSCodeDesignSystem,
-  vsCodeButton,
-  vsCodeCheckbox,
-  vsCodeLink,
-  vsCodePanelView,
-  vsCodeProgressRing,
-  vsCodeTag,
-  vsCodeRadio,
-  vsCodeRadioGroup,
-  vsCodeTextField,
-} from '@vscode/webview-ui-toolkit';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
 import { PluginFilter, PluginService } from './plugin.service';
 import { Plugin } from './plugin-info';
 import { checked, d, setChecked } from './utilities/dom';
 import { MessageType, sendMessage } from './utilities/messages';
-
-// In order to use the Webview UI Toolkit web components they
-// must be registered with the browser (i.e. webview) using the
-// syntax below.
-provideVSCodeDesignSystem().register(
-  vsCodeButton(),
-  vsCodeTextField(),
-  vsCodePanelView(),
-  vsCodeLink(),
-  vsCodeTag(),
-  vsCodeCheckbox(),
-  vsCodeRadio(),
-  vsCodeRadioGroup(),
-  vsCodeProgressRing(),
-);
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+import { PluginComponent } from './plugin.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  standalone: true,
+  imports: [BrowserModule, FormsModule, PluginComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class AppComponent implements OnInit {
   plugins: Plugin[] = [];
