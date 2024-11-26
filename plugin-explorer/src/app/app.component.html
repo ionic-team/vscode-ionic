@@ -12,14 +12,18 @@
     <vscode-button type="submit" (click)="search()">Search</vscode-button>
   </div>
   <div class="two-col">
-    <div class="progress" *ngIf="busy">
-      <vscode-progress-ring></vscode-progress-ring>
-    </div>
+    @if (busy) {
+      <div class="progress">
+        <vscode-progress-ring></vscode-progress-ring>
+      </div>
+    }
     <div style="width: 100%" [hidden]="!plugins || busy">
       <p>{{ listTitle }}</p>
-      <div class="panel" *ngFor="let plugin of plugins">
-        <plugin [assetsUri]="assetsUri" [data]="plugin"></plugin>
-      </div>
+      @for (plugin of plugins; track plugin) {
+        <div class="panel">
+          <plugin [assetsUri]="assetsUri" [data]="plugin"></plugin>
+        </div>
+      }
       <p style="opacity: 0.5">
         The most popular open source plugins are tested and indexed. Got a plugin that isnt here?
         <vscode-link href="https://github.com/ionic-team/vscode-ionic/issues">Submit a suggestion</vscode-link>

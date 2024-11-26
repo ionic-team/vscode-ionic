@@ -11,7 +11,6 @@ import { PluginComponent } from './plugin.component';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  standalone: true,
   imports: [BrowserModule, FormsModule, PluginComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

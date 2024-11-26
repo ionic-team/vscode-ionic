@@ -23,7 +23,6 @@ interface Target {
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  standalone: true,
   imports: [BrowserModule, FormsModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
