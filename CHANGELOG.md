@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.99
+
+- Fix for dialogs of "prepare release" losing focus
+
 ### Version 1.98
 
 - Update dependencies
