@@ -117,6 +117,7 @@ async function verifySettings(
       title: 'Key store password',
       placeHolder: 'Enter key store password',
       password: true,
+      ignoreFocusOut: true,
     });
     if (!settings.keyStorePassword) return undefined;
   }
@@ -125,6 +126,7 @@ async function verifySettings(
     settings.keyAlias = await window.showInputBox({
       title: 'Key alias',
       placeHolder: 'Enter key alias',
+      ignoreFocusOut: true,
     });
     if (!settings.keyAlias) return undefined;
   }
@@ -134,6 +136,7 @@ async function verifySettings(
       title: 'Key password',
       placeHolder: 'Enter key password',
       password: true,
+      ignoreFocusOut: true,
     });
     if (!settings.keyPassword) return undefined;
   }
