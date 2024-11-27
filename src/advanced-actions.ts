@@ -7,7 +7,7 @@ import { fixGlobalScss, readAngularJson, writeAngularJson } from './rules-angula
 import { ionicState } from './ionic-tree-provider';
 import { clearIgnored } from './ignore';
 import { CommandName, InternalCommand } from './command-name';
-import { ProgressLocation, commands, window } from 'vscode';
+import { ProgressLocation, QuickPickItem, QuickPickItemKind, commands, window } from 'vscode';
 import { sep } from 'path';
 import { integratePrettier } from './prettier';
 
@@ -17,69 +17,120 @@ enum Features {
   migrateToNX = '$(outline-view-icon) Migrate to NX',
   reinstallNodeModules = '$(extensions-sync-enabled) Reinstall Node Modules',
   angularESBuild = '$(test-view-icon) Switch from WebPack to ESBuild (experimental)',
-  migrateAngularControlFlow = '$(test-view-icon) Migrate to the built-in control flow syntax',
   showIgnoredRecommendations = '$(light-bulb) Show Ignored Recommendations',
-  migrateAngularStandalone = '$(test-view-icon) Migrate to Ionic standalone components',
   lintAndFormat = '$(test-view-icon) Lint and format on commit',
 }
 
+interface AngularSchematic {
+  name: string;
+  minimumVersion: string;
+  command: string;
+  description: string;
+  commandFn?: (selection: string, project: Project) => Promise<void>;
+}
+
+const angularSchematics: AngularSchematic[] = [
+  {
+    name: '$(test-view-icon) Migrate to Ionic standalone components',
+    minimumVersion: '14.0.0',
+    description:
+      'This will replace IonicModule with individual Ionic components and icons in your project. Are you sure?',
+    command: '',
+    commandFn: migrateToAngularStandalone,
+  },
+  {
+    name: '$(test-view-icon) Migrate to signal inputs',
+    minimumVersion: '19.0.0',
+    command: `npx ng generate @angular/core:signal-input-migration --interactive=false --defaults=true --path=".${sep}"`,
+    description: 'This will change your @Input decorators to Signal Inputs. Are you sure?',
+  },
+  {
+    name: '$(test-view-icon) Migrate to the built-in control flow syntax',
+    minimumVersion: '17.0.0',
+    description: 'This will change your Angular templates to use the new built-in control flow syntax. Are you sure?',
+    command: `npx ng generate @angular/core:control-flow --interactive=false --defaults=true --path=".${sep}"`,
+  },
+  {
+    name: '$(test-view-icon) Migrate to replace @Output with Output functions',
+    minimumVersion: '19.0.0',
+    description: 'This will replace your @Output decorators with Output functions. Are you sure?',
+    command: `ng generate @angular/core:output-migration --interactive=false --defaults=true --path=".${sep}"`,
+  },
+  {
+    name: '$(test-view-icon) Migrate to use inject for dependency injection',
+    minimumVersion: '19.0.0',
+    description: 'This will replace dependency injection to use the inject function. Are you sure?',
+    command: `ng generate @angular/core:inject --interactive=false --defaults=true --path=".${sep}"`,
+  },
+  {
+    name: '$(test-view-icon) Migrate ViewChild and ContentChild to use signals',
+    minimumVersion: '19.0.0',
+    description:
+      'This will replace @ViewChild and @ContentChild decorators with the equivalent signal query. Are you sure?',
+    command: `ng generate @angular/core:signal-queries --interactive=false --defaults=true --path=".${sep}"`,
+  },
+];
+
 export async function advancedActions(project: Project) {
-  const picks: Array<Features> = [];
+  const picks: Array<QuickPickItem> = [];
   if (project.packageManager == PackageManager.npm) {
-    picks.push(Features.migrateToPNPM);
-    picks.push(Features.migrateToBun);
+    picks.push({ label: Features.migrateToPNPM });
+    picks.push({ label: Features.migrateToBun });
 
     if (isGreaterOrEqual('@angular/core', '14.0.0')) {
-      picks.push(Features.migrateToNX);
+      picks.push({ label: Features.migrateToNX });
     }
 
-    picks.push(Features.reinstallNodeModules);
+    picks.push({ label: Features.reinstallNodeModules });
   } else {
     if (project.packageManager == PackageManager.bun) {
-      picks.push(Features.reinstallNodeModules);
+      picks.push({ label: Features.reinstallNodeModules });
     }
   }
-  if (isGreaterOrEqual('@angular/core', '14.0.0')) {
-    picks.push(Features.migrateAngularStandalone);
+
+  let hasAngularSchematic = false;
+  for (const migration of angularSchematics) {
+    if (isGreaterOrEqual('@angular/core', migration.minimumVersion)) {
+      if (!hasAngularSchematic) {
+        picks.push({ label: 'Angular Migrations', kind: QuickPickItemKind.Separator });
+      }
+      picks.push({ label: migration.name });
+      hasAngularSchematic = true;
+    }
   }
-  if (isGreaterOrEqual('@angular/core', '17.0.0')) {
-    picks.push(Features.migrateAngularControlFlow);
+  if (hasAngularSchematic) {
+    picks.push({ label: '', kind: QuickPickItemKind.Separator });
   }
   if (!exists('husky') && project.isCapacitor && isGreaterOrEqual('typescript', '4.0.0')) {
-    picks.push(Features.lintAndFormat);
+    picks.push({ label: Features.lintAndFormat });
   }
 
-  picks.push(Features.showIgnoredRecommendations);
+  picks.push({ label: Features.showIgnoredRecommendations });
 
   if (isGreaterOrEqual('@angular-devkit/build-angular', '14.0.0')) {
     if (!isGreaterOrEqual('@angular/core', '17.0.0')) {
       if (!angularUsingESBuild(project)) {
-        picks.push(Features.angularESBuild);
+        picks.push({ label: Features.angularESBuild });
       }
     }
   }
   const selection = await window.showQuickPick(picks, {});
-  switch (selection) {
+  if (!selection) return;
+  switch (selection.label) {
     case Features.migrateToPNPM:
-      await runCommands(migrateToPNPM(), selection, project);
+      await runCommands(migrateToPNPM(), selection.label, project);
       break;
     case Features.migrateToBun:
-      await runCommands(migrateToBun(), selection, project);
+      await runCommands(migrateToBun(), selection.label, project);
       break;
     case Features.migrateToNX:
       await window.showInformationMessage('Run the following command: npx nx init', 'OK');
       break;
     case Features.reinstallNodeModules:
-      await runCommands(reinstallNodeModules(), selection, project);
-      break;
-    case Features.migrateAngularControlFlow:
-      migrateAngularControlFlow(selection, project);
+      await runCommands(reinstallNodeModules(), selection.label, project);
       break;
     case Features.angularESBuild:
       switchAngularToESBuild(project);
-      break;
-    case Features.migrateAngularStandalone:
-      migrateToAngularStandalone(selection, project);
       break;
     case Features.showIgnoredRecommendations:
       showIgnoredRecommendations();
@@ -87,6 +138,24 @@ export async function advancedActions(project: Project) {
     case Features.lintAndFormat:
       integratePrettier(project);
       break;
+    default:
+      angularSchematic(selection.label, project);
+      break;
+  }
+}
+
+async function angularSchematic(selection: string, project: Project) {
+  const migration = angularSchematics.find((migration) => selection == migration.name);
+  if (!migration) {
+    return;
+  }
+  if (!(await confirm(migration.description, 'Continue'))) return;
+  if (migration.commandFn) {
+    await migration.commandFn(selection, project);
+    return;
+  } else {
+    const commands = [migration.command];
+    await runCommands(commands, selection, project);
   }
 }
 
@@ -102,28 +171,7 @@ function cwd(commands: string[]): string[] {
   return commands.map((command) => `${InternalCommand.cwd}${command}`);
 }
 
-async function migrateAngularControlFlow(selection: string, project: Project) {
-  if (
-    !(await confirm(
-      'This will change your Angular templates to use the new built-in control flow syntax. Are you sure?',
-      'Continue',
-    ))
-  )
-    return;
-
-  const commands = [`npx ng generate @angular/core:control-flow --interactive=false --defaults=true --path=".${sep}"`];
-  await runCommands(commands, selection, project);
-}
-
 async function migrateToAngularStandalone(selection: string, project: Project) {
-  if (
-    !(await confirm(
-      'This will replace IonicModule with individual Ionic components and icons in your project. Are you sure?',
-      'Continue',
-    ))
-  )
-    return;
-
   const commands = ['npx @ionic/angular-standalone-codemods --non-interactive'];
   if (isGreaterOrEqual('@ionic/angular', '7.0.0')) {
     if (isLess('@ionic/angular', '7.5.1')) {
