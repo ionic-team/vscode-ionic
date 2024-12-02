@@ -323,8 +323,8 @@ async function installYarnPlugin(queueFunction: QueueFunction, project: Project)
   }
   queueFunction();
   const url = project.yarnVersion?.startsWith('3')
-    ? `yarn plugin import https://mskelton.dev/yarn-outdated/v3`
-    : `yarn plugin import https://mskelton.dev/yarn-outdated/v4`;
+    ? `yarn plugin import https://go.mskelton.dev/yarn-outdated/v3`
+    : `yarn plugin import https://go.mskelton.dev/yarn-outdated/v4`;
   const result = await getRunOutput(url, project.projectFolder());
   write(result);
 }

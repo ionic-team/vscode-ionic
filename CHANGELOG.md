@@ -1,5 +1,13 @@
 ## Changelog
 
+### Version 1.99
+
+- Support for Angular 19 migration
+- Fix for yarn outdated plugin
+- Fix for Capacitor migrate with modern yarn
+- Fix for dialogs of "prepare release" losing focus
+- Angular Schematics for migrating to Signals and inject added
+
 ### Version 1.98
 
 - Update dependencies

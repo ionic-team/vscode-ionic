@@ -1,13 +1,12 @@
 import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from '@angular/core';
 import { Plugin } from './plugin-info';
-import { NgFor, NgIf } from '@angular/common';
+
 import { StarComponent } from './star.component';
 import { vscode } from './utilities/vscode';
 
 @Component({
-  standalone: true,
   selector: 'plugin',
-  imports: [NgFor, NgIf, StarComponent],
+  imports: [StarComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   styleUrls: ['./plugin.component.css'],
   template: `
@@ -21,23 +20,31 @@ import { vscode } from './utilities/vscode';
           <h2>{{ data.title }}</h2>
           <div class="tooltip center-image">
             <span class="tooltiptext wide-tip">{{ data.tagInfo }}</span>
-            <img *ngIf="frameWorkImage" class="ionicon" [src]="frameWorkImage" />
+            @if (frameWorkImage) {
+              <img class="ionicon" [src]="frameWorkImage" />
+            }
           </div>
-          <img *ngIf="platformImage" class="ionicon" [src]="platformImage" />
+          @if (platformImage) {
+            <img class="ionicon" [src]="platformImage" />
+          }
         </div>
         <p class="subtitle">{{ data.name }} {{ installedVersion }}</p>
         <!-- <div class="tooltip">
-          <span class="tooltiptext wide-tip">{{ data.tagInfo }}</span>
-          <vscode-badge *ngFor="let tag of data.tags">{{ tag }}</vscode-badge>
-        </div> -->
+        <span class="tooltiptext wide-tip">{{ data.tagInfo }}</span>
+        <vscode-badge *ngFor="let tag of data.tags">{{ tag }}</vscode-badge>
+      </div> -->
         <p>{{ data.description }}</p>
 
         <br />
-        <vscode-button *ngIf="data.installed == data.version" disabled>Up To Date</vscode-button>
-        <vscode-button *ngIf="data.installed !== data.version" (click)="install()">{{
-          data.installed ? 'Update' : 'Install'
-        }}</vscode-button>
-        <vscode-button *ngIf="data.installed" (click)="uninstall()">Uninstall</vscode-button>
+        @if (data.installed == data.version) {
+          <vscode-button disabled>Up To Date</vscode-button>
+        }
+        @if (data.installed !== data.version) {
+          <vscode-button (click)="install()">{{ data.installed ? 'Update' : 'Install' }}</vscode-button>
+        }
+        @if (data.installed) {
+          <vscode-button (click)="uninstall()">Uninstall</vscode-button>
+        }
         <vscode-button appearance="icon" (click)="chooseVersion()">
           <img class="ionicon" [src]="assetsUri + '/chevron-down.svg'" />
         </vscode-button>
@@ -50,13 +57,21 @@ import { vscode } from './utilities/vscode';
             {{ data.ratingInfo }}</span
           >
         </star>
-        <p *ngIf="data.dailyDownloads !== '0'">{{ data.dailyDownloads }} Downloads Daily</p>
+        @if (data.dailyDownloads !== '0') {
+          <p>{{ data.dailyDownloads }} Downloads Daily</p>
+        }
         <p>{{ data.changed }}</p>
         <p>License: {{ data.license }}</p>
         <vscode-link [href]="data.moreInfoUrl">More Information</vscode-link><br />
-        <vscode-link *ngIf="data.repo && data.updated" [href]="data.repo">Source Code</vscode-link
-        ><br *ngIf="data.repo && data.updated" />
-        <vscode-link *ngIf="data.bugs" [href]="data.bugs">Report Issue</vscode-link>
+        @if (data.repo && data.updated) {
+          <vscode-link [href]="data.repo">Source Code</vscode-link>
+        }
+        @if (data.repo && data.updated) {
+          <br />
+        }
+        @if (data.bugs) {
+          <vscode-link [href]="data.bugs">Report Issue</vscode-link>
+        }
       </div>
     </div>
   `,

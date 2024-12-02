@@ -2,7 +2,7 @@
   "name": "ionic",
   "displayName": "Ionic",
   "description": "Official extension for Ionic and Capacitor development",
-  "version": "1.98.0",
+  "version": "1.99.0",
   "icon": "media/ionic.png",
   "publisher": "Ionic",
   "keywords": [
@@ -14,6 +14,9 @@
     "Web Native",
     "Android",
     "iOS",
+    "React",
+    "Vue",
+    "Angular",
     "React Native",
     "Flutter"
   ],
