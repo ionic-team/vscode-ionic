@@ -36,6 +36,7 @@ const filteredLines = [
   '◒  Install Dependencies',
   '◐  Install Dependencies',
   '◓  Install Dependencies',
+  'Getting Cookies at:',
   '[INFO] Waiting for connectivity with npm...', // Occurs during debugging
 ];
 
