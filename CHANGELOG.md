@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.100
+
+- Fix filter for cookie plugin when capturing logs from Nexus Browser
+
 ### Version 1.99
 
 - Support for Angular 19 migration
