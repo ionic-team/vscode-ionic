@@ -14,6 +14,10 @@ export interface CapacitorPluginMigrationOptions {
 }
 
 export function checkCapacitorPluginMigration(project: Project) {
+  suggestCapacitorPluginMigration('6.0.0', '7.0.0', TipType.Capacitor, project, {
+    changesLink: 'https://capacitorjs.com/docs/updating/plugins/7-0',
+    migrateCommand: '@capacitor/plugin-migration-v6-to-v7@latest',
+  });
   suggestCapacitorPluginMigration('5.0.0', '6.0.0', TipType.Capacitor, project, {
     changesLink: 'https://capacitorjs.com/docs/updating/plugins/6-0',
     migrateCommand: '@capacitor/plugin-migration-v5-to-v6@latest',

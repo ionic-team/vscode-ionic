@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.101
+
+- Capacitor 7 migration support
+- Capacitor 7 plugin migration support
+
 ### Version 1.100
 
 - Fix filter for cookie plugin when capturing logs from Nexus Browser
