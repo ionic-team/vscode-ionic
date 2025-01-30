@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.102
+
+- Remove the `--external` flag for Capacitor 7
+
 ### Version 1.101
 
 - Capacitor 7 migration support
