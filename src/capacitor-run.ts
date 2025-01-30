@@ -96,8 +96,10 @@ async function capRun(
   const ionic = '';
 
   if (externalIP) {
-    if (capRunFlags.length >= 0) capRunFlags += ' ';
-    capRunFlags += '--external';
+    if (isLess('@capacitor/core', '7.0.0')) {
+      if (capRunFlags.length >= 0) capRunFlags += ' ';
+      capRunFlags += '--external';
+    }
   }
 
   if (ionic != '' && prod) {
