@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.103
+
+- Fix for Angular 19 auto imports and standalone defaulting to true
+
 ### Version 1.102
 
 - Remove the `--external` flag for Capacitor 7
