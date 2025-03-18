@@ -137,16 +137,18 @@ export async function load(fn: string, project: Project, context: ExtensionConte
   }
   allDependencies = {
     ...packageFile.dependencies,
+    ...packageFile.peerDependencies,
     ...packageFile.devDependencies,
   };
 
   // Its a capacitor project only if its a dependency and not a dev dependency
-  project.isCapacitor = !!(
-    packageFile.dependencies &&
-    (packageFile.dependencies['@capacitor/core'] ||
-      packageFile.dependencies['@capacitor/ios'] ||
-      packageFile.dependencies['@capacitor/android'])
-  );
+  project.isCapacitor =
+    !!(
+      packageFile.dependencies &&
+      (packageFile.dependencies['@capacitor/core'] ||
+        packageFile.dependencies['@capacitor/ios'] ||
+        packageFile.dependencies['@capacitor/android'])
+    ) || !!(packageFile.peerDependencies && packageFile.peerDependencies['@capacitor/core']);
 
   project.isCordova = !!(allDependencies['cordova-ios'] || allDependencies['cordova-android'] || packageFile.cordova);
 
