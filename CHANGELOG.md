@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.104
+
+- Fix to remove no-build argument when building with Capacitor
+
 ### Version 1.103
 
 - Fix for Angular 19 auto imports and standalone defaulting to true
