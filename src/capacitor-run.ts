@@ -107,12 +107,6 @@ async function capRun(
     capRunFlags += '--prod';
   }
 
-  // Live reload clashes with --no-build
-  if (noBuild && !liveReload) {
-    if (capRunFlags.length >= 0) capRunFlags += ' ';
-    capRunFlags += '--no-build';
-  }
-
   if (noSync) {
     if (capRunFlags.length >= 0) capRunFlags += ' ';
     capRunFlags += '--no-sync';
