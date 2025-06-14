@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.105
+
+- Deprecation in favor of the WebNative extension (https://webnative.dev)
+
 ### Version 1.104
 
 - Fix to remove no-build argument when building with Capacitor

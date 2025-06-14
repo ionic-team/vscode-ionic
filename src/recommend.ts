@@ -40,12 +40,13 @@ import { cancelLastOperation } from './tasks';
 import { CommandName } from './command-name';
 import { CommandTitle } from './command-title';
 import { ExtensionContext, Uri, commands, env } from 'vscode';
+import { checkRecommendedExtensions } from './vscode-recommendation';
 
 export async function getRecommendations(project: Project, context: ExtensionContext, packages: any): Promise<void> {
   tStart('getRecommendations');
   if (project.isCapacitor) {
     project.setGroup(`Run`, `Press ${alt('R')} to run the last chosen platform or Web.`, TipType.Ionic, true);
-
+    checkRecommendedExtensions(project.folder);
     const hasCapIos = project.hasCapacitorProject(CapacitorPlatform.ios);
     const hasCapAndroid = project.hasCapacitorProject(CapacitorPlatform.android);
 
