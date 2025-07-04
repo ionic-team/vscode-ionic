@@ -1,5 +1,6 @@
 Please note that this extension has been deprecated in favor of the [WebNative.dev](https://marketplace.visualstudio.com/items?itemName=WebNative.webnative) extension and is no longer maintained. If you are experiencing issues with this extension please consider switching to the [WebNative.dev](https://marketplace.visualstudio.com/items?itemName=WebNative.webnative) extension.
 
+
 This extension for Visual Studio Code features:
 
 - [Create a Project](#creating-ionic-projects) - Start a project for `Angular`, `React` or `Vue`
